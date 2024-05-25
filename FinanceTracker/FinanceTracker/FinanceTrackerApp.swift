@@ -22,11 +22,12 @@ struct FinanceTrackerApp: App {
     
     //MARK: Methods
     init() {
-        sharedModelContainer = createModelContainer()
+        sharedModelContainer = Self.createModelContainer()
     }
     
     //MARK: Methods
-    private func createModelContainer() -> ModelContainer {
+    ///This method is static, because it is used in Previews
+    static func createModelContainer() -> ModelContainer {
         UIColorValueTransformer.register()
         
         let schema = Schema([
