@@ -141,6 +141,7 @@ final class Tag {
 }
 
 //MARK: - Transaction Model
+#warning("BalanceAccount or Category can be deleted. So it is needed to de solved")
 @Model
 final class Transaction {
     //MARK: Properties
@@ -187,7 +188,6 @@ final class Transaction {
 }
 
 //MARK: - UIColor ValueTransformer
-#warning("Needed to be registered!!!")
 @objc(UIColorValueTransformer)
 final class UIColorValueTransformer: ValueTransformer {
     //MARK: ValueTransformer Registration
