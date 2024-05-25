@@ -17,6 +17,8 @@
 		73F629162C01057100E9FEB9 /* FinanceTrackerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F629152C01057100E9FEB9 /* FinanceTrackerUITestsLaunchTests.swift */; };
 		73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */; };
 		73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F629252C0201CC00E9FEB9 /* DataManager.swift */; };
+		73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */; };
+		73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +52,8 @@
 		73F629152C01057100E9FEB9 /* FinanceTrackerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		73F629252C0201CC00E9FEB9 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeView.swift; sourceTree = "<group>"; };
+		73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +105,11 @@
 			isa = PBXGroup;
 			children = (
 				73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */,
+				73F628FC2C01057100E9FEB9 /* Assets.xcassets */,
 				73F629242C0201BB00E9FEB9 /* Services */,
 				73F629272C02095900E9FEB9 /* Views */,
 				73F629282C02096B00E9FEB9 /* ViewModels */,
 				73F6292A2C0209AF00E9FEB9 /* Extensions */,
-				73F628FC2C01057100E9FEB9 /* Assets.xcassets */,
 				73F628FE2C01057100E9FEB9 /* Preview Content */,
 			);
 			path = FinanceTracker;
@@ -148,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				73F628F82C01057000E9FEB9 /* ContentView.swift */,
+				73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -155,6 +160,7 @@
 		73F629282C02096B00E9FEB9 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -310,7 +316,9 @@
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
+				73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
+				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
