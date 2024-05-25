@@ -100,11 +100,11 @@
 		73F628F52C01057000E9FEB9 /* FinanceTracker */ = {
 			isa = PBXGroup;
 			children = (
-				73F629242C0201BB00E9FEB9 /* Services */,
 				73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */,
-				73F628F82C01057000E9FEB9 /* ContentView.swift */,
-				73F628FA2C01057000E9FEB9 /* DataModels.swift */,
-				73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */,
+				73F629242C0201BB00E9FEB9 /* Services */,
+				73F629272C02095900E9FEB9 /* Views */,
+				73F629282C02096B00E9FEB9 /* ViewModels */,
+				73F6292A2C0209AF00E9FEB9 /* Extensions */,
 				73F628FC2C01057100E9FEB9 /* Assets.xcassets */,
 				73F628FE2C01057100E9FEB9 /* Preview Content */,
 			);
@@ -139,9 +139,41 @@
 		73F629242C0201BB00E9FEB9 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				73F629252C0201CC00E9FEB9 /* DataManager.swift */,
+				73F629292C02098C00E9FEB9 /* DataManager */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		73F629272C02095900E9FEB9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				73F628F82C01057000E9FEB9 /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		73F629282C02096B00E9FEB9 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		73F629292C02098C00E9FEB9 /* DataManager */ = {
+			isa = PBXGroup;
+			children = (
+				73F629252C0201CC00E9FEB9 /* DataManager.swift */,
+				73F628FA2C01057000E9FEB9 /* DataModels.swift */,
+			);
+			path = DataManager;
+			sourceTree = "<group>";
+		};
+		73F6292A2C0209AF00E9FEB9 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
