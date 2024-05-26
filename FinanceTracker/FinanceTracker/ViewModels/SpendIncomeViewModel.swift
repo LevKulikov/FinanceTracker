@@ -63,7 +63,10 @@ final class SpendIncomeViewModel: ObservableObject {
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
         do {
-            transactions = try await dataManager.fetch(descriptor)
+            let fetchedTranses = try await dataManager.fetch(descriptor)
+            withAnimation(.snappy) {
+                transactions = fetchedTranses
+            }
         } catch {
             errorHandler?(error)
         }
