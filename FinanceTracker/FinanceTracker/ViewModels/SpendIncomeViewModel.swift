@@ -22,6 +22,9 @@ final class SpendIncomeViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        Task {
+            await fetchTransactions()
+        }
     }
     
     //MARK: - Methods
@@ -50,6 +53,7 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
         let rawValue = transactionsTypeSelected.rawValue
@@ -63,7 +67,7 @@ final class SpendIncomeViewModel: ObservableObject {
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
         do {
-            let fetchedTranses = try await dataManager.fetch(descriptor)
+            let fetchedTranses = try dataManager.fetch(descriptor)
             withAnimation(.snappy) {
                 transactions = fetchedTranses
             }
