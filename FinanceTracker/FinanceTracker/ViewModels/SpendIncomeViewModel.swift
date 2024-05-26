@@ -15,6 +15,8 @@ final class SpendIncomeViewModel: ObservableObject {
         Date.now
     }
     
+    @Published var transactionsTypeSelected: TransactionsType = .spending
+    
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager

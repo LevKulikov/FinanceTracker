@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SpendIncomeView: View {
     //MARK: Properties
+    @Namespace private var namespace
     @StateObject private var viewModel: SpendIncomeViewModel
     
     //MARK: Init
@@ -18,8 +19,10 @@ struct SpendIncomeView: View {
     
     //MARK: Computed View props
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
     }
+    
+    //MARK: Methods
 }
 
 #Preview {

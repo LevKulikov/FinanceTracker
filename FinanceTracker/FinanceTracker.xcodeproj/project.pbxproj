@@ -19,6 +19,7 @@
 		73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F629252C0201CC00E9FEB9 /* DataManager.swift */; };
 		73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */; };
 		73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */; };
+		73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F629322C039D0800E9FEB9 /* SpendIncomePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		73F629252C0201CC00E9FEB9 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeView.swift; sourceTree = "<group>"; };
 		73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeViewModel.swift; sourceTree = "<group>"; };
+		73F629322C039D0800E9FEB9 /* SpendIncomePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +155,7 @@
 			children = (
 				73F628F82C01057000E9FEB9 /* ContentView.swift */,
 				73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */,
+				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -180,6 +183,14 @@
 				73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		73F629312C039CE800E9FEB9 /* SupportingViews */ = {
+			isa = PBXGroup;
+			children = (
+				73F629322C039D0800E9FEB9 /* SpendIncomePicker.swift */,
+			);
+			path = SupportingViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -317,6 +328,7 @@
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
 				73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */,
+				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
 			);
