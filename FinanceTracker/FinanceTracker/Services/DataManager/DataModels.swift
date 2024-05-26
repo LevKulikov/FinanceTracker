@@ -141,7 +141,7 @@ final class Tag {
 }
 
 //MARK: - Transaction Model
-#warning("BalanceAccount or Category can be deleted. So it is needed to de solved")
+#warning("BalanceAccount or Category can be deleted. So it is needed to de solved. Solution:\n - For Categoreis, if user wants to delete, say him/her to replace with another Category or Defualt Unidentified, or create 'deleted' flag as property and don't show it to user anymore;\n - For BalanceAccount, create 'deleted' flag as property and don't show it to user anymore ")
 @Model
 final class Transaction {
     //MARK: Properties
