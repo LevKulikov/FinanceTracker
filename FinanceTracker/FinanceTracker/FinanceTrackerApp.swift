@@ -15,8 +15,7 @@ struct FinanceTrackerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .modelContainer(sharedModelContainer!) // ModelContainer is created in init, so it will always contain an object
+            createSpendIncomeView(container: sharedModelContainer!)
         }
     }
     
@@ -43,5 +42,13 @@ struct FinanceTrackerApp: App {
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
+    }
+    
+    @MainActor @ViewBuilder
+    private func createSpendIncomeView(container: ModelContainer) -> some View {
+        let dataManager = DataManager(container: container)
+        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
+        
+        SpendIncomeView(viewModel: viewModel)
     }
 }

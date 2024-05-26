@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
-		73F628F92C01057000E9FEB9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F82C01057000E9FEB9 /* ContentView.swift */; };
 		73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628FA2C01057000E9FEB9 /* DataModels.swift */; };
 		73F628FD2C01057100E9FEB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F628FC2C01057100E9FEB9 /* Assets.xcassets */; };
 		73F629002C01057100E9FEB9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F628FF2C01057100E9FEB9 /* Preview Assets.xcassets */; };
@@ -42,7 +41,6 @@
 /* Begin PBXFileReference section */
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerApp.swift; sourceTree = "<group>"; };
-		73F628F82C01057000E9FEB9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		73F628FA2C01057000E9FEB9 /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
 		73F628FC2C01057100E9FEB9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		73F628FF2C01057100E9FEB9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -153,7 +151,6 @@
 		73F629272C02095900E9FEB9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				73F628F82C01057000E9FEB9 /* ContentView.swift */,
 				73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
@@ -323,7 +320,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				73F628F92C01057000E9FEB9 /* ContentView.swift in Sources */,
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
