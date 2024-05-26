@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 final class SpendIncomeViewModel: ObservableObject {
     //MARK: - Properties
@@ -16,6 +17,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     @Published var transactionsTypeSelected: TransactionsType = .spending
+    @Published var transactions: [Transaction] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -23,4 +25,47 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    func save(errorHandler: ((Error) -> Void)? = nil) {
+        Task {
+            do {
+                try await dataManager.save()
+                await fetchTransactions(errorHandler: errorHandler)
+            } catch {
+                errorHandler?(error)
+            }
+        }
+    }
+    
+    func delete(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
+        Task {
+            await dataManager.delete(transaction)
+            await fetchTransactions(errorHandler: errorHandler)
+        }
+    }
+    
+    func insert(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
+        Task {
+            await dataManager.insert(transaction)
+            await fetchTransactions(errorHandler: errorHandler)
+        }
+    }
+    
+    private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
+        // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
+        let rawValue = transactionsTypeSelected.rawValue
+        
+        let predicate = #Predicate<Transaction> {
+            $0.typeRawValue == rawValue
+        }
+        
+        let descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
+        )
+        do {
+            transactions = try await dataManager.fetch(descriptor)
+        } catch {
+            errorHandler?(error)
+        }
+    }
 }
