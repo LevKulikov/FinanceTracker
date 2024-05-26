@@ -146,7 +146,7 @@ final class Tag {
 final class Transaction {
     //MARK: Properties
     @Attribute(.unique) let id: String
-    var typeRawValue: String
+    private(set) var typeRawValue: String
     var comment: String
     var value: Float
     var date: Date
