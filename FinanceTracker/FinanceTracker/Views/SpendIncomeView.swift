@@ -21,13 +21,19 @@ struct SpendIncomeView: View {
     var body: some View {
         ScrollView {
             VStack {
-                ForEach(0..<20) { index in
-                    Rectangle()
-                        .fill(viewModel.transactionsTypeSelected == .spending ? .red : .green)
-                        .frame(width: 350, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
-                        .onTapGesture {
-                            print("Tap rect \(index)")
+                ForEach(viewModel.transactions) { transaction in
+                    VStack(alignment: .leading) {
+                        Text(transaction.typeRawValue)
+                        HStack {
+                            Text("\(transaction.value)")
+                                .padding(.trailing, 40)
+                            
+                            Text("\(transaction.date)")
                         }
+                    }
+                    .onTapGesture {
+                        deleteTransaction(transaction)
+                    }
                 }
                 
                 Rectangle()
@@ -81,7 +87,7 @@ struct SpendIncomeView: View {
     @ViewBuilder
     private var addButton: some View {
         Button {
-            
+            createTestTransaction()
         } label: {
             Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
                 .background {
@@ -94,6 +100,23 @@ struct SpendIncomeView: View {
     }
     
     //MARK: Methods
+    private func createTestTransaction() {
+        viewModel.insert(
+            Transaction(
+                type: viewModel.transactionsTypeSelected,
+                comment: "",
+                value: 1000,
+                date: Date.now,
+                balanceAccount: BalanceAccount(name: "Test BalanceAccount", currency: "RUB", balance: 100_000, iconName: "", color: .yellow),
+                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Category", iconName: "", color: .purple),
+                tags: []
+            )
+        )
+    }
+    
+    private func deleteTransaction(_ transaction: Transaction) {
+        viewModel.delete(transaction)
+    }
 }
 
 #Preview {
