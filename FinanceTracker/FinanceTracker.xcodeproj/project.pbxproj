@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */; };
 		736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */; };
+		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
 		73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628FA2C01057000E9FEB9 /* DataModels.swift */; };
 		73F628FD2C01057100E9FEB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F628FC2C01057100E9FEB9 /* Assets.xcassets */; };
@@ -43,6 +44,7 @@
 /* Begin PBXFileReference section */
 		736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeCell.swift; sourceTree = "<group>"; };
 		736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeView.swift; sourceTree = "<group>"; };
+		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerApp.swift; sourceTree = "<group>"; };
 		73F628FA2C01057000E9FEB9 /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
@@ -156,8 +158,8 @@
 			isa = PBXGroup;
 			children = (
 				73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */,
-				73F629312C039CE800E9FEB9 /* SupportingViews */,
 				736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */,
+				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -166,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */,
+				736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */,
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
