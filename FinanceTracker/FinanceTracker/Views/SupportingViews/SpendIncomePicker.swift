@@ -17,7 +17,7 @@ struct SpendIncomePicker: View {
                 .background {
                     if transactionsTypeSelected == .spending {
                         Capsule()
-                            .fill(LinearGradient(colors: [.red, .red.opacity(0.2)], startPoint: .leading, endPoint: .trailing))
+                            .fill(LinearGradient(colors: [.red, .red.opacity(0.35)], startPoint: .leading, endPoint: .trailing))
                             .padding(-10)
                             .matchedGeometryEffect(id: "transactionsTypeSelect", in: namespace)
                     }
@@ -32,7 +32,7 @@ struct SpendIncomePicker: View {
                 .background {
                     if transactionsTypeSelected == .income {
                         Capsule()
-                            .fill(LinearGradient(colors: [.green.opacity(0.2), .green], startPoint: .leading, endPoint: .trailing))
+                            .fill(LinearGradient(colors: [.green.opacity(0.35), .green], startPoint: .leading, endPoint: .trailing))
                             .padding(-10)
                             .matchedGeometryEffect(id: "transactionsTypeSelect", in: namespace)
                     }
