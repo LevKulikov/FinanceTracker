@@ -7,12 +7,37 @@
 
 import SwiftUI
 
+enum ActionWithTransaction {
+    case none
+    case add
+    case update(Transaction)
+}
+
 struct AddingSpendIcomeView: View {
+    //MARK: Properties
+    @ObservedObject var viewModel: SpendIncomeViewModel
+    @Binding var action: ActionWithTransaction
+    
+    //MARK: Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
+        }
     }
+    
+    //MARK: Computed View Props
+    
+    
+    //MARK: Methods
+    
 }
 
 #Preview {
-    AddingSpendIcomeView()
+    let container = FinanceTrackerApp.createModelContainer()
+    let dataManager = DataManager(container: container)
+    let viewModel = SpendIncomeViewModel(dataManager: dataManager)
+    
+    @State var action: ActionWithTransaction = .add
+    
+    return AddingSpendIcomeView(viewModel: viewModel, action: $action)
 }
