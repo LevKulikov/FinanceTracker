@@ -16,7 +16,13 @@ final class SpendIncomeViewModel: ObservableObject {
         Date.now
     }
     
-    @Published var transactionsTypeSelected: TransactionsType = .spending
+    @Published var transactionsTypeSelected: TransactionsType = .spending {
+        didSet {
+            Task {
+                await fetchTransactions()
+            }
+        }
+    }
     @Published var transactions: [Transaction] = []
     
     //MARK: - Initializer
