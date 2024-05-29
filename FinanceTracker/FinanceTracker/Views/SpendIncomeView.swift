@@ -22,18 +22,16 @@ struct SpendIncomeView: View {
         ScrollView {
             VStack {
                 ForEach(viewModel.transactions) { transaction in
-                    VStack(alignment: .leading) {
-                        Text(transaction.typeRawValue)
-                        HStack {
-                            Text("\(transaction.value)")
-                                .padding(.trailing, 40)
-                            
-                            Text("\(transaction.date)")
+                    SpendIncomeCell(transaction: transaction)
+                        .onTapGesture {
+                            deleteTransaction(transaction)
                         }
-                    }
-                    .onTapGesture {
-                        deleteTransaction(transaction)
-                    }
+                        .scrollTransition { content, phase in
+                            content
+                                .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
+                                .scaleEffect(phase.isIdentity ? 1 : 0.7)
+                                .opacity(phase.isIdentity ? 1 : 0)
+                        }
                 }
                 
                 Rectangle()
@@ -105,10 +103,11 @@ struct SpendIncomeView: View {
             Transaction(
                 type: viewModel.transactionsTypeSelected,
                 comment: "",
-                value: 1000,
+                value: 100000,
                 date: Date.now,
-                balanceAccount: BalanceAccount(name: "Test BalanceAccount", currency: "RUB", balance: 100_000, iconName: "", color: .yellow),
-                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Category", iconName: "", color: .purple),
+                balanceAccount: BalanceAccount(name: "Test BalanceAccount", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
+                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Cat", iconName: "testIcon", 
+                                   color: viewModel.transactionsTypeSelected == .spending ? .red : .green),
                 tags: []
             )
         )
