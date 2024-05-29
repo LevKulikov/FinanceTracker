@@ -9,6 +9,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+protocol Named {
+    var name: String { get set }
+}
+
 enum TransactionsType: String, CaseIterable {
     case spending = "Spendings"
     case income = "Income"
@@ -16,7 +20,7 @@ enum TransactionsType: String, CaseIterable {
 
 //MARK: - BalanceAccount Model
 @Model
-final class BalanceAccount {
+final class BalanceAccount: Named {
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String
@@ -54,7 +58,7 @@ final class BalanceAccount {
 
 //MARK: - Category Model
 @Model
-final class Category {
+final class Category: Named {
     //MARK: Properties
     @Attribute(.unique) let id: String
     var typeRawValue: String
@@ -104,7 +108,7 @@ final class Category {
 
 //MARK: - Tag Model
 @Model
-final class Tag {
+final class Tag: Named {
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String
