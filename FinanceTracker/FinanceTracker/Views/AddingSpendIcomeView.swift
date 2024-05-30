@@ -7,16 +7,17 @@
 
 import SwiftUI
 
-enum ActionWithTransaction {
-    case none
-    case add
-    case update(Transaction)
-}
-
 struct AddingSpendIcomeView: View {
     //MARK: Properties
-    @ObservedObject var viewModel: SpendIncomeViewModel
     @Binding var action: ActionWithTransaction
+    @StateObject private var viewModel: AddingSpendIcomeViewModel
+    
+    //MARK: Init
+    init(action: Binding<ActionWithTransaction>, viewModel: AddingSpendIcomeViewModel) {
+        self._action = action
+        self._viewModel = StateObject(wrappedValue: viewModel)
+        viewModel.action = self.action
+    }
     
     //MARK: Body
     var body: some View {
@@ -35,9 +36,10 @@ struct AddingSpendIcomeView: View {
 #Preview {
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
-    let viewModel = SpendIncomeViewModel(dataManager: dataManager)
+    let transactionsTypeSelected: TransactionsType = .spending
+    let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
     
     @State var action: ActionWithTransaction = .add
     
-    return AddingSpendIcomeView(viewModel: viewModel, action: $action)
+    return AddingSpendIcomeView(action: $action, viewModel: viewModel)
 }

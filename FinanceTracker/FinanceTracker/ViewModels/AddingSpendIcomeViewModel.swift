@@ -25,6 +25,32 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     //MARK: Properties
     private let dataManager: any DataManagerProtocol
     weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
+    var action: ActionWithTransaction = .none {
+        didSet {
+            switch action {
+            case .none, .add:
+                break
+                //TODO: set default values to balanceAccount
+            case .update(let transaction):
+                transactionToUpdate = transaction
+                setTransactionPropertiesToViewModel(transaction: transaction)
+            }
+        }
+    }
+    /// Used only when action is update, otherwise - crash
+    private var transactionToUpdate: Transaction!
+    @Published var availableCategories: [Category] = []
+    @Published var availableTags: [Tag] = []
+    @Published var availableBalanceAccounts: [BalanceAccount] = [] {
+        
+        didSet {
+            print(availableCategories.count)
+            print(availableTags.count)
+            print(availableBalanceAccounts.count)
+        }
+    }
+    
+    //MARK: Transaction Props
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
             delegate?.transactionsTypeReselected(to: transactionsTypeSelected)
@@ -33,9 +59,12 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             }
         }
     }
-    @Published var categories: [Category] = []
+    @Published var comment: String = ""
+    @Published var value: Float = 0
+    @Published var date: Date = .now
+    @Published var balanceAccount: BalanceAccount = .emptyBalanceAccount
+    @Published var category: Category?
     @Published var tags: [Tag] = []
-    @Published var balanceAccounts: [BalanceAccount] = []
     
     //MARK: Initializer
     init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType) {
@@ -62,44 +91,44 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             $0.typeRawValue == rawValue
         }
         
-        guard let fetchedCategories = await fetch(withPredicate: predicate) else {
+        guard let fetchedCategories = await fetch(withPredicate: predicate, sortWithString: \.name) else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
         
         withAnimation(.snappy) {
-            categories = fetchedCategories
+            availableCategories = fetchedCategories
         }
     }
     
     @MainActor
     private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedTags: [Tag] = await fetch(withPredicate: nil) else {
+        guard let fetchedTags: [Tag] = await fetch(sortWithString: \.name) else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
         }
         
         withAnimation(.snappy) {
-            tags = fetchedTags
+            availableTags = fetchedTags
         }
     }
     
     @MainActor
     private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch(withPredicate: nil) else {
+        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch(sortWithString: \.name) else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
         
         withAnimation(.snappy) {
-            balanceAccounts = fetchedBalanceAccounts
+            availableBalanceAccounts = fetchedBalanceAccounts
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>?) async -> [T]? where T: PersistentModel, T: Named {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
-            sortBy: [SortDescriptor<T>(\.name)]
+            sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]
         )
         
         do {
@@ -109,5 +138,17 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             print(error.localizedDescription)
             return nil
         }
+    }
+    
+    private func setTransactionPropertiesToViewModel(transaction: Transaction) {
+        if let trType = transaction.type, trType != transactionsTypeSelected {
+            transactionsTypeSelected = trType
+        }
+        comment = transaction.comment
+        value = transaction.value
+        date = transaction.date
+        balanceAccount = transaction.balanceAccount
+        category = transaction.category
+        tags = transaction.tags
     }
 }

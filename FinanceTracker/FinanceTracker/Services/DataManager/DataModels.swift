@@ -20,7 +20,9 @@ enum TransactionsType: String, CaseIterable {
 
 //MARK: - BalanceAccount Model
 @Model
-final class BalanceAccount: Named {
+final class BalanceAccount {
+    static let emptyBalanceAccount = BalanceAccount(name: "empty", currency: "RUB", balance: 0, iconName: "", color: .clear)
+    
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String
@@ -58,7 +60,9 @@ final class BalanceAccount: Named {
 
 //MARK: - Category Model
 @Model
-final class Category: Named {
+final class Category {
+    static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear)
+    
     //MARK: Properties
     @Attribute(.unique) let id: String
     var typeRawValue: String
@@ -108,7 +112,7 @@ final class Category: Named {
 
 //MARK: - Tag Model
 @Model
-final class Tag: Named {
+final class Tag {
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String

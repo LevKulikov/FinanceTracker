@@ -7,10 +7,17 @@
 
 import SwiftUI
 
+enum ActionWithTransaction {
+    case none
+    case add
+    case update(Transaction)
+}
+
 struct SpendIncomeView: View {
     //MARK: Properties
     @Namespace private var namespace
     @StateObject private var viewModel: SpendIncomeViewModel
+    @State private var actionSelected: ActionWithTransaction = .none
     
     //MARK: Init
     init(viewModel: SpendIncomeViewModel) {
@@ -19,33 +26,44 @@ struct SpendIncomeView: View {
     
     //MARK: Computed View props
     var body: some View {
-        ScrollView {
-            VStack {
-                ForEach(viewModel.transactions) { transaction in
-                    SpendIncomeCell(transaction: transaction)
-                        .onTapGesture {
-                            deleteTransaction(transaction)
-                        }
-                        .scrollTransition { content, phase in
-                            content
-                                .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
-                                .scaleEffect(phase.isIdentity ? 1 : 0.7)
-                                .opacity(phase.isIdentity ? 1 : 0)
-                        }
+        ZStack {
+            ScrollView {
+                VStack {
+                    ForEach(viewModel.transactions) { transaction in
+                        SpendIncomeCell(transaction: transaction)
+                            .onTapGesture {
+//                                deleteTransaction(transaction)
+                                withAnimation {
+                                    actionSelected = .update(transaction)
+                                }
+                            }
+                            .scrollTransition { content, phase in
+                                content
+                                    .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.7)
+                                    .opacity(phase.isIdentity ? 1 : 0)
+                            }
+                    }
+                    
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 40)
+                }
+                .safeAreaInset(edge: .top) {
+                    spendIncomePicker
                 }
                 
-                Rectangle()
-                    .fill(.clear)
-                    .frame(height: 40)
             }
-            .safeAreaInset(edge: .top) {
-                spendIncomePicker
+            .scrollIndicators(.hidden)
+            .overlay(alignment: .bottom) {
+                addButton
             }
             
-        }
-        .scrollIndicators(.hidden)
-        .overlay(alignment: .bottom) {
-            addButton
+            if case .add = actionSelected {
+                viewModel.getAddUpdateView(forAction: $actionSelected)
+            } else if case .update(_) = actionSelected {
+                viewModel.getAddUpdateView(forAction: $actionSelected)
+            }
         }
     }
     
@@ -85,7 +103,10 @@ struct SpendIncomeView: View {
     @ViewBuilder
     private var addButton: some View {
         Button {
-            createTestTransaction()
+//            createTestTransaction()
+            withAnimation {
+                actionSelected = .add
+            }
         } label: {
             Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
                 .background {

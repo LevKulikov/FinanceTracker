@@ -59,6 +59,12 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
+    @ViewBuilder
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>) -> some View {
+        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
+        AddingSpendIcomeView(action: forAction, viewModel: viewModel)
+    }
+    
     @MainActor
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)

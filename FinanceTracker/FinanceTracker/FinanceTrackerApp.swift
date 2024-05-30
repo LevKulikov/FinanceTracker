@@ -16,6 +16,7 @@ struct FinanceTrackerApp: App {
     var body: some Scene {
         WindowGroup {
             createSpendIncomeView(container: sharedModelContainer!)
+//            createAddingView(container: sharedModelContainer!)
         }
     }
     
@@ -51,4 +52,13 @@ struct FinanceTrackerApp: App {
         
         SpendIncomeView(viewModel: viewModel)
     }
+    
+    @MainActor @ViewBuilder
+    private func createAddingView(container: ModelContainer) -> some View {
+        let dataManager = DataManager(container: container)
+        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: .spending)
+        
+        AddingSpendIcomeView(action: .constant(.add), viewModel: viewModel)
+    }
+    
 }
