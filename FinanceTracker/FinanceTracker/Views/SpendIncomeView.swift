@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum ActionWithTransaction {
+enum ActionWithTransaction: Equatable {
     case none
     case add
     case update(Transaction)
@@ -18,6 +18,8 @@ struct SpendIncomeView: View {
     @Namespace private var namespace
     @StateObject private var viewModel: SpendIncomeViewModel
     @State private var actionSelected: ActionWithTransaction = .none
+    @State private var transactionIdSelected: String = ""
+    @State private var tapEnabled = true
     
     //MARK: Init
     init(viewModel: SpendIncomeViewModel) {
@@ -30,10 +32,12 @@ struct SpendIncomeView: View {
             ScrollView {
                 VStack {
                     ForEach(viewModel.transactions) { transaction in
-                        SpendIncomeCell(transaction: transaction)
+                        SpendIncomeCell(transaction: transaction, namespace: namespace)
                             .onTapGesture {
-//                                deleteTransaction(transaction)
-                                withAnimation {
+                                guard tapEnabled else { return }
+                                tapEnabled = false
+                                transactionIdSelected = transaction.id
+                                withAnimation(.snappy(duration: 0.5)) {
                                     actionSelected = .update(transaction)
                                 }
                             }
@@ -58,11 +62,16 @@ struct SpendIncomeView: View {
             .overlay(alignment: .bottom) {
                 addButton
             }
+            .onChange(of: actionSelected) {
+                if case .none = actionSelected {
+                    enableTapsWithDeadline()
+                }
+            }
             
             if case .add = actionSelected {
-                viewModel.getAddUpdateView(forAction: $actionSelected)
+                viewModel.getAddUpdateView(forAction: $actionSelected, namespace: namespace)
             } else if case .update(_) = actionSelected {
-                viewModel.getAddUpdateView(forAction: $actionSelected)
+                viewModel.getAddUpdateView(forAction: $actionSelected, namespace: namespace)
             }
         }
     }
@@ -80,6 +89,7 @@ struct SpendIncomeView: View {
                 Spacer()
                 
                 SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
+                    .matchedGeometryEffect(id: "picker", in: namespace)
                     .scaleEffect(scaleProgress, anchor: .top)
                     .scaleEffect(reversedScaleProgress, anchor: .top)
                     .offset(y: yOffset)
@@ -103,8 +113,9 @@ struct SpendIncomeView: View {
     @ViewBuilder
     private var addButton: some View {
         Button {
-//            createTestTransaction()
-            withAnimation {
+            guard tapEnabled else { return }
+            tapEnabled = false
+            withAnimation(.snappy(duration: 0.5)) {
                 actionSelected = .add
             }
         } label: {
@@ -112,6 +123,7 @@ struct SpendIncomeView: View {
                 .background {
                     Capsule()
                         .fill(.thinMaterial)
+                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                         .padding(.horizontal, -30)
                         .padding(.vertical, -15)
                 }
@@ -136,6 +148,12 @@ struct SpendIncomeView: View {
     
     private func deleteTransaction(_ transaction: Transaction) {
         viewModel.delete(transaction)
+    }
+    
+    private func enableTapsWithDeadline() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            tapEnabled = true
+        }
     }
 }
 

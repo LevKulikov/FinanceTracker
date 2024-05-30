@@ -37,18 +37,10 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             }
         }
     }
-    /// Used only when action is update, otherwise - crash
-    private var transactionToUpdate: Transaction!
+    var transactionToUpdate: Transaction?
     @Published var availableCategories: [Category] = []
     @Published var availableTags: [Tag] = []
-    @Published var availableBalanceAccounts: [BalanceAccount] = [] {
-        
-        didSet {
-            print(availableCategories.count)
-            print(availableTags.count)
-            print(availableBalanceAccounts.count)
-        }
-    }
+    @Published var availableBalanceAccounts: [BalanceAccount] = []
     
     //MARK: Transaction Props
     @Published var transactionsTypeSelected: TransactionsType = .spending {

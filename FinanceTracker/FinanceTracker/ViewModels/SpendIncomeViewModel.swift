@@ -60,9 +60,9 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     @ViewBuilder
-    func getAddUpdateView(forAction: Binding<ActionWithTransaction>) -> some View {
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
         let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
-        AddingSpendIcomeView(action: forAction, viewModel: viewModel)
+        AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
     }
     
     @MainActor
