@@ -14,6 +14,10 @@ struct AddingSpendIcomeView: View {
     @Binding var action: ActionWithTransaction
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
+    @FocusState private var valueTextFieldFocus
+    private var namespaceIdCompetion: String {
+        viewModel.transactionToUpdate == nil ? "empty" : viewModel.transactionToUpdate!.id
+    }
     
     //MARK: Init
     init(action: Binding<ActionWithTransaction>, namespace: Namespace.ID, viewModel: AddingSpendIcomeViewModel) {
@@ -44,6 +48,9 @@ struct AddingSpendIcomeView: View {
                 SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
                     .matchedGeometryEffect(id: "picker", in: namespace)
                 
+                valueTextField
+                    .padding(.bottom)
+                
                 categoryPickerSection
                 
 //                Image(viewModel.category?.iconName ?? "")
@@ -57,15 +64,41 @@ struct AddingSpendIcomeView: View {
                 Spacer()
             }
         }
+        .scrollDismissesKeyboard(.immediately)
         .background {
             Rectangle()
                 .fill(.background)
                 .ignoresSafeArea()
                 .matchedGeometryEffect(id: "buttonBackground", in: namespace)
         }
+        .onTapGesture(perform: dismissKeyboardFocus)
     }
     
     //MARK: Computed View Props
+    private var valueTextField: some View {
+        HStack {
+            TextField("0", text: $viewModel.valueString)
+                .focused($valueTextFieldFocus)
+                .keyboardType(.decimalPad)
+                .autocorrectionDisabled()
+                .onChange(of: viewModel.valueString, onChangeOfValueString)
+                .font(.title)
+            
+            Text(viewModel.balanceAccount.currency)
+                .font(.title2)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15.0)
+                .fill(.ultraThinMaterial)
+                .onTapGesture {
+                    valueTextFieldFocus = true
+                }
+        }
+        .padding(.horizontal, 10)
+    }
+    
     private var categoryPickerSection: some View {
         VStack(spacing: 0) {
             HStack {
@@ -211,6 +244,30 @@ struct AddingSpendIcomeView: View {
                         .font(.title2)
                 }
                 .frame(width: frameDimention - 10, height: frameDimention - 10)
+        }
+    }
+    
+    private func dismissKeyboardFocus() {
+        valueTextFieldFocus = false
+    }
+    
+    private func onChangeOfValueString() {
+        var copyString = viewModel.valueString
+        guard !copyString.isEmpty else { return }
+        
+        if copyString.contains(",") {
+            copyString.replace(",", with: ".")
+        }
+        
+        guard let floatValue = Float(copyString) else {
+            viewModel.valueString = ""
+            return
+        }
+        
+        viewModel.value = floatValue
+        
+        if let firstChar = copyString.first, firstChar == "0" {
+            viewModel.valueString.removeFirst()
         }
     }
 }

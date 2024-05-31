@@ -53,6 +53,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     @Published var comment: String = ""
+    @Published var valueString: String = ""
     @Published var value: Float = 0
     @Published var date: Date = .now
     @Published var balanceAccount: BalanceAccount = .emptyBalanceAccount
@@ -139,6 +140,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
         comment = transaction.comment
         value = transaction.value
+        valueString = String(value).replacing(".", with: ",")
         date = transaction.date
         balanceAccount = transaction.balanceAccount
         category = transaction.category

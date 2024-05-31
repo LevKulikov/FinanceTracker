@@ -22,15 +22,17 @@ struct SpendIncomeCell: View {
             Spacer()
             
             HStack(alignment: .bottom) {
-                Text(transaction.value.description)
+                Text(String(transaction.value).replacing(".", with: ","))
                     .font(.title3)
                     .bold()
                     .lineLimit(1)
+                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
                 
                 Text(transaction.balanceAccount.currency)
                     .font(.footnote)
                     .padding(.bottom, 2.6)
                     .lineLimit(1)
+                    .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
             }
         }
         .padding()
