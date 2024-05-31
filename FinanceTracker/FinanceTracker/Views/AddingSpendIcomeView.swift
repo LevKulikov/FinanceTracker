@@ -32,34 +32,36 @@ struct AddingSpendIcomeView: View {
         ScrollView {
             VStack {
                 HStack {
-                    Button("Cancel", systemImage: "xmark") {
+                    Spacer()
+                    
+                    SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
+                        .matchedGeometryEffect(id: "picker", in: namespace)
+                        .scaleEffect(0.9)
+                    
+                    Spacer()
+                }
+                .overlay(alignment: .leading) {
+                    Button("", systemImage: "xmark") {
                         withAnimation(.snappy(duration: 0.5)) {
                             action = .none
                         }
                     }
-                    .buttonBorderShape(.capsule)
+                    .font(.title)
+                    .buttonBorderShape(.circle)
                     .buttonStyle(.bordered)
                     .foregroundStyle(.secondary)
-                    
-                    Spacer()
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 10)
+                .padding(.bottom)
                 
-                SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
-                    .matchedGeometryEffect(id: "picker", in: namespace)
                 
                 valueTextField
                     .padding(.bottom)
                 
                 categoryPickerSection
+                    .padding(.bottom)
                 
-//                Image(viewModel.category?.iconName ?? "")
-//                    .resizable()
-//                    .matchedGeometryEffect(
-//                        id: "image" + (viewModel.transactionToUpdate == nil ? "empty" : viewModel.transactionToUpdate!.id),
-//                        in: namespace
-//                    )
-//                    .frame(width: 60, height: 60)
+                balanceAccountPicker
                 
                 Spacer()
             }
@@ -84,7 +86,9 @@ struct AddingSpendIcomeView: View {
                 .onChange(of: viewModel.valueString, onChangeOfValueString)
                 .font(.title)
                 .onSubmit {
-                    viewModel.valueString = AppFormatters.numberFormatterWithDecimals.string(for: viewModel.value) ?? ""
+                    viewModel.valueString = AppFormatters
+                        .numberFormatterWithDecimals
+                        .string(for: viewModel.value) ?? ""
                 }
             
             Text(viewModel.balanceAccount.currency)
@@ -148,6 +152,29 @@ struct AddingSpendIcomeView: View {
         .sheet(isPresented: $showMoreCategories) {
             wideCategoryPickerView
         }
+    }
+    
+    private var balanceAccountPicker: some View {
+        HStack {
+            Text("Balance Account")
+                .font(.title2)
+                .fontWeight(.medium)
+                .layoutPriority(1)
+            
+            Spacer()
+            
+            Menu(viewModel.balanceAccount.name) {
+                Picker("", selection: $viewModel.balanceAccount) {
+                    ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
+                        Text(balanceAcc.name)
+                            .tag(balanceAcc)
+                    }
+                }
+            }
+            .buttonStyle(.bordered)
+            .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
     }
     
     private var wideCategoryPickerView: some View {

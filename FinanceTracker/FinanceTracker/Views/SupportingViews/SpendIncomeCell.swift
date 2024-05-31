@@ -34,6 +34,7 @@ struct SpendIncomeCell: View {
                     .lineLimit(1)
                     .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
             }
+            .layoutPriority(1)
         }
         .padding()
         .background {
