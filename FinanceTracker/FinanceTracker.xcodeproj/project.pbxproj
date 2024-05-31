@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8232C0A157E006C7B0F /* AppFormatters.swift */; };
 		736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */; };
 		736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */; };
 		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		731EE8232C0A157E006C7B0F /* AppFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFormatters.swift; sourceTree = "<group>"; };
 		736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeCell.swift; sourceTree = "<group>"; };
 		736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeView.swift; sourceTree = "<group>"; };
 		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 		73F629242C0201BB00E9FEB9 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				731EE8232C0A157E006C7B0F /* AppFormatters.swift */,
 				73F629292C02098C00E9FEB9 /* DataManager */,
 			);
 			path = Services;
@@ -336,6 +339,7 @@
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
 				73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */,
 				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
+				731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,

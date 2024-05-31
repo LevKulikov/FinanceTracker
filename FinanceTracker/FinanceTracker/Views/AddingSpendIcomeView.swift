@@ -83,6 +83,9 @@ struct AddingSpendIcomeView: View {
                 .autocorrectionDisabled()
                 .onChange(of: viewModel.valueString, onChangeOfValueString)
                 .font(.title)
+                .onSubmit {
+                    viewModel.valueString = AppFormatters.numberFormatterWithDecimals.string(for: viewModel.value) ?? ""
+                }
             
             Text(viewModel.balanceAccount.currency)
                 .font(.title2)
@@ -257,6 +260,10 @@ struct AddingSpendIcomeView: View {
         
         if copyString.contains(",") {
             copyString.replace(",", with: ".")
+        }
+        
+        if copyString.contains(" ") {
+            copyString.replace(" ", with: "")
         }
         
         guard let floatValue = Float(copyString) else {

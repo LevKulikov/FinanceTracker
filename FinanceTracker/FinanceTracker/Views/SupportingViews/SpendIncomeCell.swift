@@ -22,7 +22,7 @@ struct SpendIncomeCell: View {
             Spacer()
             
             HStack(alignment: .bottom) {
-                Text(String(transaction.value).replacing(".", with: ","))
+                Text(AppFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
                     .font(.title3)
                     .bold()
                     .lineLimit(1)
