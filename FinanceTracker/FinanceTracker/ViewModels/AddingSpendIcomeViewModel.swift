@@ -46,6 +46,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
             delegate?.transactionsTypeReselected(to: transactionsTypeSelected)
+            category = nil
             Task {
                 await fetchCategories()
             }

@@ -128,6 +128,7 @@ struct SpendIncomeView: View {
                         .padding(.vertical, -15)
                 }
         }
+        .offset(y: -20)
     }
     
     //MARK: Methods
