@@ -135,7 +135,7 @@ final class Tag {
         self.uiColor = uiColor
     }
     
-    convenience init(name: String, color: Color = .init(uiColor: .random) {
+    convenience init(name: String, color: Color = .init(uiColor: .random)) {
         let id = UUID().uuidString
         let uiColor = UIColor(color)
         self.init(id: id, name: name, uiColor: uiColor)
