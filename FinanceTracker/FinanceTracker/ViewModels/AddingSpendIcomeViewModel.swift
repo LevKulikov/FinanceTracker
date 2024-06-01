@@ -76,6 +76,20 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     //MARK: Methods
+    func addRemoveTag(_ tag: Tag) {
+        if tags.contains(tag) {
+            withAnimation {
+                tags.removeAll {
+                    $0 == tag
+                }
+            }
+        } else {
+            withAnimation {
+                tags.append(tag)
+            }
+        }
+    }
+    
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)

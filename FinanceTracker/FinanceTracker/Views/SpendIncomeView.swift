@@ -129,6 +129,11 @@ struct SpendIncomeView: View {
                 }
         }
         .offset(y: -20)
+        .contextMenu {
+            Button("Add test transaction") {
+                createTestTransaction()
+            }
+        }
     }
     
     //MARK: Methods
@@ -137,12 +142,12 @@ struct SpendIncomeView: View {
             Transaction(
                 type: viewModel.transactionsTypeSelected,
                 comment: "",
-                value: 100000,
+                value: 123_200,
                 date: Date.now,
-                balanceAccount: BalanceAccount(name: "Test BalanceAccount", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
-                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Cat", iconName: "testIcon", 
+                balanceAccount: BalanceAccount(name: "Test My", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
+                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Cat", iconName: "testIcon",
                                    color: viewModel.transactionsTypeSelected == .spending ? .red : .green),
-                tags: []
+                tags: [Tag(name: "first"),Tag(name: "second"),Tag(name: "third"),Tag(name: "foobartaglong"),]
             )
         )
     }

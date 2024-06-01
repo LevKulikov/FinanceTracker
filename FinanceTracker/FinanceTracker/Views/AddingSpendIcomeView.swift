@@ -65,8 +65,9 @@ struct AddingSpendIcomeView: View {
                     .padding(.bottom)
                 
                 balanceAccountPicker
+                    .padding(.bottom)
                 
-                Spacer()
+                tagsSection
             }
         }
         .scrollDismissesKeyboard(.immediately)
@@ -236,6 +237,31 @@ struct AddingSpendIcomeView: View {
         .presentationCornerRadius(30)
     }
     
+    private var tagsSection: some View {
+        VStack {
+            ScrollView(.horizontal) {
+                HStack {
+                    ForEach(viewModel.availableTags) { tag in
+                        let tagIdAdded = viewModel.tags.contains(tag)
+                        
+                        Text("# \(tag.name)")
+                            .foregroundStyle(tagIdAdded ? .primary : .secondary)
+                            .padding(.horizontal)
+                            .padding(.vertical, 5)
+                            .background {
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(tag.color.opacity(tagIdAdded ? 0.3 : 0.1))
+                            }
+                            .onTapGesture {
+                                viewModel.addRemoveTag(tag)
+                            }
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+            .contentMargins(10)
+        }
+    }
     
     //MARK: Methods
     @ViewBuilder
