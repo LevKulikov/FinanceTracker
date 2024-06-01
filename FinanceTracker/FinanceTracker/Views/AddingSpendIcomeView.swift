@@ -14,7 +14,10 @@ struct AddingSpendIcomeView: View {
     @Binding var action: ActionWithTransaction
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
+    @State private var showMoreTagsOptions = false
     @FocusState private var valueTextFieldFocus
+    @FocusState private var searchTagsTextFieldFocus
+    @FocusState private var commentTextFieldFocus
     private var namespaceIdCompetion: String {
         viewModel.transactionToUpdate == nil ? "empty" : viewModel.transactionToUpdate!.id
     }
@@ -68,14 +71,24 @@ struct AddingSpendIcomeView: View {
                     .padding(.bottom)
                 
                 tagsSection
+                
+                commentSection
             }
         }
-        .scrollDismissesKeyboard(.immediately)
         .background {
             Rectangle()
                 .fill(.background)
                 .ignoresSafeArea()
                 .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                
+                Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                    .foregroundStyle(.secondary)
+                    .labelsHidden()
+            }
         }
         .onTapGesture(perform: dismissKeyboardFocus)
     }
@@ -174,7 +187,7 @@ struct AddingSpendIcomeView: View {
                 .pickerStyle(.segmented)
                 .scaleEffect(y: 1.1)
                 
-                DatePicker("", selection: $viewModel.date, displayedComponents: .date)
+                DatePicker("", selection: $viewModel.date, in: viewModel.availableDateRange, displayedComponents: .date)
                     .labelsHidden()
             }
             .onTapGesture(count: 20) {
@@ -203,6 +216,7 @@ struct AddingSpendIcomeView: View {
             }
             .buttonStyle(.bordered)
             .lineLimit(1)
+            .foregroundStyle(.primary)
         }
         .padding(.horizontal, 10)
     }
@@ -239,18 +253,57 @@ struct AddingSpendIcomeView: View {
     
     private var tagsSection: some View {
         VStack {
+            HStack {
+                if !showMoreTagsOptions {
+                    Text("Tags and comment")
+                        .font(.title2)
+                        .fontWeight(.medium)
+                    
+                    Spacer()
+                } else {
+                    TextField("", text: $viewModel.searchText, prompt: Text("Search or add tag"))
+                        .focused($searchTagsTextFieldFocus)
+                        .background {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.secondary.opacity(0.4))
+                                .padding(-5)
+                        }
+                        .padding(.horizontal, 5)
+                }
+                
+                Button {
+                    withAnimation {
+                        showMoreTagsOptions.toggle()
+                        searchTagsTextFieldFocus = showMoreTagsOptions
+                    }
+                } label: {
+                    if showMoreTagsOptions {
+                        Label("Close", systemImage: "xmark")
+                            .labelStyle(.iconOnly)
+                            .foregroundStyle(.blue)
+                    } else {
+                        Label("More", systemImage: "chevron.left")
+                    }
+                }
+                .buttonBorderShape(.capsule)
+                .buttonStyle(.bordered)
+                .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 10)
+            
             ScrollView(.horizontal) {
                 HStack {
-                    ForEach(viewModel.availableTags) { tag in
+                    ForEach(showMoreTagsOptions ? viewModel.searchedTags : viewModel.availableTags) { tag in
                         let tagIdAdded = viewModel.tags.contains(tag)
                         
                         Text("# \(tag.name)")
                             .foregroundStyle(tagIdAdded ? .primary : .secondary)
+                            .bold(tagIdAdded)
                             .padding(.horizontal)
                             .padding(.vertical, 5)
                             .background {
                                 RoundedRectangle(cornerRadius: 7)
-                                    .fill(tag.color.opacity(tagIdAdded ? 0.3 : 0.1))
+                                    .fill(tag.color.opacity(tagIdAdded ? 0.4 : 0.15))
                             }
                             .onTapGesture {
                                 viewModel.addRemoveTag(tag)
@@ -261,6 +314,16 @@ struct AddingSpendIcomeView: View {
             .scrollIndicators(.hidden)
             .contentMargins(10)
         }
+    }
+    
+    private var commentSection: some View {
+        TextField("Comment", text: $viewModel.comment, prompt: Text("Enter comment"), axis: .vertical)
+            .lineLimit(3...5)
+            .focused($commentTextFieldFocus)
+            .padding(10)
+            .background(.gray.opacity(0.1))
+            .cornerRadius(10)
+            .padding(.horizontal, 10)
     }
     
     //MARK: Methods
@@ -334,6 +397,8 @@ struct AddingSpendIcomeView: View {
     
     private func dismissKeyboardFocus() {
         valueTextFieldFocus = false
+        searchTagsTextFieldFocus = false
+        commentTextFieldFocus = false
     }
     
     private func onChangeOfValueString() {

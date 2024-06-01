@@ -38,11 +38,15 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             setDateArray()
         }
     }
+    var availableDateRange: ClosedRange<Date> {
+        Date(timeIntervalSince1970: 0)...Date.now
+    }
     var transactionToUpdate: Transaction?
     @Published var availableCategories: [Category] = []
     @Published var availableTags: [Tag] = []
     @Published var availableBalanceAccounts: [BalanceAccount] = []
     @Published var threeDatesArray: [Date] = []
+    @Published var searchText: String = ""
     
     //MARK: Transaction Props
     @Published var transactionsTypeSelected: TransactionsType = .spending {
@@ -182,6 +186,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             }
             
             array = [prepreviousDay, previousDay, date]
+        } else if calendar.startOfDay(for: date) == calendar.startOfDay(for:availableDateRange.lowerBound) {
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: date),
+                  let nextnextDay = calendar.date(byAdding: .day, value: 2, to: date) else {
+                return
+            }
+            
+            array = [date, nextDay, nextnextDay]
         } else {
             guard let previousDay = calendar.date(byAdding: .day, value: -1, to: date),
                   let nextDay = calendar.date(byAdding: .day, value: 1, to: date) else {
@@ -193,6 +204,19 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         
         withAnimation {
             threeDatesArray = array
+        }
+    }
+}
+
+//MARK: Extension
+extension AddingSpendIcomeViewModel {
+    // This property is embed in extension as there a problem accures with another method while the property is in the class
+    var searchedTags: [Tag] {
+        guard !searchText.isEmpty else {
+            return availableTags
+        }
+        return availableTags.filter {
+            $0.name.lowercased().contains(searchText.lowercased())
         }
     }
 }
