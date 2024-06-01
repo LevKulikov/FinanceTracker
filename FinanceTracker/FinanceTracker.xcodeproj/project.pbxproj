@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8232C0A157E006C7B0F /* AppFormatters.swift */; };
+		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
 		736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */; };
 		736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */; };
 		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		731EE8232C0A157E006C7B0F /* AppFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFormatters.swift; sourceTree = "<group>"; };
+		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeCell.swift; sourceTree = "<group>"; };
 		736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeView.swift; sourceTree = "<group>"; };
 		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */,
+				731EE8252C0B88E9006C7B0F /* Date+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -337,6 +340,7 @@
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
+				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
 				73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */,
 				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */,

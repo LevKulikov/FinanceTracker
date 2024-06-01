@@ -35,12 +35,14 @@ final class AddingSpendIcomeViewModel: ObservableObject {
                 transactionToUpdate = transaction
                 setTransactionPropertiesToViewModel(transaction: transaction)
             }
+            setDateArray()
         }
     }
     var transactionToUpdate: Transaction?
     @Published var availableCategories: [Category] = []
     @Published var availableTags: [Tag] = []
     @Published var availableBalanceAccounts: [BalanceAccount] = []
+    @Published var threeDatesArray: [Date] = []
     
     //MARK: Transaction Props
     @Published var transactionsTypeSelected: TransactionsType = .spending {
@@ -55,7 +57,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     @Published var comment: String = ""
     @Published var valueString: String = ""
     @Published var value: Float = 0
-    @Published var date: Date = .now
+    @Published var date: Date = .now {
+        didSet {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                self?.setDateArray()
+            }
+        }
+    }
     @Published var balanceAccount: BalanceAccount = .emptyBalanceAccount
     @Published var category: Category?
     @Published var tags: [Tag] = []
@@ -145,5 +153,29 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         balanceAccount = transaction.balanceAccount
         category = transaction.category
         tags = transaction.tags
+    }
+    
+    private func setDateArray() {
+        let calendar = Calendar.current
+        var array: [Date] = []
+        if calendar.startOfDay(for: date) == calendar.startOfDay(for: .now) {
+            guard let prepreviousDay = calendar.date(byAdding: .day, value: -2, to: date),
+                  let previousDay = calendar.date(byAdding: .day, value: -1, to: date) else {
+                return
+            }
+            
+            array = [prepreviousDay, previousDay, date]
+        } else {
+            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: date),
+                  let nextDay = calendar.date(byAdding: .day, value: 1, to: date) else {
+                return
+            }
+            
+            array = [previousDay, date, nextDay]
+        }
+        
+        withAnimation {
+            threeDatesArray = array
+        }
     }
 }

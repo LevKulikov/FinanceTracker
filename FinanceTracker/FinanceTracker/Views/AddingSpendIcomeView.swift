@@ -61,6 +61,9 @@ struct AddingSpendIcomeView: View {
                 categoryPickerSection
                     .padding(.bottom)
                 
+                datePicker
+                    .padding(.bottom)
+                
                 balanceAccountPicker
                 
                 Spacer()
@@ -152,6 +155,32 @@ struct AddingSpendIcomeView: View {
         .sheet(isPresented: $showMoreCategories) {
             wideCategoryPickerView
         }
+    }
+    
+    private var datePicker: some View {
+        VStack(alignment: .leading) {
+            Text("Date")
+                .font(.title2)
+                .fontWeight(.medium)
+            
+            HStack {
+                Picker("ffsf", selection: $viewModel.date) {
+                    ForEach(viewModel.threeDatesArray, id: \.self) { dateToSet in
+                        Text("\(dateToSet.get(.day)) \(dateToSet.month)")
+                            .tag(dateToSet)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .scaleEffect(y: 1.1)
+                
+                DatePicker("", selection: $viewModel.date, displayedComponents: .date)
+                    .labelsHidden()
+            }
+            .onTapGesture(count: 20) {
+                // overrides tap gesture to fix ios 17.1 bug
+            }
+        }
+        .padding(.horizontal, 10)
     }
     
     private var balanceAccountPicker: some View {
