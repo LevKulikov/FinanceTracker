@@ -145,7 +145,7 @@ struct SpendIncomeView: View {
                 value: 123_200,
                 date: Date.now,
                 balanceAccount: BalanceAccount(name: "Test My", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
-                category: Category(type: viewModel.transactionsTypeSelected, name: "Test Cat", iconName: "testIcon",
+                category: Category(type: viewModel.transactionsTypeSelected, name: "Another Test Cat", iconName: "testIcon",
                                    color: viewModel.transactionsTypeSelected == .spending ? .red : .green),
                 tags: [Tag(name: "first"),Tag(name: "second"),Tag(name: "third"),Tag(name: "foobartaglong"),]
             )

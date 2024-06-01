@@ -107,7 +107,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             $0.typeRawValue == rawValue
         }
         
-        guard let fetchedCategories = await fetch(withPredicate: predicate, sortWithString: \.name) else {
+        guard let fetchedCategories = await fetch(withPredicate: predicate) else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
@@ -119,7 +119,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     
     @MainActor
     private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedTags: [Tag] = await fetch(sortWithString: \.name) else {
+        guard let fetchedTags: [Tag] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
         }
@@ -148,7 +148,10 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         )
         
         do {
-            let fetchedItems = try await dataManager.fetch(descriptor)
+            var fetchedItems = try await dataManager.fetch(descriptor)
+            if keyPath == nil {
+                fetchedItems.reverse()
+            }
             return fetchedItems
         } catch {
             print(error.localizedDescription)
