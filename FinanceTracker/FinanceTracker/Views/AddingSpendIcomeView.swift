@@ -261,7 +261,7 @@ struct AddingSpendIcomeView: View {
                     
                     Spacer()
                 } else {
-                    TextField("", text: $viewModel.searchText, prompt: Text("Search or add tag"))
+                    TextField("", text: $viewModel.searchTagText, prompt: Text("Search or add tag"))
                         .focused($searchTagsTextFieldFocus)
                         .background {
                             RoundedRectangle(cornerRadius: 10)
@@ -308,6 +308,14 @@ struct AddingSpendIcomeView: View {
                             .onTapGesture {
                                 viewModel.addRemoveTag(tag)
                             }
+                    }
+                    
+                    if viewModel.searchedTags.isEmpty && showMoreTagsOptions {
+                        Button("Add tag") {
+                            viewModel.createNewTag(andSelect: true)
+                        }
+                        .buttonStyle(.bordered)
+                        .padding(.vertical, -2)
                     }
                 }
             }

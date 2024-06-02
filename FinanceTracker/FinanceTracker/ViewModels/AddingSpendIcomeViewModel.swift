@@ -46,7 +46,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     @Published var availableTags: [Tag] = []
     @Published var availableBalanceAccounts: [BalanceAccount] = []
     @Published var threeDatesArray: [Date] = []
-    @Published var searchText: String = ""
+    @Published var searchTagText: String = ""
     
     //MARK: Transaction Props
     @Published var transactionsTypeSelected: TransactionsType = .spending {
@@ -70,7 +70,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     @Published var balanceAccount: BalanceAccount = .emptyBalanceAccount
     @Published var category: Category?
-    @Published var tags: [Tag] = []
+    @Published var tags: [Tag] = [] {
+        didSet {
+            setSelectedTagsFirstInArray(withDelay: .now() + 1.5)
+        }
+    }
     
     //MARK: Initializer
     init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType) {
@@ -91,6 +95,28 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             withAnimation {
                 tags.append(tag)
             }
+        }
+    }
+    
+    func createNewTag(andSelect: Bool) {
+        createNewTag(name: searchTagText, andSelect: andSelect)
+    }
+    
+    func createNewTag(name: String, color: Color? = nil, andSelect: Bool) {
+        guard !name.isEmpty else { return }
+        
+        let newTag: Tag
+        if let color {
+            newTag = Tag(name: name, color: color)
+        } else {
+            newTag = Tag(name: name)
+        }
+        if andSelect {
+            addRemoveTag(newTag)
+        }
+        Task {
+            await dataManager.insert(newTag)
+            await fetchTags()
         }
     }
     
@@ -206,17 +232,36 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             threeDatesArray = array
         }
     }
+    
+    private func setSelectedTagsFirstInArray(withDelay: DispatchTime) {
+        DispatchQueue.global().asyncAfter(deadline: withDelay) { [weak self] in
+            guard let self else { return }
+            var notSelectedTagsArray = self.availableTags.filter {
+                !self.tags.contains($0)
+            }
+            
+            guard !notSelectedTagsArray.isEmpty else { return }
+            
+            let firstSelectedAllTags = self.tags + notSelectedTagsArray
+            
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.availableTags = firstSelectedAllTags
+                }
+            }
+        }
+    }
 }
 
 //MARK: Extension
 extension AddingSpendIcomeViewModel {
     // This property is embed in extension as there a problem accures with another method while the property is in the class
     var searchedTags: [Tag] {
-        guard !searchText.isEmpty else {
+        guard !searchTagText.isEmpty else {
             return availableTags
         }
         return availableTags.filter {
-            $0.name.lowercased().contains(searchText.lowercased())
+            $0.name.lowercased().contains(searchTagText.lowercased())
         }
     }
 }
