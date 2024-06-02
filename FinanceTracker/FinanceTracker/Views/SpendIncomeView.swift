@@ -64,6 +64,7 @@ struct SpendIncomeView: View {
             }
             .onChange(of: actionSelected) {
                 if case .none = actionSelected {
+                    viewModel.fetchTransactions()
                     enableTapsWithDeadline()
                 }
             }
@@ -110,7 +111,6 @@ struct SpendIncomeView: View {
         .frame(height: 70)
     }
     
-    @ViewBuilder
     private var addButton: some View {
         Button {
             guard tapEnabled else { return }
@@ -120,15 +120,14 @@ struct SpendIncomeView: View {
             }
         } label: {
             Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
+                .frame(width: 200, height: 55)
                 .background {
                     Capsule()
                         .fill(.thinMaterial)
                         .matchedGeometryEffect(id: "buttonBackground", in: namespace)
-                        .padding(.horizontal, -30)
-                        .padding(.vertical, -15)
                 }
         }
-        .offset(y: -20)
+        .offset(y: -5)
         .contextMenu {
             Button("Add test transaction") {
                 createTestTransaction()
@@ -145,8 +144,8 @@ struct SpendIncomeView: View {
                 value: 123_200,
                 date: Date.now,
                 balanceAccount: BalanceAccount(name: "Test My", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
-                category: Category(type: viewModel.transactionsTypeSelected, name: "Another Test Cat", iconName: "testIcon",
-                                   color: viewModel.transactionsTypeSelected == .spending ? .red : .green),
+                category: Category(type: viewModel.transactionsTypeSelected, name: "In many", iconName: "testIcon",
+                                   color: viewModel.transactionsTypeSelected == .spending ? .yellow : .green),
                 tags: [Tag(name: "first"),Tag(name: "second"),Tag(name: "third"),Tag(name: "foobartaglong"),]
             )
         )

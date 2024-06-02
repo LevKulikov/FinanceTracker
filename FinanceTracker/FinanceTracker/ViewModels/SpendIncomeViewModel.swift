@@ -18,9 +18,7 @@ final class SpendIncomeViewModel: ObservableObject {
     
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
-            Task {
-                await fetchTransactions()
-            }
+            fetchTransactions()
         }
     }
     @Published var transactions: [Transaction] = []
@@ -28,9 +26,7 @@ final class SpendIncomeViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        Task {
-            await fetchTransactions()
-        }
+        fetchTransactions()
     }
     
     //MARK: - Methods
@@ -63,6 +59,12 @@ final class SpendIncomeViewModel: ObservableObject {
     func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
         let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
         AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
+    }
+    
+    func fetchTransactions() {
+        Task {
+            await fetchTransactions()
+        }
     }
     
     @MainActor

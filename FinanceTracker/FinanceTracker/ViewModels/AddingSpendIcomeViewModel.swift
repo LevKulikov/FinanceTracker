@@ -22,6 +22,23 @@ enum FetchErrors: Error {
 }
 
 final class AddingSpendIcomeViewModel: ObservableObject {
+    enum SaveErrors: Error {
+        case categoryIsNil
+        case valueIsZero
+        case contextSaveError
+        
+        var localizedDescription: String {
+            switch self {
+            case .categoryIsNil:
+                return "Category is not selected"
+            case .valueIsZero:
+                return "Value cannot be zero or empy"
+            case .contextSaveError:
+                return "Some save error occured"
+            }
+        }
+    }
+    
     //MARK: Properties
     private let dataManager: any DataManagerProtocol
     weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
@@ -41,7 +58,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     var availableDateRange: ClosedRange<Date> {
         Date(timeIntervalSince1970: 0)...Date.now
     }
-    var transactionToUpdate: Transaction?
+    private(set) var transactionToUpdate: Transaction?
     @Published var availableCategories: [Category] = []
     @Published var availableTags: [Tag] = []
     @Published var availableBalanceAccounts: [BalanceAccount] = []
@@ -84,6 +101,53 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     //MARK: Methods
+    /// Updates or saves new transaction
+    func saveTransaction(completionHanler: ((SaveErrors?) -> Void)? = nil) {
+        // Field checking
+        guard value > 0 else {
+            completionHanler?(.valueIsZero)
+            return
+        }
+        
+        guard let category else {
+            completionHanler?(.categoryIsNil)
+            return
+        }
+        
+        // Saving
+        if let transactionToUpdate {
+            transactionToUpdate.type = transactionsTypeSelected
+            transactionToUpdate.value = value
+            transactionToUpdate.category = category
+            transactionToUpdate.balanceAccount = balanceAccount
+            transactionToUpdate.date = date
+            transactionToUpdate.tags = tags
+            transactionToUpdate.comment = comment
+            Task {
+                do {
+                    try await dataManager.save()
+                } catch {
+                    completionHanler?(.contextSaveError)
+                }
+            }
+        } else {
+            let newTransaction = Transaction(
+                type: transactionsTypeSelected,
+                comment: comment,
+                value: value,
+                date: date,
+                balanceAccount: balanceAccount,
+                category: category,
+                tags: tags
+            )
+            Task {
+                await dataManager.insert(newTransaction)
+            }
+        }
+        
+        completionHanler?(nil)
+    }
+    
     func addRemoveTag(_ tag: Tag) {
         if tags.contains(tag) {
             withAnimation {
@@ -234,9 +298,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     private func setSelectedTagsFirstInArray(withDelay: DispatchTime) {
+        guard !tags.isEmpty else { return }
+        
         DispatchQueue.global().asyncAfter(deadline: withDelay) { [weak self] in
             guard let self else { return }
-            var notSelectedTagsArray = self.availableTags.filter {
+            let notSelectedTagsArray = self.availableTags.filter {
                 !self.tags.contains($0)
             }
             
@@ -263,5 +329,9 @@ extension AddingSpendIcomeViewModel {
         return availableTags.filter {
             $0.name.lowercased().contains(searchTagText.lowercased())
         }
+    }
+    
+    var isThereFullyIdenticalTag: Bool {
+        searchedTags.map { $0.name.lowercased() }.contains(searchTagText.lowercased())
     }
 }

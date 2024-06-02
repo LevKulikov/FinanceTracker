@@ -15,11 +15,22 @@ struct AddingSpendIcomeView: View {
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
     @State private var showMoreTagsOptions = false
+    @State private var showSaveAlert = false
+    @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
     private var namespaceIdCompetion: String {
         viewModel.transactionToUpdate == nil ? "empty" : viewModel.transactionToUpdate!.id
+    }
+    private var isAdding: Bool {
+        if case .add = action {
+            return true
+        }
+        return false
+    }
+    private var isKeyboardActive: Bool {
+        valueTextFieldFocus || searchTagsTextFieldFocus || commentTextFieldFocus
     }
     
     //MARK: Init
@@ -45,9 +56,7 @@ struct AddingSpendIcomeView: View {
                 }
                 .overlay(alignment: .leading) {
                     Button("", systemImage: "xmark") {
-                        withAnimation(.snappy(duration: 0.5)) {
-                            action = .none
-                        }
+                        closeView()
                     }
                     .font(.title)
                     .buttonBorderShape(.circle)
@@ -73,6 +82,11 @@ struct AddingSpendIcomeView: View {
                 tagsSection
                 
                 commentSection
+                    .padding(.bottom)
+                
+                Rectangle()
+                    .fill(.clear)
+                    .frame(height: 50)
             }
         }
         .background {
@@ -91,6 +105,16 @@ struct AddingSpendIcomeView: View {
             }
         }
         .onTapGesture(perform: dismissKeyboardFocus)
+        .overlay(alignment: .bottom) {
+            if !isKeyboardActive {
+                addUpdateButton
+            }
+        }
+        .alert(
+            "\(saveError?.localizedDescription ?? "Unknown error")",
+            isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
+                Button("Ok") {}
+            }
     }
     
     //MARK: Computed View Props
@@ -310,7 +334,7 @@ struct AddingSpendIcomeView: View {
                             }
                     }
                     
-                    if viewModel.searchedTags.isEmpty && showMoreTagsOptions {
+                    if !viewModel.isThereFullyIdenticalTag && showMoreTagsOptions {
                         Button("Add tag") {
                             viewModel.createNewTag(andSelect: true)
                         }
@@ -332,6 +356,27 @@ struct AddingSpendIcomeView: View {
             .background(.gray.opacity(0.1))
             .cornerRadius(10)
             .padding(.horizontal, 10)
+    }
+    
+    private var addUpdateButton: some View {
+        Button {
+            viewModel.saveTransaction { error in
+                guard let error else {
+                    closeView()
+                    return
+                }
+                saveError = error
+            }
+        } label: {
+            Label(isAdding ? "Add" : "Update", systemImage: "plus")
+                .frame(width: 170, height: 50)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .stroke(.blue)
+                }
+        }
+        .offset(y: -5)
     }
     
     //MARK: Methods
@@ -430,6 +475,12 @@ struct AddingSpendIcomeView: View {
         
         if let firstChar = copyString.first, firstChar == "0" {
             viewModel.valueString.removeFirst()
+        }
+    }
+    
+    private func closeView() {
+        withAnimation(.snappy(duration: 0.5)) {
+            action = .none
         }
     }
 }

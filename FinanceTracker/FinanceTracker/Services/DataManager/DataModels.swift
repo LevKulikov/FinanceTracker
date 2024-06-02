@@ -154,7 +154,7 @@ final class Transaction {
     var date: Date
     var balanceAccount: BalanceAccount
     var category: Category
-    var tags: [Tag]
+    var tags: [Tag] = []
     
     //MARK: Computed Properties
     var type: TransactionsType? {
@@ -179,13 +179,17 @@ final class Transaction {
         self.date = date
         self.balanceAccount = balanceAccount
         self.category = category
-        self.tags = tags
+        setTags(tags)
     }
     
     convenience init(type: TransactionsType, comment: String, value: Float, date: Date, balanceAccount: BalanceAccount, category: Category, tags: [Tag]) {
         let id = UUID().uuidString
         let typeRawValue = type.rawValue
         self.init(id: id, typeRawValue: typeRawValue, comment: comment, value: value, date: date, balanceAccount: balanceAccount, category: category, tags: tags)
+    }
+    
+    private func setTags(_ tags: [Tag]) {
+        self.tags = tags
     }
 }
 
