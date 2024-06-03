@@ -16,6 +16,7 @@ struct FinanceTrackerApp: App {
     var body: some Scene {
         WindowGroup {
             createSpendIncomeView(container: sharedModelContainer!)
+//            createAddingView(container: sharedModelContainer!)
         }
     }
     

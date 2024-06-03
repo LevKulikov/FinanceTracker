@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import Algorithms
 
 final class SpendIncomeViewModel: ObservableObject {
     //MARK: - Properties
@@ -18,9 +19,7 @@ final class SpendIncomeViewModel: ObservableObject {
     
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
-            Task {
-                await fetchTransactions()
-            }
+            fetchTransactions()
         }
     }
     @Published var transactions: [Transaction] = []
@@ -28,9 +27,7 @@ final class SpendIncomeViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        Task {
-            await fetchTransactions()
-        }
+        fetchTransactions()
     }
     
     //MARK: - Methods
@@ -47,7 +44,7 @@ final class SpendIncomeViewModel: ObservableObject {
     
     func delete(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
         Task {
-            await dataManager.delete(transaction)
+            await dataManager.deleteTransaction(transaction)
             await fetchTransactions(errorHandler: errorHandler)
         }
     }
@@ -56,6 +53,18 @@ final class SpendIncomeViewModel: ObservableObject {
         Task {
             await dataManager.insert(transaction)
             await fetchTransactions(errorHandler: errorHandler)
+        }
+    }
+    
+    @ViewBuilder
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
+        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
+        AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
+    }
+    
+    func fetchTransactions() {
+        Task {
+            await fetchTransactions()
         }
     }
     
@@ -74,6 +83,18 @@ final class SpendIncomeViewModel: ObservableObject {
         )
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
+            
+//            let calendar = Calendar.current
+//            let chunkedByCategory = fetchedTranses.grouped { $0.category }.map { $0.value }.sorted {
+//                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
+//                switch result {
+//                case .orderedDescending:
+//                    return true
+//                default:
+//                    return false
+//                }
+//            }.flatMap { $0 }
+            
             withAnimation(.snappy) {
                 transactions = fetchedTranses
             }

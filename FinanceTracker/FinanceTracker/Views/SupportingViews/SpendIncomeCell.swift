@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SpendIncomeCell: View {
     @Bindable var transaction: Transaction
+    var namespace: Namespace.ID
     
     var body: some View {
         HStack {
@@ -21,16 +22,19 @@ struct SpendIncomeCell: View {
             Spacer()
             
             HStack(alignment: .bottom) {
-                Text(transaction.value.description)
+                Text(AppFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
                     .font(.title3)
                     .bold()
                     .lineLimit(1)
+                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
                 
                 Text(transaction.balanceAccount.currency)
                     .font(.footnote)
                     .padding(.bottom, 2.6)
                     .lineLimit(1)
+                    .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
             }
+            .layoutPriority(1)
         }
         .padding()
         .background {
@@ -50,6 +54,7 @@ struct SpendIncomeCell: View {
                 .overlay {
                     Image(uiImage: uiImage)
                         .resizable()
+                        .matchedGeometryEffect(id: "image" + transaction.id, in: namespace)
                         .scaledToFit()
                         .frame(width: frameDimention - 10, height: frameDimention - 10)
                 }
@@ -69,6 +74,7 @@ struct SpendIncomeCell: View {
 }
 
 #Preview {
+    @Namespace var namespace
     let transaction = Transaction(
         type: .spending,
         comment: "",
@@ -92,5 +98,5 @@ struct SpendIncomeCell: View {
         tags: []
     )
     
-    return SpendIncomeCell(transaction: transaction)
+    return SpendIncomeCell(transaction: transaction, namespace: namespace)
 }
