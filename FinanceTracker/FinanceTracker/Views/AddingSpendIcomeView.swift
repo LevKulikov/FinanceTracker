@@ -201,35 +201,50 @@ struct AddingSpendIcomeView: View {
     }
     
     private var wideCategoryPickerView: some View {
-        VStack {
-            HStack {
-                Text("All Categories")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                Button("Close") {
-                    showMoreCategories = false
-                }
-            }
-            .padding(.top)
-            .padding(.horizontal, 25)
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
-                    ForEach(viewModel.availableCategories) { categoryToSet in
-                        CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
-                            .onTapGesture {
-                                showMoreCategories = false
-                                withAnimation {
-                                    viewModel.category = categoryToSet
-                                }
-                            }
+        NavigationStack {
+            VStack {
+                HStack {
+                    Text("All Categories")
+                        .font(.title2)
+                        .fontWeight(.medium)
+                    
+                    Spacer()
+                    
+                    Button("Close") {
+                        showMoreCategories = false
                     }
                 }
+                .padding(.top, 20)
+                .padding(.horizontal, 25)
+                
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
+                        ForEach(viewModel.availableCategories) { categoryToSet in
+                            CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
+                                .onTapGesture {
+                                    showMoreCategories = false
+                                    withAnimation {
+                                        viewModel.category = categoryToSet
+                                    }
+                                }
+                        }
+                        
+                        NavigationLink {
+                            
+                        } label: {
+                            Image(systemName: "plus")
+                                .foregroundStyle(.white)
+                                .font(.system(size: 50, weight: .medium))
+                                .padding(8)
+                                .background {
+                                    Circle()
+                                        .fill(.blue)
+                                }
+                        }
+                    }
+                }
+                .contentMargins(10, for: .scrollContent)
             }
-            .contentMargins(10, for: .scrollContent)
         }
         .presentationBackground(Material.thin)
         .presentationDetents([.medium, .large])
@@ -306,7 +321,7 @@ struct AddingSpendIcomeView: View {
                 saveError = error
             }
         } label: {
-            Label(isAdding ? "Add" : "Update", systemImage: "plus")
+            Label(isAdding ? "Add" : "Update", systemImage: isAdding ? "plus" : "pencil.and.outline")
                 .frame(width: 170, height: 50)
                 .background {
                     Capsule()

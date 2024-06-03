@@ -40,7 +40,6 @@ struct SpendIncomeCell: View {
         .background {
             RoundedRectangle(cornerRadius: 25.0)
                 .fill(.ultraThinMaterial)
-//                .matchedGeometryEffect(id: "background" + transaction.id, in: namespace, isSource: false)
         }
         .padding(.horizontal)
     }
