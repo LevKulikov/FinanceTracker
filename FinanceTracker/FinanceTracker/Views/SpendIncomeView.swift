@@ -95,15 +95,6 @@ struct SpendIncomeView: View {
                     .scaleEffect(reversedScaleProgress, anchor: .top)
                     .offset(y: yOffset)
                     .frame(maxWidth: .infinity)
-//                    .background {
-//                        Rectangle()
-//                            .fill(Material.ultraThin)
-//                            .padding(.bottom, -6)
-//                            .padding(.top, -100)
-//                            .padding(.horizontal, -20)
-//                            .offset(y:  yOffset)
-//                            .opacity(minY >= 0 ? 0 : min(((-minY / scrollViewHeight) * (scrollViewHeight / 50)), 1))
-//                    }
                 
                 Spacer()
             }

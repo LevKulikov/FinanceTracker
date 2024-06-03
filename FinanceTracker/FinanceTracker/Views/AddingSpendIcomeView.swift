@@ -79,7 +79,7 @@ struct AddingSpendIcomeView: View {
                 balanceAccountPicker
                     .padding(.bottom)
                 
-                tagsSection
+                TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
                 
                 commentSection
                     .padding(.bottom)
@@ -169,7 +169,12 @@ struct AddingSpendIcomeView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(viewModel.availableCategories) { categoryToSet in
-                            getCategoryItem(for: categoryToSet)
+                            CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
+                                .onTapGesture {
+                                    withAnimation {
+                                        viewModel.category = categoryToSet
+                                    }
+                                }
                         }
                     }
                 }
@@ -193,6 +198,42 @@ struct AddingSpendIcomeView: View {
         .sheet(isPresented: $showMoreCategories) {
             wideCategoryPickerView
         }
+    }
+    
+    private var wideCategoryPickerView: some View {
+        VStack {
+            HStack {
+                Text("All Categories")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                
+                Spacer()
+                
+                Button("Close") {
+                    showMoreCategories = false
+                }
+            }
+            .padding(.top)
+            .padding(.horizontal, 25)
+            
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
+                    ForEach(viewModel.availableCategories) { categoryToSet in
+                        CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
+                            .onTapGesture {
+                                showMoreCategories = false
+                                withAnimation {
+                                    viewModel.category = categoryToSet
+                                }
+                            }
+                    }
+                }
+            }
+            .contentMargins(10, for: .scrollContent)
+        }
+        .presentationBackground(Material.thin)
+        .presentationDetents([.medium, .large])
+        .presentationCornerRadius(30)
     }
     
     private var datePicker: some View {
@@ -245,109 +286,6 @@ struct AddingSpendIcomeView: View {
         .padding(.horizontal, 10)
     }
     
-    private var wideCategoryPickerView: some View {
-        VStack {
-            HStack {
-                Text("All Categories")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                Button("Close") {
-                    showMoreCategories = false
-                }
-            }
-            .padding(.top)
-            .padding(.horizontal, 25)
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
-                    ForEach(viewModel.availableCategories) { categoryToSet in
-                        getCategoryItem(for: categoryToSet)
-                    }
-                }
-            }
-            .contentMargins(10, for: .scrollContent)
-        }
-        .presentationBackground(Material.thin)
-        .presentationDetents([.medium, .large])
-        .presentationCornerRadius(30)
-    }
-    
-    private var tagsSection: some View {
-        VStack {
-            HStack {
-                if !showMoreTagsOptions {
-                    Text("Tags and comment")
-                        .font(.title2)
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                } else {
-                    TextField("", text: $viewModel.searchTagText, prompt: Text("Search or add tag"))
-                        .focused($searchTagsTextFieldFocus)
-                        .background {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.secondary.opacity(0.4))
-                                .padding(-5)
-                        }
-                        .padding(.horizontal, 5)
-                }
-                
-                Button {
-                    withAnimation {
-                        showMoreTagsOptions.toggle()
-                        searchTagsTextFieldFocus = showMoreTagsOptions
-                    }
-                } label: {
-                    if showMoreTagsOptions {
-                        Label("Close", systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                            .foregroundStyle(.blue)
-                    } else {
-                        Label("More", systemImage: "chevron.left")
-                    }
-                }
-                .buttonBorderShape(.capsule)
-                .buttonStyle(.bordered)
-                .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 10)
-            
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(showMoreTagsOptions ? viewModel.searchedTags : viewModel.availableTags) { tag in
-                        let tagIdAdded = viewModel.tags.contains(tag)
-                        
-                        Text("# \(tag.name)")
-                            .foregroundStyle(tagIdAdded ? .primary : .secondary)
-                            .bold(tagIdAdded)
-                            .padding(.horizontal)
-                            .padding(.vertical, 5)
-                            .background {
-                                RoundedRectangle(cornerRadius: 7)
-                                    .fill(tag.color.opacity(tagIdAdded ? 0.4 : 0.15))
-                            }
-                            .onTapGesture {
-                                viewModel.addRemoveTag(tag)
-                            }
-                    }
-                    
-                    if !viewModel.isThereFullyIdenticalTag && showMoreTagsOptions {
-                        Button("Add tag") {
-                            viewModel.createNewTag(andSelect: true)
-                        }
-                        .buttonStyle(.bordered)
-                        .padding(.vertical, -2)
-                    }
-                }
-            }
-            .scrollIndicators(.hidden)
-            .contentMargins(10)
-        }
-    }
-    
     private var commentSection: some View {
         TextField("Comment", text: $viewModel.comment, prompt: Text("Enter comment"), axis: .vertical)
             .lineLimit(3...5)
@@ -380,74 +318,6 @@ struct AddingSpendIcomeView: View {
     }
     
     //MARK: Methods
-    @ViewBuilder
-    private func getCategoryItem(for categoryToSet: Category) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(
-                    LinearGradient(
-                        stops: [.init(color: categoryToSet.color.opacity(viewModel.category == categoryToSet ? 0.4 : 0.2), location: 0.7),
-                                .init(color: categoryToSet.color, location: 1.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 100, height: 130)
-            
-            VStack {
-                Circle()
-                    .fill(
-                        LinearGradient(colors: [categoryToSet.color.opacity(viewModel.category == categoryToSet ? 0.5 : 1), categoryToSet.color.opacity(0.1)],
-                                         startPoint: .leading,
-                                         endPoint: .trailing)
-                    )
-                    .overlay {
-                        getCategoryImage(for: categoryToSet)
-                    }
-                    .frame(width: 70)
-                
-                Spacer()
-                
-                Text(categoryToSet.name)
-                    .bold(viewModel.category == categoryToSet ? true : false)
-                    .font(.footnote)
-                    .lineLimit(1)
-                    .frame(width: 90)
-            }
-            .padding(.vertical, 12)
-        }
-        .id(categoryToSet)
-        .onTapGesture {
-            showMoreCategories = false
-            withAnimation {
-                viewModel.category = categoryToSet
-            }
-        }
-        .scaleEffect(viewModel.category == categoryToSet ? 1.1 : 1)
-        .padding(.horizontal, viewModel.category == categoryToSet ? 6 : 0)
-    }
-    
-    @ViewBuilder
-    private func getCategoryImage(for categoryToSet: Category) -> some View {
-        let frameDimention: CGFloat = 50
-        
-        if let uiImage = UIImage(named: categoryToSet.iconName) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFit()
-                .frame(width: frameDimention, height: frameDimention)
-        } else {
-            Image(systemName: "circle")
-                .resizable()
-                .scaledToFit()
-                .overlay {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                }
-                .frame(width: frameDimention - 10, height: frameDimention - 10)
-        }
-    }
-    
     private func dismissKeyboardFocus() {
         valueTextFieldFocus = false
         searchTagsTextFieldFocus = false
