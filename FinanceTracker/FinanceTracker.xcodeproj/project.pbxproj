@@ -27,6 +27,7 @@
 		73F923262C0D2C10001D96D4 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 73F923252C0D2C10001D96D4 /* Algorithms */; };
 		73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F923272C0DE5A3001D96D4 /* TagsSectionView.swift */; };
 		73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F923292C0DEA70001D96D4 /* CategoryItemView.swift */; };
+		73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F9232B2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 		73F629322C039D0800E9FEB9 /* SpendIncomePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomePicker.swift; sourceTree = "<group>"; };
 		73F923272C0DE5A3001D96D4 /* TagsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsSectionView.swift; sourceTree = "<group>"; };
 		73F923292C0DEA70001D96D4 /* CategoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryItemView.swift; sourceTree = "<group>"; };
+		73F9232B2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedSpendIncomeCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +211,7 @@
 				736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */,
 				73F923272C0DE5A3001D96D4 /* TagsSectionView.swift */,
 				73F923292C0DEA70001D96D4 /* CategoryItemView.swift */,
+				73F9232B2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -360,6 +363,7 @@
 				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
+				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,

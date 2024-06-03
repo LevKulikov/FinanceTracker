@@ -184,6 +184,14 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
+    func deleteUpdatedTransaction(completionHandler: (() -> Void)?) {
+        guard let transactionToUpdate else { return }
+        Task {
+            await dataManager.deleteTransaction(transactionToUpdate)
+            completionHandler?()
+        }
+    }
+    
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)

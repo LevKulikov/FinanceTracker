@@ -15,8 +15,8 @@ struct AddingSpendIcomeView: View {
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
     @State private var showMoreTagsOptions = false
-    @State private var showSaveAlert = false
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
+    @State private var deletionAlert = false
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
@@ -25,6 +25,12 @@ struct AddingSpendIcomeView: View {
     }
     private var isAdding: Bool {
         if case .add = action {
+            return true
+        }
+        return false
+    }
+    private var isUpdating: Bool {
+        if case .update = action {
             return true
         }
         return false
@@ -54,7 +60,7 @@ struct AddingSpendIcomeView: View {
                     
                     Spacer()
                 }
-                .overlay(alignment: .leading) {
+                .overlay(alignment: .trailing) {
                     Button("", systemImage: "xmark") {
                         closeView()
                     }
@@ -62,6 +68,17 @@ struct AddingSpendIcomeView: View {
                     .buttonBorderShape(.circle)
                     .buttonStyle(.bordered)
                     .foregroundStyle(.secondary)
+                }
+                .overlay(alignment: .leading) {
+                    if isUpdating {
+                        Button("", systemImage: "trash") {
+                            deletionAlert.toggle()
+                        }
+                        .font(.title2)
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(.bordered)
+                        .foregroundStyle(.red)
+                    }
                 }
                 .padding(.horizontal, 10)
                 .padding(.bottom)
@@ -73,10 +90,22 @@ struct AddingSpendIcomeView: View {
                 categoryPickerSection
                     .padding(.bottom)
                 
+                Divider()
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                
                 datePicker
                     .padding(.bottom)
                 
+                Divider()
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                
                 balanceAccountPicker
+                    .padding(.bottom)
+                
+                Divider()
+                    .padding(.horizontal)
                     .padding(.bottom)
                 
                 TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
@@ -110,11 +139,21 @@ struct AddingSpendIcomeView: View {
                 addUpdateButton
             }
         }
-        .alert(
-            "\(saveError?.localizedDescription ?? "Unknown error")",
-            isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
-                Button("Ok") {}
+        .confirmationDialog("Delete transaction?", isPresented: $deletionAlert, titleVisibility: .visible, actions: {
+            Button("Delete", role: .destructive) {
+                viewModel.deleteUpdatedTransaction {
+                    closeView()
+                }
             }
+            Button("Cancel", role: .cancel) {}
+        }, message: {
+            Text("This action is irretable")
+        })
+        .alert("\(saveError?.localizedDescription ?? "Unknown error")",
+               isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
+            Button("Ok") {}
+        }
+        
     }
     
     //MARK: Computed View Props
@@ -130,6 +169,11 @@ struct AddingSpendIcomeView: View {
                     viewModel.valueString = AppFormatters
                         .numberFormatterWithDecimals
                         .string(for: viewModel.value) ?? ""
+                }
+                .onAppear {
+                    if isAdding {
+                        valueTextFieldFocus = true
+                    }
                 }
             
             Text(viewModel.balanceAccount.currency)
@@ -364,6 +408,7 @@ struct AddingSpendIcomeView: View {
     }
     
     private func closeView() {
+        dismissKeyboardFocus()
         withAnimation(.snappy(duration: 0.5)) {
             action = .none
         }

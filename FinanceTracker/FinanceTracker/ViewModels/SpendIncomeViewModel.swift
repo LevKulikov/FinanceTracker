@@ -49,6 +49,18 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
+    func deleteTransactions(at indexSet: IndexSet, errorHandler: ((Error) -> Void)? = nil) {
+        for index in indexSet {
+            let transactionToDelete = transactions[index]
+            Task {
+                await dataManager.deleteTransaction(transactionToDelete)
+            }
+        }
+        Task {
+            await fetchTransactions(errorHandler: errorHandler)
+        }
+    }
+    
     func insert(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await dataManager.insert(transaction)

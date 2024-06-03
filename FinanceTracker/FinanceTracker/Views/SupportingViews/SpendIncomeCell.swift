@@ -78,8 +78,8 @@ struct SpendIncomeCell: View {
     let transaction = Transaction(
         type: .spending,
         comment: "",
-        value: 1000,
-        date: .now,
+        value: 10000.0,
+        date: Date(timeIntervalSince1970: 800),
         balanceAccount:
             BalanceAccount(
                 name: "TestBA",
@@ -93,7 +93,7 @@ struct SpendIncomeCell: View {
                 type: .spending,
                 name: "TestCat",
                 iconName: "testIcon",
-                color: .cyan
+                color: .green
             ),
         tags: []
     )
