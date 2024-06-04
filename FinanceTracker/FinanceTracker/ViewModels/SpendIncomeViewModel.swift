@@ -22,7 +22,7 @@ final class SpendIncomeViewModel: ObservableObject {
             fetchTransactions()
         }
     }
-    @Published var transactions: [Transaction] = []
+    @Published var transactions: [[Transaction]] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -49,17 +49,17 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-    func deleteTransactions(at indexSet: IndexSet, errorHandler: ((Error) -> Void)? = nil) {
-        for index in indexSet {
-            let transactionToDelete = transactions[index]
-            Task {
-                await dataManager.deleteTransaction(transactionToDelete)
-            }
-        }
-        Task {
-            await fetchTransactions(errorHandler: errorHandler)
-        }
-    }
+//    func deleteTransactions(at indexSet: IndexSet, errorHandler: ((Error) -> Void)? = nil) {
+//        for index in indexSet {
+//            let transactionToDelete = transactions[index]
+//            Task {
+//                await dataManager.deleteTransaction(transactionToDelete)
+//            }
+//        }
+//        Task {
+//            await fetchTransactions(errorHandler: errorHandler)
+//        }
+//    }
     
     func insert(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
         Task {
@@ -96,19 +96,19 @@ final class SpendIncomeViewModel: ObservableObject {
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
             
-//            let calendar = Calendar.current
-//            let chunkedByCategory = fetchedTranses.grouped { $0.category }.map { $0.value }.sorted {
-//                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
-//                switch result {
-//                case .orderedDescending:
-//                    return true
-//                default:
-//                    return false
-//                }
-//            }.flatMap { $0 }
+            let calendar = Calendar.current
+            let groupedByCategory = fetchedTranses.grouped { $0.category }.map { $0.value }.sorted {
+                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
+                switch result {
+                case .orderedDescending:
+                    return true
+                default:
+                    return false
+                }
+            }
             
             withAnimation(.snappy) {
-                transactions = fetchedTranses
+                transactions = groupedByCategory
             }
         } catch {
             errorHandler?(error)

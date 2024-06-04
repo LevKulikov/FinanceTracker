@@ -31,22 +31,22 @@ struct SpendIncomeView: View {
         ZStack {
             ScrollView {
                 VStack {
-                    ForEach(viewModel.transactions) { transaction in
-                        SpendIncomeCell(transaction: transaction, namespace: namespace)
-                            .onTapGesture {
-                                guard tapEnabled else { return }
-                                tapEnabled = false
-                                transactionIdSelected = transaction.id
-                                withAnimation(.snappy(duration: 0.5)) {
-                                    actionSelected = .update(transaction)
-                                }
+                    ForEach(viewModel.transactions, id: \.self) { transactionArray in
+                        GroupedSpendIncomeCell(transactions: transactionArray, namespace: namespace) { transaction in
+                            guard tapEnabled else { return }
+                            tapEnabled = false
+                            transactionIdSelected = transaction.id
+                            withAnimation(.snappy(duration: 0.5)) {
+                                actionSelected = .update(transaction)
                             }
-                            .scrollTransition { content, phase in
-                                content
-                                    .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
-                                    .scaleEffect(phase.isIdentity ? 1 : 0.7)
-                                    .opacity(phase.isIdentity ? 1 : 0)
-                            }
+                            
+                        }
+                        .scrollTransition { content, phase in
+                            content
+                                .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
+                                .scaleEffect(phase.isIdentity ? 1 : 0.7)
+                                .opacity(phase.isIdentity ? 1 : 0)
+                        }
                     }
                     
                     Rectangle()
@@ -119,29 +119,9 @@ struct SpendIncomeView: View {
                 }
         }
         .offset(y: -5)
-        .contextMenu {
-            Button("Add test transaction") {
-                createTestTransaction()
-            }
-        }
     }
     
     //MARK: Methods
-    private func createTestTransaction() {
-        viewModel.insert(
-            Transaction(
-                type: viewModel.transactionsTypeSelected,
-                comment: "",
-                value: 123_200,
-                date: Date.now,
-                balanceAccount: BalanceAccount(name: "Test My", currency: "RUB", balance: 100_000, iconName: "testIcon", color: .yellow),
-                category: Category(type: viewModel.transactionsTypeSelected, name: "In many", iconName: "testIcon",
-                                   color: viewModel.transactionsTypeSelected == .spending ? .yellow : .green),
-                tags: [Tag(name: "first"),Tag(name: "second"),Tag(name: "third"),Tag(name: "foobartaglong"),]
-            )
-        )
-    }
-    
     private func deleteTransaction(_ transaction: Transaction) {
         viewModel.delete(transaction)
     }

@@ -302,7 +302,7 @@ struct AddingSpendIcomeView: View {
                 .fontWeight(.medium)
             
             HStack {
-                Picker("ffsf", selection: $viewModel.date) {
+                Picker("", selection: $viewModel.date) {
                     ForEach(viewModel.threeDatesArray, id: \.self) { dateToSet in
                         Text("\(dateToSet.get(.day)) \(dateToSet.month)")
                             .tag(dateToSet)
