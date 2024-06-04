@@ -34,13 +34,13 @@ struct GroupedSpendIncomeCell: View {
                     }
             } else {
                 groupCellOpenedView
-                    .transition(.blurReplace.combined(with: .push(from: .top)))
+                    .transition(.blurReplace.combined(with: .push(from: .bottom)))
             }
             
             if showAll {
                 ForEach(transactions) { transaction in
                     SpendIncomeCell(transaction: transaction, namespace: namespace)
-                        .transition(.push(from: .top))
+                        .transition(.blurReplace)
                         .onTapGesture {
                             onTapTransaction(transaction)
                         }

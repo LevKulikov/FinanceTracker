@@ -9,7 +9,7 @@ import SwiftUI
 
 enum ActionWithTransaction: Equatable {
     case none
-    case add
+    case add(Date)
     case update(Transaction)
 }
 
@@ -21,6 +21,9 @@ struct SpendIncomeView: View {
     @State private var transactionIdSelected: String = ""
     @State private var tapEnabled = true
     
+    //For drag gesture
+    @State private var dragXOffset: CGFloat = 0
+    
     //MARK: Init
     init(viewModel: SpendIncomeViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -31,15 +34,20 @@ struct SpendIncomeView: View {
         ZStack {
             ScrollView {
                 VStack {
-                    ForEach(viewModel.transactions, id: \.self) { transactionArray in
-                        GroupedSpendIncomeCell(transactions: transactionArray, namespace: namespace) { transaction in
+                    sumAndDateView
+                        .offset(x: dragXOffset)
+                    
+                    ForEach(viewModel.filteredGroupedTranactions, id: \.self) { transactionArray in
+                        GroupedSpendIncomeCell(
+                            transactions: transactionArray,
+                            namespace: namespace
+                        ) { transaction in
                             guard tapEnabled else { return }
                             tapEnabled = false
                             transactionIdSelected = transaction.id
                             withAnimation(.snappy(duration: 0.5)) {
                                 actionSelected = .update(transaction)
                             }
-                            
                         }
                         .scrollTransition { content, phase in
                             content
@@ -56,7 +64,6 @@ struct SpendIncomeView: View {
                 .safeAreaInset(edge: .top) {
                     spendIncomePicker
                 }
-                
             }
             .scrollIndicators(.hidden)
             .overlay(alignment: .bottom) {
@@ -68,6 +75,16 @@ struct SpendIncomeView: View {
                     enableTapsWithDeadline()
                 }
             }
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        let xTrans = value.translation.width
+                        dragXOffset = xTrans
+                    }
+                    .onEnded { value in
+                        onDragEnded(value: value)
+                    }
+            )
             
             if case .add = actionSelected {
                 viewModel.getAddUpdateView(forAction: $actionSelected, namespace: namespace)
@@ -77,7 +94,6 @@ struct SpendIncomeView: View {
         }
     }
     
-    @ViewBuilder
     private var spendIncomePicker: some View {
         GeometryReader { proxy in
             let minY = proxy.frame(in: .scrollView(axis: .vertical)).minY
@@ -87,6 +103,16 @@ struct SpendIncomeView: View {
             let yOffset = minY < 0 ? -minY + max((minY / 5), -5) : 0
             
             HStack {
+                Button("", systemImage: "chevron.left") {
+                    viewModel.setDate(destination: .back)
+                }
+                .labelStyle(.iconOnly)
+                .font(.title)
+                .disabled(!viewModel.movingBackwardDateAvailable)
+                .padding(.leading)
+                .scaleEffect(reversedScaleProgress, anchor: .topLeading)
+                .offset(y: yOffset)
+                
                 Spacer()
                 
                 SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
@@ -94,12 +120,59 @@ struct SpendIncomeView: View {
                     .scaleEffect(scaleProgress, anchor: .top)
                     .scaleEffect(reversedScaleProgress, anchor: .top)
                     .offset(y: yOffset)
-                    .frame(maxWidth: .infinity)
                 
                 Spacer()
+                
+                Button("", systemImage: "chevron.right") {
+                    viewModel.setDate(destination: .forward)
+                }
+                .labelStyle(.iconOnly)
+                .font(.title)
+                .disabled(!viewModel.movingForwardDateAvailable)
+                .padding(.trailing)
+                .scaleEffect(reversedScaleProgress, anchor: .topTrailing)
+                .offset(y: yOffset)
             }
         }
         .frame(height: 70)
+    }
+    
+    private var sumAndDateView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(AppFormatters.numberFormatterWithDecimals.string(for: viewModel.transactionsValueSum) ?? "NaN")
+                    .font(.title)
+                    .bold()
+                    .layoutPriority(1)
+                
+                Spacer()
+                
+                DatePicker("", selection: $viewModel.dateSelected.animation(.snappy(duration: 0.5)), in: viewModel.availableDateRange, displayedComponents: .date)
+                    .frame(maxWidth: 125)
+                    .contentShape([.hoverEffect, .contextMenuPreview], RoundedRectangle(cornerRadius: 8.0))
+                    .contextMenu {
+                        Button("Current date") {
+                            withAnimation {
+                                viewModel.dateSelected = .now
+                            }
+                        }
+                    }
+            }
+            
+            if viewModel.filteredGroupedTranactions.isEmpty {
+                Text("No \(viewModel.transactionsTypeSelected.rawValue) for this date")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top)
+            }
+        }
+        .padding(.horizontal, 20)
+        .scrollTransition { content, phase in
+            content
+                .scaleEffect(phase.isIdentity ? 1 : 0.7, anchor: .leading)
+                .opacity(phase.isIdentity ? 1 : 0)
+        }
     }
     
     private var addButton: some View {
@@ -107,7 +180,7 @@ struct SpendIncomeView: View {
             guard tapEnabled else { return }
             tapEnabled = false
             withAnimation(.snappy(duration: 0.5)) {
-                actionSelected = .add
+                actionSelected = .add(viewModel.dateSelected)
             }
         } label: {
             Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
@@ -129,6 +202,30 @@ struct SpendIncomeView: View {
     private func enableTapsWithDeadline() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             tapEnabled = true
+        }
+    }
+    
+    private func getScreenSize() -> CGSize {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
+        return windowScene.screen.bounds.size
+    }
+    
+    private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
+        let xTrans = value.translation.width
+        let screenWidth = getScreenSize().width
+        // plus is back, minus is forward
+        if abs(xTrans) > screenWidth / 2.5 {
+            if xTrans > 0, viewModel.movingBackwardDateAvailable {
+                dragXOffset = -screenWidth - 20
+            } else if viewModel.movingForwardDateAvailable {
+                dragXOffset = screenWidth + 20
+            }
+            
+            viewModel.setDate(destination: xTrans > 0 ? .back : .forward)
+        }
+            
+        withAnimation {
+            dragXOffset = 0
         }
     }
 }

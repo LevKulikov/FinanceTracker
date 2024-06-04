@@ -422,7 +422,7 @@ struct AddingSpendIcomeView: View {
     let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
     
     @Namespace var namespace
-    @State var action: ActionWithTransaction = .add
+    @State var action: ActionWithTransaction = .add(.now)
     
     return AddingSpendIcomeView(action: $action, namespace: namespace, viewModel: viewModel)
 }

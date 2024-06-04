@@ -11,10 +11,49 @@ import SwiftData
 import Algorithms
 
 final class SpendIncomeViewModel: ObservableObject {
+    enum DateSettingDestination {
+        case back
+        case forward
+    }
+    
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
-    var currentDate: Date {
-        Date.now
+    let calendar = Calendar.current
+    var transactionsValueSum: Float {
+        filteredGroupedTranactions.flatMap{$0}.map{$0.value}.reduce(0, +)
+    }
+    var availableDateRange: ClosedRange<Date> {
+        Date(timeIntervalSince1970: 0)...Date.now
+    }
+    var movingBackwardDateAvailable: Bool {
+        guard let backDate = calendar.date(byAdding: .day, value: -1, to: dateSelected) else {
+            return false
+        }
+        return availableDateRange.contains(backDate)
+    }
+    var movingForwardDateAvailable: Bool {
+        guard let forwardDate = calendar.date(byAdding: .day, value: 1, to: dateSelected) else {
+            return false
+        }
+        return availableDateRange.contains(forwardDate)
+    }
+    var filteredGroupedTranactions: [[Transaction]] {
+        let filteredGroupedByCategory = transactions
+            .filter {
+                calendar.isDate($0.date, equalTo: dateSelected, toGranularity: .day)
+            }
+            .grouped { $0.category }
+            .map { $0.value }
+            .sorted {
+                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
+                switch result {
+                case .orderedDescending:
+                    return true
+                default:
+                    return false
+                }
+            }
+        return filteredGroupedByCategory
     }
     
     @Published var transactionsTypeSelected: TransactionsType = .spending {
@@ -22,7 +61,8 @@ final class SpendIncomeViewModel: ObservableObject {
             fetchTransactions()
         }
     }
-    @Published var transactions: [[Transaction]] = []
+    @Published var transactions: [Transaction] = []
+    @Published var dateSelected: Date = .now
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -68,10 +108,19 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-    @ViewBuilder
+    func setDate(destination: DateSettingDestination) {
+        guard let newDate = calendar.date(byAdding: .day, value: destination == .back ? -1 : 1, to: dateSelected),
+              availableDateRange.contains(newDate) else { return }
+        withAnimation {
+            dateSelected = newDate
+        }
+    }
+    
     func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
         let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
-        AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
+        viewModel.delegate = self
+        
+        return AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
     }
     
     func fetchTransactions() {
@@ -96,22 +145,22 @@ final class SpendIncomeViewModel: ObservableObject {
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
             
-            let calendar = Calendar.current
-            let groupedByCategory = fetchedTranses.grouped { $0.category }.map { $0.value }.sorted {
-                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
-                switch result {
-                case .orderedDescending:
-                    return true
-                default:
-                    return false
-                }
-            }
-            
             withAnimation(.snappy) {
-                transactions = groupedByCategory
+                transactions = fetchedTranses
             }
         } catch {
             errorHandler?(error)
         }
+    }
+}
+
+//MARK: Extension for AddingSpendIcomeViewModelDelegate
+extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
+    func addedNewTransaction(_ transaction: Transaction) {}
+    
+    func updateTransaction(_ transaction: Transaction) {}
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        transactionsTypeSelected = newType
     }
 }
