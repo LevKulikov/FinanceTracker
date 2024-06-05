@@ -38,6 +38,7 @@ struct AddingSpendIcomeView: View {
     private var isKeyboardActive: Bool {
         valueTextFieldFocus || searchTagsTextFieldFocus || commentTextFieldFocus
     }
+    private var userIdiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
     //MARK: Init
     init(action: Binding<ActionWithTransaction>, namespace: Namespace.ID, viewModel: AddingSpendIcomeViewModel) {
@@ -118,11 +119,29 @@ struct AddingSpendIcomeView: View {
                     .frame(height: 50)
             }
         }
+        .frame(maxWidth: 600, maxHeight: 900)
+        .background {
+            if userIdiom == .phone {
+                Rectangle()
+                    .fill(.background)
+                    .ignoresSafeArea()
+                    .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+            } else {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(.background)
+                    .ignoresSafeArea()
+                    .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+                    .shadow(color: .gray.opacity(0.5), radius: 30)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             Rectangle()
-                .fill(.background)
+                .fill(.ultraThinMaterial)
                 .ignoresSafeArea()
-                .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+                .onTapGesture {
+                    closeView()
+                }
         }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
@@ -153,7 +172,6 @@ struct AddingSpendIcomeView: View {
                isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
             Button("Ok") {}
         }
-        
     }
     
     //MARK: Computed View Props
