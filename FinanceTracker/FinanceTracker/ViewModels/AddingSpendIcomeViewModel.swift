@@ -194,6 +194,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
+    func getAddingCategoryView() -> some View {
+        let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionsTypeSelected)
+        viewModel.delegate = self
+        
+        return AddingCategoryView(viewModel: viewModel)
+    }
+    
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)
@@ -329,7 +336,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
 }
 
-//MARK: Extension
+//MARK: Fixing Extension
 extension AddingSpendIcomeViewModel {
     // This property is embed in extension as there a problem accures with another method while the property is in the class
     var searchedTags: [Tag] {
@@ -343,5 +350,14 @@ extension AddingSpendIcomeViewModel {
     
     var isThereFullyIdenticalTag: Bool {
         searchedTags.map { $0.name.lowercased() }.contains(searchTagText.lowercased())
+    }
+}
+
+//MARK: AddingCategoryViewModelProtocol extension
+extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
+    func didUpdateCategory() {
+        Task {
+            await fetchCategories()
+        }
     }
 }

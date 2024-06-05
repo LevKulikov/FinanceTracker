@@ -9,19 +9,37 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol AddingCategoryViewModelProtocol: AnyObject {
+protocol AddingCategoryViewModelDelegate: AnyObject {
     func didUpdateCategory()
 }
 
 final class AddingCategoryViewModel: ObservableObject {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
-    weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
+    weak var delegate: (any AddingCategoryViewModelDelegate)?
     var filteredCategories: [Category] {
-        availableCategories.filter {
+        guard !name.isEmpty else { return [] }
+        
+        return availableCategories.filter {
             $0.name.lowercased().contains(name.lowercased())
         }
     }
+    var categoryPreview: Category {
+        Category(
+            type: transactionType,
+            name: name,
+            iconName: iconName,
+            color: categoryColor
+        )
+    }
+    let defaultColors: [Color] = [
+        .red,
+        .blue,
+        .green,
+        .orange,
+        .purple,
+        .yellow,
+    ]
     
     //MARK: Published props
     @Published private(set) var availableCategories: [Category] = []
@@ -34,12 +52,13 @@ final class AddingCategoryViewModel: ObservableObject {
     }
     @Published var name: String = ""
     @Published var iconName: String = ""
-    @Published var categoryColor: Color = .clear
+    @Published var categoryColor: Color
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol, transactionType: TransactionsType) {
         self.dataManager = dataManager
         self.transactionType = transactionType
+        self.categoryColor = transactionType == .spending ? .red : .green
         Task {
             await fetchCategories()
         }
@@ -48,6 +67,9 @@ final class AddingCategoryViewModel: ObservableObject {
     //MARK: - Methods
     //MARK: Internal methods
     func saveCategory(completionHandler: @escaping () -> Void ) {
+        guard !name.isEmpty else { return }
+        guard !iconName.isEmpty else { return }
+        
         let newCategory = Category(
             type: transactionType,
             name: name,
@@ -56,7 +78,11 @@ final class AddingCategoryViewModel: ObservableObject {
         )
         Task {
             await dataManager.insert(newCategory)
+            delegate?.didUpdateCategory()
             completionHandler()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                self?.removeAndRefetch()
+            }
         }
     }
     
@@ -96,6 +122,16 @@ final class AddingCategoryViewModel: ObservableObject {
         } catch {
             print(error.localizedDescription)
             return nil
+        }
+    }
+    
+    private func removeAndRefetch() {
+        withAnimation {
+            name = ""
+            iconName = ""
+        }
+        Task {
+            await fetchCategories()
         }
     }
 }

@@ -292,7 +292,7 @@ struct AddingSpendIcomeView: View {
                         }
                         
                         NavigationLink {
-                            
+                            viewModel.getAddingCategoryView()
                         } label: {
                             Image(systemName: "plus")
                                 .foregroundStyle(.white)

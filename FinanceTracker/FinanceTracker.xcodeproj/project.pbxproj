@@ -14,6 +14,7 @@
 		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
 		73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D592C10FC5F00A80355 /* AddingCategoryView.swift */; };
 		73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */; };
+		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
 		73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628FA2C01057000E9FEB9 /* DataModels.swift */; };
 		73F628FD2C01057100E9FEB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F628FC2C01057100E9FEB9 /* Assets.xcassets */; };
@@ -57,6 +58,7 @@
 		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
 		73731D592C10FC5F00A80355 /* AddingCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryView.swift; sourceTree = "<group>"; };
 		73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryViewModel.swift; sourceTree = "<group>"; };
+		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerApp.swift; sourceTree = "<group>"; };
 		73F628FA2C01057000E9FEB9 /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				731EE8232C0A157E006C7B0F /* AppFormatters.swift */,
 				73F629292C02098C00E9FEB9 /* DataManager */,
+				738D752D2C111A2D00198521 /* FTAppAssets.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */,
+				738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
