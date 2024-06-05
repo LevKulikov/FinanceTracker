@@ -9,6 +9,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+protocol Named {
+    var name: String { get set }
+}
+
 enum TransactionsType: String, CaseIterable {
     case spending = "Spendings"
     case income = "Income"
@@ -17,6 +21,8 @@ enum TransactionsType: String, CaseIterable {
 //MARK: - BalanceAccount Model
 @Model
 final class BalanceAccount {
+    static let emptyBalanceAccount = BalanceAccount(name: "empty", currency: "RUB", balance: 0, iconName: "", color: .clear)
+    
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String
@@ -55,6 +61,8 @@ final class BalanceAccount {
 //MARK: - Category Model
 @Model
 final class Category {
+    static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear)
+    
     //MARK: Properties
     @Attribute(.unique) let id: String
     var typeRawValue: String
@@ -127,32 +135,26 @@ final class Tag {
         self.uiColor = uiColor
     }
     
-    convenience init(name: String, color: Color) {
+    convenience init(name: String, color: Color = .init(uiColor: .random)) {
         let id = UUID().uuidString
         let uiColor = UIColor(color)
         self.init(id: id, name: name, uiColor: uiColor)
     }
-    
-    //Init with random colors
-    convenience init(name: String) {
-        let color = Color(uiColor: .random)
-        self.init(name: name, color: color)
-    }
 }
 
 //MARK: - Transaction Model
-#warning("BalanceAccount or Category can be deleted. So it is needed to de solved")
+#warning("BalanceAccount or Category can be deleted. So it is needed to de solved. Solution:\n - For Categoreis, if user wants to delete, say him/her to replace with another Category or Defualt Unidentified, or create 'deleted' flag as property and don't show it to user anymore;\n - For BalanceAccount, create 'deleted' flag as property and don't show it to user anymore ")
 @Model
 final class Transaction {
     //MARK: Properties
     @Attribute(.unique) let id: String
-    var typeRawValue: String
+    private(set) var typeRawValue: String
     var comment: String
     var value: Float
     var date: Date
     var balanceAccount: BalanceAccount
     var category: Category
-    var tags: [Tag]
+    var tags: [Tag] = []
     
     //MARK: Computed Properties
     var type: TransactionsType? {
@@ -177,13 +179,17 @@ final class Transaction {
         self.date = date
         self.balanceAccount = balanceAccount
         self.category = category
-        self.tags = tags
+        setTags(tags)
     }
     
     convenience init(type: TransactionsType, comment: String, value: Float, date: Date, balanceAccount: BalanceAccount, category: Category, tags: [Tag]) {
         let id = UUID().uuidString
         let typeRawValue = type.rawValue
         self.init(id: id, typeRawValue: typeRawValue, comment: comment, value: value, date: date, balanceAccount: balanceAccount, category: category, tags: tags)
+    }
+    
+    private func setTags(_ tags: [Tag]) {
+        self.tags = tags
     }
 }
 

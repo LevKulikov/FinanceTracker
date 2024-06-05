@@ -12,7 +12,7 @@ import SwiftData
 protocol DataManagerProtocol: AnyObject {
     func save() throws
     
-    func delete<T>(_ model: T) where T : PersistentModel
+    func deleteTransaction(_ transaction: Transaction)
     
     func insert<T>(_ model: T) where T : PersistentModel
     
@@ -33,8 +33,8 @@ final class DataManager: DataManagerProtocol {
         try container.mainContext.save()
     }
     
-    func delete<T>(_ model: T) where T : PersistentModel {
-        container.mainContext.delete(model)
+    func deleteTransaction(_ transaction: Transaction) {
+        container.mainContext.delete(transaction)
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {
