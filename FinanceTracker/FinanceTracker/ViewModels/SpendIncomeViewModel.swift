@@ -61,7 +61,7 @@ final class SpendIncomeViewModel: ObservableObject {
             fetchTransactions()
         }
     }
-    @Published var transactions: [Transaction] = []
+    @Published private(set) var transactions: [Transaction] = []
     @Published var dateSelected: Date = .now
     
     //MARK: - Initializer

@@ -61,10 +61,10 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         Date(timeIntervalSince1970: 0)...Date.now
     }
     private(set) var transactionToUpdate: Transaction?
-    @Published var availableCategories: [Category] = []
-    @Published var availableTags: [Tag] = []
-    @Published var availableBalanceAccounts: [BalanceAccount] = []
-    @Published var threeDatesArray: [Date] = []
+    @Published private(set) var availableCategories: [Category] = []
+    @Published private(set) var availableTags: [Tag] = []
+    @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
+    @Published private(set) var threeDatesArray: [Date] = []
     @Published var searchTagText: String = ""
     
     //MARK: Transaction Props
