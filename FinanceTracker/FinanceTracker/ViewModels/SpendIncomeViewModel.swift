@@ -89,18 +89,6 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-//    func deleteTransactions(at indexSet: IndexSet, errorHandler: ((Error) -> Void)? = nil) {
-//        for index in indexSet {
-//            let transactionToDelete = transactions[index]
-//            Task {
-//                await dataManager.deleteTransaction(transactionToDelete)
-//            }
-//        }
-//        Task {
-//            await fetchTransactions(errorHandler: errorHandler)
-//        }
-//    }
-    
     func insert(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await dataManager.insert(transaction)
@@ -108,10 +96,14 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-    func setDate(destination: DateSettingDestination) {
+    func setDate(destination: DateSettingDestination, withAnimation animated: Bool = true) {
         guard let newDate = calendar.date(byAdding: .day, value: destination == .back ? -1 : 1, to: dateSelected),
               availableDateRange.contains(newDate) else { return }
-        withAnimation {
+        if animated {
+            withAnimation(.snappy(duration: 0.3)) {
+                dateSelected = newDate
+            }
+        } else {
             dateSelected = newDate
         }
     }

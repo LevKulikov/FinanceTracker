@@ -20,6 +20,7 @@ struct SpendIncomeView: View {
     @State private var actionSelected: ActionWithTransaction = .none
     @State private var transactionIdSelected: String = ""
     @State private var tapEnabled = true
+    @State private var closeAllOpenedGroup = false
     
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
@@ -40,7 +41,8 @@ struct SpendIncomeView: View {
                     ForEach(viewModel.filteredGroupedTranactions, id: \.self) { transactionArray in
                         GroupedSpendIncomeCell(
                             transactions: transactionArray,
-                            namespace: namespace
+                            namespace: namespace,
+                            closeGroupFlag: $closeAllOpenedGroup
                         ) { transaction in
                             guard tapEnabled else { return }
                             tapEnabled = false
@@ -79,6 +81,11 @@ struct SpendIncomeView: View {
                 DragGesture()
                     .onChanged { value in
                         let xTrans = value.translation.width
+                        if !closeAllOpenedGroup {
+                            withAnimation(.snappy(duration: 0.5)) {
+                                closeAllOpenedGroup = true
+                            }
+                        }
                         dragXOffset = xTrans
                     }
                     .onEnded { value in

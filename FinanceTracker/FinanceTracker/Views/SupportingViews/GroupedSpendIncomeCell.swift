@@ -10,7 +10,10 @@ import SwiftUI
 struct GroupedSpendIncomeCell: View {
     var transactions: [Transaction]
     var namespace: Namespace.ID
+    @Binding var closeGroupFlag: Bool
     var onTapTransaction: (Transaction) -> Void
+    
+    @State private var openGroup = false
     private var mutualCategory: Category? {
         return transactions.first?.category
     }
@@ -20,16 +23,16 @@ struct GroupedSpendIncomeCell: View {
     private var transactionsValueSum: Float {
         transactions.map { $0.value }.reduce(0, +)
     }
-    @State private var showAll = false
     
     var body: some View {
         VStack {
-            if !showAll {
+            if !openGroup {
                 groupCellPreview
                     .transition(.blurReplace)
                     .onTapGesture {
+                        closeGroupFlag = false
                         withAnimation {
-                            showAll = true
+                            openGroup = true
                         }
                     }
             } else {
@@ -37,7 +40,7 @@ struct GroupedSpendIncomeCell: View {
                     .transition(.blurReplace.combined(with: .push(from: .bottom)))
             }
             
-            if showAll {
+            if openGroup {
                 ForEach(transactions) { transaction in
                     SpendIncomeCell(transaction: transaction, namespace: namespace)
                         .transition(.blurReplace)
@@ -47,7 +50,14 @@ struct GroupedSpendIncomeCell: View {
                 }
             }
         }
-        .padding(.bottom, showAll ? 20 : 0)
+        .padding(.bottom, openGroup ? 20 : 0)
+        .onChange(of: closeGroupFlag) {
+            if closeGroupFlag {
+                withAnimation(.snappy(duration: 0.5)) {
+                    openGroup = false
+                }
+            }
+        }
     }
     
     private var groupCellPreview: some View {
@@ -96,7 +106,7 @@ struct GroupedSpendIncomeCell: View {
             
             Button("Show less", systemImage: "chevron.up") {
                 withAnimation {
-                    showAll = false
+                    openGroup = false
                 }
             }
             .buttonBorderShape(.capsule)
@@ -106,18 +116,6 @@ struct GroupedSpendIncomeCell: View {
         .padding(.horizontal)
         .padding(.horizontal)
         .padding(.top, 20)
-    }
-    
-    @ViewBuilder
-    func someView(withText: String) -> some View {
-        Text(withText)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(.ultraThinMaterial)
-            }
-            .padding(.horizontal)
     }
     
     @ViewBuilder
@@ -155,6 +153,7 @@ struct GroupedSpendIncomeCell: View {
 //    viewModel.fetchTransactions()
     
     @Namespace var namespace
+    @State var flag = false
     
     let transactions = [
         Transaction(
@@ -269,7 +268,7 @@ struct GroupedSpendIncomeCell: View {
         )
     ]
     
-    return GroupedSpendIncomeCell(transactions: transactions, namespace: namespace) {
+    return GroupedSpendIncomeCell(transactions: transactions, namespace: namespace, closeGroupFlag: $flag) {
         print($0.typeRawValue)
     }
 }
