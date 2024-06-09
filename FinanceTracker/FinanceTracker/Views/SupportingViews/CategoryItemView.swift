@@ -55,26 +55,20 @@ struct CategoryItemView: View {
     private func getCategoryImage(for category: Category) -> some View {
         let frameDimention: CGFloat = 50
         
-        if let uiImage = UIImage(named: category.iconName) {
+        if let uiImage = FTAppAssets.iconUIImage(name: category.iconName) {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFit()
                 .frame(width: frameDimention, height: frameDimention)
         } else {
-            Image(systemName: "circle")
-                .resizable()
-                .scaledToFit()
-                .overlay {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                }
+            FTAppAssets.emptyIconImage(xMarkFont: .title2)
                 .frame(width: frameDimention - 10, height: frameDimention - 10)
         }
     }
 }
 
 #Preview {
-    let category = Category(type: .spending, name: "Show me", iconName: "testIcon", color: .cyan)
+    let category = Category(type: .spending, name: "Show me", iconName: "", color: .cyan)
     @State var picked: Category? = category
     
     return CategoryItemView(category: category, selectedCategory: $picked)

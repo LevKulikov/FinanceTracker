@@ -14,6 +14,7 @@ struct AddingCategoryView: View {
     @FocusState private var nameTextFieldFocus
     @State private var showPreview = false
     @State private var categoryIsAdded = false
+    @State private var showMoreIcons = false
     private var isKeyboardActive: Bool {
         nameTextFieldFocus
     }
@@ -76,6 +77,9 @@ struct AddingCategoryView: View {
         }
         .onTapGesture {
             dismissKeyboard()
+        }
+        .sheet(isPresented: $showMoreIcons) {
+            iconsListView
         }
     }
     
@@ -170,19 +174,72 @@ struct AddingCategoryView: View {
                     .fontWeight(.medium)
                 
                 Spacer()
+                
+                Button("Open", systemImage: "chevron.up") {
+                    showMoreIcons.toggle()
+                }
+                .buttonBorderShape(.capsule)
+                .buttonStyle(.bordered)
+                .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             
-            ScrollView(.horizontal) {
-                let gridSpace: CGFloat = 55
-                LazyHGrid(rows: [GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace))], spacing: 20) {
-                    ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
-                        getIconItem(for: iconName)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal) {
+                    let gridSpace: CGFloat = 55
+                    LazyHGrid(rows: [GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace))], spacing: 20) {
+                        ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
+                            getIconItem(for: iconName)
+                                .id(iconName)
+                                .scrollTargetLayout()
+                                .onTapGesture {
+                                    withAnimation {
+                                        viewModel.iconName = iconName
+                                    }
+                                }
+                        }
+                    }
+                }
+//                .scrollTargetBehavior(.paging)
+                .contentMargins(12, for: .scrollContent)
+                .onReceive(viewModel.$iconName) { iconName in
+                    withAnimation {
+                        proxy.scrollTo(iconName)
                     }
                 }
             }
-            .scrollTargetBehavior(.paging)
-            .contentMargins(12, for: .scrollContent)
+        }
+    }
+    
+    private var iconsListView: some View {
+        VStack {
+            HStack {
+                Text("All Icons")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                
+                Spacer()
+                
+                Button("Close") {
+                    showMoreIcons.toggle()
+                }
+            }
+            .padding(.top, 20)
+            .padding(.horizontal, 25)
+            
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 55, maximum: 75))], spacing: 20) {
+                    ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
+                        getIconItem(for: iconName)
+                            .onTapGesture {
+                                showMoreIcons.toggle()
+                                withAnimation {
+                                    viewModel.iconName = iconName
+                                }
+                            }
+                    }
+                }
+            }
         }
     }
     
@@ -301,20 +358,14 @@ struct AddingCategoryView: View {
     
     @ViewBuilder
     private func getIconItem(for iconName: String) -> some View {
-        Image(iconName)
+        FTAppAssets.iconImageOrEpty(name: iconName)
             .resizable()
             .scaledToFit()
             .frame(width: 40, height: 40)
-            .scrollTargetLayout()
             .padding(8)
             .background {
                 Circle()
                     .fill(viewModel.iconName == iconName ? viewModel.categoryColor.opacity(0.3) : .gray.opacity(0.3))
-            }
-            .onTapGesture {
-                withAnimation {
-                    viewModel.iconName = iconName
-                }
             }
     }
     

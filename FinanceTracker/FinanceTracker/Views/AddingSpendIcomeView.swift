@@ -154,7 +154,7 @@ struct AddingSpendIcomeView: View {
         }
         .onTapGesture(perform: dismissKeyboardFocus)
         .overlay(alignment: .bottom) {
-            if !isKeyboardActive {
+            if !searchTagsTextFieldFocus && !commentTextFieldFocus {
                 addUpdateButton
             }
         }

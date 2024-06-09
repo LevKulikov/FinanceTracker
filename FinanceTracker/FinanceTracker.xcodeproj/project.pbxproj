@@ -15,6 +15,7 @@
 		73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D592C10FC5F00A80355 /* AddingCategoryView.swift */; };
 		73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */; };
 		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
+		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
 		73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628FA2C01057000E9FEB9 /* DataModels.swift */; };
 		73F628FD2C01057100E9FEB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 73F628FC2C01057100E9FEB9 /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		73731D592C10FC5F00A80355 /* AddingCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryView.swift; sourceTree = "<group>"; };
 		73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryViewModel.swift; sourceTree = "<group>"; };
 		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
+		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerApp.swift; sourceTree = "<group>"; };
 		73F628FA2C01057000E9FEB9 /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		73F628F52C01057000E9FEB9 /* FinanceTracker */ = {
 			isa = PBXGroup;
 			children = (
+				738D75402C11D6A400198521 /* IconImages.bundle */,
 				73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */,
 				73F628FC2C01057100E9FEB9 /* Assets.xcassets */,
 				73F629242C0201BB00E9FEB9 /* Services */,
@@ -168,8 +171,8 @@
 			isa = PBXGroup;
 			children = (
 				731EE8232C0A157E006C7B0F /* AppFormatters.swift */,
-				73F629292C02098C00E9FEB9 /* DataManager */,
 				738D752D2C111A2D00198521 /* FTAppAssets.swift */,
+				73F629292C02098C00E9FEB9 /* DataManager */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -337,6 +340,7 @@
 			files = (
 				73F629002C01057100E9FEB9 /* Preview Assets.xcassets in Resources */,
 				73F628FD2C01057100E9FEB9 /* Assets.xcassets in Resources */,
+				738D75412C11D6A400198521 /* IconImages.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
