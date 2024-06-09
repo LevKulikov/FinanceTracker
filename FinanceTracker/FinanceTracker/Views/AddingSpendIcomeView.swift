@@ -154,7 +154,7 @@ struct AddingSpendIcomeView: View {
         }
         .onTapGesture(perform: dismissKeyboardFocus)
         .overlay(alignment: .bottom) {
-            if !isKeyboardActive {
+            if !searchTagsTextFieldFocus && !commentTextFieldFocus {
                 addUpdateButton
             }
         }
@@ -292,7 +292,7 @@ struct AddingSpendIcomeView: View {
                         }
                         
                         NavigationLink {
-                            
+                            viewModel.getAddingCategoryView()
                         } label: {
                             Image(systemName: "plus")
                                 .foregroundStyle(.white)

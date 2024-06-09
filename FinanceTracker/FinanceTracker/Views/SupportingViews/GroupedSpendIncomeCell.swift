@@ -122,7 +122,7 @@ struct GroupedSpendIncomeCell: View {
     private var categoryImage: some View {
         let frameDimention: CGFloat = 40
         
-        if let mutualCategory, let uiImage = UIImage(named: mutualCategory.iconName) {
+        if let mutualCategory, let uiImage = FTAppAssets.iconUIImage(name: mutualCategory.iconName) {
             Circle()
                 .fill(LinearGradient(colors: [mutualCategory.color, .clear], startPoint: .leading, endPoint: .trailing))
                 .overlay {
@@ -133,14 +133,7 @@ struct GroupedSpendIncomeCell: View {
                 }
                 .frame(width: frameDimention, height: frameDimention)
         } else {
-            Image(systemName: "circle")
-                .resizable()
-                .scaledToFit()
-                .overlay {
-                    Image(systemName: "xmark")
-                        .font(.title)
-                        .bold()
-                }
+            FTAppAssets.emptyIconImage()
                 .frame(width: frameDimention, height: frameDimention)
         }
     }

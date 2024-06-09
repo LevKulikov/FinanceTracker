@@ -48,7 +48,7 @@ struct SpendIncomeCell: View {
     private var categoryImage: some View {
         let frameDimention: CGFloat = 40
         
-        if let uiImage = UIImage(named: transaction.category.iconName) {
+        if let uiImage = FTAppAssets.iconUIImage(name: transaction.category.iconName) {
             Circle()
                 .fill(LinearGradient(colors: [transaction.category.color, .clear], startPoint: .leading, endPoint: .trailing))
                 .overlay {
@@ -60,14 +60,7 @@ struct SpendIncomeCell: View {
                 }
                 .frame(width: frameDimention, height: frameDimention)
         } else {
-            Image(systemName: "circle")
-                .resizable()
-                .scaledToFit()
-                .overlay {
-                    Image(systemName: "xmark")
-                        .font(.title)
-                        .bold()
-                }
+            FTAppAssets.emptyIconImage()
                 .frame(width: frameDimention, height: frameDimention)
         }
     }
