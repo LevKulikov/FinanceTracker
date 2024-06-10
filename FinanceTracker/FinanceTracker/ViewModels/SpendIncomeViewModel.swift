@@ -42,6 +42,9 @@ final class SpendIncomeViewModel: ObservableObject {
             .filter {
                 calendar.isDate($0.date, equalTo: dateSelected, toGranularity: .day)
             }
+            .filter {
+                $0.balanceAccount == balanceAccountToFilter
+            }
             .grouped { $0.category }
             .map { $0.value }
             .sorted {
@@ -58,16 +61,18 @@ final class SpendIncomeViewModel: ObservableObject {
     
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
-            fetchTransactions()
+            fetchAllData()
         }
     }
     @Published private(set) var transactions: [Transaction] = []
+    @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var dateSelected: Date = .now
+    @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        fetchTransactions()
+        fetchAllData()
     }
     
     //MARK: - Methods
@@ -115,9 +120,10 @@ final class SpendIncomeViewModel: ObservableObject {
         return AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
     }
     
-    func fetchTransactions() {
+    func fetchAllData() {
         Task {
             await fetchTransactions()
+            await fetchBalanceAccounts()
         }
     }
     
@@ -144,6 +150,18 @@ final class SpendIncomeViewModel: ObservableObject {
             errorHandler?(error)
         }
     }
+    
+    @MainActor
+    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) {
+        let descriptor = FetchDescriptor<BalanceAccount>()
+        
+        do {
+            let fetchedBAs = try dataManager.fetch(descriptor)
+            availableBalanceAccounts = fetchedBAs
+        } catch {
+            errorHandler?(error)
+        }
+    }
 }
 
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
@@ -157,6 +175,6 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func categoryUpdated() {
-        fetchTransactions()
+        fetchAllData()
     }
 }

@@ -73,7 +73,7 @@ struct SpendIncomeView: View {
             }
             .onChange(of: actionSelected) {
                 if case .none = actionSelected {
-                    viewModel.fetchTransactions()
+                    viewModel.fetchAllData()
                     enableTapsWithDeadline()
                 }
             }
@@ -146,6 +146,35 @@ struct SpendIncomeView: View {
     
     private var sumAndDateView: some View {
         VStack(spacing: 0) {
+            HStack {
+                Menu {
+                    Picker("", selection: $viewModel.balanceAccountToFilter.animation()) {
+                        ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
+                            HStack {
+                                Text(balanceAcc.name)
+                                
+                                if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
+                                    Image(uiImage: uiImage)
+                                } else {
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .tag(balanceAcc)
+                        }
+                    }
+                } label: {
+                    Label(viewModel.balanceAccountToFilter.name, systemImage: "chevron.down")
+                        .font(.title)
+                        .bold()
+                }
+                .foregroundStyle(.primary)
+
+                
+                
+                Spacer()
+            }
+            .padding(.bottom)
+            
             HStack {
                 Text(AppFormatters.numberFormatterWithDecimals.string(for: viewModel.transactionsValueSum) ?? "NaN")
                     .font(.title)
