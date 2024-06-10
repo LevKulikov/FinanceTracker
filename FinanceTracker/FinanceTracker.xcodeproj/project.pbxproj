@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8232C0A157E006C7B0F /* AppFormatters.swift */; };
 		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
+		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
+		735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */; };
 		736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */; };
 		736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */; };
 		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
@@ -54,6 +56,8 @@
 /* Begin PBXFileReference section */
 		731EE8232C0A157E006C7B0F /* AppFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFormatters.swift; sourceTree = "<group>"; };
 		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
+		735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccountViewModel.swift; sourceTree = "<group>"; };
 		736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeCell.swift; sourceTree = "<group>"; };
 		736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeView.swift; sourceTree = "<group>"; };
 		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
@@ -183,6 +187,7 @@
 				73F6292B2C020B8600E9FEB9 /* SpendIncomeView.swift */,
 				736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */,
 				73731D592C10FC5F00A80355 /* AddingCategoryView.swift */,
+				735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -194,6 +199,7 @@
 				73F6292D2C020BA700E9FEB9 /* SpendIncomeViewModel.swift */,
 				736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */,
 				73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */,
+				735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -377,10 +383,12 @@
 				73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */,
 				73F6292C2C020B8600E9FEB9 /* SpendIncomeView.swift in Sources */,
 				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
+				735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* AppFormatters.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
+				735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
 			);

@@ -202,6 +202,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         return AddingCategoryView(viewModel: viewModel)
     }
     
+    func getAddingBalanceAccountView() -> some View {
+        let viewModel = AddingBalanceAccountViewModel(dataManager: dataManager, action: .add)
+        viewModel.delegate = self
+        
+        return AddingBalanceAccauntView(viewModel: viewModel)
+    }
+    
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)
@@ -361,5 +368,13 @@ extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
             await fetchCategories()
         }
         delegate?.categoryUpdated()
+    }
+}
+
+extension AddingSpendIcomeViewModel: AddingBalanceAccountViewModelDelegate {
+    func didUpdateBalanceAccount() {
+        Task {
+            await fetchBalanceAccounts()
+        }
     }
 }

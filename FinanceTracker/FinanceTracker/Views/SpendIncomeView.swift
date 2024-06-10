@@ -212,14 +212,9 @@ struct SpendIncomeView: View {
         }
     }
     
-    private func getScreenSize() -> CGSize {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
-        return windowScene.screen.bounds.size
-    }
-    
     private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
         let xTrans = value.translation.width
-        let screenWidth = getScreenSize().width
+        let screenWidth = FTAppAssets.getScreenSize().width
         // plus is back, minus is forward
         if abs(xTrans) > screenWidth / 2.5 {
             if xTrans > 0, viewModel.movingBackwardDateAvailable {

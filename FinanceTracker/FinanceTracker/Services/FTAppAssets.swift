@@ -12,6 +12,15 @@ struct FTAppAssets {
     //MARK: Properteis
     static var defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
     
+    static let defaultColors: [Color] = [
+        .red,
+        .blue,
+        .green,
+        .orange,
+        .purple,
+        .yellow,
+    ]
+    
     //MARK: Methods
     static func iconUIImage(name: String, bundle: String = "IconImages.bundle") -> UIImage? {
         let location = bundle + "/" + name
@@ -37,6 +46,11 @@ struct FTAppAssets {
         Image(uiImage: uiImage)
     }
     
+    static func getScreenSize() -> CGSize {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
+        return windowScene.screen.bounds.size
+    }
+    
     private static func getIconNames() -> [String] {
         let fileManager = FileManager.default
         let bundleURL = Bundle.main.bundleURL
@@ -50,4 +64,5 @@ struct FTAppAssets {
             return []
         }
     }
+    
 }

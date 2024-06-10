@@ -1,28 +1,30 @@
 //
-//  AddingCategoryView.swift
+//  AddingBalanceAccauntView.swift
 //  FinanceTracker
 //
-//  Created by Лев Куликов on 05.06.2024.
+//  Created by Лев Куликов on 10.06.2024.
 //
 
 import SwiftUI
 
-struct AddingCategoryView: View {
-    //MARK: Properties
+struct AddingBalanceAccauntView: View {
+    //MARK: - Properties
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: AddingCategoryViewModel
+    @StateObject private var viewModel: AddingBalanceAccountViewModel
     @FocusState private var nameTextFieldFocus
-    @State private var showPreview = false
-    @State private var categoryIsAdded = false
+    @FocusState private var balanceTextFieldFocus
+    @FocusState private var currencyTextFieldFocus
     @State private var showMoreIcons = false
-    private var isKeyboardActive: Bool {
-        nameTextFieldFocus
-    }
-    private var canBeAdded: Bool {
+    private var canBeAddedOrUpdated: Bool {
         guard !viewModel.name.isEmpty else { return false }
+        guard !viewModel.currency.isEmpty else { return false }
         guard !viewModel.iconName.isEmpty else { return false }
         return true
     }
+    private var isKeyboardActive: Bool {
+        nameTextFieldFocus || balanceTextFieldFocus || currencyTextFieldFocus
+    }
+    
     private var isUpdating: Bool {
         if case .update = viewModel.action {
             return true
@@ -30,21 +32,17 @@ struct AddingCategoryView: View {
         return false
     }
     
-    //MARK: Init
-    init(viewModel: AddingCategoryViewModel) {
+    //MARK: - Initializer
+    init(viewModel: AddingBalanceAccountViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
     
-    //MARK: Body
+    //MARK: - Body
     var body: some View {
         ScrollView {
             VStack {
                 headerView
                     .padding(.vertical, 10)
-                
-                if showPreview {
-                    categoryPreview
-                }
                 
                 nameSection
                 
@@ -52,122 +50,83 @@ struct AddingCategoryView: View {
                     .padding(.horizontal)
                     .padding(.bottom)
                 
-                typeSelectionSection
+                balanceSection
                 
                 Divider()
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.bottom)
                 
                 iconSelectionSection
                 
                 Divider()
-                    .padding()
-                
-                colorPickerSection
+                    .padding(.horizontal)
                     .padding(.bottom)
                 
-                Rectangle()
-                    .fill(.clear)
-                    .frame(height: 50)
+                colorPickerSection
             }
         }
         .scrollDismissesKeyboard(.immediately)
-        .overlay(alignment: .bottom) {
-            if !isKeyboardActive {
-                addButton
-            }
-        }
-        .overlay {
-            if categoryIsAdded {
-                addingConfirmedView
-            }
-        }
         .onTapGesture {
             dismissKeyboard()
         }
         .sheet(isPresented: $showMoreIcons) {
             iconsListView
         }
+        .overlay(alignment: .bottom) {
+            if !isKeyboardActive {
+                addButton
+            }
+        }
     }
     
-    //MARK: View Propeties
+    //MARK: View Properties
     private var headerView: some View {
         HStack {
-            Text(isUpdating ? "Update category" : "New category")
+            Text(isUpdating ? "Balance account" : "New balance account")
                 .font(.title)
                 .bold()
             
             Spacer()
-            
-            Button(showPreview ? "Hide" : "Preview") {
-                withAnimation {
-                    showPreview.toggle()
-                }
-            }
         }
         .padding(.horizontal)
     }
     
-    private var categoryPreview: some View {
-        CategoryItemView(category: viewModel.categoryPreview, selectedCategory: .constant(nil))
-    }
-    
     private var nameSection: some View {
-        VStack {
-            HStack {
-                Text("Name")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-            }
-            .padding(.horizontal)
+        VStack(alignment: .leading) {
+            Text("Name")
+                .font(.title2)
+                .fontWeight(.medium)
             
-            TextField("Category name", text: $viewModel.name.animation(), prompt: Text("Enter name here"))
+            TextField("Balance account name", text: $viewModel.name, prompt: Text("Enter name here"))
                 .focused($nameTextFieldFocus)
                 .font(.title2)
-                .padding(.horizontal)
-            
-            if nameTextFieldFocus && !viewModel.filteredCategories.isEmpty {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Some existing categories")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(viewModel.filteredCategories) { category in
-                                getCategoryPreview(for: category)
-                            }
-                        }
-                    }
-                    .contentMargins(12, for: .scrollContent)
-                }
-                .transition(.blurReplace)
-            }
         }
+        .padding(.horizontal)
     }
     
-    private var typeSelectionSection: some View {
-        VStack {
-            HStack {
-                Text("Of type")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-            }
+    private var balanceSection: some View {
+        VStack(alignment: .leading) {
+            Text((isUpdating ? "Current balance" : "Initial balance") + " and currency")
+                .font(.title2)
+                .fontWeight(.medium)
             
-            Picker("Type", selection: $viewModel.transactionType) {
-                Text("Spending")
-                    .tag(TransactionsType.spending)
-                Text("Income")
-                    .tag(TransactionsType.income)
+            HStack {
+                TextField("0", text: $viewModel.balanceString)
+                    .onChange(of: viewModel.balanceString, onChangeOfBalanceString)
+                    .focused($balanceTextFieldFocus)
+                    .keyboardType(.decimalPad)
+                    .autocorrectionDisabled()
+                    .font(.title2)
+                    .textFieldStyle(.roundedBorder)
+                
+                TextField("USD", text: $viewModel.currency)
+                    .focused($currencyTextFieldFocus)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .font(.title2)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: FTAppAssets.getScreenSize().width / 3)
             }
-            .pickerStyle(.segmented)
-            .onTapGesture(count: 20, perform: {
-                //Prevents iOS 17 bug
-            })
         }
         .padding(.horizontal)
     }
@@ -197,7 +156,6 @@ struct AddingCategoryView: View {
                         ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
                             getIconItem(for: iconName)
                                 .id(iconName)
-                                .scrollTargetLayout()
                                 .onTapGesture {
                                     withAnimation {
                                         viewModel.iconName = iconName
@@ -265,16 +223,16 @@ struct AddingCategoryView: View {
                     Spacer()
                 }
                 
-                ColorPicker("", selection: $viewModel.categoryColor)
+                ColorPicker("", selection: $viewModel.color)
                     .labelsHidden()
                     .overlay {
-                        if !FTAppAssets.defaultColors.contains(viewModel.categoryColor) {
+                        if !FTAppAssets.defaultColors.contains(viewModel.color) {
                             Image(systemName: "checkmark")
                                 .font(.footnote)
                                 .foregroundStyle(.white)
                         }
                     }
-                    .scaleEffect(!FTAppAssets.defaultColors.contains(viewModel.categoryColor) ? 1.5 : 1.3)
+                    .scaleEffect(!FTAppAssets.defaultColors.contains(viewModel.color) ? 1.5 : 1.3)
                     .shadow(radius: 5)
                     .onTapGesture(count: 20, perform: {
                         //Prevents iOS 17 bug
@@ -292,51 +250,33 @@ struct AddingCategoryView: View {
     
     private var addButton: some View {
         Button {
-            viewModel.saveCategory {
-                hideConfirmedView()
-                withAnimation {
-                    categoryIsAdded = true
-                } completion: {
-                    dismiss()
-                }
+            viewModel.save {
+                dismiss()
             }
         } label: {
-            Label(isUpdating ? "Update" : "Add", systemImage: isUpdating ? "pencil.and.outline" : "plus")
+            Label("Add", systemImage: "plus")
                 .frame(width: 170, height: 50)
                 .background {
                     Capsule()
                         .fill(.ultraThinMaterial)
-                        .stroke(canBeAdded ? .blue : .gray)
+                        .stroke(canBeAddedOrUpdated ? .blue : .gray)
                 }
         }
-        .disabled(!canBeAdded)
+        .disabled(!canBeAddedOrUpdated)
         .offset(y: -5)
     }
     
-    private var addingConfirmedView: some View {
-        RoundedRectangle(cornerRadius: 20.0)
-            .fill(Color.green.opacity(0.4))
-            .overlay {
-                Image(systemName: "checkmark")
-                    .foregroundStyle(.white)
-                    .font(.system(size: 50))
-                    .bold()
-                    .symbolEffect(.bounce, value: categoryIsAdded)
-            }
-            .frame(width: 100, height: 100)
-            .transition(.blurReplace)
-    }
-    
-    //MARK: Methods
+    //MARK: - Methods
     @ViewBuilder
-    private func getCategoryPreview(for category: Category) -> some View {
-        Text(category.name)
-            .font(.callout)
-            .foregroundStyle(.secondary)
-            .padding(10)
+    private func getIconItem(for iconName: String) -> some View {
+        FTAppAssets.iconImageOrEpty(name: iconName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 40, height: 40)
+            .padding(8)
             .background {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(category.color.opacity(0.3))
+                Circle()
+                    .fill(viewModel.iconName == iconName ? viewModel.color.opacity(0.3) : .gray.opacity(0.3))
             }
     }
     
@@ -348,49 +288,53 @@ struct AddingCategoryView: View {
             .shadow(radius: 5)
             .onTapGesture {
                 withAnimation {
-                    viewModel.categoryColor = colorToSet
+                    viewModel.color = colorToSet
                 }
             }
             .overlay {
-                if viewModel.categoryColor == colorToSet {
+                if viewModel.color == colorToSet {
                     Image(systemName: "checkmark")
                         .font(.title2)
                         .foregroundStyle(.white)
                 }
             }
-            .scaleEffect(viewModel.categoryColor == colorToSet ? 1.1 : 1)
-    }
-    
-    @ViewBuilder
-    private func getIconItem(for iconName: String) -> some View {
-        FTAppAssets.iconImageOrEpty(name: iconName)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 40, height: 40)
-            .padding(8)
-            .background {
-                Circle()
-                    .fill(viewModel.iconName == iconName ? viewModel.categoryColor.opacity(0.3) : .gray.opacity(0.3))
-            }
-    }
-    
-    private func hideConfirmedView() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            withAnimation {
-                categoryIsAdded = false
-            }
-        }
+            .scaleEffect(viewModel.color == colorToSet ? 1.1 : 1)
     }
     
     private func dismissKeyboard() {
         nameTextFieldFocus = false
+        balanceTextFieldFocus = false
+    }
+    
+    private func onChangeOfBalanceString() {
+        var copyString = viewModel.balanceString
+        guard !copyString.isEmpty else { return }
+        
+        if copyString.contains(",") {
+            copyString.replace(",", with: ".")
+        }
+        
+        if copyString.contains(" ") {
+            copyString.replace(" ", with: "")
+        }
+        
+        guard let floatValue = Float(copyString) else {
+            viewModel.balanceString = ""
+            return
+        }
+        
+        viewModel.balance = floatValue
+        
+        if let firstChar = copyString.first, firstChar == "0" {
+            viewModel.balanceString.removeFirst()
+        }
     }
 }
 
 #Preview {
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
-    let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: .income, action: .add)
+    let viewModel = AddingBalanceAccountViewModel(dataManager: dataManager, action: .add)
     
-    return AddingCategoryView(viewModel: viewModel)
+    return AddingBalanceAccauntView(viewModel: viewModel)
 }
