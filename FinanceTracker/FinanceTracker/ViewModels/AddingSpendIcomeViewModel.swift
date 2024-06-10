@@ -13,6 +13,7 @@ protocol AddingSpendIcomeViewModelDelegate: AnyObject {
     func addedNewTransaction(_ transaction: Transaction)
     func updateTransaction(_ transaction: Transaction)
     func transactionsTypeReselected(to newType: TransactionsType)
+    func categoryUpdated()
 }
 
 enum FetchErrors: Error {
@@ -194,8 +195,8 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
-    func getAddingCategoryView() -> some View {
-        let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionsTypeSelected)
+    func getAddingCategoryView(action: ActionWithCategory) -> some View {
+        let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action)
         viewModel.delegate = self
         
         return AddingCategoryView(viewModel: viewModel)
@@ -359,5 +360,6 @@ extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
         Task {
             await fetchCategories()
         }
+        delegate?.categoryUpdated()
     }
 }

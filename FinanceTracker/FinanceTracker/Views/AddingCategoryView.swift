@@ -23,6 +23,12 @@ struct AddingCategoryView: View {
         guard !viewModel.iconName.isEmpty else { return false }
         return true
     }
+    private var isUpdating: Bool {
+        if case .update = viewModel.action {
+            return true
+        }
+        return false
+    }
     
     //MARK: Init
     init(viewModel: AddingCategoryViewModel) {
@@ -34,7 +40,7 @@ struct AddingCategoryView: View {
         ScrollView {
             VStack {
                 headerView
-                    .padding(.bottom, 10)
+                    .padding(.vertical, 10)
                 
                 if showPreview {
                     categoryPreview
@@ -86,7 +92,7 @@ struct AddingCategoryView: View {
     //MARK: View Propeties
     private var headerView: some View {
         HStack {
-            Text("New category")
+            Text(isUpdating ? "Update category" : "New category")
                 .font(.title)
                 .bold()
             
@@ -296,7 +302,7 @@ struct AddingCategoryView: View {
                 }
             }
         } label: {
-            Label("Add", systemImage: "plus")
+            Label(isUpdating ? "Update" : "Add", systemImage: isUpdating ? "pencil.and.outline" : "plus")
                 .frame(width: 170, height: 50)
                 .background {
                     Capsule()
@@ -385,7 +391,7 @@ struct AddingCategoryView: View {
 #Preview {
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
-    let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: .income)
+    let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: .income, action: .add)
     
     return AddingCategoryView(viewModel: viewModel)
 }
