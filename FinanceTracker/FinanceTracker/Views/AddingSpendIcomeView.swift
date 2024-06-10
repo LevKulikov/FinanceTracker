@@ -16,6 +16,7 @@ struct AddingSpendIcomeView: View {
     @State private var showMoreCategories = false
     @State private var showUpdatingCategoryView: Category?
     @State private var showMoreTagsOptions = false
+    @State private var showAddingBalanceAccountView = false
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
     @FocusState private var valueTextFieldFocus
@@ -39,6 +40,9 @@ struct AddingSpendIcomeView: View {
     private var isKeyboardActive: Bool {
         valueTextFieldFocus || searchTagsTextFieldFocus || commentTextFieldFocus
     }
+    private var toolbarCanBeDisplayed: Bool {
+        !showAddingBalanceAccountView && (showUpdatingCategoryView == nil)
+    }
     private var userIdiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
     
     //MARK: Init
@@ -53,37 +57,8 @@ struct AddingSpendIcomeView: View {
     var body: some View {
         ScrollView {
             VStack {
-                HStack {
-                    Spacer()
-                    
-                    SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
-                        .matchedGeometryEffect(id: "picker", in: namespace)
-                        .scaleEffect(0.9)
-                    
-                    Spacer()
-                }
-                .overlay(alignment: .trailing) {
-                    Button("", systemImage: "xmark") {
-                        closeView()
-                    }
-                    .font(.title)
-                    .buttonBorderShape(.circle)
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.secondary)
-                }
-                .overlay(alignment: .leading) {
-                    if isUpdating {
-                        Button("", systemImage: "trash") {
-                            deletionAlert.toggle()
-                        }
-                        .font(.title2)
-                        .buttonBorderShape(.circle)
-                        .buttonStyle(.bordered)
-                        .foregroundStyle(.red)
-                    }
-                }
-                .padding(.horizontal, 10)
-                .padding(.bottom)
+                headerSection
+                    .padding(.bottom)
                 
                 
                 valueTextField
@@ -145,12 +120,8 @@ struct AddingSpendIcomeView: View {
                 }
         }
         .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                
-                Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
-                    .foregroundStyle(.secondary)
-                    .labelsHidden()
+            if toolbarCanBeDisplayed {
+                toolbarView
             }
         }
         .onTapGesture(perform: dismissKeyboardFocus)
@@ -176,6 +147,49 @@ struct AddingSpendIcomeView: View {
     }
     
     //MARK: Computed View Props
+    private var toolbarView: some ToolbarContent {
+        ToolbarItemGroup(placement: .keyboard) {
+            Spacer()
+            
+            Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                .foregroundStyle(.secondary)
+                .labelsHidden()
+        }
+    }
+    
+    private var headerSection: some View {
+        HStack {
+            Spacer()
+            
+            SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
+                .matchedGeometryEffect(id: "picker", in: namespace)
+                .scaleEffect(0.9)
+            
+            Spacer()
+        }
+        .overlay(alignment: .trailing) {
+            Button("", systemImage: "xmark") {
+                closeView()
+            }
+            .font(.title)
+            .buttonBorderShape(.circle)
+            .buttonStyle(.bordered)
+            .foregroundStyle(.secondary)
+        }
+        .overlay(alignment: .leading) {
+            if isUpdating {
+                Button("", systemImage: "trash") {
+                    deletionAlert.toggle()
+                }
+                .font(.title2)
+                .buttonBorderShape(.circle)
+                .buttonStyle(.bordered)
+                .foregroundStyle(.red)
+            }
+        }
+        .padding(.horizontal, 10)
+    }
+    
     private var valueTextField: some View {
         HStack {
             TextField("0", text: $viewModel.valueString)
@@ -371,12 +385,19 @@ struct AddingSpendIcomeView: View {
                             .tag(balanceAcc)
                     }
                 }
+                
+                Button("Add new", systemImage: "plus") {
+                    showAddingBalanceAccountView.toggle()
+                }
             }
             .buttonStyle(.bordered)
             .lineLimit(1)
             .foregroundStyle(.primary)
         }
         .padding(.horizontal, 10)
+        .sheet(isPresented: $showAddingBalanceAccountView) {
+            viewModel.getAddingBalanceAccountView()
+        }
     }
     
     private var commentSection: some View {
