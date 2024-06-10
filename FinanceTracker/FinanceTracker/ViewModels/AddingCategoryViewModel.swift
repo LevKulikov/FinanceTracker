@@ -13,9 +13,16 @@ protocol AddingCategoryViewModelDelegate: AnyObject {
     func didUpdateCategory()
 }
 
+enum ActionWithCategory: Equatable {
+    case none
+    case add
+    case update(Category)
+}
+
 final class AddingCategoryViewModel: ObservableObject {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
+    private var categoryToUpdate: Category?
     weak var delegate: (any AddingCategoryViewModelDelegate)?
     var filteredCategories: [Category] {
         guard !name.isEmpty else { return [] }
@@ -42,6 +49,7 @@ final class AddingCategoryViewModel: ObservableObject {
     ]
     
     //MARK: Published props
+    @Published private(set) var action: ActionWithCategory = .none
     @Published private(set) var availableCategories: [Category] = []
     @Published var transactionType: TransactionsType = .spending {
         didSet {
@@ -55,10 +63,13 @@ final class AddingCategoryViewModel: ObservableObject {
     @Published var categoryColor: Color
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol, transactionType: TransactionsType) {
+    init(dataManager: some DataManagerProtocol, transactionType: TransactionsType, action: ActionWithCategory) {
         self.dataManager = dataManager
         self.transactionType = transactionType
         self.categoryColor = transactionType == .spending ? .red : .green
+        self.action = action
+        
+        setDataIfNeeded()
         Task {
             await fetchCategories()
         }
@@ -70,23 +81,59 @@ final class AddingCategoryViewModel: ObservableObject {
         guard !name.isEmpty else { return }
         guard !iconName.isEmpty else { return }
         
-        let newCategory = Category(
-            type: transactionType,
-            name: name,
-            iconName: iconName,
-            color: categoryColor
-        )
-        Task {
-            await dataManager.insert(newCategory)
-            delegate?.didUpdateCategory()
-            completionHandler()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.removeAndRefetch()
+        switch action {
+        case .none, .add:
+            let newCategory = Category(
+                type: transactionType,
+                name: name,
+                iconName: iconName,
+                color: categoryColor
+            )
+            Task {
+                await dataManager.insert(newCategory)
+                delegate?.didUpdateCategory()
+                completionHandler()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                    self?.removeAndRefetch()
+                }
+            }
+        case .update:
+            guard let categoryToUpdate else {
+                print("Category to update is nil, though action is .update")
+                return
+            }
+            categoryToUpdate.type = transactionType
+            categoryToUpdate.name = name
+            categoryToUpdate.iconName = iconName
+            categoryToUpdate.color = categoryColor
+            
+            Task {
+                do {
+                    try await dataManager.save()
+                    delegate?.didUpdateCategory()
+                    completionHandler()
+                } catch {
+                    print("Caterory cannot be updated, error: \(error)")
+                    return
+                }
             }
         }
     }
     
     //MARK: Private methods
+    private func setDataIfNeeded() {
+        switch action {
+        case .none, .add:
+            break
+        case .update(let category):
+            categoryToUpdate = category
+            transactionType = category.type ?? .spending
+            name = category.name
+            iconName = category.iconName
+            categoryColor = category.color
+        }
+    }
+    
     /// This method is needed to check if such category exists
     @MainActor
     private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {

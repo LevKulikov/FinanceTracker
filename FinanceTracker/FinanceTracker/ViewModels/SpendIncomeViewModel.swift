@@ -155,4 +155,8 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }
+    
+    func categoryUpdated() {
+        fetchTransactions()
+    }
 }

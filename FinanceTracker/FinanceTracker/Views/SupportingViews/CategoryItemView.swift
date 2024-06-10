@@ -49,6 +49,7 @@ struct CategoryItemView: View {
         .id(category)
         .scaleEffect(selectedCategory == category ? 1.1 : 1)
         .padding(.horizontal, selectedCategory == category ? 6 : 0)
+        .contentShape([.hoverEffect, .contextMenuPreview], RoundedRectangle(cornerRadius: 10.0))
     }
     
     @ViewBuilder

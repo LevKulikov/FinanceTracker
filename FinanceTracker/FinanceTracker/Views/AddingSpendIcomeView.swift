@@ -14,6 +14,7 @@ struct AddingSpendIcomeView: View {
     @Binding var action: ActionWithTransaction
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
+    @State private var showUpdatingCategoryView: Category?
     @State private var showMoreTagsOptions = false
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
@@ -237,6 +238,11 @@ struct AddingSpendIcomeView: View {
                                         viewModel.category = categoryToSet
                                     }
                                 }
+                                .contextMenu {
+                                    Button("Update", systemImage: "pencil.and.outline") {
+                                        showUpdatingCategoryView = categoryToSet
+                                    }
+                                }
                         }
                     }
                 }
@@ -259,6 +265,9 @@ struct AddingSpendIcomeView: View {
         }
         .sheet(isPresented: $showMoreCategories) {
             wideCategoryPickerView
+        }
+        .sheet(item: $showUpdatingCategoryView) { categoryToUpdate in
+            viewModel.getAddingCategoryView(action: .update(categoryToUpdate))
         }
     }
     
@@ -289,10 +298,16 @@ struct AddingSpendIcomeView: View {
                                         viewModel.category = categoryToSet
                                     }
                                 }
+                                .contextMenu {
+                                    Button("Update", systemImage: "pencil.and.outline") {
+                                        showMoreCategories = false
+                                        showUpdatingCategoryView = categoryToSet
+                                    }
+                                }
                         }
                         
                         NavigationLink {
-                            viewModel.getAddingCategoryView()
+                            viewModel.getAddingCategoryView(action: .add)
                         } label: {
                             Image(systemName: "plus")
                                 .foregroundStyle(.white)
@@ -303,6 +318,7 @@ struct AddingSpendIcomeView: View {
                                         .fill(.blue)
                                 }
                         }
+                        .frame(width: 100, height: 130)
                     }
                 }
                 .contentMargins(10, for: .scrollContent)
