@@ -200,7 +200,6 @@ struct AddingCategoryView: View {
                         }
                     }
                 }
-//                .scrollTargetBehavior(.paging)
                 .contentMargins(12, for: .scrollContent)
                 .onReceive(viewModel.$iconName) { iconName in
                     withAnimation {
@@ -254,7 +253,7 @@ struct AddingCategoryView: View {
             }
             
             HStack {
-                ForEach(viewModel.defaultColors, id: \.self) { defaultColor in
+                ForEach(FTAppAssets.defaultColors, id: \.self) { defaultColor in
                     getColorItem(for: defaultColor)
                     
                     Spacer()
@@ -263,13 +262,13 @@ struct AddingCategoryView: View {
                 ColorPicker("", selection: $viewModel.categoryColor)
                     .labelsHidden()
                     .overlay {
-                        if !viewModel.defaultColors.contains(viewModel.categoryColor) {
+                        if !FTAppAssets.defaultColors.contains(viewModel.categoryColor) {
                             Image(systemName: "checkmark")
                                 .font(.footnote)
                                 .foregroundStyle(.white)
                         }
                     }
-                    .scaleEffect(!viewModel.defaultColors.contains(viewModel.categoryColor) ? 1.5 : 1.3)
+                    .scaleEffect(!FTAppAssets.defaultColors.contains(viewModel.categoryColor) ? 1.5 : 1.3)
                     .shadow(radius: 5)
                     .onTapGesture(count: 20, perform: {
                         //Prevents iOS 17 bug

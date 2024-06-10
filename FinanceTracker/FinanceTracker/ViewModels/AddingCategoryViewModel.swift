@@ -32,14 +32,6 @@ final class AddingCategoryViewModel: ObservableObject {
             color: categoryColor
         )
     }
-    let defaultColors: [Color] = [
-        .red,
-        .blue,
-        .green,
-        .orange,
-        .purple,
-        .yellow,
-    ]
     
     //MARK: Published props
     @Published private(set) var availableCategories: [Category] = []

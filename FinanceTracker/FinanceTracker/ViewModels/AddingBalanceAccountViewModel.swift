@@ -35,7 +35,8 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     //MARK: Category props to set
     @Published var name: String = ""
     @Published var currency: String = ""
-    private var balance: Float = 0
+    /// Converted from balanceString to float from View
+    var balance: Float = 0
     @Published var iconName: String = ""
     @Published var color: Color = .cyan
     
@@ -50,21 +51,17 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     func save(completionHandler: @escaping () -> Void) {
         switch action {
         case .none, .add:
-            guard let balanceToSet = Float(balanceString) else {
-                print("Value in balanceString (AddingBalanceAccountViewModel) cannot be converted in float")
-                return
-            }
-            
             let newBalanceAccount = BalanceAccount(
                 name: name,
                 currency: currency,
-                balance: balanceToSet,
+                balance: balance,
                 iconName: iconName,
                 color: color
             )
             
             Task {
                 await dataManager.insert(newBalanceAccount)
+                delegate?.didUpdateBalanceAccount()
                 completionHandler()
             }
         case .update:
@@ -73,10 +70,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
                 return
             }
             
-            guard let balanceToSet = calculateNeededBalance() else {
-                print("Unable to calculate needed balance account")
-                return
-            }
+            let balanceToSet = calculateNeededBalance()
             
             balanceAccountToUpdate.name = name
             balanceAccountToUpdate.currency = currency
@@ -87,6 +81,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             Task {
                 do {
                     try await dataManager.save()
+                    delegate?.didUpdateBalanceAccount()
                     completionHandler()
                 } catch {
                     print("Saving BalanceAccount error: \(error)")
@@ -163,12 +158,8 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     
     //TODO: Чтобы была возможность изменить текущий балас с учетом всех трат и доходов: через формулу изначально устанавливать калькулированное значение изначальный баланс + изменения в значение balanceString, и только в ините; далее после изменения пользователем и кнопки сохранить через формулу вычислять, какое должно быть изначальное значение баланса, чтобы оно сходилось с установленным пользователем значением после добавления изменений всех трат и доходов
     
-    private func calculateNeededBalance() -> Float? {
-        guard let floatSetBalance = Float(balanceString) else {
-            print("Value in balanceString (AddingBalanceAccountViewModel) cannot be converted in float")
-            return nil
-        }
-        let valueToReturn = floatSetBalance - transactionsChanges
+    private func calculateNeededBalance() -> Float {
+        let valueToReturn = balance - transactionsChanges
         return valueToReturn
     }
 }
