@@ -113,11 +113,8 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
-        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
-        viewModel.delegate = self
-        
-        return AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel)
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {        
+        return FTFactory.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transactionsTypeSelected, forAction: forAction, namespace: namespace, delegate: self)
     }
     
     func fetchAllData() {

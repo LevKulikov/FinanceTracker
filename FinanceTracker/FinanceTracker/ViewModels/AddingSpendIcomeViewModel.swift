@@ -196,17 +196,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     func getAddingCategoryView(action: ActionWithCategory) -> some View {
-        let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action)
-        viewModel.delegate = self
-        
-        return AddingCategoryView(viewModel: viewModel)
+        return FTFactory.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
     }
     
     func getAddingBalanceAccountView() -> some View {
-        let viewModel = AddingBalanceAccountViewModel(dataManager: dataManager, action: .add)
-        viewModel.delegate = self
-        
-        return AddingBalanceAccauntView(viewModel: viewModel)
+        return FTFactory.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
     
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {

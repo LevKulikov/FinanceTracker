@@ -47,9 +47,6 @@ struct FinanceTrackerApp: App {
     
     @MainActor @ViewBuilder
     private func createSpendIncomeView(container: ModelContainer) -> some View {
-        let dataManager = DataManager(container: container)
-        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-        
-        SpendIncomeView(viewModel: viewModel)
+        FTFactory.createSpendIncomeView(container: container)
     }
 }
