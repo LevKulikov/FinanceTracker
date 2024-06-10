@@ -82,6 +82,7 @@ struct TagsSectionView: View {
             }
             .scrollIndicators(.hidden)
             .contentMargins(10)
+            .id("existing tags")
         }
     }
 }

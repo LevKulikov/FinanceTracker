@@ -55,94 +55,105 @@ struct AddingSpendIcomeView: View {
     
     //MARK: Body
     var body: some View {
-        ScrollView {
-            VStack {
-                headerSection
-                    .padding(.bottom)
-                
-                
-                valueTextField
-                    .padding(.bottom)
-                
-                categoryPickerSection
-                    .padding(.bottom)
-                
-                Divider()
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                
-                datePicker
-                    .padding(.bottom)
-                
-                Divider()
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                
-                balanceAccountPicker
-                    .padding(.bottom)
-                
-                Divider()
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                
-                TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
-                
-                commentSection
-                    .padding(.bottom)
-                
-                Rectangle()
-                    .fill(.clear)
-                    .frame(height: 50)
-            }
-        }
-        .frame(maxWidth: 600, maxHeight: 900)
-        .background {
-            if userIdiom == .phone {
-                Rectangle()
-                    .fill(.background)
-                    .ignoresSafeArea()
-                    .matchedGeometryEffect(id: "buttonBackground", in: namespace)
-            } else {
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(.background)
-                    .ignoresSafeArea()
-                    .matchedGeometryEffect(id: "buttonBackground", in: namespace)
-                    .shadow(color: .gray.opacity(0.5), radius: 30)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    closeView()
-                }
-        }
-        .toolbar {
-            if toolbarCanBeDisplayed {
-                toolbarView
-            }
-        }
-        .onTapGesture(perform: dismissKeyboardFocus)
-        .overlay(alignment: .bottom) {
-            if !searchTagsTextFieldFocus && !commentTextFieldFocus {
-                addUpdateButton
-            }
-        }
-        .confirmationDialog("Delete transaction?", isPresented: $deletionAlert, titleVisibility: .visible, actions: {
-            Button("Delete", role: .destructive) {
-                viewModel.deleteUpdatedTransaction {
-                    closeView()
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack {
+                    headerSection
+                        .padding(.bottom)
+                    
+                    
+                    valueTextField
+                        .padding(.bottom)
+                    
+                    categoryPickerSection
+                        .padding(.bottom)
+                    
+                    Divider()
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                    
+                    datePicker
+                        .padding(.bottom)
+                    
+                    Divider()
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                    
+                    balanceAccountPicker
+                        .padding(.bottom)
+                    
+                    Divider()
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                    
+                    TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
+                        .onChange(of: searchTagsTextFieldFocus) {
+                            if searchTagsTextFieldFocus {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation {
+                                        proxy.scrollTo("existing tags", anchor: .bottom)
+                                    }
+                                }
+                            }
+                        }
+                    
+                    commentSection
+                        .padding(.bottom)
+                    
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 50)
                 }
             }
-            Button("Cancel", role: .cancel) {}
-        }, message: {
-            Text("This action is irretable")
-        })
-        .alert("\(saveError?.localizedDescription ?? "Unknown error")",
-               isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
-            Button("Ok") {}
+            .frame(maxWidth: 600, maxHeight: 900)
+            .background {
+                if userIdiom == .phone {
+                    Rectangle()
+                        .fill(.background)
+                        .ignoresSafeArea()
+                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+                } else {
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(.background)
+                        .ignoresSafeArea()
+                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+                        .shadow(color: .gray.opacity(0.5), radius: 30)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        closeView()
+                    }
+            }
+            .toolbar {
+                if toolbarCanBeDisplayed {
+                    toolbarView
+                }
+            }
+            .onTapGesture(perform: dismissKeyboardFocus)
+            .overlay(alignment: .bottom) {
+                if !searchTagsTextFieldFocus && !commentTextFieldFocus {
+                    addUpdateButton
+                }
+            }
+            .confirmationDialog("Delete transaction?", isPresented: $deletionAlert, titleVisibility: .visible, actions: {
+                Button("Delete", role: .destructive) {
+                    viewModel.deleteUpdatedTransaction {
+                        closeView()
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            }, message: {
+                Text("This action is irretable")
+            })
+            .alert("\(saveError?.localizedDescription ?? "Unknown error")",
+                   isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
+                Button("Ok") {}
+            }
         }
     }
     
