@@ -243,7 +243,7 @@ struct SpendIncomeView: View {
         let xTrans = value.translation.width
         let screenWidth = FTAppAssets.getScreenSize().width
         // plus is back, minus is forward
-        if abs(xTrans) > screenWidth / 2.5 {
+        if abs(xTrans) > screenWidth / 4 {
             if xTrans > 0, viewModel.movingBackwardDateAvailable {
                 dragXOffset = -screenWidth - 20
             } else if viewModel.movingForwardDateAvailable {

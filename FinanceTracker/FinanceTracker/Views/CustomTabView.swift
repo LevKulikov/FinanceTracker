@@ -29,42 +29,39 @@ struct CustomTabView: View  {
     
     //MARK: - Body
     var body: some View {
-        TabView(selection: $tabSelection) {
-            viewModel.getSpendIncomeView(namespace: namespace)
-                .tag(1)
-                .toolbar(.hidden, for: .tabBar)
-            
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
-                .tag(2)
-            
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
-                .tag(3)
-            
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
-                .tag(4)
+        ZStack {
+            switch tabSelection {
+            case 1:
+                viewModel.getSpendIncomeView(namespace: namespace)
+                    .tag(1)
+            default:
+                Label("In develop", systemImage: "gearshape.2")
+                    .font(.largeTitle)
+                    .tag(2)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
             customTabView
                 .offset(y: availableYOffset)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
-        .ignoresSafeArea(.keyboard)
     }
     
     private var customTabView: some View {
-        HStack(alignment: .bottom) {
+        HStack {
             let buttonWidth: CGFloat = 70
+            let imageHeight: CGFloat = 20
             
             Button {
                 selectTab(1)
             } label: {
                 VStack {
                     Image(systemName: "list.bullet.clipboard")
+                        .frame(height: imageHeight)
                     
                     Text("List")
+                        .font(.caption)
                 }
             }
             .frame(width: buttonWidth)
@@ -77,8 +74,10 @@ struct CustomTabView: View  {
             } label: {
                 VStack {
                     Image(systemName: "chart.bar")
+                        .frame(height: imageHeight)
                     
                     Text("Charts")
+                        .font(.caption)
                 }
             }
             .frame(width: buttonWidth)
@@ -110,8 +109,10 @@ struct CustomTabView: View  {
             } label: {
                 VStack {
                     Image(systemName: "list.bullet.below.rectangle")
+                        .frame(height: imageHeight)
                     
                     Text("Entities")
+                        .font(.caption)
                 }
             }
             .frame(width: buttonWidth)
@@ -124,8 +125,10 @@ struct CustomTabView: View  {
             } label: {
                 VStack {
                     Image(systemName: "gear")
+                        .frame(height: imageHeight)
                     
                     Text("Setting")
+                        .font(.caption)
                 }
             }
             .frame(width: buttonWidth)
