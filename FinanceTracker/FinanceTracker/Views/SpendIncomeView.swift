@@ -15,19 +15,18 @@ enum ActionWithTransaction: Equatable {
 
 struct SpendIncomeView: View {
     //MARK: Properties
-    @Namespace private var namespace
+    private var namespace: Namespace.ID
     @StateObject private var viewModel: SpendIncomeViewModel
-    @State private var actionSelected: ActionWithTransaction = .none
     @State private var transactionIdSelected: String = ""
-    @State private var tapEnabled = true
     @State private var closeAllOpenedGroup = false
     
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
     
     //MARK: Init
-    init(viewModel: SpendIncomeViewModel) {
+    init(viewModel: SpendIncomeViewModel, namespace: Namespace.ID) {
         self._viewModel = StateObject(wrappedValue: viewModel)
+        self.namespace = namespace
     }
     
     //MARK: Computed View props
@@ -44,11 +43,11 @@ struct SpendIncomeView: View {
                             namespace: namespace,
                             closeGroupFlag: $closeAllOpenedGroup
                         ) { transaction in
-                            guard tapEnabled else { return }
-                            tapEnabled = false
+                            guard viewModel.tapEnabled else { return }
+                            viewModel.tapEnabled = false
                             transactionIdSelected = transaction.id
                             withAnimation(.snappy(duration: 0.5)) {
-                                actionSelected = .update(transaction)
+                                viewModel.actionSelected = .update(transaction)
                             }
                         }
                         .scrollTransition { content, phase in
@@ -68,11 +67,9 @@ struct SpendIncomeView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .overlay(alignment: .bottom) {
-                addButton
-            }
-            .onChange(of: actionSelected) {
-                if case .none = actionSelected {
+            .onReceive(viewModel.$actionSelected) { newAction in
+                viewModel.didSelectAction(action: newAction)
+                if case .none = newAction {
                     viewModel.fetchAllData()
                     enableTapsWithDeadline()
                 }
@@ -93,10 +90,12 @@ struct SpendIncomeView: View {
                     }
             )
             
-            if case .add = actionSelected {
-                viewModel.getAddUpdateView(forAction: $actionSelected, namespace: namespace)
-            } else if case .update(_) = actionSelected {
-                viewModel.getAddUpdateView(forAction: $actionSelected, namespace: namespace)
+            if case .add = viewModel.actionSelected {
+                viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
+                    .toolbar(.hidden, for: .tabBar)
+            } else if case .update = viewModel.actionSelected {
+                viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
+                    .toolbar(.hidden, for: .tabBar)
             }
         }
     }
@@ -212,10 +211,10 @@ struct SpendIncomeView: View {
     
     private var addButton: some View {
         Button {
-            guard tapEnabled else { return }
-            tapEnabled = false
+            guard viewModel.tapEnabled else { return }
+            viewModel.tapEnabled = false
             withAnimation(.snappy(duration: 0.5)) {
-                actionSelected = .add(viewModel.dateSelected)
+                viewModel.actionSelected = .add(viewModel.dateSelected)
             }
         } label: {
             Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
@@ -236,7 +235,7 @@ struct SpendIncomeView: View {
     
     private func enableTapsWithDeadline() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            tapEnabled = true
+            viewModel.tapEnabled = true
         }
     }
     
@@ -265,5 +264,7 @@ struct SpendIncomeView: View {
     let dataManager = DataManager(container: container)
     let viewModel = SpendIncomeViewModel(dataManager: dataManager)
     
-    return SpendIncomeView(viewModel: viewModel)
+    @Namespace var namespace
+    
+    return SpendIncomeView(viewModel: viewModel, namespace: namespace)
 }

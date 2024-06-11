@@ -111,12 +111,12 @@ struct AddingSpendIcomeView: View {
                     Rectangle()
                         .fill(.background)
                         .ignoresSafeArea()
-                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                 } else {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(.background)
                         .ignoresSafeArea()
-                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                         .shadow(color: .gray.opacity(0.5), radius: 30)
                 }
             }
@@ -437,6 +437,7 @@ struct AddingSpendIcomeView: View {
                     Capsule()
                         .fill(.ultraThinMaterial)
                         .stroke(.blue)
+                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                 }
         }
         .offset(y: -5)

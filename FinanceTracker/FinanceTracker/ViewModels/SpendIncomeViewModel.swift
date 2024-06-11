@@ -10,6 +10,10 @@ import SwiftUI
 import SwiftData
 import Algorithms
 
+protocol SpendIncomeViewModelDelegate: AnyObject {
+    func didSelectAction(_ action: ActionWithTransaction)
+}
+
 final class SpendIncomeViewModel: ObservableObject {
     enum DateSettingDestination {
         case back
@@ -18,6 +22,8 @@ final class SpendIncomeViewModel: ObservableObject {
     
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
+    weak var delegate: (any SpendIncomeViewModelDelegate)?
+    var addButtonAction: (() -> Void)?
     let calendar = Calendar.current
     var transactionsValueSum: Float {
         filteredGroupedTranactions.flatMap{$0}.map{$0.value}.reduce(0, +)
@@ -58,7 +64,8 @@ final class SpendIncomeViewModel: ObservableObject {
             }
         return filteredGroupedByCategory
     }
-    
+    @Published var tapEnabled = true
+    @Published var actionSelected: ActionWithTransaction = .none
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
             fetchAllData()
@@ -124,6 +131,18 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
+    func didSelectAction(action: ActionWithTransaction) {
+        delegate?.didSelectAction(action)
+    }
+    
+    private func addButtonPressedFromTabBar() {
+        guard tapEnabled else { return }
+        tapEnabled = false
+        withAnimation(.snappy(duration: 0.5)) {
+            actionSelected = .add(dateSelected)
+        }
+    }
+    
     @MainActor
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
@@ -173,5 +192,12 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     
     func categoryUpdated() {
         fetchAllData()
+    }
+}
+
+//MARK: Extension for CustomTabViewModelDelegate
+extension SpendIncomeViewModel: CustomTabViewModelDelegate {
+    func addButtonPressed() {
+        addButtonPressedFromTabBar()
     }
 }

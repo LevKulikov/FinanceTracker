@@ -10,16 +10,16 @@ import SwiftUI
 import SwiftData
 
 struct FTFactory {
-    @MainActor
-    static func createSpendIncomeView(container: ModelContainer) -> some View {
-        let dataManager = DataManager(container: container)
-        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-        return SpendIncomeView(viewModel: viewModel)
+    static func createCustomTabView(dataManager: some DataManagerProtocol) -> some View {
+        let viewModel = CustomTabViewModel(dataManager: dataManager)
+        return CustomTabView(viewModel: viewModel)
     }
     
-    static func createSpendIncomeView(dataManager: some DataManagerProtocol) -> some View {
+    static func createSpendIncomeView(dataManager: some DataManagerProtocol, delegate: (some SpendIncomeViewModelDelegate)?, namespace: Namespace.ID) -> some View {
         let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-        return SpendIncomeView(viewModel: viewModel)
+        viewModel.delegate = delegate
+        
+        return SpendIncomeView(viewModel: viewModel, namespace: namespace)
     }
     
     static func createAddingSpendIcomeView(

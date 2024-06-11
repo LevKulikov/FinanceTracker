@@ -11,18 +11,19 @@ import SwiftData
 @main
 struct FinanceTrackerApp: App {
     //MARK: Properties
-    var sharedModelContainer: ModelContainer?
+    private var sharedModelContainer: ModelContainer
+    private var dataManager: DataManager
 
     var body: some Scene {
-        WindowGroup {
-            createSpendIncomeView(container: sharedModelContainer!)
-//            createAddingView(container: sharedModelContainer!)
+        WindowGroup {            
+            FTFactory.createCustomTabView(dataManager: dataManager)
         }
     }
     
-    //MARK: Methods
+    //MARK: Init
     init() {
         sharedModelContainer = Self.createModelContainer()
+        dataManager = DataManager(container: sharedModelContainer)
     }
     
     //MARK: Methods
@@ -43,10 +44,5 @@ struct FinanceTrackerApp: App {
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-    }
-    
-    @MainActor @ViewBuilder
-    private func createSpendIncomeView(container: ModelContainer) -> some View {
-        FTFactory.createSpendIncomeView(container: container)
     }
 }
