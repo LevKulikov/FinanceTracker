@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AppFormatters {
+struct FTFormatters {
     static var numberFormatterWithDecimals: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.groupingSeparator = " "

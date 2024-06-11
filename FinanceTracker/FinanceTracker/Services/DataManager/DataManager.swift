@@ -8,14 +8,17 @@
 import Foundation
 import SwiftData
 
-@MainActor
 protocol DataManagerProtocol: AnyObject {
+    @MainActor
     func save() throws
     
+    @MainActor
     func deleteTransaction(_ transaction: Transaction)
     
+    @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
+    @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
 }
 

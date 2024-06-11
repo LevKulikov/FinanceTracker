@@ -210,7 +210,7 @@ struct AddingSpendIcomeView: View {
                 .onChange(of: viewModel.valueString, onChangeOfValueString)
                 .font(.title)
                 .onSubmit {
-                    viewModel.valueString = AppFormatters
+                    viewModel.valueString = FTFormatters
                         .numberFormatterWithDecimals
                         .string(for: viewModel.value) ?? ""
                 }

@@ -106,7 +106,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             Task {
                 await setTransactionsChanges()
                 let totalBalance = balance + transactionsChanges
-                balanceString = AppFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
+                balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
             }
         }
     }

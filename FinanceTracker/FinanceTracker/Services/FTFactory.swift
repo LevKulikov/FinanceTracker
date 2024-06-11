@@ -17,6 +17,11 @@ struct FTFactory {
         return SpendIncomeView(viewModel: viewModel)
     }
     
+    static func createSpendIncomeView(dataManager: some DataManagerProtocol) -> some View {
+        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
+        return SpendIncomeView(viewModel: viewModel)
+    }
+    
     static func createAddingSpendIcomeView(
         dataManager: some DataManagerProtocol,
         transactionType: TransactionsType,

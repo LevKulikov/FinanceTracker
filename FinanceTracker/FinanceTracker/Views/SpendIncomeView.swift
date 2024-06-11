@@ -165,7 +165,6 @@ struct SpendIncomeView: View {
                 } label: {
                     Label(viewModel.balanceAccountToFilter.name, systemImage: "chevron.down")
                         .font(.title)
-                        .bold()
                 }
                 .foregroundStyle(.primary)
 
@@ -176,7 +175,7 @@ struct SpendIncomeView: View {
             .padding(.bottom)
             
             HStack {
-                Text(AppFormatters.numberFormatterWithDecimals.string(for: viewModel.transactionsValueSum) ?? "NaN")
+                Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.transactionsValueSum) ?? "NaN")
                     .font(.title)
                     .bold()
                     .layoutPriority(1)

@@ -71,7 +71,7 @@ struct GroupedSpendIncomeCell: View {
             Spacer()
             
             HStack(alignment: .bottom) {
-                Text(AppFormatters.numberFormatterWithDecimals.string(for: transactionsValueSum) ?? "Err")
+                Text(FTFormatters.numberFormatterWithDecimals.string(for: transactionsValueSum) ?? "Err")
                     .font(.title3)
                     .bold()
                     .lineLimit(1)
