@@ -58,7 +58,7 @@ struct SpendIncomeView: View {
                     
                     Rectangle()
                         .fill(.clear)
-                        .frame(height: 40)
+                        .frame(height: 80)
                 }
                 .safeAreaInset(edge: .top) {
                     spendIncomePicker
@@ -78,12 +78,8 @@ struct SpendIncomeView: View {
             
             if case .add = viewModel.actionSelected {
                 viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
-                    .toolbar(.hidden, for: .tabBar)
-//                    .ignoresSafeArea(edges: .bottom)
             } else if case .update = viewModel.actionSelected {
                 viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
-                    .toolbar(.hidden, for: .tabBar)
-//                    .ignoresSafeArea(edges: .bottom)
             }
         }
     }

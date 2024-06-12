@@ -24,6 +24,7 @@ struct FinanceTrackerApp: App {
     init() {
         sharedModelContainer = Self.createModelContainer()
         dataManager = DataManager(container: sharedModelContainer)
+        setAppearance()
     }
     
     //MARK: Methods
@@ -44,5 +45,11 @@ struct FinanceTrackerApp: App {
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
+    }
+    
+    private func setAppearance() {
+        UITabBar.appearance().backgroundColor = UIColor.clear
+        UITabBar.appearance().barTintColor = .clear
+        UITabBar.appearance().isHidden = true
     }
 }

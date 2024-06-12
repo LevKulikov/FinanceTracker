@@ -21,6 +21,119 @@ struct FTAppAssets {
         .yellow,
     ]
     
+    static let testTransactions = [
+        Transaction(
+            type: .spending,
+            comment: "",
+            value: 1000,
+            date: .now,
+            balanceAccount:
+                BalanceAccount(
+                    name: "TestBA",
+                    currency: "RUB",
+                    balance: 123000,
+                    iconName: "",
+                    color: .yellow
+                ),
+            category:
+                Category(
+                    type: .spending,
+                    name: "Test categ",
+                    iconName: "testIcon",
+                    color: .cyan
+                ),
+            tags: []
+        ),
+        Transaction(
+            type: .spending,
+            comment: "",
+            value: 1000,
+            date: .now,
+            balanceAccount:
+                BalanceAccount(
+                    name: "Test categ",
+                    currency: "RUB",
+                    balance: 123000,
+                    iconName: "",
+                    color: .yellow
+                ),
+            category:
+                Category(
+                    type: .spending,
+                    name: "Test categ",
+                    iconName: "testIcon",
+                    color: .cyan
+                ),
+            tags: []
+        ),
+        Transaction(
+            type: .spending,
+            comment: "",
+            value: 1000,
+            date: .now,
+            balanceAccount:
+                BalanceAccount(
+                    name: "TestBA",
+                    currency: "RUB",
+                    balance: 123000,
+                    iconName: "",
+                    color: .yellow
+                ),
+            category:
+                Category(
+                    type: .spending,
+                    name: "Test categ",
+                    iconName: "testIcon",
+                    color: .cyan
+                ),
+            tags: []
+        ),
+        Transaction(
+            type: .spending,
+            comment: "",
+            value: 1000,
+            date: .now,
+            balanceAccount:
+                BalanceAccount(
+                    name: "TestBA",
+                    currency: "RUB",
+                    balance: 123000,
+                    iconName: "",
+                    color: .yellow
+                ),
+            category:
+                Category(
+                    type: .spending,
+                    name: "Test categ",
+                    iconName: "testIcon",
+                    color: .cyan
+                ),
+            tags: []
+        ),
+        Transaction(
+            type: .spending,
+            comment: "",
+            value: 1000,
+            date: .now,
+            balanceAccount:
+                BalanceAccount(
+                    name: "TestBA",
+                    currency: "RUB",
+                    balance: 123000,
+                    iconName: "",
+                    color: .yellow
+                ),
+            category:
+                Category(
+                    type: .spending,
+                    name: "Test categ",
+                    iconName: "testIcon",
+                    color: .cyan
+                ),
+            tags: []
+        )
+    ]
+    
     static let currentUserDevise: UIUserInterfaceIdiom = UIDevice.current.userInterfaceIdiom
     
     static let currnetUserDeviseName: String = UIDevice.current.name

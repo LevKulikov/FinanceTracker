@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7305BAC72C1A495100F712BC /* TransactionPieChart.swift */; };
+		7305BACA2C1A4C1900F712BC /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7305BAC92C1A4C1900F712BC /* StatisticsView.swift */; };
+		7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */; };
 		731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8232C0A157E006C7B0F /* FTFormatters.swift */; };
 		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
 		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
@@ -57,6 +60,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7305BAC72C1A495100F712BC /* TransactionPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionPieChart.swift; sourceTree = "<group>"; };
+		7305BAC92C1A4C1900F712BC /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		731EE8232C0A157E006C7B0F /* FTFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTFormatters.swift; sourceTree = "<group>"; };
 		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
@@ -196,6 +202,7 @@
 				73731D592C10FC5F00A80355 /* AddingCategoryView.swift */,
 				735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */,
 				73EC38632C18A40C004A7BA9 /* CustomTabView.swift */,
+				7305BAC92C1A4C1900F712BC /* StatisticsView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -209,6 +216,7 @@
 				73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */,
 				735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */,
 				73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */,
+				7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -239,6 +247,7 @@
 				73F923272C0DE5A3001D96D4 /* TagsSectionView.swift */,
 				73F923292C0DEA70001D96D4 /* CategoryItemView.swift */,
 				73F9232B2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift */,
+				7305BAC72C1A495100F712BC /* TransactionPieChart.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -381,6 +390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */,
+				7305BACA2C1A4C1900F712BC /* StatisticsView.swift in Sources */,
 				73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */,
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
@@ -398,7 +408,9 @@
 				735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
+				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
+				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
