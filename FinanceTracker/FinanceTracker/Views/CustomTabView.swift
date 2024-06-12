@@ -14,7 +14,7 @@ struct CustomTabView: View  {
     @StateObject private var viewModel: CustomTabViewModel
     @State private var tabSelection = 1
     private var availableYOffset: CGFloat {
-        if UIDevice.current.name == "iPhone SE (3rd generation)" {
+        if FTAppAssets.currnetUserDeviseName == "iPhone SE (3rd generation)" {
             return 5
         } else if UIDevice.current.userInterfaceIdiom == .pad {
             return 15
@@ -41,8 +41,11 @@ struct CustomTabView: View  {
                 .font(.largeTitle)
                 .tag(3)
             
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
+//            Label("In develop", systemImage: "gearshape.2")
+//                .font(.largeTitle)
+//                .tag(4)
+            Rectangle()
+                .fill(.red)
                 .tag(4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -12,6 +12,7 @@ struct GroupedSpendIncomeCell: View {
     var namespace: Namespace.ID
     @Binding var closeGroupFlag: Bool
     var onTapTransaction: (Transaction) -> Void
+    var closeOpenHandler: ((Bool) -> Void)?
     
     @State private var openGroup = false
     private var mutualCategory: Category? {
@@ -22,6 +23,18 @@ struct GroupedSpendIncomeCell: View {
     }
     private var transactionsValueSum: Float {
         transactions.map { $0.value }.reduce(0, +)
+    }
+    
+    init(transactions: [Transaction], 
+         namespace: Namespace.ID,
+         closeGroupFlag: Binding<Bool>,
+         onTapTransaction: @escaping (Transaction) -> Void,
+         closeOpenHandler: ((Bool) -> Void)? = nil) {
+        self.transactions = transactions
+        self.namespace = namespace
+        self._closeGroupFlag = closeGroupFlag
+        self.onTapTransaction = onTapTransaction
+        self.closeOpenHandler = closeOpenHandler
     }
     
     var body: some View {

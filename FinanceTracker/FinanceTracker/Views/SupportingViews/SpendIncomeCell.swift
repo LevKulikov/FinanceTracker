@@ -26,13 +26,13 @@ struct SpendIncomeCell: View {
                     .font(.title3)
                     .bold()
                     .lineLimit(1)
-                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
+//                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
                 
                 Text(transaction.balanceAccount.currency)
                     .font(.footnote)
                     .padding(.bottom, 2.6)
                     .lineLimit(1)
-                    .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
+//                    .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
             }
             .layoutPriority(1)
         }
@@ -54,7 +54,7 @@ struct SpendIncomeCell: View {
                 .overlay {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .matchedGeometryEffect(id: "image" + transaction.id, in: namespace)
+//                        .matchedGeometryEffect(id: "image" + transaction.id, in: namespace)
                         .scaledToFit()
                         .frame(width: frameDimention - 10, height: frameDimention - 10)
                 }

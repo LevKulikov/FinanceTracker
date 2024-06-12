@@ -7,19 +7,13 @@
 
 import SwiftUI
 
-enum ActionWithTransaction: Equatable {
-    case none
-    case add(Date)
-    case update(Transaction)
-}
-
 struct SpendIncomeView: View {
     //MARK: Properties
     private var namespace: Namespace.ID
     @StateObject private var viewModel: SpendIncomeViewModel
     @State private var transactionIdSelected: String = ""
     @State private var closeAllOpenedGroup = false
-    
+    @State private var isSomeGroupOpened = false
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
     
@@ -36,6 +30,12 @@ struct SpendIncomeView: View {
                 VStack {
                     sumAndDateView
                         .offset(x: dragXOffset)
+                        .scrollTransition { content, phase in
+                            content
+                                .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
+                                .scaleEffect(phase.isIdentity ? 1 : 0.7)
+                                .opacity(phase.isIdentity ? 1 : 0)
+                        }
                     
                     ForEach(viewModel.filteredGroupedTranactions, id: \.self) { transactionArray in
                         GroupedSpendIncomeCell(
@@ -49,12 +49,10 @@ struct SpendIncomeView: View {
                             withAnimation(.snappy(duration: 0.5)) {
                                 viewModel.actionSelected = .update(transaction)
                             }
-                        }
-                        .scrollTransition { content, phase in
-                            content
-                                .offset(y: phase.isIdentity ? 0 : phase == .topLeading ? 100 : -100)
-                                .scaleEffect(phase.isIdentity ? 1 : 0.7)
-                                .opacity(phase.isIdentity ? 1 : 0)
+                        } closeOpenHandler: { isOpen in
+                            withAnimation {
+                                isSomeGroupOpened = isOpen
+                            }
                         }
                     }
                     
@@ -67,22 +65,10 @@ struct SpendIncomeView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .onReceive(viewModel.$actionSelected) { newAction in
-                viewModel.didSelectAction(action: newAction)
-                if case .none = newAction {
-                    viewModel.fetchAllData()
-                    enableTapsWithDeadline()
-                }
-            }
             .gesture(
                 DragGesture()
                     .onChanged { value in
                         let xTrans = value.translation.width
-//                        if !closeAllOpenedGroup {
-//                            withAnimation(.snappy(duration: 0.5)) {
-//                                closeAllOpenedGroup = true
-//                            }
-//                        }
                         dragXOffset = xTrans
                     }
                     .onEnded { value in
@@ -224,7 +210,7 @@ struct SpendIncomeView: View {
                 .background {
                     Capsule()
                         .fill(.thinMaterial)
-                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
+//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                 }
         }
         .offset(y: -5)
@@ -233,12 +219,6 @@ struct SpendIncomeView: View {
     //MARK: Methods
     private func deleteTransaction(_ transaction: Transaction) {
         viewModel.delete(transaction)
-    }
-    
-    private func enableTapsWithDeadline() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            viewModel.tapEnabled = true
-        }
     }
     
     private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
@@ -255,7 +235,7 @@ struct SpendIncomeView: View {
             viewModel.setDate(destination: xTrans > 0 ? .back : .forward)
         }
             
-        withAnimation {
+        withAnimation(.snappy) {
             dragXOffset = 0
         }
     }

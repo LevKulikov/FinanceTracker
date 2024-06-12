@@ -21,6 +21,10 @@ struct FTAppAssets {
         .yellow,
     ]
     
+    static let currentUserDevise: UIUserInterfaceIdiom = UIDevice.current.userInterfaceIdiom
+    
+    static let currnetUserDeviseName: String = UIDevice.current.name
+    
     //MARK: Methods
     static func iconUIImage(name: String, bundle: String = "IconImages.bundle") -> UIImage? {
         let location = bundle + "/" + name

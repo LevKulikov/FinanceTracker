@@ -112,12 +112,10 @@ struct AddingSpendIcomeView: View {
                     Rectangle()
                         .fill(.background)
                         .ignoresSafeArea()
-//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                 } else {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(.background)
                         .ignoresSafeArea()
-//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
                         .shadow(color: .gray.opacity(0.5), radius: 30)
                 }
             }
@@ -479,7 +477,7 @@ struct AddingSpendIcomeView: View {
     
     private func closeView() {
         dismissKeyboardFocus()
-        withAnimation(.snappy(duration: 0.5)) {
+        withAnimation(.snappy(duration: 0.35)) {
             action = .none
         }
     }

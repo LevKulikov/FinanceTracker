@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 
 protocol CustomTabViewModelDelegate: AnyObject {
+    /// ID to prevents doublicates
+    var id: String { get }
+    
     func addButtonPressed()
 }
 
@@ -46,6 +49,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     private func addDelegate(object: some CustomTabViewModelDelegate) {
+        guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
     }
 }

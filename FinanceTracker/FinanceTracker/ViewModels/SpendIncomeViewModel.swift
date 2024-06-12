@@ -9,9 +9,16 @@ import Foundation
 import SwiftUI
 import SwiftData
 import Algorithms
+import Combine
 
 protocol SpendIncomeViewModelDelegate: AnyObject {
     func didSelectAction(_ action: ActionWithTransaction)
+}
+
+enum ActionWithTransaction: Equatable {
+    case none
+    case add(Date)
+    case update(Transaction)
 }
 
 final class SpendIncomeViewModel: ObservableObject {
@@ -21,13 +28,15 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     //MARK: - Properties
+    //MARK: Private props
     private let dataManager: any DataManagerProtocol
+    private var transactions: [Transaction] = []
+    
+    //MARK: Internal props
     weak var delegate: (any SpendIncomeViewModelDelegate)?
-    var addButtonAction: (() -> Void)?
     let calendar = Calendar.current
-    var transactionsValueSum: Float {
-        filteredGroupedTranactions.flatMap{$0}.map{$0.value}.reduce(0, +)
-    }
+    var cancelables = Set<AnyCancellable>()
+    
     var availableDateRange: ClosedRange<Date> {
         Date(timeIntervalSince1970: 0)...Date.now
     }
@@ -43,43 +52,47 @@ final class SpendIncomeViewModel: ObservableObject {
         }
         return availableDateRange.contains(forwardDate)
     }
-    var filteredGroupedTranactions: [[Transaction]] {
-        let filteredGroupedByCategory = transactions
-            .filter {
-                calendar.isDate($0.date, equalTo: dateSelected, toGranularity: .day)
-            }
-            .filter {
-                $0.balanceAccount == balanceAccountToFilter
-            }
-            .grouped { $0.category }
-            .map { $0.value }
-            .sorted {
-                let result = calendar.compare($0.first!.date, to: $1.first!.date, toGranularity: .second)
-                switch result {
-                case .orderedDescending:
-                    return true
-                default:
-                    return false
-                }
-            }
-        return filteredGroupedByCategory
-    }
+    
+    //MARK: Published props
+    @Published private(set) var transactionsValueSum: Float = 0
+    @Published private(set) var filteredGroupedTranactions: [[Transaction]] = []
     @Published var tapEnabled = true
-    @Published var actionSelected: ActionWithTransaction = .none
-    @Published var transactionsTypeSelected: TransactionsType = .spending {
+    @Published var actionSelected: ActionWithTransaction = .none {
         didSet {
-            fetchAllData()
+            didSelectAction(action: actionSelected)
+            if case .none = actionSelected {
+                fetchAllData { [weak self] in
+                    self?.filterGroupSortTransactions()
+                }
+                enableTapsWithDeadline()
+            }
         }
     }
-    @Published private(set) var transactions: [Transaction] = []
+    @Published var transactionsTypeSelected: TransactionsType = .spending {
+        didSet {
+            fetchAllData { [weak self] in
+                self?.filterGroupSortTransactions(animated: true)
+            }
+        }
+    }
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
-    @Published var dateSelected: Date = .now
-    @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount
+    @Published var dateSelected: Date = .now {
+        didSet {
+            filterGroupSortTransactions()
+        }
+    }
+    @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
+        didSet {
+            filterGroupSortTransactions(animated: true)
+        }
+    }
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        fetchAllData()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
     }
     
     //MARK: - Methods
@@ -121,25 +134,77 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {        
-        return FTFactory.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transactionsTypeSelected, balanceAccount: balanceAccountToFilter, forAction: forAction, namespace: namespace, delegate: self)
-    }
-    
-    func fetchAllData() {
-        Task {
-            await fetchTransactions()
-            await fetchBalanceAccounts()
-        }
+        return FTFactory.createAddingSpendIcomeView(
+            dataManager: dataManager,
+            transactionType: transactionsTypeSelected, 
+            balanceAccount: balanceAccountToFilter,
+            forAction: forAction,
+            namespace: namespace,
+            delegate: self
+        )
     }
     
     func didSelectAction(action: ActionWithTransaction) {
         delegate?.didSelectAction(action)
     }
     
+    //MARK: Private props
     private func addButtonPressedFromTabBar() {
         guard tapEnabled else { return }
         tapEnabled = false
         withAnimation(.snappy(duration: 0.5)) {
             actionSelected = .add(dateSelected)
+        }
+    }
+    
+    private func enableTapsWithDeadline() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.tapEnabled = true
+        }
+    }
+    
+    /// Groups, filters and sorts fetshed transactions array and sets new array to published array of transactions (filteredGroupedTranactions) with default animation
+    /// - Parameters:
+    ///   - date: provide value to filter by date, if nil the method filters by selected from UI date
+    ///   - balanceAccount: provide value to filter by balance account, if nil the method filters by selected from UI balance acount
+    private func filterGroupSortTransactions(date: Date? = nil, balanceAccount: BalanceAccount? = nil, animated: Bool = false) {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+            
+            let changedTransactions = self.transactions
+                .filter {
+                    self.calendar.isDate($0.date, equalTo: date ?? self.dateSelected, toGranularity: .day)
+                }
+                .filter {
+                    $0.balanceAccount == balanceAccount ?? self.balanceAccountToFilter
+                }
+                .grouped { $0.category }
+                .map { $0.value }
+                .sorted {
+                    $0.first!.category.name < $1.first!.category.name
+                }
+            
+            let sumValue = changedTransactions.flatMap{$0}.map{$0.value}.reduce(0, +)
+            
+            DispatchQueue.main.async {
+                if animated {
+                    withAnimation{
+                        self.filteredGroupedTranactions = changedTransactions
+                        self.transactionsValueSum = sumValue
+                    }
+                } else {
+                    self.filteredGroupedTranactions = changedTransactions
+                    self.transactionsValueSum = sumValue
+                }
+            }
+        }
+    }
+    
+    private func fetchAllData(completionHandler: (()->Void)? = nil) {
+        Task {
+            await fetchTransactions()
+            await fetchBalanceAccounts()
+            completionHandler?()
         }
     }
     
@@ -158,10 +223,7 @@ final class SpendIncomeViewModel: ObservableObject {
         )
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
-            
-            withAnimation(.snappy) {
-                transactions = fetchedTranses
-            }
+            transactions = fetchedTranses
         } catch {
             errorHandler?(error)
         }
@@ -191,13 +253,69 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func categoryUpdated() {
-        fetchAllData()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+        }
     }
 }
 
 //MARK: Extension for CustomTabViewModelDelegate
 extension SpendIncomeViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        "SpendIncomeViewModel"
+    }
+    
     func addButtonPressed() {
         addButtonPressedFromTabBar()
+    }
+}
+
+//MARK: - Sink extension
+extension SpendIncomeViewModel {
+    private func sinkOnPublishers() {
+        sinkOnDate()
+        sinkOnAction()
+        sinkOnBalanceAccount()
+        sinkOnTransactionType()
+    }
+    
+    private func sinkOnTransactionType() {
+        $transactionsTypeSelected
+            .sink { [weak self] newTransactionType in
+                self?.fetchAllData {
+                    self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+                }
+            }
+            .store(in: &cancelables)
+    }
+    
+    private func sinkOnAction() {
+        $actionSelected
+            .sink { [weak self] newAction in
+                self?.didSelectAction(action: newAction)
+                if case .none = newAction {
+                    self?.fetchAllData {
+                        self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+                    }
+                    self?.enableTapsWithDeadline()
+                }
+            }
+            .store(in: &cancelables)
+    }
+    
+    private func sinkOnDate() {
+        $dateSelected
+            .sink { [weak self] newDate in
+                self?.filterGroupSortTransactions(date: newDate, balanceAccount: nil)
+            }
+            .store(in: &cancelables)
+    }
+    
+    private func sinkOnBalanceAccount() {
+        $balanceAccountToFilter
+            .sink { [weak self] newBalanceAccount in
+                self?.filterGroupSortTransactions(date: nil, balanceAccount: newBalanceAccount)
+            }
+            .store(in: &cancelables)
     }
 }
