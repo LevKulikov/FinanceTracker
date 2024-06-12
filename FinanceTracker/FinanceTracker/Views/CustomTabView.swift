@@ -33,8 +33,7 @@ struct CustomTabView: View  {
             viewModel.getSpendIncomeView(namespace: namespace)
                 .tag(1)
             
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
+            viewModel.getStatisticsView()
                 .tag(2)
             
             Label("In develop", systemImage: "gearshape.2")

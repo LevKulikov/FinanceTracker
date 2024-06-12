@@ -8,11 +8,20 @@
 import SwiftUI
 
 struct StatisticsView: View {
+    @StateObject private var viewModel: StatisticsViewModel
+    
+    init(viewModel: StatisticsViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     var body: some View {
-        TransactionPieChart(transactions: FTAppAssets.testTransactions)
+        TransactionPieChart(transactions: viewModel.transactions)
     }
 }
 
 #Preview {
-    StatisticsView()
+    let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
+    let viewModel = StatisticsViewModel(dataManager: dataManger)
+    
+    return StatisticsView(viewModel: viewModel)
 }

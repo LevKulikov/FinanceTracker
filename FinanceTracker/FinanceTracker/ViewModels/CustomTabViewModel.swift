@@ -48,6 +48,11 @@ final class CustomTabViewModel: ObservableObject {
         return SpendIncomeView(viewModel: viewModel, namespace: namespace)
     }
     
+    func getStatisticsView() -> some View {
+        let viewModel = StatisticsViewModel(dataManager: dataManager)
+        return StatisticsView(viewModel: viewModel)
+    }
+    
     private func addDelegate(object: some CustomTabViewModelDelegate) {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
