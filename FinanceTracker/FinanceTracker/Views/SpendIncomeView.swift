@@ -78,11 +78,11 @@ struct SpendIncomeView: View {
                 DragGesture()
                     .onChanged { value in
                         let xTrans = value.translation.width
-                        if !closeAllOpenedGroup {
-                            withAnimation(.snappy(duration: 0.5)) {
-                                closeAllOpenedGroup = true
-                            }
-                        }
+//                        if !closeAllOpenedGroup {
+//                            withAnimation(.snappy(duration: 0.5)) {
+//                                closeAllOpenedGroup = true
+//                            }
+//                        }
                         dragXOffset = xTrans
                     }
                     .onEnded { value in
@@ -149,7 +149,7 @@ struct SpendIncomeView: View {
         VStack(spacing: 0) {
             HStack {
                 Menu {
-                    Picker("", selection: $viewModel.balanceAccountToFilter.animation()) {
+                    Picker("", selection: $viewModel.balanceAccountToFilter) {
                         ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
                             HStack {
                                 Text(balanceAcc.name)
