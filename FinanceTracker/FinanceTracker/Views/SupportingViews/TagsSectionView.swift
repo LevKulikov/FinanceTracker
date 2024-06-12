@@ -91,7 +91,7 @@ struct TagsSectionView: View {
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let transactionsTypeSelected: TransactionsType = .spending
-    let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected)
+    let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
     
     @State var showOpt = false
     @FocusState var focusState

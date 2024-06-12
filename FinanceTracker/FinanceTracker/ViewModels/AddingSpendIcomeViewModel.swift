@@ -88,7 +88,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             }
         }
     }
-    @Published var balanceAccount: BalanceAccount = .emptyBalanceAccount
+    @Published var balanceAccount: BalanceAccount
     @Published var category: Category?
     @Published var tags: [Tag] = [] {
         didSet {
@@ -97,9 +97,10 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     //MARK: Initializer
-    init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType) {
+    init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
         self.dataManager = dataManager
         self._transactionsTypeSelected = Published(wrappedValue: transactionsTypeSelected)
+        self._balanceAccount = Published(wrappedValue: balanceAccount)
         fetchAllData()
     }
     

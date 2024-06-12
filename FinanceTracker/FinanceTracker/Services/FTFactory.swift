@@ -25,11 +25,12 @@ struct FTFactory {
     static func createAddingSpendIcomeView(
         dataManager: some DataManagerProtocol,
         transactionType: TransactionsType,
+        balanceAccount: BalanceAccount,
         forAction: Binding<ActionWithTransaction>,
         namespace: Namespace.ID,
         delegate: (some AddingSpendIcomeViewModelDelegate)?
     ) -> AnyView {
-        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionType)
+        let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionType, balanceAccount: balanceAccount)
         viewModel.delegate = delegate
         return AnyView(AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel))
     }
