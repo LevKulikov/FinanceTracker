@@ -29,16 +29,21 @@ struct CustomTabView: View  {
     
     //MARK: - Body
     var body: some View {
-        ZStack {
-            switch tabSelection {
-            case 1:
-                viewModel.getSpendIncomeView(namespace: namespace)
-                    .tag(1)
-            default:
-                Label("In develop", systemImage: "gearshape.2")
-                    .font(.largeTitle)
-                    .tag(2)
-            }
+        TabView(selection: $tabSelection) {
+            viewModel.getSpendIncomeView(namespace: namespace)
+                .tag(1)
+            
+            Label("In develop", systemImage: "gearshape.2")
+                .font(.largeTitle)
+                .tag(2)
+            
+            Label("In develop", systemImage: "gearshape.2")
+                .font(.largeTitle)
+                .tag(3)
+            
+            Label("In develop", systemImage: "gearshape.2")
+                .font(.largeTitle)
+                .tag(4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {

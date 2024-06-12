@@ -150,8 +150,10 @@ struct AddingSpendIcomeView: View {
             }, message: {
                 Text("This action is irretable")
             })
-            .alert("\(saveError?.localizedDescription ?? "Unknown error")",
-                   isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )) {
+            .alert(
+                "\(saveError?.localizedDescription ?? "Unknown error")",
+                isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )
+            ) {
                 Button("Ok") {}
             }
         }

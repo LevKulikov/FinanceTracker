@@ -93,9 +93,11 @@ struct SpendIncomeView: View {
             if case .add = viewModel.actionSelected {
                 viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
                     .toolbar(.hidden, for: .tabBar)
+//                    .ignoresSafeArea(edges: .bottom)
             } else if case .update = viewModel.actionSelected {
                 viewModel.getAddUpdateView(forAction: $viewModel.actionSelected, namespace: namespace)
                     .toolbar(.hidden, for: .tabBar)
+//                    .ignoresSafeArea(edges: .bottom)
             }
         }
     }
