@@ -70,6 +70,7 @@ struct AddingCategoryView: View {
                     .frame(height: 50)
             }
         }
+        .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .overlay(alignment: .bottom) {
             if !isKeyboardActive {

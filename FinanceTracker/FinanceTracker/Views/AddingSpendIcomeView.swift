@@ -105,6 +105,7 @@ struct AddingSpendIcomeView: View {
                         .frame(height: 50)
                 }
             }
+            .scrollIndicators(.hidden)
             .frame(maxWidth: 600, maxHeight: 900)
             .background {
                 if userIdiom == .phone {

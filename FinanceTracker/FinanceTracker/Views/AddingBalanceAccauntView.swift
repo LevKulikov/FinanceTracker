@@ -65,6 +65,7 @@ struct AddingBalanceAccauntView: View {
                 colorPickerSection
             }
         }
+        .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .onTapGesture {
             dismissKeyboard()
