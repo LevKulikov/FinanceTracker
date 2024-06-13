@@ -15,6 +15,7 @@ struct GroupedSpendIncomeCell: View {
     var closeOpenHandler: ((Bool) -> Void)?
     
     @State private var openGroup = false
+    private let colorLimit = 5
     private var mutualCategory: Category? {
         return transactions.first?.category
     }
@@ -23,6 +24,21 @@ struct GroupedSpendIncomeCell: View {
     }
     private var transactionsValueSum: Float {
         transactions.map { $0.value }.reduce(0, +)
+    }
+    private var colorToSet: Color {
+        guard transactions.count > 0, let categoryColor = mutualCategory?.color else { return .clear}
+        let count = transactions.count
+        guard count < colorLimit else { return categoryColor.opacity(0.9) }
+        let opacity: Double = Double(colorLimit)/10 + Double(count-1)/10
+        return categoryColor.opacity(opacity)
+    }
+    private var gradientStopLocations: (colorStop: CGFloat, grayStop: CGFloat) {
+        guard transactions.count > 0 else { return (0, 1)}
+        let count = transactions.count
+        guard count < colorLimit else { return (0.6, 1) }
+        let first: CGFloat = 0.05 + CGFloat(count)/10
+        let second: CGFloat = 0.9 - CGFloat(colorLimit - count)/10
+        return (first, second)
     }
     
     init(transactions: [Transaction], 
@@ -103,7 +119,16 @@ struct GroupedSpendIncomeCell: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 25.0)
-                .fill(.ultraThinMaterial)
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            .init(color: colorToSet, location: gradientStopLocations.colorStop),
+                            .init(color: Color(.secondarySystemBackground), location: gradientStopLocations.grayStop),
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
         }
         .padding(.horizontal)
     }
@@ -137,7 +162,7 @@ struct GroupedSpendIncomeCell: View {
         
         if let mutualCategory, let uiImage = FTAppAssets.iconUIImage(name: mutualCategory.iconName) {
             Circle()
-                .fill(LinearGradient(colors: [mutualCategory.color, .clear], startPoint: .leading, endPoint: .trailing))
+                .fill(LinearGradient(colors: [.clear, mutualCategory.color], startPoint: .leading, endPoint: .trailing))
                 .overlay {
                     Image(uiImage: uiImage)
                         .resizable()
@@ -153,128 +178,14 @@ struct GroupedSpendIncomeCell: View {
 }
 
 #Preview {
-//    let container = FinanceTrackerApp.createModelContainer()
-//    let dataManager = DataManager(container: container)
-//    let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-//    viewModel.fetchTransactions()
+    let container = FinanceTrackerApp.createModelContainer()
+    let dataManager = DataManager(container: container)
+    let viewModel = SpendIncomeViewModel(dataManager: dataManager)
     
     @Namespace var namespace
     @State var flag = false
     
-    let transactions = [
-        Transaction(
-            type: .spending,
-            comment: "",
-            value: 1000,
-            date: .now,
-            balanceAccount:
-                BalanceAccount(
-                    name: "TestBA",
-                    currency: "RUB",
-                    balance: 123000,
-                    iconName: "",
-                    color: .yellow
-                ),
-            category:
-                Category(
-                    type: .spending,
-                    name: "Test categ",
-                    iconName: "testIcon",
-                    color: .cyan
-                ),
-            tags: []
-        ),
-        Transaction(
-            type: .spending,
-            comment: "",
-            value: 1000,
-            date: .now,
-            balanceAccount:
-                BalanceAccount(
-                    name: "Test categ",
-                    currency: "RUB",
-                    balance: 123000,
-                    iconName: "",
-                    color: .yellow
-                ),
-            category:
-                Category(
-                    type: .spending,
-                    name: "Test categ",
-                    iconName: "testIcon",
-                    color: .cyan
-                ),
-            tags: []
-        ),
-        Transaction(
-            type: .spending,
-            comment: "",
-            value: 1000,
-            date: .now,
-            balanceAccount:
-                BalanceAccount(
-                    name: "TestBA",
-                    currency: "RUB",
-                    balance: 123000,
-                    iconName: "",
-                    color: .yellow
-                ),
-            category:
-                Category(
-                    type: .spending,
-                    name: "Test categ",
-                    iconName: "testIcon",
-                    color: .cyan
-                ),
-            tags: []
-        ),
-        Transaction(
-            type: .spending,
-            comment: "",
-            value: 1000,
-            date: .now,
-            balanceAccount:
-                BalanceAccount(
-                    name: "TestBA",
-                    currency: "RUB",
-                    balance: 123000,
-                    iconName: "",
-                    color: .yellow
-                ),
-            category:
-                Category(
-                    type: .spending,
-                    name: "Test categ",
-                    iconName: "testIcon",
-                    color: .cyan
-                ),
-            tags: []
-        ),
-        Transaction(
-            type: .spending,
-            comment: "",
-            value: 1000,
-            date: .now,
-            balanceAccount:
-                BalanceAccount(
-                    name: "TestBA",
-                    currency: "RUB",
-                    balance: 123000,
-                    iconName: "",
-                    color: .yellow
-                ),
-            category:
-                Category(
-                    type: .spending,
-                    name: "Test categ",
-                    iconName: "testIcon",
-                    color: .cyan
-                ),
-            tags: []
-        )
-    ]
-    
-    return GroupedSpendIncomeCell(transactions: transactions, namespace: namespace, closeGroupFlag: $flag) {
+    return GroupedSpendIncomeCell(transactions: viewModel.filteredGroupedTranactions.first ?? [], namespace: namespace, closeGroupFlag: $flag) {
         print($0.typeRawValue)
     }
 }
