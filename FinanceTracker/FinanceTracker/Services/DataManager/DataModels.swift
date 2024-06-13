@@ -154,7 +154,7 @@ final class Transaction {
     var date: Date
     private(set) var balanceAccount: BalanceAccount!
     private(set) var category: Category!
-    var tags: [Tag] = []
+    private(set) var tags: [Tag] = []
     
     //MARK: Computed Properties
     var type: TransactionsType? {
@@ -196,7 +196,7 @@ final class Transaction {
         self.category = category
     }
     
-    private func setTags(_ tags: [Tag]) {
+    func setTags(_ tags: [Tag]) {
         self.tags = tags
     }
 }

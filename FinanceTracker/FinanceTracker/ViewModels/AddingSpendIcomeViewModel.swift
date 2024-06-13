@@ -125,7 +125,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             transactionToUpdate.setCategory(category)
             transactionToUpdate.setBalanceAccount(balanceAccount)
             transactionToUpdate.date = date
-            transactionToUpdate.tags = tags
+            transactionToUpdate.setTags(tags)
             transactionToUpdate.comment = comment
             Task {
                 do {
