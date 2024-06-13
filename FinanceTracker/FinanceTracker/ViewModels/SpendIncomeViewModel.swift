@@ -83,7 +83,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            filterGroupSortTransactions(animated: true)
+            filterGroupSortTransactions()
         }
     }
     
