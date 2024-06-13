@@ -142,7 +142,7 @@ struct FTAppAssets {
     static func iconUIImage(name: String, bundle: String = "IconImages.bundle") -> UIImage? {
         let location = bundle + "/" + name
         let uiImage = UIImage(named: location)
-        return uiImage
+        return uiImage?.withRenderingMode(.alwaysTemplate)
     }
     
     @ViewBuilder

@@ -139,7 +139,6 @@ struct SpendIncomeView: View {
                                 
                                 if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
                                     Image(uiImage: uiImage)
-                                        .renderingMode(.original)
                                         .saturation(0.99)
                                 } else {
                                     Image(systemName: "xmark")
