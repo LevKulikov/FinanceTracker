@@ -122,8 +122,8 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         if let transactionToUpdate {
             transactionToUpdate.type = transactionsTypeSelected
             transactionToUpdate.value = value
-            transactionToUpdate.category = category
-            transactionToUpdate.balanceAccount = balanceAccount
+            transactionToUpdate.setCategory(category)
+            transactionToUpdate.setBalanceAccount(balanceAccount)
             transactionToUpdate.date = date
             transactionToUpdate.tags = tags
             transactionToUpdate.comment = comment
@@ -192,7 +192,9 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         guard let transactionToUpdate else { return }
         Task {
             await dataManager.deleteTransaction(transactionToUpdate)
-            completionHandler?()
+            DispatchQueue.main.async {
+                completionHandler?()
+            }
         }
     }
     

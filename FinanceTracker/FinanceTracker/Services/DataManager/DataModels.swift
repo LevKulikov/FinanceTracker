@@ -152,8 +152,8 @@ final class Transaction {
     var comment: String
     var value: Float
     var date: Date
-    var balanceAccount: BalanceAccount
-    var category: Category
+    private(set) var balanceAccount: BalanceAccount!
+    private(set) var category: Category!
     var tags: [Tag] = []
     
     //MARK: Computed Properties
@@ -177,8 +177,8 @@ final class Transaction {
         self.comment = comment
         self.value = value
         self.date = date
-        self.balanceAccount = balanceAccount
-        self.category = category
+        setBalanceAccount(balanceAccount)
+        setCategory(category)
         setTags(tags)
     }
     
@@ -186,6 +186,14 @@ final class Transaction {
         let id = UUID().uuidString
         let typeRawValue = type.rawValue
         self.init(id: id, typeRawValue: typeRawValue, comment: comment, value: value, date: date, balanceAccount: balanceAccount, category: category, tags: tags)
+    }
+    
+    func setBalanceAccount(_ balanceAccount: BalanceAccount) {
+        self.balanceAccount = balanceAccount
+    }
+    
+    func setCategory(_ category: Category) {
+        self.category = category
     }
     
     private func setTags(_ tags: [Tag]) {

@@ -10,6 +10,7 @@ import SwiftUI
 struct SpendIncomeView: View {
     //MARK: Properties
     private var namespace: Namespace.ID
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel: SpendIncomeViewModel
     @State private var transactionIdSelected: String = ""
     @State private var closeAllOpenedGroup = false
@@ -138,6 +139,8 @@ struct SpendIncomeView: View {
                                 
                                 if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
                                     Image(uiImage: uiImage)
+                                        .renderingMode(.original)
+                                        .saturation(0.99)
                                 } else {
                                     Image(systemName: "xmark")
                                 }
