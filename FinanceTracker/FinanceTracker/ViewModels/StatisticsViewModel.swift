@@ -17,16 +17,24 @@ enum TransactionFilterTypes: String, Equatable, CaseIterable {
 }
 
 enum PieChartDateFilter: String, Equatable, CaseIterable {
-    case day = "for a day"
+    case day = "For a day"
     case month = "For a month"
     case year = "For a year"
-    case dateRange = "Specific date range"
+    case dateRange = "Date range"
     case allTime = "All time"
 }
 
 final class StatisticsViewModel: ObservableObject {
     //MARK: - Properties
     let calendar = Calendar.current
+    /// Defines if Pie Chart Date range can be moved backward
+    var pieDateRangeCanBeMovedBack: Bool {
+        return calendar.startOfDay(for: pieChartDateStart) != calendar.startOfDay(for: FTAppAssets.availableDateRange.lowerBound)
+    }
+    /// Defines if Pie Chart Date range can be moved forward
+    var pieDateRangeCanBeMovedForward: Bool {
+        return calendar.startOfDay(for: pieChartDateEnd) != calendar.startOfDay(for: FTAppAssets.availableDateRange.upperBound)
+    }
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
@@ -95,6 +103,38 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     
+    /// Moves date range consiquentely its size to back or forward
+    /// - Parameter direction: direction to move date range
+    func moveDateRange(direction: DateSettingDestination) {
+        guard var numberOfDays = calendar.dateComponents([.day], from: pieChartDateStart, to: pieChartDateEnd).day else {
+            print("StatisticsViewModel: moveDateRange(direction:): Unable to get number of dayes between start and end dates")
+            return
+        }
+        
+        switch direction {
+        case .back:
+            guard pieDateRangeCanBeMovedBack else { return }
+            numberOfDays = -numberOfDays - 2
+        case .forward:
+            guard pieDateRangeCanBeMovedForward else { return }
+            numberOfDays += 2
+        }
+        
+        guard var newStartDate = calendar.date(byAdding: .day, value: numberOfDays, to: pieChartDateStart),
+              var newEndDate = calendar.date(byAdding: .day, value: numberOfDays, to: pieChartDateEnd) else { return }
+        
+        if !FTAppAssets.availableDateRange.contains(newStartDate) {
+            newStartDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
+        }
+        
+        if !FTAppAssets.availableDateRange.contains(newEndDate) {
+            newEndDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
+        }
+        
+        pieChartDateStart = newStartDate
+        pieChartDateEnd = newEndDate
+    }
+    
     /// For preview only
     func setAnyExistingBA() {
         guard let toset = balanceAccounts.first else { return }
@@ -155,7 +195,7 @@ final class StatisticsViewModel: ObservableObject {
                     return (category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory)
                 }
             
-            returnData = returnData.sorted(by: { $0.category.name < $1.category.name })
+            returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
             DispatchQueue.main.async {
                 withAnimation {

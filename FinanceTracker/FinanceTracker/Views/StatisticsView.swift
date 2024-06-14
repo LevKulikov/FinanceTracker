@@ -24,13 +24,23 @@ struct StatisticsView: View {
                     totalValueSection
                         .padding(.bottom)
 
-                    TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
-                        .frame(height: 200)
+                    pieChartSection
+                    
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 60)
                 }
                 .padding()
             }
             .refreshable {
                 viewModel.refreshData()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Refresh", systemImage: "arrow.clockwise") {
+                        viewModel.refreshData()
+                    }
+                }
             }
             .navigationTitle("Statistics")
         }
@@ -74,6 +84,96 @@ struct StatisticsView: View {
         .background {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
+        }
+    }
+    
+    private var pieChartSection: some View {
+        VStack {
+            HStack {
+                Text("Pie chart")
+                    .font(.title2)
+                    .bold()
+                
+                Spacer()
+                
+                Menu(viewModel.pieChartTransactionType.rawValue) {
+                    Picker("Pie chart picker", selection: $viewModel.pieChartTransactionType) {
+                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
+                            Text(type.rawValue)
+                                .tag(type)
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            
+            TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
+                .frame(height: 200)
+                .padding(.bottom)
+            
+            pieChartMenuDatePickerView
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color(.secondarySystemBackground))
+        }
+    }
+    
+    private var pieChartMenuDatePickerView: some View {
+        VStack {
+            HStack {
+                Menu(viewModel.pieChartMenuDateFilterSelected.rawValue, systemImage: "chevron.up.chevron.down") {
+                    Picker("Pie chart date type picker", selection: $viewModel.pieChartMenuDateFilterSelected) {
+                        ForEach(PieChartDateFilter.allCases, id: \.rawValue) { dateFilterType in
+                            Text(dateFilterType.rawValue)
+                                .tag(dateFilterType)
+                        }
+                    }
+                }
+                .foregroundStyle(.primary)
+                
+                Spacer()
+                
+                switch viewModel.pieChartMenuDateFilterSelected {
+                case .day:
+                    DatePicker("One day date picker", selection: $viewModel.pieChartDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
+                        .labelsHidden()
+                case .month:
+                    MonthYearPicker(date: $viewModel.pieChartDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
+                case .year:
+                    MonthYearPicker(date: $viewModel.pieChartDate, dateRange: FTAppAssets.availableDateRange, components: .year)
+                case .dateRange:
+                    EmptyView()
+                case .allTime:
+                    EmptyView()
+                }
+            }
+            
+            if case .dateRange = viewModel.pieChartMenuDateFilterSelected {
+                HStack {
+                    Button("Back", systemImage: "chevron.left") {
+                        viewModel.moveDateRange(direction: .back)
+                    }
+                    .labelStyle(.iconOnly)
+                    .font(.title2)
+                    .disabled(!viewModel.pieDateRangeCanBeMovedBack)
+                    
+                    Spacer()
+                    
+                    DateRangePicker(startDate: $viewModel.pieChartDateStart, endDate: $viewModel.pieChartDateEnd, dateRange: FTAppAssets.availableDateRange)
+                    
+                    Spacer()
+                    
+                    Button("Forward", systemImage: "chevron.right") {
+                        viewModel.moveDateRange(direction: .forward)
+                    }
+                    .labelStyle(.iconOnly)
+                    .font(.title2)
+                    .disabled(!viewModel.pieDateRangeCanBeMovedForward)
+                }
+                .padding(.top)
+            }
         }
     }
     
