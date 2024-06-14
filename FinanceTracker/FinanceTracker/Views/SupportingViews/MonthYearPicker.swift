@@ -13,7 +13,17 @@ struct MonthYearPicker: View {
         case year
     }
     
-    @Binding var date: Date
+    @Binding var date: Date {
+        didSet {
+            if !dateRange.contains(date) {
+                if date > dateRange.upperBound {
+                    date = dateRange.upperBound
+                } else {
+                    date = dateRange.lowerBound
+                }
+            }
+        }
+    }
     let dateRange: ClosedRange<Date>
     let components: MonthYearComponent
     let calendar: Calendar
@@ -24,7 +34,7 @@ struct MonthYearPicker: View {
         if calendar.component(.year, from: date) == calendar.component(.year, from: upperBound) {
             return 1...calendar.component(.month, from: upperBound)
         } else if calendar.component(.year, from: date) == calendar.component(.year, from: lowerBound) {
-            return calendar.component(.year, from: lowerBound)...12
+            return calendar.component(.month, from: lowerBound)...12
         }
         return 1...12
     }
