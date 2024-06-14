@@ -22,8 +22,10 @@ struct StatisticsView: View {
             ScrollView {
                 VStack {
                     totalValueSection
+                        .padding(.bottom)
 
                     TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
+                        .frame(height: 200)
                 }
                 .padding()
             }

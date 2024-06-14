@@ -48,7 +48,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //Pie chart
     /// Data Array to provide in pie chart
-    @Published private(set) var pieChartTransactionData: [(categoryName: String, sumValue: Float)] = []
+    @Published private(set) var pieChartTransactionData: [(category: Category, sumValue: Float)] = []
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
@@ -95,6 +95,12 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     
+    /// For preview only
+    func setAnyExistingBA() {
+        guard let toset = balanceAccounts.first else { return }
+        balanceAccountToFilter = toset
+    }
+    
     //MARK: Private methods
     /// Calculates total value (initial balance + income - spendings) for Balance Account and sets value to totalForBalanceAccount
     /// - Warning: .map uses forse unwraping of transaction type
@@ -126,7 +132,7 @@ final class StatisticsViewModel: ObservableObject {
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
             var returnData = self.transactions
-                .filter { $0.type == self.pieChartTransactionType }
+                .filter { $0.type == self.pieChartTransactionType && $0.balanceAccount == self.balanceAccountToFilter }
                 .filter { singleTransaction in
                     switch self.pieChartMenuDateFilterSelected {
                     case .day:
@@ -145,12 +151,11 @@ final class StatisticsViewModel: ObservableObject {
                 }
                 .grouped { $0.category }
                 .map { singleDict in
-                    let categoryName = singleDict.key?.name ?? "Err category"
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
-                    return (categoryName, totalValueForCategory)
+                    return (category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory)
                 }
             
-            returnData = returnData.sorted(by: { $0.0 < $1.0 })
+            returnData = returnData.sorted(by: { $0.category.name < $1.category.name })
             
             DispatchQueue.main.async {
                 withAnimation {
