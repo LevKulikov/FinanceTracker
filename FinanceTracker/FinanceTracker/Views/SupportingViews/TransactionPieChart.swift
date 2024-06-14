@@ -36,75 +36,87 @@ struct TransactionPieChart: View {
     
     //MARK: - Body
     var body: some View {
-        VStack {
-            HStack {
-                Chart {
+        HStack {
+            Chart {
+                if !transactionGroups.isEmpty {
+                    ForEach(transactionGroups, id: \.category) { singleData in
+                        let selectedFlag = isSelected(singleData.category)
+                        
+                        SectorMark(
+                            angle: .value("Sum of transactions", singleData.sumValue),
+                            innerRadius: .ratio(0.65),
+                            outerRadius: .ratio(selectedFlag ? 1 : 0.95),
+                            angularInset: selectedFlag ? 1.5 : 0
+                        )
+                        .cornerRadius(selectedFlag ? 3 : 0)
+                        .foregroundStyle(singleData.category.color)
+                        .opacity(
+                            selectedCategoryId != nil ? (selectedFlag ? 1 : 0.6) : 1
+                        )
+                        .foregroundStyle(by: .value(Text(verbatim: singleData.category.name), singleData.category.name))
+                    }
+                } else {
+                    SectorMark(
+                        angle: .value("Empy", 100),
+                        innerRadius: .ratio(0.65),
+                        outerRadius: .ratio(0.95)
+                    )
+                    .foregroundStyle(Color.gray.opacity(0.5))
+                }
+            }
+            .chartAngleSelection(value: $selectedValue)
+            .chartLegend(.hidden)
+            .onChange(of: selectedValue, setSelectedCategoryId)
+            .overlay { chartOverlay }
+            
+            charLegendView
+        }
+    }
+    
+    private var charLegendView: some View {
+        ScrollViewReader { proxy in 
+            ScrollView {
+                VStack(alignment: .leading) {
                     if !transactionGroups.isEmpty {
-                        ForEach(transactionGroups, id: \.category) { singleData in
+                        ForEach(transactionGroups, id: \.category) {singleData in
                             let selectedFlag = isSelected(singleData.category)
                             
-                            SectorMark(
-                                angle: .value("Sum of transactions", singleData.sumValue),
-                                innerRadius: .ratio(0.65),
-                                outerRadius: .ratio(selectedFlag ? 1 : 0.95),
-                                angularInset: selectedFlag ? 1.5 : 0
-                            )
-                            .cornerRadius(selectedFlag ? 3 : 0)
-                            .foregroundStyle(singleData.category.color)
-                            .opacity(
-                                selectedCategoryId != nil ? (selectedFlag ? 1 : 0.6) : 1
-                            )
-                            .foregroundStyle(by: .value(Text(verbatim: singleData.category.name), singleData.category.name))
-                        }
-                    } else {
-                        SectorMark(
-                            angle: .value("Empy", 100),
-                            innerRadius: .ratio(0.65),
-                            outerRadius: .ratio(0.95)
-                        )
-                        .foregroundStyle(Color.gray.opacity(0.5))
-                    }
-                }
-                .chartAngleSelection(value: $selectedValue)
-                .chartLegend(.hidden)
-                .onChange(of: selectedValue, setSelectedCategoryId)
-                .overlay { chartOverlay }
-                
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        if !transactionGroups.isEmpty {
-                            ForEach(transactionGroups, id: \.category) {singleData in
-                                let selectedFlag = isSelected(singleData.category)
-                                
-                                HStack {
-                                    BasicChartSymbolShape.circle
-                                        .foregroundStyle(singleData.category.color)
-                                        .frame(width: 8, height: 8)
-                                    
-                                    Text(singleData.category.name)
-                                        .foregroundColor(selectedFlag ? .primary : .gray)
-                                        .font(.caption)
-                                }
-                                .underline(selectedFlag, color: .secondary)
-                                .onTapGesture {
-                                    setSelectedCategory(selectedFlag ? nil : singleData.category)
-                                }
-                            }
-                        } else {
                             HStack {
                                 BasicChartSymbolShape.circle
-                                    .foregroundStyle(Color.gray.opacity(0.5))
+                                    .foregroundStyle(singleData.category.color)
                                     .frame(width: 8, height: 8)
                                 
-                                Text("Epty")
-                                    .foregroundColor(.gray)
+                                Text(singleData.category.name)
+                                    .foregroundColor(selectedFlag ? .primary : .gray)
                                     .font(.caption)
                             }
+                            .underline(selectedFlag, color: .secondary)
+                            .onTapGesture {
+                                setSelectedCategory(selectedFlag ? nil : singleData.category)
+                            }
+                            .id(singleData.category.id)
+                        }
+                    } else {
+                        HStack {
+                            BasicChartSymbolShape.circle
+                                .foregroundStyle(Color.gray.opacity(0.5))
+                                .frame(width: 8, height: 8)
+                            
+                            Text("Epty")
+                                .foregroundColor(.gray)
+                                .font(.caption)
                         }
                     }
                 }
-                .scrollIndicators(.hidden)
-                .frame(maxWidth: FTAppAssets.getScreenSize().width / 4 * 1.3)
+            }
+            .scrollIndicators(.hidden)
+            .frame(maxWidth: FTAppAssets.getScreenSize().width / 4 * 1.3)
+            .onChange(of: selectedCategoryId) {
+                if let selectedCategoryId {
+                    withAnimation {
+                        proxy.scrollTo(selectedCategoryId)
+                    }
+                }
             }
         }
     }

@@ -25,6 +25,12 @@ enum PieChartDateFilter: String, Equatable, CaseIterable {
 }
 
 final class StatisticsViewModel: ObservableObject {
+    /// Data types which are calculated for different type of entities
+    private enum CalculatingDataType: Equatable {
+        case totalValue
+        case pieChart
+    }
+    
     //MARK: - Properties
     let calendar = Calendar.current
     /// Defines if Pie Chart Date range can be moved backward
@@ -39,6 +45,8 @@ final class StatisticsViewModel: ObservableObject {
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
     private let dataManager: any DataManagerProtocol
+    /// Flag for allowing data calculation for all data types (enitites)
+    private var isCalculationAllowed = true
     
     //MARK: Published
     /// All transactions
@@ -54,7 +62,7 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     
-    //Pie chart
+    //MARK: For pie chart
     /// Data Array to provide in pie chart
     @Published private(set) var pieChartTransactionData: [(category: Category, sumValue: Float)] = []
     /// Filter by type of transactions to display in pie chart
@@ -135,6 +143,15 @@ final class StatisticsViewModel: ObservableObject {
         pieChartDateEnd = newEndDate
     }
     
+    /// Sets pie chart date filter to default values
+    func setPieChartDateFiltersToDefault() {
+        doNotCalculateDataUntilBlockIsFinished({
+            pieChartDate = .now
+            pieChartDateStart = .now
+            pieChartDateEnd = .now
+        }, for: .pieChart)
+    }
+    
     /// For preview only
     func setAnyExistingBA() {
         guard let toset = balanceAccounts.first else { return }
@@ -142,9 +159,30 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     //MARK: Private methods
+    /// Prevents recalculation of different data types until provided block of code is executed. This method is needed because of data calculation is caused by didSet observer
+    /// - Parameters:
+    ///   - block: code to execute before data recalculation
+    ///   - calculationData: which data should be calculated after block will be executed. Provide nil if calculation is need for all data types
+    private func doNotCalculateDataUntilBlockIsFinished(_ block: () -> Void, for calculationData: CalculatingDataType?) {
+        isCalculationAllowed = false
+        block()
+        isCalculationAllowed = true
+        switch calculationData {
+        case .totalValue:
+            calculateTotalForBalanceAccount()
+        case .pieChart:
+            calculateDataForPieChart()
+        case .none:
+            calculateTotalForBalanceAccount()
+            calculateDataForPieChart()
+        }
+    }
+    
     /// Calculates total value (initial balance + income - spendings) for Balance Account and sets value to totalForBalanceAccount
     /// - Warning: .map uses forse unwraping of transaction type
     private func calculateTotalForBalanceAccount() {
+        guard isCalculationAllowed else { return }
+        
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
             var totalValue = self.transactions
@@ -169,6 +207,8 @@ final class StatisticsViewModel: ObservableObject {
     
     /// Calculates data for pie chart and sets it with animation
     private func calculateDataForPieChart() {
+        guard isCalculationAllowed else { return }
+        
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
             var returnData = self.transactions

@@ -130,6 +130,10 @@ struct StatisticsView: View {
                                 .tag(dateFilterType)
                         }
                     }
+                    
+                    Button("Default filter", systemImage: "arrowshape.turn.up.backward") {
+                        viewModel.setPieChartDateFiltersToDefault()
+                    }
                 }
                 .foregroundStyle(.primary)
                 
