@@ -24,11 +24,19 @@ enum PieChartDateFilter: String, Equatable, CaseIterable {
     case allTime = "All time"
 }
 
+enum BarChartPerDateFilter: String, Equatable, CaseIterable {
+    case perDay = "Per day"
+    case perWeek = "Per week"
+    case perMonth = "Per month"
+    case perYear = "Per year"
+}
+
 final class StatisticsViewModel: ObservableObject {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
         case totalValue
         case pieChart
+        case barChart
     }
     
     //MARK: - Properties
@@ -47,6 +55,12 @@ final class StatisticsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
+    /// Array of years those are available
+    private var availableYearDates: [Date] = []
+    /// Array of years with months those are available
+    private var availableYearMonthDates: [Date] = []
+    /// Array of years with months and days those are available
+    private var availableYearMonthDayDates: [Date] = []
     
     //MARK: Published
     /// All transactions
@@ -63,7 +77,7 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     //MARK: For pie chart
-    /// Data Array to provide in pie chart
+    /// Data Array to be provided in pie chart
     @Published private(set) var pieChartTransactionData: [(category: Category, sumValue: Float)] = []
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
@@ -96,10 +110,24 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     
+    //MARK: For bar chart
+    /// Data Array to be provided to bar chart
+    @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = [] {
+        didSet {
+            dump(barChartTransactionData.dropFirst(19650))
+        }
+    }
+    /// Filter by transactions type (adding both case) to display in bar chart
+    @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .both
+    /// Filter to select per which type of date to be diplayed in bar chart
+    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay
+    
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        refreshData()
+        setDateArrays { [weak self] in
+            self?.refreshData()
+        }
     }
     
     //MARK: - Methods
@@ -108,6 +136,7 @@ final class StatisticsViewModel: ObservableObject {
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
             self?.calculateDataForPieChart()
+            self?.calculateDataForBarChart()
         }
     }
     
@@ -172,9 +201,12 @@ final class StatisticsViewModel: ObservableObject {
             calculateTotalForBalanceAccount()
         case .pieChart:
             calculateDataForPieChart()
+        case .barChart:
+            calculateDataForBarChart()
         case .none:
             calculateTotalForBalanceAccount()
             calculateDataForPieChart()
+            calculateDataForBarChart()
         }
     }
     
@@ -242,6 +274,179 @@ final class StatisticsViewModel: ObservableObject {
                     self.pieChartTransactionData = returnData
                 }
             }
+        }
+    }
+    
+    /// Calculates data for bar chart and sets it with animation
+    private func calculateDataForBarChart() {
+        guard isCalculationAllowed else { return }
+        
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+            
+            let availableBarData = self.transactions
+                .filter { singleTransaction in
+                    let sameBalanceAccount = singleTransaction.balanceAccount == self.balanceAccountToFilter
+                    
+                    switch self.barChartTransactionTypeFilter {
+                    case .both:
+                        return sameBalanceAccount
+                    case .spending:
+                        return (singleTransaction.type == .spending && sameBalanceAccount)
+                    case .income:
+                        return (singleTransaction.type == .income && sameBalanceAccount)
+                    }
+                }
+                .grouped { singleTransaction in
+                    let year = self.calendar.component(.year, from: singleTransaction.date)
+                    let month = self.calendar.component(.month, from: singleTransaction.date)
+                    
+                    switch self.barChartPerDateFilter {
+                    case .perDay:
+                        let day = self.calendar.component(.day, from: singleTransaction.date)
+                        return DateComponents(year: year, month: month, day: day)
+                    case .perWeek:
+                        let week = self.calendar.component(.weekOfMonth, from: singleTransaction.date)
+                        return DateComponents(year: year, month: month, weekOfMonth: week)
+                    case .perMonth:
+                        return DateComponents(year: year, month: month)
+                    case .perYear:
+                        return DateComponents(year: year)
+                    }
+                }
+                .map { singleGroup in
+                    let dateToSet = self.calendar.date(from: singleGroup.key) ?? .now
+                    let groupedByTransTypeDict = singleGroup.value.grouped { $0.type }
+                    var arrayOfBarData =  groupedByTransTypeDict.map {
+                        let sumValue = $0.value.map { $0.value }.reduce(0, +)
+                        
+                        switch $0.key {
+                        case .spending:
+                            return TransactionBarChartData(type: .spending, value: sumValue, date: dateToSet)
+                        case .income:
+                            return TransactionBarChartData(type: .income, value: sumValue, date: dateToSet)
+                        case .none:
+                            return TransactionBarChartData(type: .unknown, value: sumValue, date: dateToSet)
+                        }
+                    }
+                    
+                    if case .both = self.barChartTransactionTypeFilter {
+                        let incomeValue = arrayOfBarData.first { $0.type == .income }?.value ?? 0
+                        let spendValue = arrayOfBarData.first { $0.type == .spending }?.value ?? 0
+                        let profitData = TransactionBarChartData(type: .profit, value: incomeValue - spendValue, date: dateToSet)
+                        arrayOfBarData.append(profitData)
+                    }
+                    
+                    return arrayOfBarData
+                }
+            
+            let filledBarData = addEmptyDataTo(availableBarData)
+            
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.barChartTransactionData = filledBarData
+                }
+            }
+        }
+    }
+    
+    /// Fills date gaps with empty TransactionBarChartData
+    /// - Parameter barChartData: existing TransactionBarChartData
+    /// - Returns: filled and sorted array of arrays of bar chart data
+    private func addEmptyDataTo(_ barChartData: [[TransactionBarChartData]]) -> [[TransactionBarChartData]] {
+        var usedDateArray: [Date]
+        var dateComponentsToUse: Set<Calendar.Component> = [.year]
+        switch barChartPerDateFilter {
+        case .perDay:
+            usedDateArray = availableYearMonthDayDates
+            dateComponentsToUse.insert(.day)
+            dateComponentsToUse.insert(.month)
+        case .perWeek:
+            usedDateArray = availableYearMonthDayDates
+            dateComponentsToUse.insert(.weekOfMonth)
+            dateComponentsToUse.insert(.month)
+        case .perMonth:
+            usedDateArray = availableYearMonthDates
+            dateComponentsToUse.insert(.month)
+        case .perYear:
+            usedDateArray = availableYearDates
+            
+        }
+        
+        let returnArray = usedDateArray
+            .map { date in
+                let filterDateComponent = calendar.dateComponents(dateComponentsToUse, from: date)
+                if let equelTransaction = barChartData.first(where: { transDataArray in
+                    guard let firstTrans = transDataArray.first else { return false }
+                    let transDateComponents = calendar.dateComponents(dateComponentsToUse, from: firstTrans.date)
+                    return (filterDateComponent == transDateComponents)
+                }) {
+                    return equelTransaction
+                }
+                
+                var returnTransData: [TransactionBarChartData] = []
+                let emptySpendingTransData = TransactionBarChartData(type: .spending, value: 0, date: date)
+                let emptyIncomeTransData = TransactionBarChartData(type: .income, value: 0, date: date)
+                let emptyProfitTransData = TransactionBarChartData(type: .profit, value: 0, date: date)
+                
+                switch barChartTransactionTypeFilter {
+                case .both:
+                    returnTransData.append(emptySpendingTransData)
+                    returnTransData.append(emptyIncomeTransData)
+                    returnTransData.append(emptyProfitTransData)
+                case .spending:
+                    returnTransData.append(emptySpendingTransData)
+                case .income:
+                    returnTransData.append(emptyIncomeTransData)
+                }
+                
+                return returnTransData
+            }
+        
+        return returnArray
+    }
+    
+    /// Sets available dates arrays for only years and years with months
+    private func setDateArrays(completionHandler: @escaping () -> Void) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self else { return }
+            
+            let availabelDateRange = FTAppAssets.availableDateRange
+            var yearDateArray: [Date?] = []
+            var yearMonthDateArray: [Date?] = []
+            var yearMonthDayDateArray: [Date?] = []
+            let standardMonthArray = Array(1...12)
+            let standardDayArray = Array(1...31)
+            let maxYear = calendar.component(.year, from: availabelDateRange.upperBound)
+            let maxMonth = calendar.component(.month, from: availabelDateRange.upperBound)
+            let maxDay = calendar.component(.day, from: availabelDateRange.upperBound)
+            
+            let yearRange = calendar.component(.year, from: availabelDateRange.lowerBound)...calendar.component(.year, from: availabelDateRange.upperBound)
+            yearLoop: for oneYear in yearRange {
+                let yearDate = calendar.date(from: DateComponents(year: oneYear))
+                yearDateArray.append(yearDate)
+                
+                monthLoop: for monthNumber in standardMonthArray {
+                    var monthDateComponent = DateComponents(year: oneYear, month: monthNumber)
+                    let monthDate = calendar.date(from: monthDateComponent)
+                    yearMonthDateArray.append(monthDate)
+                    
+                    dayLoop: for dayNumber in standardDayArray {
+                        var dayDateComponent = DateComponents(year: oneYear, month: monthNumber, day: dayNumber)
+                        let dayDate = calendar.date(from: dayDateComponent)
+                        
+                        if oneYear == maxYear, monthNumber == maxMonth, dayNumber == (maxDay + 1) {
+                            yearMonthDayDateArray.append(dayDate)
+                            break yearLoop
+                        }
+                        yearMonthDayDateArray.append(dayDate)
+                    }
+                }
+            }
+            self.availableYearDates = yearDateArray.compactMap { $0 }
+            self.availableYearMonthDates = yearMonthDateArray.compactMap { $0 }
+            self.availableYearMonthDayDates = yearMonthDayDateArray.compactMap { $0 }
+            completionHandler()
         }
     }
     

@@ -9,8 +9,15 @@ import SwiftUI
 import Charts
 
 struct TransactionBarChartData: Identifiable {
+    enum TransactionBarChartDataType: String {
+        case spending = "Spending"
+        case income = "Income"
+        case profit = "Profit"
+        case unknown = "Unknown"
+    }
+    
     let id: String = UUID().uuidString
-    let name: String
+    let type: TransactionBarChartDataType
     let value: Float
     let date: Date
 }
