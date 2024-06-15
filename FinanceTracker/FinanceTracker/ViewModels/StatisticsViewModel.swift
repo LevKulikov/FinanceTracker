@@ -59,6 +59,8 @@ final class StatisticsViewModel: ObservableObject {
     private var availableYearDates: [Date] = []
     /// Array of years with months those are available
     private var availableYearMonthDates: [Date] = []
+    /// Array of years with months and week number those are available
+    private var availableYearMonthWeekDates: [Date] = []
     /// Array of years with months and days those are available
     private var availableYearMonthDayDates: [Date] = []
     
@@ -114,7 +116,7 @@ final class StatisticsViewModel: ObservableObject {
     /// Data Array to be provided to bar chart
     @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = [] {
         didSet {
-            dump(barChartTransactionData.dropFirst(19650))
+            dump(barChartTransactionData)
         }
     }
     /// Filter by transactions type (adding both case) to display in bar chart
@@ -286,15 +288,17 @@ final class StatisticsViewModel: ObservableObject {
             
             let availableBarData = self.transactions
                 .filter { singleTransaction in
-                    let sameBalanceAccount = singleTransaction.balanceAccount == self.balanceAccountToFilter
+                    guard singleTransaction.balanceAccount == self.balanceAccountToFilter else {
+                        return false
+                    }
                     
                     switch self.barChartTransactionTypeFilter {
                     case .both:
-                        return sameBalanceAccount
+                        return true
                     case .spending:
-                        return (singleTransaction.type == .spending && sameBalanceAccount)
+                        return (singleTransaction.type == .spending)
                     case .income:
-                        return (singleTransaction.type == .income && sameBalanceAccount)
+                        return (singleTransaction.type == .income)
                     }
                 }
                 .grouped { singleTransaction in
@@ -306,8 +310,8 @@ final class StatisticsViewModel: ObservableObject {
                         let day = self.calendar.component(.day, from: singleTransaction.date)
                         return DateComponents(year: year, month: month, day: day)
                     case .perWeek:
-                        let week = self.calendar.component(.weekOfMonth, from: singleTransaction.date)
-                        return DateComponents(year: year, month: month, weekOfMonth: week)
+                        let dateComp = self.calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: singleTransaction.date)
+                        return dateComp
                     case .perMonth:
                         return DateComponents(year: year, month: month)
                     case .perYear:
@@ -317,6 +321,7 @@ final class StatisticsViewModel: ObservableObject {
                 .map { singleGroup in
                     let dateToSet = self.calendar.date(from: singleGroup.key) ?? .now
                     let groupedByTransTypeDict = singleGroup.value.grouped { $0.type }
+                    
                     var arrayOfBarData =  groupedByTransTypeDict.map {
                         let sumValue = $0.value.map { $0.value }.reduce(0, +)
                         
@@ -331,9 +336,20 @@ final class StatisticsViewModel: ObservableObject {
                     }
                     
                     if case .both = self.barChartTransactionTypeFilter {
-                        let incomeValue = arrayOfBarData.first { $0.type == .income }?.value ?? 0
-                        let spendValue = arrayOfBarData.first { $0.type == .spending }?.value ?? 0
-                        let profitData = TransactionBarChartData(type: .profit, value: incomeValue - spendValue, date: dateToSet)
+                        var incomeTransData = arrayOfBarData.first { $0.type == .income }
+                        if incomeTransData == nil {
+                            incomeTransData = TransactionBarChartData(type: .income, value: 0, date: dateToSet)
+                            arrayOfBarData.append(incomeTransData!)
+                        }
+                        
+                        var spendTransData = arrayOfBarData.first { $0.type == .spending }
+                        if spendTransData == nil {
+                            spendTransData = TransactionBarChartData(type: .spending, value: 0, date: dateToSet)
+                            arrayOfBarData.append(spendTransData!)
+                        }
+                        
+                        let profitValue = incomeTransData!.value - spendTransData!.value
+                        let profitData = TransactionBarChartData(type: .profit, value: profitValue, date: dateToSet)
                         arrayOfBarData.append(profitData)
                     }
                     
@@ -344,7 +360,7 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 withAnimation {
-                    self.barChartTransactionData = filledBarData
+                    self.barChartTransactionData = availableBarData
                 }
             }
         }
