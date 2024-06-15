@@ -116,13 +116,13 @@ final class StatisticsViewModel: ObservableObject {
     /// Data Array to be provided to bar chart
     @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = [] {
         didSet {
-            dump(barChartTransactionData)
+            dump(barChartTransactionData.dropFirst(2800))
         }
     }
     /// Filter by transactions type (adding both case) to display in bar chart
     @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .both
     /// Filter to select per which type of date to be diplayed in bar chart
-    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay
+    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perWeek
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -282,8 +282,8 @@ final class StatisticsViewModel: ObservableObject {
     /// Calculates data for bar chart and sets it with animation
     private func calculateDataForBarChart() {
         guard isCalculationAllowed else { return }
-        
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+        // This is utility because of high calculation compexity
+        DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             
             let availableBarData = self.transactions
@@ -360,7 +360,7 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 withAnimation {
-                    self.barChartTransactionData = availableBarData
+                    self.barChartTransactionData = filledBarData
                 }
             }
         }
@@ -371,22 +371,25 @@ final class StatisticsViewModel: ObservableObject {
     /// - Returns: filled and sorted array of arrays of bar chart data
     private func addEmptyDataTo(_ barChartData: [[TransactionBarChartData]]) -> [[TransactionBarChartData]] {
         var usedDateArray: [Date]
-        var dateComponentsToUse: Set<Calendar.Component> = [.year]
+        var dateComponentsToUse: Set<Calendar.Component> = []
         switch barChartPerDateFilter {
         case .perDay:
             usedDateArray = availableYearMonthDayDates
             dateComponentsToUse.insert(.day)
             dateComponentsToUse.insert(.month)
+            dateComponentsToUse.insert(.year)
         case .perWeek:
-            usedDateArray = availableYearMonthDayDates
-            dateComponentsToUse.insert(.weekOfMonth)
-            dateComponentsToUse.insert(.month)
+            usedDateArray = availableYearMonthWeekDates
+            dateComponentsToUse.insert(.calendar)
+            dateComponentsToUse.insert(.yearForWeekOfYear)
+            dateComponentsToUse.insert(.weekOfYear)
         case .perMonth:
             usedDateArray = availableYearMonthDates
             dateComponentsToUse.insert(.month)
+            dateComponentsToUse.insert(.year)
         case .perYear:
             usedDateArray = availableYearDates
-            
+            dateComponentsToUse.insert(.year)
         }
         
         let returnArray = usedDateArray
@@ -431,6 +434,7 @@ final class StatisticsViewModel: ObservableObject {
             var yearDateArray: [Date?] = []
             var yearMonthDateArray: [Date?] = []
             var yearMonthDayDateArray: [Date?] = []
+            var yearMonthWeekDateArray: [Date?] = []
             let standardMonthArray = Array(1...12)
             let standardDayArray = Array(1...31)
             let maxYear = calendar.component(.year, from: availabelDateRange.upperBound)
@@ -443,13 +447,18 @@ final class StatisticsViewModel: ObservableObject {
                 yearDateArray.append(yearDate)
                 
                 monthLoop: for monthNumber in standardMonthArray {
-                    var monthDateComponent = DateComponents(year: oneYear, month: monthNumber)
+                    let monthDateComponent = DateComponents(year: oneYear, month: monthNumber)
                     let monthDate = calendar.date(from: monthDateComponent)
                     yearMonthDateArray.append(monthDate)
                     
                     dayLoop: for dayNumber in standardDayArray {
-                        var dayDateComponent = DateComponents(year: oneYear, month: monthNumber, day: dayNumber)
+                        let dayDateComponent = DateComponents(year: oneYear, month: monthNumber, day: dayNumber)
                         let dayDate = calendar.date(from: dayDateComponent)
+                        
+                        let startOfWeekDate = dayDate?.startOfWeek()
+                        if !yearMonthWeekDateArray.contains(startOfWeekDate) {
+                            yearMonthWeekDateArray.append(startOfWeekDate)
+                        }
                         
                         if oneYear == maxYear, monthNumber == maxMonth, dayNumber == (maxDay + 1) {
                             yearMonthDayDateArray.append(dayDate)
@@ -462,6 +471,7 @@ final class StatisticsViewModel: ObservableObject {
             self.availableYearDates = yearDateArray.compactMap { $0 }
             self.availableYearMonthDates = yearMonthDateArray.compactMap { $0 }
             self.availableYearMonthDayDates = yearMonthDayDateArray.compactMap { $0 }
+            self.availableYearMonthWeekDates = yearMonthWeekDateArray.compactMap { $0 }
             completionHandler()
         }
     }

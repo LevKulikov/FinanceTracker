@@ -21,4 +21,8 @@ extension Date {
     func get(_ component: Calendar.Component, calendar: Calendar = Calendar.current) -> Int {
         return calendar.component(component, from: self)
     }
+    
+    func startOfWeek(using calendar: Calendar = .current) -> Date? {
+        calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date
+    }
 }
