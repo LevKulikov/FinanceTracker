@@ -25,6 +25,9 @@ struct StatisticsView: View {
                         .padding(.bottom)
 
                     pieChartSection
+                        .padding(.bottom)
+                    
+                    barChartSection
                     
                     Rectangle()
                         .fill(.clear)
@@ -131,7 +134,7 @@ struct StatisticsView: View {
                         }
                     }
                     
-                    Button("Default filter", systemImage: "arrowshape.turn.up.backward") {
+                    Button("Default filters", systemImage: "arrowshape.turn.up.backward") {
                         viewModel.setPieChartDateFiltersToDefault()
                     }
                 }
@@ -178,6 +181,17 @@ struct StatisticsView: View {
                 }
                 .padding(.top)
             }
+        }
+    }
+    
+    private var barChartSection: some View {
+        VStack {
+            TransactionBarChart(
+                transactionsData: viewModel.barChartTransactionData,
+                perDate: viewModel.barChartPerDateFilter,
+                transactionType: viewModel.barChartTransactionTypeFilter
+            )
+            .frame(height: 300)
         }
     }
     

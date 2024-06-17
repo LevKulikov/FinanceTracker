@@ -114,22 +114,24 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: For bar chart
     /// Data Array to be provided to bar chart
-    @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = [] {
+    @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = []
+    /// Filter by transactions type (adding both case) to display in bar chart
+    @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
         didSet {
-            dump(barChartTransactionData.dropFirst(2800))
+            calculateDataForBarChart()
         }
     }
-    /// Filter by transactions type (adding both case) to display in bar chart
-    @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .both
     /// Filter to select per which type of date to be diplayed in bar chart
-    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perWeek
+    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perWeek {
+        didSet {
+            calculateDataForBarChart()
+        }
+    }
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        setDateArrays { [weak self] in
-            self?.refreshData()
-        }
+        refreshData()
     }
     
     //MARK: - Methods
@@ -280,10 +282,10 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Calculates data for bar chart and sets it with animation
-    private func calculateDataForBarChart() {
+    private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility)) {
         guard isCalculationAllowed else { return }
         // This is utility because of high calculation compexity
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        thread.async { [weak self] in
             guard let self else { return }
             
             let availableBarData = self.transactions
@@ -356,11 +358,12 @@ final class StatisticsViewModel: ObservableObject {
                     return arrayOfBarData
                 }
             
-            let filledBarData = addEmptyDataTo(availableBarData)
+            // Useless code because Bar Charts algorithms
+            //let filledBarData = addEmptyDataTo(availableBarData)
             
             DispatchQueue.main.async {
                 withAnimation {
-                    self.barChartTransactionData = filledBarData
+                    self.barChartTransactionData = availableBarData
                 }
             }
         }
@@ -425,7 +428,7 @@ final class StatisticsViewModel: ObservableObject {
         return returnArray
     }
     
-    /// Sets available dates arrays for only years and years with months
+    /// Sets available dates arrays for only years and years with months (useless)
     private func setDateArrays(completionHandler: @escaping () -> Void) {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
