@@ -97,6 +97,11 @@ struct StatisticsView: View {
                     .font(.title2)
                     .bold()
                 
+                if viewModel.pieDataIsCalculating {
+                    ProgressView()
+                        .padding(.leading, 5)
+                }
+                
                 Spacer()
                 
                 Menu(viewModel.pieChartTransactionType.rawValue) {
@@ -186,12 +191,63 @@ struct StatisticsView: View {
     
     private var barChartSection: some View {
         VStack {
+            HStack {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Bar chart")
+                            .font(.title2)
+                            .bold()
+                        
+                        if viewModel.barDataIsCalculating {
+                            ProgressView()
+                                .padding(.leading, 5)
+                        }
+                    }
+                    
+                    Text("Scroll to get more info")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Spacer()
+                
+                Menu(viewModel.barChartTransactionTypeFilter.rawValue) {
+                    Picker("Bar chart picker", selection: $viewModel.barChartTransactionTypeFilter) {
+                        ForEach(TransactionFilterTypes.allCases, id: \.rawValue) { type in
+                            Text(type.rawValue)
+                                .tag(type)
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            
             TransactionBarChart(
                 transactionsData: viewModel.barChartTransactionData,
-                perDate: viewModel.barChartPerDateFilter,
-                transactionType: viewModel.barChartTransactionTypeFilter
+                perDate: $viewModel.barChartPerDateFilter,
+                transactionType: $viewModel.barChartTransactionTypeFilter
             )
             .frame(height: 300)
+            .padding(.bottom)
+            
+            HStack {
+                Menu(viewModel.barChartPerDateFilter.rawValue, systemImage: "chevron.up.chevron.down") {
+                    Picker("Bar chart date sride type picker", selection: $viewModel.barChartPerDateFilter) {
+                        ForEach(BarChartPerDateFilter.allCases, id: \.rawValue) { dateFilterType in
+                            Text(dateFilterType.rawValue)
+                                .tag(dateFilterType)
+                        }
+                    }
+                }
+                .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color(.secondarySystemBackground))
         }
     }
     

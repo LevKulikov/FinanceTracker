@@ -14,6 +14,19 @@ struct TransactionBarChartData: Identifiable {
         case income = "Income"
         case profit = "Profit"
         case unknown = "Unknown"
+        
+        var color: Color {
+            switch self {
+            case .spending:
+                return .red
+            case .income:
+                return .green
+            case .profit:
+                return .blue
+            case .unknown:
+                return .yellow
+            }
+        }
     }
     
     let id: String = UUID().uuidString
@@ -25,11 +38,11 @@ struct TransactionBarChartData: Identifiable {
 struct TransactionBarChart: View {
     //MARK: Properties
     let transactionsData: [[TransactionBarChartData]]
-    let perDate: BarChartPerDateFilter
-    let transactionType: TransactionFilterTypes
+    @Binding var perDate: BarChartPerDateFilter
+    @Binding var transactionType: TransactionFilterTypes
     
     private var maxXVisibleLenth: Int {
-        let count = transactionsData.count
+//        let count = transactionsData.count
         let multiplier = transactionType == .both ? 5 : 10
         let seconds: Int
         switch perDate {
@@ -43,7 +56,7 @@ struct TransactionBarChart: View {
         case .perYear:
             seconds = 86400 * 365
         }
-        return seconds * (count > multiplier ? multiplier : count)
+        return seconds * multiplier
     }
     private var unit: Calendar.Component {
         switch perDate {
@@ -57,7 +70,26 @@ struct TransactionBarChart: View {
             return .year
         }
     }
+    private var componentsToCompare: Set<Calendar.Component> {
+        let components: Set<Calendar.Component>
+        switch perDate {
+        case .perDay:
+            components = [.day, .month, .year]
+        case .perWeek:
+            components = [.weekOfMonth, .month, .year]
+        case .perMonth:
+            components = [.month, .year]
+        case .perYear:
+            components = [.year]
+        }
+        return components
+    }
+    
     @State private var xScrollPosition: Date = .now
+    @State private var selection: Date?
+    @State private var selectionBuffer: Date?
+    @State private var transactionDataSelected: [TransactionBarChartData]?
+    @State private var cancleDispatchWorkItem: DispatchWorkItem?
     
     //MARK: Body
     var body: some View {
@@ -70,6 +102,14 @@ struct TransactionBarChart: View {
                     )
                     .foregroundStyle(by: .value("Type", transaction.type.rawValue))
                     .position(by: .value("Type", transaction.type.rawValue), axis: .horizontal)
+                    
+                    if let selectionBuffer {
+                        RuleMark(x: .value("Date", selectionBuffer, unit: unit))
+                            .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))) {
+                                annotationPopover
+                            }
+                            .foregroundStyle(by: .value("Type", transaction.type.rawValue))
+                    }
                 }
             }
         }
@@ -82,6 +122,8 @@ struct TransactionBarChart: View {
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
         .chartScrollPosition(x: $xScrollPosition)
+        .chartXSelection(value: $selection)
+        .onChange(of: selection, selectTransactionData)
         .chartXAxis {
             switch perDate {
             case .perDay:
@@ -118,14 +160,104 @@ struct TransactionBarChart: View {
                 AxisMarks(values: .stride(by: .year))
             }
         }
+        .chartOverlay { _ in
+            if transactionsData.isEmpty {
+                Label("Empty", systemImage: "xmark.app")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .onChange(of: perDate) {
+            setSelected(nil, date: nil)
+        }
+        .onChange(of: transactionType) {
+            setSelected(nil, date: nil)
+        }
     }
     
     //MARK: Computer properties
+    private var annotationPopover: some View {
+        VStack(alignment: .leading) {
+            if let transactionDataSelected {
+                Text(getDateText(transactionDataSelected.first?.date))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                
+                ForEach(transactionDataSelected) { transaction in
+                    HStack(alignment: .bottom) {
+                        Text(FTFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "0")
+                            
+                        Text(transaction.type.rawValue)
+                            .foregroundStyle(transaction.type.color)
+                    }
+                    .font(.footnote)
+                    .fontWeight(.medium)
+                }
+            }
+        }
+        .padding(5)
+        .background {
+            RoundedRectangle(cornerRadius: 7)
+                .stroke(Color(.secondarySystemBackground))
+                .fill(Color(.systemBackground))
+        }
+        .padding(.top, 5)
+        .background {
+            Rectangle()
+                .fill(Color(.secondarySystemBackground))
+        }
+    }
     
     //MARK: Methods
+    private func getDateText(_ date: Date?) -> String {
+        guard let date else { return "" }
+        let dateComponents = Calendar.current.dateComponents(componentsToCompare, from: date)
+        switch perDate {
+        case .perDay:
+            return date.formatted(date: .abbreviated, time: .omitted)
+        case .perWeek:
+            return "Week \(dateComponents.weekOfMonth ?? 0), \(date.month) \(dateComponents.year ?? 0)"
+        case .perMonth:
+            return "\(date.month) \(dateComponents.year ?? 0)"
+        case .perYear:
+            return "\(dateComponents.year ?? 0)"
+        }
+    }
     
+    private func selectTransactionData() {
+        guard let selection else { return }
+        let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
+        if let data {
+            setSelected(data, date: selection, withCancelation: true)
+        }
+    }
+    
+    private func isBarDateEqual(left: Date?, right: Date?) -> Bool {
+        guard let left, let right else { return false }
+        let calendar = Calendar.current
+        return calendar.dateComponents(componentsToCompare, from: left) == calendar.dateComponents(componentsToCompare, from: right)
+    }
+    
+    private func setSelected(_ data: [TransactionBarChartData]?, date: Date?, withCancelation: Bool = false) {
+        selectionBuffer = date
+        transactionDataSelected = data
+        if withCancelation {
+            cancelSelectionAfterDeadline()
+        }
+    }
+    
+    private func cancelSelectionAfterDeadline() {
+        guard transactionDataSelected != nil else { return }
+        cancleDispatchWorkItem?.cancel()
+        cancleDispatchWorkItem = DispatchWorkItem {
+            withAnimation {
+                setSelected(nil, date: nil)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: cancleDispatchWorkItem!)
+    }
 }
 
 #Preview {
-    TransactionBarChart(transactionsData: [], perDate: .perWeek, transactionType: .both)
+    TransactionBarChart(transactionsData: [], perDate: .constant(.perWeek), transactionType: .constant(.both))
 }

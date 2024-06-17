@@ -111,6 +111,8 @@ final class StatisticsViewModel: ObservableObject {
             calculateDataForPieChart()
         }
     }
+    /// Flag to identify if pie chart data is currently being calculate
+    @Published private(set) var pieDataIsCalculating: Bool = false
     
     //MARK: For bar chart
     /// Data Array to be provided to bar chart
@@ -122,11 +124,13 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     /// Filter to select per which type of date to be diplayed in bar chart
-    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perWeek {
+    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
         didSet {
             calculateDataForBarChart()
         }
     }
+    /// Flag to identify if bar chart data is currently being calculate
+    @Published private(set) var barDataIsCalculating: Bool = false
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -245,6 +249,10 @@ final class StatisticsViewModel: ObservableObject {
     private func calculateDataForPieChart() {
         guard isCalculationAllowed else { return }
         
+        DispatchQueue.main.async { [weak self] in
+            self?.pieDataIsCalculating = true
+        }
+        
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
             var returnData = self.transactions
@@ -274,6 +282,7 @@ final class StatisticsViewModel: ObservableObject {
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
             DispatchQueue.main.async {
+                self.pieDataIsCalculating = false
                 withAnimation {
                     self.pieChartTransactionData = returnData
                 }
@@ -284,6 +293,11 @@ final class StatisticsViewModel: ObservableObject {
     /// Calculates data for bar chart and sets it with animation
     private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility)) {
         guard isCalculationAllowed else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.barDataIsCalculating = true
+        }
+        
         // This is utility because of high calculation compexity
         thread.async { [weak self] in
             guard let self else { return }
@@ -337,7 +351,7 @@ final class StatisticsViewModel: ObservableObject {
                         }
                     }
                     
-                    if case .both = self.barChartTransactionTypeFilter {
+                    if self.barChartTransactionTypeFilter == .both {
                         var incomeTransData = arrayOfBarData.first { $0.type == .income }
                         if incomeTransData == nil {
                             incomeTransData = TransactionBarChartData(type: .income, value: 0, date: dateToSet)
@@ -362,6 +376,7 @@ final class StatisticsViewModel: ObservableObject {
             //let filledBarData = addEmptyDataTo(availableBarData)
             
             DispatchQueue.main.async {
+                self.barDataIsCalculating = false
                 withAnimation {
                     self.barChartTransactionData = availableBarData
                 }
