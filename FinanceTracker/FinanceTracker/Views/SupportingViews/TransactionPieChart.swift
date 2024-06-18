@@ -7,37 +7,206 @@
 
 import SwiftUI
 import Charts
-import Algorithms
 
 struct TransactionPieChart: View {
-    let transactions: [Transaction]
-    @State private var transactionsGroups: [(categoryName: String, sumValue: Float)] = []
+    //MARK: - Properties
+    let transactionGroups: [(category: Category, sumValue: Float)]
     
-    init(transactions: [Transaction]) {
-        self.transactions = transactions
+    //MARK: Private pros
+    private var sumOfValue: Float = 0
+    @State private var selectedValue: Int?
+    @State private var selectedCategoryId: String?
+    @State private var cancleDispatchWorkItem: DispatchWorkItem?
+    private var selectedCategoryPersentage: Int? {
+        guard let selectedCategoryId else { return nil }
+        guard let data = transactionGroups.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
+        return calculatePercentage(for: data.sumValue)
+    }
+    private var selectedCategoryValue: Float? {
+        guard let selectedCategoryId else { return nil }
+        guard let data = transactionGroups.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
+        return data.sumValue
     }
     
+    //MARK: - Init
+    init(transactionGroups: [(category: Category, sumValue: Float)]) {
+        self.transactionGroups = transactionGroups
+        sumOfValue = calculateTotalValue()
+    }
+    
+    //MARK: - Body
     var body: some View {
-        Chart(transactionsGroups, id: \.categoryName) { transaction in
-            SectorMark(
-                angle: .value(transaction.categoryName, transaction.sumValue),
-                innerRadius: .ratio(0.6)
-            )
-            .foregroundStyle(by: .value(Text(verbatim: transaction.categoryName), transaction.categoryName))
-        }
-        .onAppear {
-            transactionsGroups = transactions
-                .grouped { $0.category.name }
-                .map { singleDict in
-                    let sumOfValue = singleDict.value.reduce(0, { $0 + $1.value })
-                    let name = singleDict.key
-                    return (categoryName: name, sumValue: sumOfValue)
+        HStack {
+            Chart {
+                if !transactionGroups.isEmpty {
+                    ForEach(transactionGroups, id: \.category) { singleData in
+                        let selectedFlag = isSelected(singleData.category)
+                        
+                        SectorMark(
+                            angle: .value("Sum of transactions", singleData.sumValue),
+                            innerRadius: .ratio(0.65),
+                            outerRadius: .ratio(selectedFlag ? 1 : 0.95),
+                            angularInset: selectedFlag ? 1.5 : 0
+                        )
+                        .cornerRadius(selectedFlag ? 3 : 0)
+                        .foregroundStyle(singleData.category.color)
+                        .opacity(
+                            selectedCategoryId != nil ? (selectedFlag ? 1 : 0.6) : 1
+                        )
+                        .foregroundStyle(by: .value(Text(verbatim: singleData.category.name), singleData.category.name))
+                    }
+                } else {
+                    SectorMark(
+                        angle: .value("Empy", 100),
+                        innerRadius: .ratio(0.65),
+                        outerRadius: .ratio(0.95)
+                    )
+                    .foregroundStyle(Color.gray.opacity(0.5))
                 }
-                .sorted(by: { $0.categoryName < $1.categoryName })
+            }
+            .chartAngleSelection(value: $selectedValue)
+            .chartLegend(.hidden)
+            .onChange(of: selectedValue, setSelectedCategoryId)
+            .overlay { chartOverlay }
+            
+            charLegendView
         }
+    }
+    
+    private var charLegendView: some View {
+        ScrollViewReader { proxy in 
+            ScrollView {
+                VStack(alignment: .leading) {
+                    if !transactionGroups.isEmpty {
+                        ForEach(transactionGroups, id: \.category) {singleData in
+                            let selectedFlag = isSelected(singleData.category)
+                            
+                            HStack {
+                                BasicChartSymbolShape.circle
+                                    .foregroundStyle(singleData.category.color)
+                                    .frame(width: 8, height: 8)
+                                
+                                Text(singleData.category.name)
+                                    .foregroundColor(selectedFlag ? .primary : .gray)
+                                    .font(.caption)
+                            }
+                            .underline(selectedFlag, color: .secondary)
+                            .onTapGesture {
+                                setSelectedCategory(selectedFlag ? nil : singleData.category)
+                            }
+                            .id(singleData.category.id)
+                        }
+                    } else {
+                        HStack {
+                            BasicChartSymbolShape.circle
+                                .foregroundStyle(Color.gray.opacity(0.5))
+                                .frame(width: 8, height: 8)
+                            
+                            Text("Epty")
+                                .foregroundColor(.gray)
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+            .frame(maxWidth: FTAppAssets.getScreenSize().width / 4 * 1.3)
+            .onChange(of: selectedCategoryId) {
+                if let selectedCategoryId {
+                    withAnimation {
+                        proxy.scrollTo(selectedCategoryId)
+                    }
+                }
+            }
+        }
+    }
+    
+    private var chartOverlay: some View {
+        VStack(spacing: 0) {
+            let sumValueDisplay = selectedCategoryId == nil ? sumOfValue : selectedCategoryValue ?? 0
+            
+            Text(FTFormatters.numberFormatterWithDecimals.string(for: sumValueDisplay) ?? "Err")
+                .foregroundStyle(.secondary)
+                .bold()
+            
+            if selectedCategoryId != nil {
+                Divider()
+                    .padding(.horizontal)
+                
+                Text("\(selectedCategoryPersentage ?? 0)%")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: 110)
+    }
+    
+    //MARK: - Methods
+    @ViewBuilder
+    private func getAnnotationPopover(value: Float) -> some View {
+        let percentage = calculatePercentage(for: value)
+        
+        Text("\(percentage)%")
+            .transaction { $0.animation = nil }
+            .padding(.vertical, 5)
+            .padding(.horizontal, 10)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+    
+    private func calculateTotalValue() -> Float {
+        let value = transactionGroups
+            .map { $0.sumValue }
+            .reduce(0, +)
+        
+        return value
+    }
+    
+    private func calculatePercentage(for value: Float) -> Int {
+        return Int(value/sumOfValue * 100)
+    }
+    
+    private func setSelectedCategory(_ category: Category?) {
+        let categoryId = category?.id
+        withAnimation(.snappy(duration: 0.35)) {
+            selectedCategoryId = categoryId
+        } completion: {
+            cancelSelectionAfterDeadline()
+        }
+    }
+    
+    private func setSelectedCategoryId() {
+        guard let selectedValue else { return }
+        var total: Float = 0
+        
+        for element in transactionGroups {
+            total += element.sumValue
+            if Float(selectedValue) <= total {
+                setSelectedCategory(element.category)
+                return
+            }
+        }
+    }
+    
+    private func cancelSelectionAfterDeadline() {
+        guard selectedCategoryId != nil else { return }
+        cancleDispatchWorkItem?.cancel()
+        cancleDispatchWorkItem = DispatchWorkItem {
+            withAnimation {
+                selectedCategoryId = nil
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: cancleDispatchWorkItem!)
+    }
+    
+    private func isSelected(_ category: Category) -> Bool {
+        return category.id == selectedCategoryId
     }
 }
 
 #Preview {
-    TransactionPieChart(transactions: FTAppAssets.testTransactions)
+    let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
+    @StateObject var viewModel = StatisticsViewModel(dataManager: dataManger)
+    viewModel.setAnyExistingBA()
+    
+    return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
 }

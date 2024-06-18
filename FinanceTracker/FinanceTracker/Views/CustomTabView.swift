@@ -40,9 +40,6 @@ struct CustomTabView: View  {
                 .font(.largeTitle)
                 .tag(3)
             
-//            Label("In develop", systemImage: "gearshape.2")
-//                .font(.largeTitle)
-//                .tag(4)
             Rectangle()
                 .fill(.red)
                 .tag(4)
@@ -115,10 +112,10 @@ struct CustomTabView: View  {
                 selectTab(3)
             } label: {
                 VStack {
-                    Image(systemName: "list.bullet.below.rectangle")
+                    Image(systemName: "magnifyingglass")
                         .frame(height: imageHeight)
                     
-                    Text("Entities")
+                    Text("Search")
                         .font(.caption)
                 }
             }

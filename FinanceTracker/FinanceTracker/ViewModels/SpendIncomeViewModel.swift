@@ -21,12 +21,12 @@ enum ActionWithTransaction: Equatable {
     case update(Transaction)
 }
 
+enum DateSettingDestination: Equatable {
+    case back
+    case forward
+}
+
 final class SpendIncomeViewModel: ObservableObject {
-    enum DateSettingDestination {
-        case back
-        case forward
-    }
-    
     //MARK: - Properties
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
@@ -38,7 +38,7 @@ final class SpendIncomeViewModel: ObservableObject {
     var cancelables = Set<AnyCancellable>()
     
     var availableDateRange: ClosedRange<Date> {
-        Date(timeIntervalSince1970: 0)...Date.now
+        FTAppAssets.availableDateRange
     }
     var movingBackwardDateAvailable: Bool {
         guard let backDate = calendar.date(byAdding: .day, value: -1, to: dateSelected) else {

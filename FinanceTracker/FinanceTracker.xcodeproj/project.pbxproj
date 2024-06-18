@@ -21,6 +21,9 @@
 		73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */; };
 		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
+		73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */; };
+		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
+		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
 		73C562FD2C17A2DD00FCB65D /* FTFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C562FC2C17A2DD00FCB65D /* FTFactory.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
@@ -74,6 +77,9 @@
 		73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryViewModel.swift; sourceTree = "<group>"; };
 		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
+		73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
+		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
+		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
 		73C562FC2C17A2DD00FCB65D /* FTFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTFactory.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
@@ -248,6 +254,9 @@
 				73F923292C0DEA70001D96D4 /* CategoryItemView.swift */,
 				73F9232B2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift */,
 				7305BAC72C1A495100F712BC /* TransactionPieChart.swift */,
+				73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */,
+				73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */,
+				73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -396,8 +405,10 @@
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
 				73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */,
 				738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */,
+				73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
+				73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */,
 				73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
 				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
@@ -410,6 +421,7 @@
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
 				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
+				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */,

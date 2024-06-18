@@ -49,8 +49,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getStatisticsView() -> some View {
-        let viewModel = StatisticsViewModel(dataManager: dataManager)
-        return StatisticsView(viewModel: viewModel)
+        return FTFactory.createStatisticsView(dataManager: dataManager)
     }
     
     private func addDelegate(object: some CustomTabViewModelDelegate) {

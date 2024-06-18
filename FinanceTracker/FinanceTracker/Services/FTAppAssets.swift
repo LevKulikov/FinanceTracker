@@ -12,6 +12,10 @@ struct FTAppAssets {
     //MARK: Properteis
     static var defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
     
+    static var availableDateRange: ClosedRange<Date> {
+        Date(timeIntervalSince1970: 0)...Date.now
+    }
+    
     static let defaultColors: [Color] = [
         .red,
         .blue,
