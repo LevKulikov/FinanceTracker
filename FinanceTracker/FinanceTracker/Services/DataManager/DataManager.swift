@@ -20,18 +20,25 @@ protocol DataManagerProtocol: AnyObject {
     
     @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
+    
+    func getDefaultBalanceAccount() -> BalanceAccount?
 }
 
 final class DataManager: DataManagerProtocol {
-    //MARK: Properties
+    //MARK: - Properties
     private let container: ModelContainer
+    private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
+    private var balanceAccounts: [BalanceAccount] = []
     
-    //MARK: Init
+    //MARK: - Init
     init(container: ModelContainer) {
         self.container = container
+        fetchBalanceAccounts()
     }
     
-    //MARK: Methods
+    //MARK: - Methods
     func save() throws {
         try container.mainContext.save()
     }
@@ -45,6 +52,28 @@ final class DataManager: DataManagerProtocol {
     }
     
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
-        return try container.mainContext.fetch(descriptor)
+        let fetchedData = try container.mainContext.fetch(descriptor)
+        if let balanceAccountsData = fetchedData as? [BalanceAccount] {
+            balanceAccounts = balanceAccountsData
+        }
+        return fetchedData
+    }
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
+        UserDefaults.standard.set(balanceAccount.id, forKey: defaultBalanceAccountIdKey)
+    }
+    
+    func getDefaultBalanceAccount() -> BalanceAccount? {
+        guard let baId = UserDefaults.standard.string(forKey: defaultBalanceAccountIdKey) else { return nil }
+        return balanceAccounts.first { $0.id == baId }
+    }
+    
+    //MARK: Private methods
+    private func fetchBalanceAccounts() {
+        let descriptor = FetchDescriptor<BalanceAccount>()
+        Task {
+            let data = try await fetch(descriptor)
+            balanceAccounts = data
+        }
     }
 }
