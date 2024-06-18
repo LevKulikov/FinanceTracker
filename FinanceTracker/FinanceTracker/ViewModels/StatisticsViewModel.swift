@@ -516,7 +516,7 @@ final class StatisticsViewModel: ObservableObject {
             let fetchedTranses = try dataManager.fetch(descriptor)
             transactions = fetchedTranses
         } catch {
-            print("Unable to fetch transactions")
+            print("StatisticsViewModel: Unable to fetch transactions")
         }
     }
     
@@ -532,7 +532,7 @@ final class StatisticsViewModel: ObservableObject {
             let fetchedBalanceAccounts = try dataManager.fetch(descriptor)
             balanceAccounts = fetchedBalanceAccounts
         } catch {
-            print("Unable to fetch transactions")
+            print("StatisticsViewModel: Unable to fetch Balance Accounts")
         }
     }
 }

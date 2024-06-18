@@ -42,7 +42,6 @@ struct TransactionBarChart: View {
     @Binding var transactionType: TransactionFilterTypes
     
     private var maxXVisibleLenth: Int {
-//        let count = transactionsData.count
         let multiplier = transactionType == .both ? 5 : 10
         let seconds: Int
         switch perDate {
