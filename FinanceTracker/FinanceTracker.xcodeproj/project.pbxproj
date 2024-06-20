@@ -17,6 +17,8 @@
 		736389142C21C7FF00D6478E /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736389132C21C7FF00D6478E /* SettingsViewModel.swift */; };
 		736389162C22EA5C00D6478E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736389152C22EA5C00D6478E /* SettingsView.swift */; };
 		736389182C22F5AF00D6478E /* GlobalMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736389172C22F5AF00D6478E /* GlobalMethods.swift */; };
+		7363891A2C246B7D00D6478E /* BalanceAccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736389192C246B7D00D6478E /* BalanceAccountsView.swift */; };
+		7363891C2C246BA400D6478E /* BalanceAccountsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7363891B2C246BA400D6478E /* BalanceAccountsViewModel.swift */; };
 		736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */; };
 		736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */; };
 		736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */; };
@@ -76,6 +78,8 @@
 		736389132C21C7FF00D6478E /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		736389152C22EA5C00D6478E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		736389172C22F5AF00D6478E /* GlobalMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMethods.swift; sourceTree = "<group>"; };
+		736389192C246B7D00D6478E /* BalanceAccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAccountsView.swift; sourceTree = "<group>"; };
+		7363891B2C246BA400D6478E /* BalanceAccountsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceAccountsViewModel.swift; sourceTree = "<group>"; };
 		736821C82C075B5200FFD5FD /* SpendIncomeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendIncomeCell.swift; sourceTree = "<group>"; };
 		736821CA2C076DEA00FFD5FD /* AddingSpendIcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeView.swift; sourceTree = "<group>"; };
 		736821CC2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingSpendIcomeViewModel.swift; sourceTree = "<group>"; };
@@ -216,6 +220,7 @@
 				73EC38632C18A40C004A7BA9 /* CustomTabView.swift */,
 				7305BAC92C1A4C1900F712BC /* StatisticsView.swift */,
 				736389152C22EA5C00D6478E /* SettingsView.swift */,
+				736389192C246B7D00D6478E /* BalanceAccountsView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -231,6 +236,7 @@
 				73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */,
 				7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */,
 				736389132C21C7FF00D6478E /* SettingsViewModel.swift */,
+				7363891B2C246BA400D6478E /* BalanceAccountsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -431,6 +437,7 @@
 				731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
 				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
+				7363891A2C246B7D00D6478E /* BalanceAccountsView.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
@@ -439,6 +446,7 @@
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				736389162C22EA5C00D6478E /* SettingsView.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
+				7363891C2C246BA400D6478E /* BalanceAccountsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
