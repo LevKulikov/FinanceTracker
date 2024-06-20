@@ -8,22 +8,11 @@
 import SwiftUI
 
 struct SettingsView: View {
-    enum SettingsSection {
-        case categories
-        case balanceAccounts
-        case tags
-        case appearance
-        case data
-    }
-    
     //MARK: - Properties
     @Environment(\.openURL) var openURL
     @StateObject private var viewModel: SettingsViewModel
-    @State private var selectedSettings: SettingsSection?
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
-    private let developerTelegramUsername = "k_lev_s"
-    private let developerEmail = "levkulikov.appdev@gmail.com"
     
     //MARK: - Initializer
     init(viewModel: SettingsViewModel) {
@@ -42,7 +31,7 @@ struct SettingsView: View {
     
     //MARK: - Computed View Prop
     private var settingsList: some View {
-        List(selection: $selectedSettings) {
+        List(selection: $viewModel.selectedSettings) {
             enitiesSection
             
             appSettingsSection
@@ -58,7 +47,7 @@ struct SettingsView: View {
     
     @ViewBuilder
     private var selectedSettingsView: some View {
-        if let selectedSettings {
+        if let selectedSettings = viewModel.selectedSettings {
             switch selectedSettings {
             case .categories:
                 inDevelopmentPlaceholder
@@ -129,12 +118,12 @@ struct SettingsView: View {
                 .onTapGesture {
                     telegramConfirmationFlag.toggle()
                 }
-                .confirmationDialog("@" + developerTelegramUsername, isPresented: $telegramConfirmationFlag, titleVisibility: .visible) {
+                .confirmationDialog("@" + viewModel.developerTelegramUsername, isPresented: $telegramConfirmationFlag, titleVisibility: .visible) {
                     Button("Copy username") {
-                        copyAsPlainText("@" + developerTelegramUsername)
+                        copyAsPlainText("@" + viewModel.developerTelegramUsername)
                     }
                     
-                    Link("Send message", destination: URL(string: "https://t.me/" + developerTelegramUsername)!)
+                    Link("Send message", destination: URL(string: "https://t.me/" + viewModel.developerTelegramUsername)!)
                 }
             
             Label("Email", systemImage: "envelope")
@@ -143,9 +132,9 @@ struct SettingsView: View {
                 .onTapGesture {
                     emailConfirmationFlag.toggle()
                 }
-                .confirmationDialog(developerEmail, isPresented: $emailConfirmationFlag, titleVisibility: .visible) {
+                .confirmationDialog(viewModel.developerEmail, isPresented: $emailConfirmationFlag, titleVisibility: .visible) {
                     Button("Copy email") {
-                        copyAsPlainText(developerEmail)
+                        copyAsPlainText(viewModel.developerEmail)
                     }
                     
                     Button("Send mail", action: sendMailToDeveloper)
@@ -155,7 +144,7 @@ struct SettingsView: View {
     
     //MARK: - Methods
     private func sendMailToDeveloper() {
-        let mail = "mailto:" + developerEmail
+        let mail = "mailto:" + viewModel.developerEmail
         guard let mailURL = URL(string: mail) else { return }
         openURL(mailURL)
     }

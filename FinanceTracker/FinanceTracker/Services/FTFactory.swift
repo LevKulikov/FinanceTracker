@@ -51,4 +51,10 @@ struct FTFactory {
         let viewModel = StatisticsViewModel(dataManager: dataManager)
         return AnyView(StatisticsView(viewModel: viewModel))
     }
+    
+    static func createSettingsView(dataManager: some DataManagerProtocol, delegate: (some SettingsViewModelDelegate)?) -> AnyView {
+        let viewModel = SettingsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(SettingsView(viewModel: viewModel))
+    }
 }
