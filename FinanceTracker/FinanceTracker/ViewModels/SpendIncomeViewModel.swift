@@ -268,6 +268,19 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
     func addButtonPressed() {
         addButtonPressedFromTabBar()
     }
+    
+    func didUpdateFromSettings(for section: SettingsSection) {
+        switch section {
+        case .balanceAccounts:
+            Task {
+                await fetchBalanceAccounts()
+            }
+        case .data:
+            fetchAllData()
+        default:
+            break
+        }
+    }
 }
 
 //MARK: - Sink extension

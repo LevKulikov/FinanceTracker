@@ -13,6 +13,8 @@ protocol CustomTabViewModelDelegate: AnyObject {
     var id: String { get }
     
     func addButtonPressed()
+    
+    func didUpdateFromSettings(for section: SettingsSection)
 }
 
 final class CustomTabViewModel: ObservableObject {
@@ -93,5 +95,9 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
                 }
             }
         }
+    }
+    
+    func didUpdateSettingsSection(_ section: SettingsSection) {
+        delegates.forEach { $0.object?.didUpdateFromSettings(for: section) }
     }
 }

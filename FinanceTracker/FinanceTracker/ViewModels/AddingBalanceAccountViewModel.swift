@@ -13,7 +13,7 @@ protocol AddingBalanceAccountViewModelDelegate: AnyObject {
     func didUpdateBalanceAccount()
 }
 
-enum ActionWithBalanceAccaunt: Equatable {
+enum ActionWithBalanceAccaunt: Equatable, Hashable {
     case none
     case add
     case update(BalanceAccount)
@@ -28,6 +28,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     weak var delegate: (any AddingBalanceAccountViewModelDelegate)?
     
     //MARK: Published props
+    //TODO: Published property "action" is changed from background thread when action is .update(_). I dnk why, but the issue should be solved
     @Published private(set) var action: ActionWithBalanceAccaunt = .none
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var balanceString: String = ""
@@ -59,8 +60,8 @@ final class AddingBalanceAccountViewModel: ObservableObject {
                 color: color
             )
             
-            Task {
-                await dataManager.insert(newBalanceAccount)
+            Task { @MainActor in
+                dataManager.insert(newBalanceAccount)
                 delegate?.didUpdateBalanceAccount()
                 completionHandler()
             }
@@ -78,9 +79,9 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             balanceAccountToUpdate.iconName = iconName
             balanceAccountToUpdate.color = color
             
-            Task {
+            Task { @MainActor in
                 do {
-                    try await dataManager.save()
+                    try dataManager.save()
                     delegate?.didUpdateBalanceAccount()
                     completionHandler()
                 } catch {
@@ -132,17 +133,15 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     
     private func fetchTransactionsWithBalanceAccount(errorHandler: ((Error) -> Void)?) async {
         guard let balanceAccountToUpdate else { return }
-        let baId = balanceAccountToUpdate.id
         
-        let descriptor = FetchDescriptor<Transaction>(
-            predicate: #Predicate {
-                $0.balanceAccount.id == baId
-            }
-        )
+        //Because of problems with predicate (it does not support multiple keypath and is unable to convert PredicateExpresion)
+        //fetch descriptor fetches all transaction, and afterwords ViewModel filters fetched array
+        let descriptor = FetchDescriptor<Transaction>()
         
         do {
             let fetchedTransactions = try await dataManager.fetch(descriptor)
-            transactionWithBalanceAccount = fetchedTransactions
+            let filteredTransactions = fetchedTransactions.filter { $0.balanceAccount == balanceAccountToUpdate }
+            transactionWithBalanceAccount = filteredTransactions
         } catch {
             errorHandler?(error)
         }
@@ -155,8 +154,6 @@ final class AddingBalanceAccountViewModel: ObservableObject {
         }.reduce(0, +)
         return changes
     }
-    
-    //TODO: Чтобы была возможность изменить текущий балас с учетом всех трат и доходов: через формулу изначально устанавливать калькулированное значение изначальный баланс + изменения в значение balanceString, и только в ините; далее после изменения пользователем и кнопки сохранить через формулу вычислять, какое должно быть изначальное значение баланса, чтобы оно сходилось с установленным пользователем значением после добавления изменений всех трат и доходов
     
     private func calculateNeededBalance() -> Float {
         let valueToReturn = balance - transactionsChanges

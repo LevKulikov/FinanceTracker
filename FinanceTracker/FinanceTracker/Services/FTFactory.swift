@@ -57,4 +57,10 @@ struct FTFactory {
         viewModel.delegate = delegate
         return AnyView(SettingsView(viewModel: viewModel))
     }
+    
+    static func createBalanceAccountsView(dataManager: some DataManagerProtocol, delegate: (some BalanceAccountsViewModelDelegate)?) -> AnyView {
+        let viewModel = BalanceAccountsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(BalanceAccountsView(viewModel: viewModel))
+    }
 }

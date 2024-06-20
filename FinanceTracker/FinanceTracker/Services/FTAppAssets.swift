@@ -161,10 +161,14 @@ struct FTAppAssets {
             }
     }
     
-    @ViewBuilder
     static func iconImageOrEpty(name: String, bundle: String = "IconImages.bundle") -> Image {
-        let uiImage: UIImage = iconUIImage(name: name, bundle: bundle) ?? UIImage(systemName: "xmark")!
-        Image(uiImage: uiImage)
+        let uiImage = iconUIImage(name: name, bundle: bundle)
+        if let uiImage {
+            return Image(uiImage: uiImage).resizable()
+        } else {
+            let defaultUiImage = UIImage(systemName: "xmark")!
+            return Image(uiImage: defaultUiImage)
+        }
     }
     
     static func getScreenSize() -> CGSize {
