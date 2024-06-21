@@ -10,7 +10,8 @@ import SwiftData
 import SwiftUI
 
 protocol BalanceAccountsViewModelDelegate: AnyObject {
-    func didUpdatedBalanceAccountsList() 
+    func didUpdatedBalanceAccountsList()
+    func didDeleteBalanceAccount()
 }
 
 final class BalanceAccountsViewModel: ObservableObject {
@@ -41,6 +42,22 @@ final class BalanceAccountsViewModel: ObservableObject {
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
         dataManager.setDefaultBalanceAccount(balanceAccount)
         defaultBalanceAccount = balanceAccount
+    }
+    
+    func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
+        Task { @MainActor in
+            dataManager.deleteBalanceAccount(balanceAccount)
+            delegate?.didDeleteBalanceAccount()
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
+        Task { @MainActor in
+            dataManager.deleteBalanceAccountWithTransactions(balanceAccount)
+            delegate?.didDeleteBalanceAccount()
+            await fetchBalanceAccounts()
+        }
     }
     
     func getAddingBalanceAccountView(for action: ActionWithBalanceAccaunt) -> some View {

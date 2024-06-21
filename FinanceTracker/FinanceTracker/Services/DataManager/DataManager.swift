@@ -15,6 +15,17 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteTransaction(_ transaction: Transaction)
     
+    /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
+    /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
+    @MainActor
+    func deleteBalanceAccount(_ balanceAccount: BalanceAccount)
+    
+    
+    /// Deletes selected balance account (BA) with binded transactions. If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
+    /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
+    @MainActor
+    func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount)
+    
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
@@ -45,6 +56,46 @@ final class DataManager: DataManagerProtocol {
     
     func deleteTransaction(_ transaction: Transaction) {
         container.mainContext.delete(transaction)
+    }
+    
+    func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
+        guard let defaultBA = getDefaultBalanceAccount() else { return }
+        guard balanceAccount != defaultBA else { return }
+        
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected balance account
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            // Replace selected balance account to default one for each transaction
+            filtered.forEach { $0.setBalanceAccount(defaultBA) }
+            // Delete selected balance account and save changes
+            container.mainContext.delete(balanceAccount)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
+        guard let defaultBA = getDefaultBalanceAccount() else { return }
+        guard balanceAccount != defaultBA else { return }
+        
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected balance account
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            // Delete filtered transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete selected balance account and save changes
+            container.mainContext.delete(balanceAccount)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {

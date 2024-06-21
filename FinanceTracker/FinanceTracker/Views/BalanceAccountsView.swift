@@ -12,6 +12,10 @@ struct BalanceAccountsView: View {
     @StateObject private var viewModel: BalanceAccountsViewModel
     @State private var deleteBalanceAccountFlag: BalanceAccount?
     @State private var navigationPath = NavigationPath()
+    private var canDeleteBalanceAccount: Bool {
+        guard let defaultBalanceAccount = viewModel.defaultBalanceAccount else { return false }
+        return defaultBalanceAccount != deleteBalanceAccountFlag
+    }
     
     //MARK: - Initializer
     init(viewModel: BalanceAccountsViewModel) {
@@ -39,13 +43,12 @@ struct BalanceAccountsView: View {
                 }
             }
             .confirmationDialog(
-                "Delete balance account?",
+                canDeleteBalanceAccount ? "Delete balance account?" : "Unable to delete",
                 isPresented: .init(get: { deleteBalanceAccountFlag != nil }, set: { _ in deleteBalanceAccountFlag = nil }),
                 titleVisibility: .visible) {
-                    //TODO: Implement balance account deletion
-                    Button("Ok", action: {})
+                    getActionsForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)
                 } message: {
-                    Text("This feature has not been implemented yet, balance account \"\(deleteBalanceAccountFlag?.name ?? "")\" cannot be deleted")
+                    getMessageForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)
                 }
         }
     }
@@ -102,8 +105,12 @@ struct BalanceAccountsView: View {
             navigationPath.append(ActionWithBalanceAccaunt.update(balanceAccount))
         }
         .contextMenu {
-            Button("Set as default") {
+            Button("Set as default", systemImage: "checkmark") {
                 viewModel.setDefaultBalanceAccount(balanceAccount)
+            }
+            
+            Button("Delete", systemImage: "trash", role: .destructive) {
+                deleteBalanceAccountFlag = balanceAccount
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -113,6 +120,37 @@ struct BalanceAccountsView: View {
                 Label("Delete", systemImage: "trash")
             }
             .tint(.red)
+        }
+    }
+    
+    @ViewBuilder
+    private func getActionsForDeleteDialog(balanceAccount: BalanceAccount?) -> some View {
+        if let defaultBalanceAccount = viewModel.defaultBalanceAccount, let balanceAccount {
+            if defaultBalanceAccount != balanceAccount {
+                Button("Delete only balance account", role: .destructive) {
+                    viewModel.deleteBalanceAccount(balanceAccount)
+                }
+                Button("Delete with transactions", role: .destructive) {
+                    viewModel.deleteBalanceAccountWithTransactions(balanceAccount)
+                }
+            } else {
+                Button("Ok", action: {})
+            }
+        } else {
+            Button("Ok", action: {})
+        }
+    }
+    
+    @ViewBuilder
+    private func getMessageForDeleteDialog(balanceAccount: BalanceAccount?) -> some View {
+        if let defaultBalanceAccount = viewModel.defaultBalanceAccount {
+            if defaultBalanceAccount != balanceAccount {
+                Text("This action is irretable. There are two ways to delete:\n\n - Delete only balance account: all transactions binded to deleted balance account will be moved to default one\n\n - Delete with transactions: balance account and binded to this account transactions will be deleted")
+            } else {
+                Text("Unable to delete default balance account. Set an another balance account as default if you need to delete the selected one")
+            }
+        } else {
+            Text("Set the default balance account first")
         }
     }
 }

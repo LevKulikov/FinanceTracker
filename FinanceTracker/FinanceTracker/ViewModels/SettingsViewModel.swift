@@ -55,4 +55,8 @@ extension SettingsViewModel: BalanceAccountsViewModelDelegate {
     func didUpdatedBalanceAccountsList() {
         delegate?.didUpdateSettingsSection(.balanceAccounts)
     }
+    
+    func didDeleteBalanceAccount() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
 }
