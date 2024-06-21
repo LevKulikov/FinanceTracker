@@ -67,9 +67,23 @@ struct BalanceAccountsView: View {
             
             Spacer()
             
-            FTAppAssets.iconImageOrEpty(name: balanceAccount.iconName)
-                .frame(width: 30, height: 30)
-                .padding(.trailing)
+            HStack {
+                if balanceAccount == viewModel.defaultBalanceAccount {
+                    Text("default")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 3)
+                        .background {
+                            Capsule()
+                                .stroke(.secondary)
+                        }
+                }
+                
+                FTAppAssets.iconImageOrEpty(name: balanceAccount.iconName)
+                    .frame(width: 30, height: 30)
+            }
+            .padding(.trailing)
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .padding(.vertical)
@@ -86,6 +100,11 @@ struct BalanceAccountsView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             navigationPath.append(ActionWithBalanceAccaunt.update(balanceAccount))
+        }
+        .contextMenu {
+            Button("Set as default") {
+                viewModel.setDefaultBalanceAccount(balanceAccount)
+            }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button {

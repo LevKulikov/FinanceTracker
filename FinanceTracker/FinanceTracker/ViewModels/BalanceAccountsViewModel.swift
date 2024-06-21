@@ -22,6 +22,7 @@ final class BalanceAccountsViewModel: ObservableObject {
     
     //MARK: Published
     @Published private(set) var balanceAccounts: [BalanceAccount] = []
+    @Published private(set) var defaultBalanceAccount: BalanceAccount?
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -31,9 +32,15 @@ final class BalanceAccountsViewModel: ObservableObject {
     
     //MARK: - Methods
     func fetchData() {
-        Task {
+        Task { @MainActor in
             await fetchBalanceAccounts()
+            getDefaultBalanceAccount()
         }
+    }
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
+        dataManager.setDefaultBalanceAccount(balanceAccount)
+        defaultBalanceAccount = balanceAccount
     }
     
     func getAddingBalanceAccountView(for action: ActionWithBalanceAccaunt) -> some View {
@@ -60,6 +67,10 @@ final class BalanceAccountsViewModel: ObservableObject {
         } catch {
             errorHandler?(error)
         }
+    }
+    
+    private func getDefaultBalanceAccount() {
+        defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
     }
 }
 
