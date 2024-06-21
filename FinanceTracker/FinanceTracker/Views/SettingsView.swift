@@ -52,7 +52,7 @@ struct SettingsView: View {
             case .categories:
                 inDevelopmentPlaceholder
             case .balanceAccounts:
-                inDevelopmentPlaceholder
+                viewModel.getBalanceAccountsView()
             case .tags:
                 inDevelopmentPlaceholder
             case .appearance:

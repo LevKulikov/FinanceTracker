@@ -25,11 +25,8 @@ struct AddingBalanceAccauntView: View {
         nameTextFieldFocus || balanceTextFieldFocus || currencyTextFieldFocus
     }
     
-    private var isUpdating: Bool {
-        if case .update = viewModel.action {
-            return true
-        }
-        return false
+    private var isAdding: Bool {
+        viewModel.action == .add
     }
     
     //MARK: - Initializer
@@ -41,8 +38,8 @@ struct AddingBalanceAccauntView: View {
     var body: some View {
         ScrollView {
             VStack {
-                headerView
-                    .padding(.vertical, 10)
+//                headerView
+//                    .padding(.vertical, 10)
                 
                 nameSection
                 
@@ -65,6 +62,7 @@ struct AddingBalanceAccauntView: View {
                 colorPickerSection
             }
         }
+        .navigationTitle(isAdding ? "New balance account" : "Balance account")
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .onTapGesture {
@@ -83,7 +81,7 @@ struct AddingBalanceAccauntView: View {
     //MARK: View Properties
     private var headerView: some View {
         HStack {
-            Text(isUpdating ? "Balance account" : "New balance account")
+            Text(isAdding ? "New balance account" : "Balance account")
                 .font(.title)
                 .bold()
             
@@ -107,7 +105,7 @@ struct AddingBalanceAccauntView: View {
     
     private var balanceSection: some View {
         VStack(alignment: .leading) {
-            Text((isUpdating ? "Current balance" : "Initial balance") + " and currency")
+            Text((isAdding ? "Initial balance" : "Current balance") + " and currency")
                 .font(.title2)
                 .fontWeight(.medium)
             
@@ -255,7 +253,7 @@ struct AddingBalanceAccauntView: View {
                 dismiss()
             }
         } label: {
-            Label("Add", systemImage: "plus")
+            Label(isAdding ? "Add" : "Update", systemImage: isAdding ? "plus" : "pencil.and.outline")
                 .frame(width: 170, height: 50)
                 .background {
                     Capsule()

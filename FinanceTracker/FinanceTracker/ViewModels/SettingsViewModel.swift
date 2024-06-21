@@ -10,6 +10,8 @@ import SwiftUI
 
 protocol SettingsViewModelDelegate: AnyObject {
     func didSelectSetting(_ setting: SettingsSection?)
+    
+    func didUpdateSettingsSection(_ section: SettingsSection)
 }
 
 enum SettingsSection {
@@ -42,5 +44,19 @@ final class SettingsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    func getBalanceAccountsView() -> some View {
+        return FTFactory.createBalanceAccountsView(dataManager: dataManager, delegate: self)
+    }
+}
+
+//MARK: - Extensions
+//MARK: Extension for BalanceAccountsViewModelDelegate
+extension SettingsViewModel: BalanceAccountsViewModelDelegate {
+    func didUpdatedBalanceAccountsList() {
+        delegate?.didUpdateSettingsSection(.balanceAccounts)
+    }
     
+    func didDeleteBalanceAccount() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
 }
