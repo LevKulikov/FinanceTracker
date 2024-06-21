@@ -127,14 +127,27 @@ struct TransactionBarChart: View {
             return DateComponents(month: 1)
         }
     }
+    private var xScrollPositionEnd: Date {
+        return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
+    }
     
     @State private var xScrollPosition: Date = .now
+    @State private var yScale: ClosedRange<Float> = 0...50_000
     @State private var selection: Date?
     @State private var selectionBuffer: Date?
     @State private var transactionDataSelected: [TransactionBarChartData]?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
+    @State private var yScaleDispatchWorkItem: DispatchWorkItem?
     
-    //MARK: Body
+    //MARK: - Init
+    init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>) {
+        self.transactionsData = transactionsData
+        self._perDate = perDate
+        self._transactionType = transactionType
+        setYScaleRange()
+    }
+    
+    //MARK: - Body
     var body: some View {
         Chart {
             ForEach(transactionsData, id: \.first?.id) { transactionArray in
@@ -165,15 +178,19 @@ struct TransactionBarChart: View {
         .chartScrollTargetBehavior(
             .valueAligned(
                 matching: cartMatchingAlignment,
-                majorAlignment: .matching(chartMajorAlignment)
+                majorAlignment: .matching(cartMatchingAlignment)
             )
         )
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
         .chartXScale(domain: chartXScale)
+        .chartYScale(domain: yScale)
         .chartScrollPosition(x: $xScrollPosition)
         .chartXSelection(value: $selection)
         .onChange(of: selection, selectTransactionData)
+        .onChange(of: xScrollPosition) {
+            adaptYAxisScaleToVisibleData()
+        }
         .chartXAxis {
             switch perDate {
             case .perDay:
@@ -229,9 +246,11 @@ struct TransactionBarChart: View {
         }
         .onChange(of: perDate) {
             setSelected(nil, date: nil)
+            adaptYAxisScaleToVisibleData()
         }
         .onChange(of: transactionType) {
             setSelected(nil, date: nil)
+            adaptYAxisScaleToVisibleData()
         }
     }
     
@@ -316,8 +335,35 @@ struct TransactionBarChart: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: cancleDispatchWorkItem!)
     }
+    
+    private func adaptYAxisScaleToVisibleData() {
+        yScaleDispatchWorkItem?.cancel()
+        yScaleDispatchWorkItem = DispatchWorkItem {
+            setYScaleRange(withAnimation: true)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: yScaleDispatchWorkItem!)
+    }
+    
+    private func setYScaleRange(withAnimation animated: Bool = false) {
+        let values = transactionsData.flatMap { $0 }.filter {
+            (xScrollPosition.addingTimeInterval(-3600)...xScrollPositionEnd.addingTimeInterval(-3600)).contains($0.date)
+        }.map { $0.value }
+        guard var minValue = values.min(), var maxValue = values.max() else { return }
+        if minValue > 0 { minValue = 0 }
+        
+        minValue -= (minValue * 0.1)
+        maxValue += (maxValue * 0.1)
+        
+        if animated {
+            withAnimation(.easeOut(duration: 0.3)) {
+                yScale = minValue...maxValue
+            }
+        } else {
+            yScale = minValue...maxValue
+        }
+    }
 }
 
 #Preview {
-    TransactionBarChart(transactionsData: [], perDate: .constant(.perWeek), transactionType: .constant(.both))
+    TransactionBarChart(transactionsData: [], perDate: .constant(.perDay), transactionType: .constant(.both))
 }
