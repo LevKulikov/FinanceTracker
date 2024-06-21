@@ -83,14 +83,71 @@ struct TransactionBarChart: View {
         }
         return components
     }
+    private var chartXScale: ClosedRange<Date> {
+        let calendar = Calendar.current
+        switch perDate {
+        case .perDay:
+            let dateComp = calendar.dateComponents([.year], from: .now)
+            let startDate = calendar.date(from: dateComp) ?? .now
+            return startDate...Date.now
+        case .perWeek:
+            let startDate = calendar.date(byAdding: .year, value: -2, to: .now) ?? .now
+            let endDate = calendar.date(byAdding: .weekOfMonth, value: 1, to: .now) ?? .now
+            return startDate...endDate
+        case .perMonth:
+            let startDate = calendar.date(byAdding: .year, value: -5, to: .now) ?? .now
+            let endDate = calendar.date(byAdding: .month, value: 1, to: .now) ?? .now
+            return startDate...endDate
+        case .perYear:
+            let endDate = calendar.date(byAdding: .year, value: 1, to: .now) ?? .now
+            return FTAppAssets.availableDateRange.lowerBound...endDate
+        }
+    }
+    private var cartMatchingAlignment: DateComponents {
+        switch perDate {
+        case .perDay:
+            return DateComponents(hour: 0)
+        case .perWeek:
+            return DateComponents(day: 1)
+        case .perMonth:
+            return DateComponents(day: 1)
+        case .perYear:
+            return DateComponents(month: 1)
+        }
+    }
+    private var chartMajorAlignment: DateComponents {
+        switch perDate {
+        case .perDay:
+            return DateComponents(day: 1)
+        case .perWeek:
+            return DateComponents(day: 1)
+        case .perMonth:
+            return DateComponents(month: 1)
+        case .perYear:
+            return DateComponents(month: 1)
+        }
+    }
+    private var xScrollPositionEnd: Date {
+        return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
+    }
     
     @State private var xScrollPosition: Date = .now
+    @State private var yScale: ClosedRange<Float> = 0...50_000
     @State private var selection: Date?
     @State private var selectionBuffer: Date?
     @State private var transactionDataSelected: [TransactionBarChartData]?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
+    @State private var yScaleDispatchWorkItem: DispatchWorkItem?
     
-    //MARK: Body
+    //MARK: - Init
+    init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>) {
+        self.transactionsData = transactionsData
+        self._perDate = perDate
+        self._transactionType = transactionType
+        setYScaleRange()
+    }
+    
+    //MARK: - Body
     var body: some View {
         Chart {
             ForEach(transactionsData, id: \.first?.id) { transactionArray in
@@ -118,11 +175,22 @@ struct TransactionBarChart: View {
             TransactionBarChartData.TransactionBarChartDataType.profit.rawValue : .blue,
             TransactionBarChartData.TransactionBarChartDataType.unknown.rawValue : .yellow,
         ])
+        .chartScrollTargetBehavior(
+            .valueAligned(
+                matching: cartMatchingAlignment,
+                majorAlignment: .matching(cartMatchingAlignment)
+            )
+        )
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
+        .chartXScale(domain: chartXScale)
+        .chartYScale(domain: yScale)
         .chartScrollPosition(x: $xScrollPosition)
         .chartXSelection(value: $selection)
         .onChange(of: selection, selectTransactionData)
+        .onChange(of: xScrollPosition) {
+            adaptYAxisScaleToVisibleData()
+        }
         .chartXAxis {
             switch perDate {
             case .perDay:
@@ -151,12 +219,22 @@ struct TransactionBarChart: View {
                 }
             case .perMonth:
                 AxisMarks(values: .stride(by: .month)) { value in
-                    AxisGridLine()
-                    AxisTick()
-                    AxisValueLabel(format: .dateTime.month(.wide))
+                    if value.as(Date.self)!.isFirstMonthOfYear() {
+                        AxisGridLine().foregroundStyle(.black)
+                        AxisTick().foregroundStyle(.black)
+                        AxisValueLabel(format: .dateTime.year(.twoDigits))
+                    } else {
+                        AxisGridLine()
+                        AxisTick()
+                        AxisValueLabel(format: .dateTime.month(.narrow))
+                    }
                 }
             case .perYear:
-                AxisMarks(values: .stride(by: .year))
+                AxisMarks(values: .stride(by: .year)) { _ in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: .dateTime.year(.twoDigits))
+                }
             }
         }
         .chartOverlay { _ in
@@ -168,9 +246,11 @@ struct TransactionBarChart: View {
         }
         .onChange(of: perDate) {
             setSelected(nil, date: nil)
+            adaptYAxisScaleToVisibleData()
         }
         .onChange(of: transactionType) {
             setSelected(nil, date: nil)
+            adaptYAxisScaleToVisibleData()
         }
     }
     
@@ -255,8 +335,35 @@ struct TransactionBarChart: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: cancleDispatchWorkItem!)
     }
+    
+    private func adaptYAxisScaleToVisibleData() {
+        yScaleDispatchWorkItem?.cancel()
+        yScaleDispatchWorkItem = DispatchWorkItem {
+            setYScaleRange(withAnimation: true)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: yScaleDispatchWorkItem!)
+    }
+    
+    private func setYScaleRange(withAnimation animated: Bool = false) {
+        let values = transactionsData.flatMap { $0 }.filter {
+            (xScrollPosition.addingTimeInterval(-3600)...xScrollPositionEnd.addingTimeInterval(-3600)).contains($0.date)
+        }.map { $0.value }
+        guard var minValue = values.min(), var maxValue = values.max() else { return }
+        if minValue > 0 { minValue = 0 }
+        
+        minValue -= (minValue * 0.1)
+        maxValue += (maxValue * 0.1)
+        
+        if animated {
+            withAnimation(.easeOut(duration: 0.3)) {
+                yScale = minValue...maxValue
+            }
+        } else {
+            yScale = minValue...maxValue
+        }
+    }
 }
 
 #Preview {
-    TransactionBarChart(transactionsData: [], perDate: .constant(.perWeek), transactionType: .constant(.both))
+    TransactionBarChart(transactionsData: [], perDate: .constant(.perDay), transactionType: .constant(.both))
 }

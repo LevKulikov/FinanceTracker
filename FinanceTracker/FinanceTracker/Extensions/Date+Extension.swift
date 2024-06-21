@@ -30,4 +30,9 @@ extension Date {
         let dateComponents = calendar.dateComponents([.weekOfMonth], from: self)
         return dateComponents.weekOfMonth == 1 ? true : false
     }
+    
+    func isFirstMonthOfYear(using calendar: Calendar = .current) -> Bool {
+        let dateComponents = calendar.dateComponents([.month], from: self)
+        return dateComponents.month == 1 ? true : false
+    }
 }
