@@ -351,7 +351,7 @@ struct TransactionBarChart: View {
         guard var minValue = values.min(), var maxValue = values.max() else { return }
         if minValue > 0 { minValue = 0 }
         
-        minValue -= (minValue * 0.1)
+        minValue += (minValue * 0.1)
         maxValue += (maxValue * 0.1)
         
         if animated {

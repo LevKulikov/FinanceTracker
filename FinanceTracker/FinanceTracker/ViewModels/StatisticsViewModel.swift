@@ -88,7 +88,7 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     /// Which type of date filtering is selected for pie chart
-    @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .allTime {
+    @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .month {
         didSet {
             calculateDataForPieChart()
         }
