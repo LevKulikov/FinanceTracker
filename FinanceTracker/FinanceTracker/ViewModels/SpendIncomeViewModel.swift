@@ -92,6 +92,9 @@ final class SpendIncomeViewModel: ObservableObject {
         self.dataManager = dataManager
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
+            DispatchQueue.main.async {
+                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
         }
     }
     
