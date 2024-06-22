@@ -38,10 +38,11 @@ struct SettingsView: View {
             
             contactsSection
             
-            Text("App version: idk 🫤")
+            Text("__Finance Tracker__\nVersion: idk 🫤")
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.tertiary)
                 .listRowBackground(Color.clear)
+                .multilineTextAlignment(.center)
         }
     }
     
