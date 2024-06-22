@@ -18,12 +18,15 @@ protocol CategoriesViewModelDelegate: AnyObject {
 final class CategoriesViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any CategoriesViewModelDelegate)?
+    var filteredCategories: [Category] {
+        allCategories.filter { $0.type == caterotyType }
+    }
     
     //MARK: Private props
     private var dataManager: any DataManagerProtocol
     
     //MARK: Published props
-    @Published private(set) var categories: [Category] = []
+    @Published private(set) var allCategories: [Category] = []
     @Published var caterotyType: TransactionsType = .spending
     
     //MARK: - Initializer
@@ -51,7 +54,7 @@ final class CategoriesViewModel: ObservableObject {
         do {
             let fetchedData = try dataManager.fetch(descriptor)
             withAnimation {
-                categories = fetchedData
+                allCategories = fetchedData
             }
         } catch {
             errorHandler?()
