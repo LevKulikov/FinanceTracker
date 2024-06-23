@@ -20,11 +20,22 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount)
     
-    
     /// Deletes selected balance account (BA) with binded transactions. If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
     @MainActor
     func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount)
+    
+    /// Deletes selected category and moves binded transactions to the second provided one
+    /// - Parameters:
+    ///   - category: category to delete
+    ///   - replacingCategory: category to move transaction to
+    @MainActor
+    func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async
+    
+    /// Deletes selected category and all binded to it transactions
+    /// - Parameter category: category to delete
+    @MainActor
+    func deleteCategoryWithTransactions(_ category: Category) async
     
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
@@ -91,6 +102,40 @@ final class DataManager: DataManagerProtocol {
             filtered.forEach { deleteTransaction($0) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected category
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.category == category }
+            // Replace category in transaction with provided replacing category
+            filtered.forEach { $0.setCategory(replacingCategory) }
+            // Delete initial category
+            container.mainContext.delete(category)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteCategoryWithTransactions(_ category: Category) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected category
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.category == category }
+            // Delete transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete category
+            container.mainContext.delete(category)
             try save()
         } catch {
             print(error)

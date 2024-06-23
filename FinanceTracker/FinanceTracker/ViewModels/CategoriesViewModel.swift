@@ -32,13 +32,13 @@ final class CategoriesViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        fetchData()
+        fetchData(withAnimation: true)
     }
     
     //MARK: - Methods
-    func fetchData(completionHandler: (() -> Void)? = nil) {
+    func fetchData(withAnimation: Bool = false, completionHandler: (() -> Void)? = nil) {
         Task {
-            await fetchCategories()
+            await fetchCategories(withAnimation: withAnimation)
             completionHandler?()
         }
     }
@@ -47,13 +47,33 @@ final class CategoriesViewModel: ObservableObject {
         return FTFactory.createAddingCategoryView(dataManager: dataManager, transactionType: caterotyType, action: action, delegate: self)
     }
     
+    func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) {
+        Task { @MainActor in
+            await dataManager.deleteCategory(category, moveTransactionsTo: replacingCategory)
+            delegate?.didDeleteCategory()
+            await fetchCategories()
+        }
+    }
+    
+    func deleteCategoryWithTransactions(_ category: Category) {
+        Task { @MainActor in
+            await dataManager.deleteCategoryWithTransactions(category)
+            delegate?.didDeleteCategory()
+            await fetchCategories()
+        }
+    }
+    
     //MARK: Private methods
     @MainActor
-    private func fetchCategories(errorHandler: (() -> Void)? = nil) {
+    private func fetchCategories(withAnimation animated: Bool = false, errorHandler: (() -> Void)? = nil) async {
         let descriptor = FetchDescriptor<Category>()
         do {
             let fetchedData = try dataManager.fetch(descriptor)
-            withAnimation {
+            if animated {
+                withAnimation {
+                    allCategories = fetchedData
+                }
+            } else {
                 allCategories = fetchedData
             }
         } catch {
@@ -68,5 +88,6 @@ final class CategoriesViewModel: ObservableObject {
 extension CategoriesViewModel: AddingCategoryViewModelDelegate {
     func didUpdateCategory() {
         fetchData()
+        delegate?.didUpdateCategoryList()
     }
 }

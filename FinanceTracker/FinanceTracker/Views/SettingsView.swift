@@ -51,7 +51,7 @@ struct SettingsView: View {
         if let selectedSettings = viewModel.selectedSettings {
             switch selectedSettings {
             case .categories:
-                inDevelopmentPlaceholder
+                viewModel.getCategoriesView()
             case .balanceAccounts:
                 viewModel.getBalanceAccountsView()
             case .tags:
