@@ -47,6 +47,10 @@ final class SettingsViewModel: ObservableObject {
     func getBalanceAccountsView() -> some View {
         return FTFactory.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
+    
+    func getCategoriesView() -> some View {
+        return FTFactory.createCategoriesView(dataManager: dataManager, delegate: self)
+    }
 }
 
 //MARK: - Extensions
@@ -57,6 +61,17 @@ extension SettingsViewModel: BalanceAccountsViewModelDelegate {
     }
     
     func didDeleteBalanceAccount() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
+}
+
+//MARK: Extension for CategoriesViewModelDelegate
+extension SettingsViewModel: CategoriesViewModelDelegate {
+    func didUpdateCategoryList() {
+        delegate?.didUpdateSettingsSection(.categories)
+    }
+    
+    func didDeleteCategory() {
         delegate?.didUpdateSettingsSection(.data)
     }
 }

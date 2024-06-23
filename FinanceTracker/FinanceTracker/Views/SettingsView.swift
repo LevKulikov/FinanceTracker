@@ -38,10 +38,11 @@ struct SettingsView: View {
             
             contactsSection
             
-            Text("App version: idk 🫤")
+            Text("__Finance Tracker__\nVersion: idk 🫤")
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.tertiary)
                 .listRowBackground(Color.clear)
+                .multilineTextAlignment(.center)
         }
     }
     
@@ -50,7 +51,7 @@ struct SettingsView: View {
         if let selectedSettings = viewModel.selectedSettings {
             switch selectedSettings {
             case .categories:
-                inDevelopmentPlaceholder
+                viewModel.getCategoriesView()
             case .balanceAccounts:
                 viewModel.getBalanceAccountsView()
             case .tags:

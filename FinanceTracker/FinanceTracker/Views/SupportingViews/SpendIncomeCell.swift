@@ -48,7 +48,7 @@ struct SpendIncomeCell: View {
     private var categoryImage: some View {
         let frameDimention: CGFloat = 40
         
-        if let uiImage = FTAppAssets.iconUIImage(name: transaction.category.iconName) {
+        if let category = transaction.category, let uiImage = FTAppAssets.iconUIImage(name: category.iconName) {
             Circle()
                 .fill(LinearGradient(colors: [transaction.category.color, .clear], startPoint: .leading, endPoint: .trailing))
                 .overlay {

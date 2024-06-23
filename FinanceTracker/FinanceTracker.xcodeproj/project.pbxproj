@@ -30,6 +30,8 @@
 		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
 		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
 		73C562FD2C17A2DD00FCB65D /* FTFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C562FC2C17A2DD00FCB65D /* FTFactory.swift */; };
+		73CCF3D52C2765D6009D8001 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3D42C2765D6009D8001 /* CategoriesView.swift */; };
+		73CCF3D72C2765E7009D8001 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3D62C2765E7009D8001 /* CategoriesViewModel.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
@@ -91,6 +93,8 @@
 		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
 		73C562FC2C17A2DD00FCB65D /* FTFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTFactory.swift; sourceTree = "<group>"; };
+		73CCF3D42C2765D6009D8001 /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		73CCF3D62C2765E7009D8001 /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -221,6 +225,7 @@
 				7305BAC92C1A4C1900F712BC /* StatisticsView.swift */,
 				736389152C22EA5C00D6478E /* SettingsView.swift */,
 				736389192C246B7D00D6478E /* BalanceAccountsView.swift */,
+				73CCF3D42C2765D6009D8001 /* CategoriesView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -237,6 +242,7 @@
 				7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */,
 				736389132C21C7FF00D6478E /* SettingsViewModel.swift */,
 				7363891B2C246BA400D6478E /* BalanceAccountsViewModel.swift */,
+				73CCF3D62C2765E7009D8001 /* CategoriesViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -421,6 +427,7 @@
 				736389142C21C7FF00D6478E /* SettingsViewModel.swift in Sources */,
 				73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */,
 				738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */,
+				73CCF3D52C2765D6009D8001 /* CategoriesView.swift in Sources */,
 				73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
@@ -446,6 +453,7 @@
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				736389162C22EA5C00D6478E /* SettingsView.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
+				73CCF3D72C2765E7009D8001 /* CategoriesViewModel.swift in Sources */,
 				7363891C2C246BA400D6478E /* BalanceAccountsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

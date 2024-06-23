@@ -257,7 +257,7 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     
     func categoryUpdated() {
         fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+            self?.filterGroupSortTransactions()
         }
     }
 }
@@ -278,8 +278,17 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
             Task {
                 await fetchBalanceAccounts()
             }
+        case .categories:
+            Task {
+                await fetchTransactions()
+            }
         case .data:
-            fetchAllData()
+            fetchAllData { [weak self] in
+                self?.filterGroupSortTransactions()
+                DispatchQueue.main.async {
+                    self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+                }
+            }
         default:
             break
         }
