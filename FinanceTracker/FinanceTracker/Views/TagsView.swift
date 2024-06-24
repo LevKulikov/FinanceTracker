@@ -18,7 +18,7 @@ struct TagsView: View {
     
     //MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text("Tag settings")
     }
     
     //MARK: - Computed View props

@@ -230,8 +230,8 @@
 				736389152C22EA5C00D6478E /* SettingsView.swift */,
 				736389192C246B7D00D6478E /* BalanceAccountsView.swift */,
 				73CCF3D42C2765D6009D8001 /* CategoriesView.swift */,
-				73F629312C039CE800E9FEB9 /* SupportingViews */,
 				73CCF3DA2C29C506009D8001 /* TagsView.swift */,
+				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
