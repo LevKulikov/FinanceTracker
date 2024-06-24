@@ -38,6 +38,12 @@ protocol DataManagerProtocol: AnyObject {
     func deleteCategoryWithTransactions(_ category: Category) async
     
     @MainActor
+    func deleteTag(_ tag: Tag) async
+    
+    @MainActor
+    func deleteTagWithTransactions(_ tag: Tag) async
+    
+    @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
     @MainActor
@@ -136,6 +142,40 @@ final class DataManager: DataManagerProtocol {
             filtered.forEach { deleteTransaction($0) }
             // Delete category
             container.mainContext.delete(category)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTag(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Remove tag from transactions
+            filtered.forEach { $0.removeTag(tag) }
+            // Delete tag
+            container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTagWithTransactions(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Delete transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete tag
+            container.mainContext.delete(tag)
             try save()
         } catch {
             print(error)
