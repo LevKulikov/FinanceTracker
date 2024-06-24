@@ -69,4 +69,10 @@ struct FTFactory {
         viewModel.delegate = delegate
         return AnyView(CategoriesView(viewModel: viewModel))
     }
+    
+    static func createTagsView(dataManager: some DataManagerProtocol, delegate: (some TagsViewModelDelegate)?) -> AnyView {
+        let viewModel = TagsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(TagsView(viewModel: viewModel))
+    }
 }
