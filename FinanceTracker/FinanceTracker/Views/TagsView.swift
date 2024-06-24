@@ -15,6 +15,7 @@ struct TagsView: View {
     @FocusState private var tagAddingTextFieldFocused
     @Namespace private var namespace
     @State private var tagDeletionFlag: Tag?
+    @State private var showSettings = false
     
     //MARK: - Initializer
     init(viewModel: TagsViewModel) {
@@ -35,7 +36,16 @@ struct TagsView: View {
             }
             .navigationTitle("Tags")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Settings", systemImage: "gear") {
+                        showSettings.toggle()
+                    }
+                    .labelStyle(.iconOnly)
+                    .popover(isPresented: $showSettings) {
+                        tagDefaultSettingsView
+                            .presentationCompactAdaptation(.popover)
+                    }
+                    
                     Button(showAddingRow ? "Hide" : "Add", systemImage: showAddingRow ? "xmark" : "plus") {
                         tagAddingTextFieldFocused = !showAddingRow
                         withAnimation {
@@ -70,6 +80,18 @@ struct TagsView: View {
     }
     
     //MARK: - Computed View props
+    private var tagDefaultSettingsView: some View {
+        VStack {
+            Toggle("Random color by default", isOn: $viewModel.globalRandomColorToggle)
+            
+            if !viewModel.globalRandomColorToggle {
+                ColorPicker("Default color", selection: $viewModel.tagDefaulColor)
+                    .disabled(viewModel.globalRandomColorToggle)
+            }
+        }
+        .padding()
+    }
+    
     private var addingTagRow: some View {
         VStack {
             HStack {

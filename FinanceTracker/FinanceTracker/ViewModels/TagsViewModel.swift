@@ -27,9 +27,26 @@ final class TagsViewModel: ObservableObject {
     @Published var tagColor: Color = .orange
     @Published var randomColorToggle = true
     
+    @Published var globalRandomColorToggle = true {
+        didSet {
+            saveTagDefaultColorSetting()
+        }
+    }
+    @Published var tagDefaulColor: Color = .orange {
+        didSet {
+            saveTagDefaultColorSetting()
+        }
+    }
+    
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        if let defaultColor = dataManager.tagDefaultColor {
+            randomColorToggle = false
+            globalRandomColorToggle = false
+            tagColor = defaultColor
+            tagDefaulColor = defaultColor
+        }
         fetchData(withAnimation: true)
     }
     
@@ -100,6 +117,11 @@ final class TagsViewModel: ObservableObject {
             await dataManager.deleteTagWithTransactions(tag)
             await fetchTags(withAnimation: withAnimation)
         }
+    }
+    
+    func saveTagDefaultColorSetting() {
+        let colorToSave: Color? = globalRandomColorToggle ? nil : tagDefaulColor
+        dataManager.tagDefaultColor = colorToSave
     }
     
     //MARK: Pivate methods
