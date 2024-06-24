@@ -25,14 +25,7 @@ final class TagsViewModel: ObservableObject {
     @Published var tagSelected: Tag?
     @Published var tagName: String = ""
     @Published var tagColor: Color = .orange
-    @FocusState var tagChangeTextFieldFocused {
-        didSet {
-            if tagChangeTextFieldFocused {
-                tagName = tagSelected?.name ?? ""
-                tagColor = tagSelected?.color ?? .orange
-            }
-        }
-    }
+    @Published var randomColorToggle = true
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -46,6 +39,22 @@ final class TagsViewModel: ObservableObject {
             await fetchTags(withAnimation: withAnimation)
             completionHandler?()
         }
+    }
+    
+    func startUpdatingTag(_ tag: Tag) {
+        tagSelected = tag
+        tagName = tag.name
+        tagColor = tag.color
+    }
+    
+    func endUpdatingTag() {
+        tagSelected = nil
+        tagName = ""
+        tagColor = .orange
+    }
+    
+    func createNewTag() {
+        createNewTag(name: tagName, color: randomColorToggle ? nil : tagColor)
     }
     
     func createNewTag(name: String, color: Color? = nil) {
@@ -96,16 +105,16 @@ final class TagsViewModel: ObservableObject {
     //MARK: Pivate methods
     @MainActor
     private func fetchTags(withAnimation animated: Bool = false, errorHandler: ((Error) -> Void)? = nil) async {
-        let descriptor = FetchDescriptor<Tag>(sortBy: [SortDescriptor(\.name)])
+        let descriptor = FetchDescriptor<Tag>()
         
         do {
             let fetchedTags = try dataManager.fetch(descriptor)
             if animated {
                 withAnimation {
-                    tags = fetchedTags
+                    tags = fetchedTags.reversed()
                 }
             } else {
-                tags = fetchedTags
+                tags = fetchedTags.reversed()
             }
         } catch {
             errorHandler?(error)
