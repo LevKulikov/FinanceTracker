@@ -13,7 +13,7 @@ protocol SettingsManagerProtocol: AnyObject {
     /// - Parameter color: color to save, nil = delete saved
     func setTagDefaultColor(_ color: Color?)
     
-    func getsetTagDefaultColor() -> Color?
+    func getTagDefaultColor() -> Color?
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -31,7 +31,7 @@ final class SettingsManager: SettingsManagerProtocol {
         UserDefaults.standard.set(uiColor?.encode(), forKey: tagDefaultColorKey)
     }
     
-    func getsetTagDefaultColor() -> Color? {
+    func getTagDefaultColor() -> Color? {
         guard let data = UserDefaults.standard.data(forKey: tagDefaultColorKey) else { return nil }
         guard let uiColor = UIColor.color(data: data) else { return nil }
         return Color(uiColor: uiColor)

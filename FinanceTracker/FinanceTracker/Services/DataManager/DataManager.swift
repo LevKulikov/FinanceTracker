@@ -7,8 +7,11 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 protocol DataManagerProtocol: AnyObject {
+    var tagDefaultColor: Color? { get set }
+    
     @MainActor
     func save() throws
     
@@ -57,12 +60,24 @@ protocol DataManagerProtocol: AnyObject {
 final class DataManager: DataManagerProtocol {
     //MARK: - Properties
     private let container: ModelContainer
+    private let settingsManager: any SettingsManagerProtocol
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
+    
+    var tagDefaultColor: Color? {
+        get {
+            settingsManager.getTagDefaultColor()
+        }
+        
+        set {
+            settingsManager.setTagDefaultColor(newValue)
+        }
+    }
     
     //MARK: - Init
     init(container: ModelContainer) {
         self.container = container
+        self.settingsManager = SettingsManager()
         fetchBalanceAccounts()
     }
     
