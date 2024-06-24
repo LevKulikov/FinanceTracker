@@ -88,17 +88,17 @@ final class TagsViewModel: ObservableObject {
         }
     }
     
-    func deleteTag(_ tag: Tag) {
+    func deleteTag(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTag(tag)
-            await fetchTags()
+            await fetchTags(withAnimation: withAnimation)
         }
     }
     
-    func deleteTagWithTransactions(_ tag: Tag) {
+    func deleteTagWithTransactions(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTagWithTransactions(tag)
-            await fetchTags()
+            await fetchTags(withAnimation: withAnimation)
         }
     }
     
