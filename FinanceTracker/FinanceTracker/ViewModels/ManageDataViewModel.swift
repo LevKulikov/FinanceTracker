@@ -25,6 +25,6 @@ final class ManageDataViewModel: ObservableObject {
     
     //MARK: - Methods
     func deleteAllStoredData() {
-        
+        dataManager.deleteAllStoredData()
     }
 }
