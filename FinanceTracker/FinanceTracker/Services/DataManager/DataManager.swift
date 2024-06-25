@@ -55,9 +55,13 @@ protocol DataManagerProtocol: AnyObject {
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
     func getDefaultBalanceAccount() -> BalanceAccount?
+    
+    func setPreferredColorScheme(_ colorScheme: ColorScheme?)
+    
+    func getPreferredColorScheme() -> ColorScheme?
 }
 
-final class DataManager: DataManagerProtocol {
+final class DataManager: DataManagerProtocol, ObservableObject {
     //MARK: - Properties
     private let container: ModelContainer
     private let settingsManager: any SettingsManagerProtocol
@@ -74,10 +78,14 @@ final class DataManager: DataManagerProtocol {
         }
     }
     
+    //MARK: Only for DataManager properties
+    @Published private(set) var preferredColorScheme: ColorScheme?
+    
     //MARK: - Init
     init(container: ModelContainer) {
         self.container = container
         self.settingsManager = SettingsManager()
+        self.preferredColorScheme = settingsManager.getPreferredColorScheme()
         fetchBalanceAccounts()
     }
     
@@ -217,6 +225,15 @@ final class DataManager: DataManagerProtocol {
     func getDefaultBalanceAccount() -> BalanceAccount? {
         guard let baId = UserDefaults.standard.string(forKey: defaultBalanceAccountIdKey) else { return nil }
         return balanceAccounts.first { $0.id == baId }
+    }
+    
+    func setPreferredColorScheme(_ colorScheme: ColorScheme?) {
+        preferredColorScheme = colorScheme
+        settingsManager.setPreferredColorScheme(colorScheme)
+    }
+    
+    func getPreferredColorScheme() -> ColorScheme? {
+        settingsManager.getPreferredColorScheme()
     }
     
     //MARK: Private methods

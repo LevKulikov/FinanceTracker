@@ -75,4 +75,9 @@ struct FTFactory {
         viewModel.delegate = delegate
         return AnyView(TagsView(viewModel: viewModel))
     }
+    
+    static func createAppearanceView(dataManager: some DataManagerProtocol) -> AnyView {
+        let viewModel = AppearanceViewModel(dataManager: dataManager)
+        return AnyView(AppearanceView(viewModel: viewModel))
+    }
 }

@@ -55,6 +55,10 @@ final class SettingsViewModel: ObservableObject {
     func getTagsView() -> some View {
         return FTFactory.createTagsView(dataManager: dataManager, delegate: self)
     }
+    
+    func getAppearanceView() -> some View {
+        return FTFactory.createAppearanceView(dataManager: dataManager)
+    }
 }
 
 //MARK: - Extensions
