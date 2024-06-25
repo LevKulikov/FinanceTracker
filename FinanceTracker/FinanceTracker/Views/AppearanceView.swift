@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AppearanceView: View {
     //MARK: - Properties
+    @Environment(\.colorScheme) private var colorScheme
     
     //MARK: - Initializer
     

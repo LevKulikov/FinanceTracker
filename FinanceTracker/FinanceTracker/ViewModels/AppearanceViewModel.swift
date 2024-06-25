@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+final class AppearanceViewModel: ObservableObject {
+    //MARK: - Properties
+    
+    //MARK: - Initializer
+    
+    //MARK: - Methods
+}
