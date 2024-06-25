@@ -7,31 +7,95 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 protocol DataManagerProtocol: AnyObject {
+    var tagDefaultColor: Color? { get set }
+    
     @MainActor
     func save() throws
     
     @MainActor
     func deleteTransaction(_ transaction: Transaction)
     
+    /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
+    /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
+    @MainActor
+    func deleteBalanceAccount(_ balanceAccount: BalanceAccount)
+    
+    /// Deletes selected balance account (BA) with binded transactions. If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
+    /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
+    @MainActor
+    func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount)
+    
+    /// Deletes selected category and moves binded transactions to the second provided one
+    /// - Parameters:
+    ///   - category: category to delete
+    ///   - replacingCategory: category to move transaction to
+    @MainActor
+    func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async
+    
+    /// Deletes selected category and all binded to it transactions
+    /// - Parameter category: category to delete
+    @MainActor
+    func deleteCategoryWithTransactions(_ category: Category) async
+    
+    @MainActor
+    func deleteTag(_ tag: Tag) async
+    
+    @MainActor
+    func deleteTagWithTransactions(_ tag: Tag) async
+    
+    @MainActor
+    func deleteAllTransactions() async
+    
+    @MainActor
+    func deleteAllStoredData() async
+    
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
     @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
+    
+    func getDefaultBalanceAccount() -> BalanceAccount?
+    
+    func setPreferredColorScheme(_ colorScheme: ColorScheme?)
+    
+    func getPreferredColorScheme() -> ColorScheme?
 }
 
-final class DataManager: DataManagerProtocol {
-    //MARK: Properties
+final class DataManager: DataManagerProtocol, ObservableObject {
+    //MARK: - Properties
     private let container: ModelContainer
+    private let settingsManager: any SettingsManagerProtocol
+    private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
+    private var balanceAccounts: [BalanceAccount] = []
     
-    //MARK: Init
-    init(container: ModelContainer) {
-        self.container = container
+    var tagDefaultColor: Color? {
+        get {
+            settingsManager.getTagDefaultColor()
+        }
+        
+        set {
+            settingsManager.setTagDefaultColor(newValue)
+        }
     }
     
-    //MARK: Methods
+    //MARK: Only for DataManager properties
+    @Published private(set) var preferredColorScheme: ColorScheme?
+    
+    //MARK: - Init
+    init(container: ModelContainer) {
+        self.container = container
+        self.settingsManager = SettingsManager()
+        self.preferredColorScheme = settingsManager.getPreferredColorScheme()
+        fetchBalanceAccounts()
+    }
+    
+    //MARK: - Methods
     func save() throws {
         try container.mainContext.save()
     }
@@ -40,11 +104,173 @@ final class DataManager: DataManagerProtocol {
         container.mainContext.delete(transaction)
     }
     
+    func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
+        guard let defaultBA = getDefaultBalanceAccount() else { return }
+        guard balanceAccount != defaultBA else { return }
+        
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected balance account
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            // Replace selected balance account to default one for each transaction
+            filtered.forEach { $0.setBalanceAccount(defaultBA) }
+            // Delete selected balance account and save changes
+            container.mainContext.delete(balanceAccount)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
+        guard let defaultBA = getDefaultBalanceAccount() else { return }
+        guard balanceAccount != defaultBA else { return }
+        
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected balance account
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            // Delete filtered transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete selected balance account and save changes
+            container.mainContext.delete(balanceAccount)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected category
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.category == category }
+            // Replace category in transaction with provided replacing category
+            filtered.forEach { $0.setCategory(replacingCategory) }
+            // Delete initial category
+            container.mainContext.delete(category)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteCategoryWithTransactions(_ category: Category) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected category
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.category == category }
+            // Delete transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete category
+            container.mainContext.delete(category)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTag(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Remove tag from transactions
+            filtered.forEach { $0.removeTag(tag) }
+            // Delete tag
+            container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTagWithTransactions(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Delete transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete tag
+            container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteAllTransactions() async {
+        do {
+            try container.mainContext.delete(model: Transaction.self)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteAllStoredData() async {
+        do {
+            try container.mainContext.delete(model: Transaction.self)
+            try container.mainContext.delete(model: BalanceAccount.self)
+            try container.mainContext.delete(model: Category.self)
+            try container.mainContext.delete(model: Tag.self)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
     func insert<T>(_ model: T) where T : PersistentModel {
         container.mainContext.insert(model)
     }
     
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
-        return try container.mainContext.fetch(descriptor)
+        let fetchedData = try container.mainContext.fetch(descriptor)
+        if let balanceAccountsData = fetchedData as? [BalanceAccount] {
+            balanceAccounts = balanceAccountsData
+        }
+        return fetchedData
+    }
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
+        UserDefaults.standard.set(balanceAccount.id, forKey: defaultBalanceAccountIdKey)
+    }
+    
+    func getDefaultBalanceAccount() -> BalanceAccount? {
+        guard let baId = UserDefaults.standard.string(forKey: defaultBalanceAccountIdKey) else { return nil }
+        return balanceAccounts.first { $0.id == baId }
+    }
+    
+    func setPreferredColorScheme(_ colorScheme: ColorScheme?) {
+        preferredColorScheme = colorScheme
+        settingsManager.setPreferredColorScheme(colorScheme)
+    }
+    
+    func getPreferredColorScheme() -> ColorScheme? {
+        settingsManager.getPreferredColorScheme()
+    }
+    
+    //MARK: Private methods
+    private func fetchBalanceAccounts() {
+        let descriptor = FetchDescriptor<BalanceAccount>()
+        Task {
+            let data = try await fetch(descriptor)
+            balanceAccounts = data
+        }
     }
 }

@@ -173,12 +173,15 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     func createNewTag(name: String, color: Color? = nil, andSelect: Bool) {
         guard !name.isEmpty else { return }
         
-        let newTag: Tag
+        var colorToSet: Color? = nil
         if let color {
-            newTag = Tag(name: name, color: color)
+            colorToSet = color
         } else {
-            newTag = Tag(name: name)
+            colorToSet = dataManager.tagDefaultColor
         }
+        
+        let newTag = Tag(name: name, color: colorToSet)
+        
         if andSelect {
             addRemoveTag(newTag)
         }

@@ -51,4 +51,39 @@ struct FTFactory {
         let viewModel = StatisticsViewModel(dataManager: dataManager)
         return AnyView(StatisticsView(viewModel: viewModel))
     }
+    
+    static func createSettingsView(dataManager: some DataManagerProtocol, delegate: (some SettingsViewModelDelegate)?) -> AnyView {
+        let viewModel = SettingsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(SettingsView(viewModel: viewModel))
+    }
+    
+    static func createBalanceAccountsView(dataManager: some DataManagerProtocol, delegate: (some BalanceAccountsViewModelDelegate)?) -> AnyView {
+        let viewModel = BalanceAccountsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(BalanceAccountsView(viewModel: viewModel))
+    }
+    
+    static func createCategoriesView(dataManager: some DataManagerProtocol, delegate: (some CategoriesViewModelDelegate)?) -> AnyView {
+        let viewModel = CategoriesViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(CategoriesView(viewModel: viewModel))
+    }
+    
+    static func createTagsView(dataManager: some DataManagerProtocol, delegate: (some TagsViewModelDelegate)?) -> AnyView {
+        let viewModel = TagsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(TagsView(viewModel: viewModel))
+    }
+    
+    static func createAppearanceView(dataManager: some DataManagerProtocol) -> AnyView {
+        let viewModel = AppearanceViewModel(dataManager: dataManager)
+        return AnyView(AppearanceView(viewModel: viewModel))
+    }
+    
+    static func createManageDataView(dataManager: some DataManagerProtocol, delegate: (any ManageDataViewModelDelegate)?) -> AnyView {
+        let viewModel = ManageDataViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(ManageDataView(viewModel: viewModel))
+    }
 }

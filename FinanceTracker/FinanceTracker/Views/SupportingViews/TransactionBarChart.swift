@@ -282,7 +282,7 @@ struct TransactionBarChart: View {
         }
         .padding(.top, 5)
         .background {
-            Rectangle()
+            RoundedRectangle(cornerRadius: 7)
                 .fill(Color(.secondarySystemBackground))
         }
     }

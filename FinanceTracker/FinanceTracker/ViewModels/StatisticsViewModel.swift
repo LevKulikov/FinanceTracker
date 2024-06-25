@@ -135,16 +135,21 @@ final class StatisticsViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        refreshData()
+        refreshData { [weak self] in
+            DispatchQueue.main.async {
+                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+        }
     }
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData() {
+    func refreshData(compeletionHandler: (() -> Void)? = nil) {
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
             self?.calculateDataForPieChart()
             self?.calculateDataForBarChart()
+            compeletionHandler?()
         }
     }
     
@@ -372,7 +377,7 @@ final class StatisticsViewModel: ObservableObject {
                     return arrayOfBarData
                 }
             
-            // Useless code because Bar Charts algorithms
+            // Useless code because of Bar Charts algorithms
             //let filledBarData = addEmptyDataTo(availableBarData)
             
             DispatchQueue.main.async {

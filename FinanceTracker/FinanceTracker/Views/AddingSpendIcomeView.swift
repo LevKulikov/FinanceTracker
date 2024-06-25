@@ -408,7 +408,10 @@ struct AddingSpendIcomeView: View {
         }
         .padding(.horizontal, 10)
         .sheet(isPresented: $showAddingBalanceAccountView) {
-            viewModel.getAddingBalanceAccountView()
+            NavigationStack {
+                viewModel.getAddingBalanceAccountView()
+                    .navigationBarTitleDisplayMode(.inline)
+            }
         }
     }
     

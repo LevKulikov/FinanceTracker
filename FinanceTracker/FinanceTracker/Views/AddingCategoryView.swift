@@ -39,8 +39,8 @@ struct AddingCategoryView: View {
     var body: some View {
         ScrollView {
             VStack {
-                headerView
-                    .padding(.vertical, 10)
+//                headerView
+//                    .padding(.vertical, 10)
                 
                 if showPreview {
                     categoryPreview
@@ -68,6 +68,16 @@ struct AddingCategoryView: View {
                 Rectangle()
                     .fill(.clear)
                     .frame(height: 50)
+            }
+        }
+        .navigationTitle(isUpdating ? "Update category" : "New category")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(showPreview ? "Hide" : "Preview") {
+                    withAnimation {
+                        showPreview.toggle()
+                    }
+                }
             }
         }
         .scrollIndicators(.hidden)
@@ -393,5 +403,5 @@ struct AddingCategoryView: View {
     let dataManager = DataManager(container: container)
     let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: .income, action: .add)
     
-    return AddingCategoryView(viewModel: viewModel)
+    return NavigationStack { AddingCategoryView(viewModel: viewModel) }
 }

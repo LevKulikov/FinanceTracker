@@ -92,6 +92,9 @@ final class SpendIncomeViewModel: ObservableObject {
         self.dataManager = dataManager
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
+            DispatchQueue.main.async {
+                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
         }
     }
     
@@ -254,7 +257,7 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     
     func categoryUpdated() {
         fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+            self?.filterGroupSortTransactions()
         }
     }
 }
@@ -267,6 +270,28 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
     
     func addButtonPressed() {
         addButtonPressedFromTabBar()
+    }
+    
+    func didUpdateFromSettings(for section: SettingsSection) {
+        switch section {
+        case .balanceAccounts:
+            Task {
+                await fetchBalanceAccounts()
+            }
+        case .categories:
+            Task {
+                await fetchTransactions()
+            }
+        case .data:
+            fetchAllData { [weak self] in
+                self?.filterGroupSortTransactions()
+                DispatchQueue.main.async {
+                    self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+                }
+            }
+        default:
+            break
+        }
     }
 }
 

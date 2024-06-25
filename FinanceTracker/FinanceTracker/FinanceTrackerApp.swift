@@ -12,18 +12,20 @@ import SwiftData
 struct FinanceTrackerApp: App {
     //MARK: Properties
     private var sharedModelContainer: ModelContainer
-    private var dataManager: DataManager
+    @StateObject private var dataManager: DataManager
 
     var body: some Scene {
         WindowGroup {            
             FTFactory.createCustomTabView(dataManager: dataManager)
+                .preferredColorScheme(dataManager.preferredColorScheme)
         }
     }
     
     //MARK: Init
     init() {
         sharedModelContainer = Self.createModelContainer()
-        dataManager = DataManager(container: sharedModelContainer)
+        let dm = DataManager(container: sharedModelContainer)
+        _dataManager = StateObject(wrappedValue: dm)
         setAppearance()
     }
     

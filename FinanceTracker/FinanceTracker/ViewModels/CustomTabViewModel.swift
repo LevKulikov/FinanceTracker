@@ -13,6 +13,8 @@ protocol CustomTabViewModelDelegate: AnyObject {
     var id: String { get }
     
     func addButtonPressed()
+    
+    func didUpdateFromSettings(for section: SettingsSection)
 }
 
 final class CustomTabViewModel: ObservableObject {
@@ -52,12 +54,17 @@ final class CustomTabViewModel: ObservableObject {
         return FTFactory.createStatisticsView(dataManager: dataManager)
     }
     
+    func getSettingsView() -> some View {
+        return FTFactory.createSettingsView(dataManager: dataManager, delegate: self)
+    }
+    
     private func addDelegate(object: some CustomTabViewModelDelegate) {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
     }
 }
 
+//MARK: - Extensions
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {
@@ -71,5 +78,26 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
                 showTabBar = false
             }
         }
+    }
+}
+
+//MARK: Extension for SettingsViewModelDelegate
+extension CustomTabViewModel: SettingsViewModelDelegate {
+    func didSelectSetting(_ setting: SettingsSection?) {
+        DispatchQueue.main.async { [weak self] in
+            if setting == nil {
+                withAnimation {
+                    self?.showTabBar = true
+                }
+            } else {
+                withAnimation {
+                    self?.showTabBar = false
+                }
+            }
+        }
+    }
+    
+    func didUpdateSettingsSection(_ section: SettingsSection) {
+        delegates.forEach { $0.object?.didUpdateFromSettings(for: section) }
     }
 }

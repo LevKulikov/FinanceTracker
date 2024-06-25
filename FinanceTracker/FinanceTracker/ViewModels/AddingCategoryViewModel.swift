@@ -13,7 +13,7 @@ protocol AddingCategoryViewModelDelegate: AnyObject {
     func didUpdateCategory()
 }
 
-enum ActionWithCategory: Equatable {
+enum ActionWithCategory: Equatable, Hashable {
     case none
     case add
     case update(Category)

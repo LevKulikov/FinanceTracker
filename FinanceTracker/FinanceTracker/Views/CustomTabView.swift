@@ -40,8 +40,7 @@ struct CustomTabView: View  {
                 .font(.largeTitle)
                 .tag(3)
             
-            Rectangle()
-                .fill(.red)
+            viewModel.getSettingsView()
                 .tag(4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
