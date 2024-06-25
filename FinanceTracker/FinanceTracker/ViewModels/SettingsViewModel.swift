@@ -90,7 +90,13 @@ extension SettingsViewModel: CategoriesViewModelDelegate {
 
 //MARK: Extension for TagsViewModelDelegate
 extension SettingsViewModel: TagsViewModelDelegate {
-    #warning("Implemet")
+    func didDeleteTag() {
+        delegate?.didUpdateSettingsSection(.tags)
+    }
+    
+    func didDeleteTagWithTransactions() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
 }
 
 //MARK: Extension for ManageDataViewModelDelegate

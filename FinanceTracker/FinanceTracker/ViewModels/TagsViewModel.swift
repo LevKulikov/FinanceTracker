@@ -10,7 +10,8 @@ import SwiftData
 import SwiftUI
 
 protocol TagsViewModelDelegate: AnyObject {
-    
+    func didDeleteTag()
+    func didDeleteTagWithTransactions()
 }
 
 final class TagsViewModel: ObservableObject {
@@ -108,6 +109,7 @@ final class TagsViewModel: ObservableObject {
     func deleteTag(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTag(tag)
+            delegate?.didDeleteTag()
             await fetchTags(withAnimation: withAnimation)
         }
     }
@@ -115,6 +117,7 @@ final class TagsViewModel: ObservableObject {
     func deleteTagWithTransactions(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTagWithTransactions(tag)
+            delegate?.didDeleteTagWithTransactions()
             await fetchTags(withAnimation: withAnimation)
         }
     }
