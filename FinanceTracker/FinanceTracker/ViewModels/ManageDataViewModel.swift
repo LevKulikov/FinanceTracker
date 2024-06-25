@@ -24,6 +24,12 @@ final class ManageDataViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    func deleteAllTransactions() {
+        Task {
+            await dataManager.deleteAllTransactions()
+        }
+    }
+    
     func deleteAllStoredData() {
         dataManager.deleteAllStoredData()
     }

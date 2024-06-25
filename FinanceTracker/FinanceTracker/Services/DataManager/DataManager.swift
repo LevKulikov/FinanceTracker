@@ -46,6 +46,9 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteTagWithTransactions(_ tag: Tag) async
     
+    @MainActor
+    func deleteAllTransactions() async
+    
     func deleteAllStoredData()
     
     @MainActor
@@ -201,6 +204,16 @@ final class DataManager: DataManagerProtocol, ObservableObject {
             filtered.forEach { deleteTransaction($0) }
             // Delete tag
             container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteAllTransactions() async {
+        do {
+            try container.mainContext.delete(model: Transaction.self)
             try save()
         } catch {
             print(error)
