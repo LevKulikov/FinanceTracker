@@ -49,7 +49,8 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteAllTransactions() async
     
-    func deleteAllStoredData()
+    @MainActor
+    func deleteAllStoredData() async
     
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
@@ -221,8 +222,17 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         }
     }
     
-    func deleteAllStoredData() {
-        container.deleteAllData()
+    func deleteAllStoredData() async {
+        do {
+            try container.mainContext.delete(model: Transaction.self)
+            try container.mainContext.delete(model: BalanceAccount.self)
+            try container.mainContext.delete(model: Category.self)
+            try container.mainContext.delete(model: Tag.self)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {

@@ -8,6 +8,8 @@
 import Foundation
 
 protocol ManageDataViewModelDelegate: AnyObject {
+    func didDeleteAllTransactions()
+    
     func didDeleteAllData()
 }
 
@@ -31,6 +33,8 @@ final class ManageDataViewModel: ObservableObject {
     }
     
     func deleteAllStoredData() {
-        dataManager.deleteAllStoredData()
+        Task {
+            await dataManager.deleteAllStoredData()
+        }
     }
 }

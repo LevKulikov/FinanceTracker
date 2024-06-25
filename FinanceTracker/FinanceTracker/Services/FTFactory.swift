@@ -80,4 +80,10 @@ struct FTFactory {
         let viewModel = AppearanceViewModel(dataManager: dataManager)
         return AnyView(AppearanceView(viewModel: viewModel))
     }
+    
+    static func createManageDataView(dataManager: some DataManagerProtocol, delegate: (any ManageDataViewModelDelegate)?) -> AnyView {
+        let viewModel = ManageDataViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(ManageDataView(viewModel: viewModel))
+    }
 }
