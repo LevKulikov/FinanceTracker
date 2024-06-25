@@ -38,6 +38,7 @@
 		73CCF3DF2C2B2C99009D8001 /* AppearanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3DE2C2B2C99009D8001 /* AppearanceViewModel.swift */; };
 		73CCF3E12C2B2D25009D8001 /* AppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3E02C2B2D25009D8001 /* AppearanceView.swift */; };
 		73CCF3E32C2B51AB009D8001 /* ManageDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3E22C2B51AB009D8001 /* ManageDataViewModel.swift */; };
+		73CCF3E52C2B533C009D8001 /* ManageDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CCF3E42C2B533C009D8001 /* ManageDataView.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
@@ -107,6 +108,7 @@
 		73CCF3DE2C2B2C99009D8001 /* AppearanceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceViewModel.swift; sourceTree = "<group>"; };
 		73CCF3E02C2B2D25009D8001 /* AppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceView.swift; sourceTree = "<group>"; };
 		73CCF3E22C2B51AB009D8001 /* ManageDataViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataViewModel.swift; sourceTree = "<group>"; };
+		73CCF3E42C2B533C009D8001 /* ManageDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataView.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -242,6 +244,7 @@
 				73CCF3DA2C29C506009D8001 /* TagsView.swift */,
 				73CCF3E02C2B2D25009D8001 /* AppearanceView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
+				73CCF3E42C2B533C009D8001 /* ManageDataView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 				73CCF3DB2C29C506009D8001 /* TagsView.swift in Sources */,
 				73CCF3DD2C29F81B009D8001 /* SettingsManager.swift in Sources */,
 				73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */,
+				73CCF3E52C2B533C009D8001 /* ManageDataView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
 				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
 				73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */,
