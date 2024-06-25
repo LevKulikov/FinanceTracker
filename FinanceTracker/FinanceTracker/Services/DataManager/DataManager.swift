@@ -46,6 +46,8 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteTagWithTransactions(_ tag: Tag) async
     
+    func deleteAllStoredData()
+    
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
@@ -204,6 +206,10 @@ final class DataManager: DataManagerProtocol, ObservableObject {
             print(error)
             return
         }
+    }
+    
+    func deleteAllStoredData() {
+        container.deleteAllData()
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {
