@@ -59,7 +59,7 @@ struct SettingsView: View {
             case .appearance:
                 viewModel.getAppearanceView()
             case .data:
-                inDevelopmentPlaceholder
+                viewModel.getManageDataView()
             }
         } else {
             noSelectionView

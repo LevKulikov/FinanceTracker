@@ -59,6 +59,10 @@ final class SettingsViewModel: ObservableObject {
     func getAppearanceView() -> some View {
         return FTFactory.createAppearanceView(dataManager: dataManager)
     }
+    
+    func getManageDataView() -> some View {
+        return FTFactory.createManageDataView(dataManager: dataManager, delegate: self)
+    }
 }
 
 //MARK: - Extensions
@@ -86,5 +90,16 @@ extension SettingsViewModel: CategoriesViewModelDelegate {
 
 //MARK: Extension for TagsViewModelDelegate
 extension SettingsViewModel: TagsViewModelDelegate {
+    #warning("Implemet")
+}
+
+//MARK: Extension for ManageDataViewModelDelegate
+extension SettingsViewModel: ManageDataViewModelDelegate {
+    func didDeleteAllTransactions() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
     
+    func didDeleteAllData() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
 }
