@@ -51,6 +51,10 @@ final class SettingsViewModel: ObservableObject {
     func getCategoriesView() -> some View {
         return FTFactory.createCategoriesView(dataManager: dataManager, delegate: self)
     }
+    
+    func getTagsView() -> some View {
+        return FTFactory.createTagsView(dataManager: dataManager, delegate: self)
+    }
 }
 
 //MARK: - Extensions
@@ -74,4 +78,9 @@ extension SettingsViewModel: CategoriesViewModelDelegate {
     func didDeleteCategory() {
         delegate?.didUpdateSettingsSection(.data)
     }
+}
+
+//MARK: Extension for TagsViewModelDelegate
+extension SettingsViewModel: TagsViewModelDelegate {
+    
 }

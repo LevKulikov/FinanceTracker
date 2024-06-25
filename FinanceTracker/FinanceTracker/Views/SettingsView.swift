@@ -55,7 +55,7 @@ struct SettingsView: View {
             case .balanceAccounts:
                 viewModel.getBalanceAccountsView()
             case .tags:
-                inDevelopmentPlaceholder
+                viewModel.getTagsView()
             case .appearance:
                 inDevelopmentPlaceholder
             case .data:

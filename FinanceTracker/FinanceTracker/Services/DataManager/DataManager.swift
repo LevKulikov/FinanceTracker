@@ -7,8 +7,11 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 protocol DataManagerProtocol: AnyObject {
+    var tagDefaultColor: Color? { get set }
+    
     @MainActor
     func save() throws
     
@@ -38,6 +41,12 @@ protocol DataManagerProtocol: AnyObject {
     func deleteCategoryWithTransactions(_ category: Category) async
     
     @MainActor
+    func deleteTag(_ tag: Tag) async
+    
+    @MainActor
+    func deleteTagWithTransactions(_ tag: Tag) async
+    
+    @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
     @MainActor
@@ -51,12 +60,24 @@ protocol DataManagerProtocol: AnyObject {
 final class DataManager: DataManagerProtocol {
     //MARK: - Properties
     private let container: ModelContainer
+    private let settingsManager: any SettingsManagerProtocol
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
+    
+    var tagDefaultColor: Color? {
+        get {
+            settingsManager.getTagDefaultColor()
+        }
+        
+        set {
+            settingsManager.setTagDefaultColor(newValue)
+        }
+    }
     
     //MARK: - Init
     init(container: ModelContainer) {
         self.container = container
+        self.settingsManager = SettingsManager()
         fetchBalanceAccounts()
     }
     
@@ -136,6 +157,40 @@ final class DataManager: DataManagerProtocol {
             filtered.forEach { deleteTransaction($0) }
             // Delete category
             container.mainContext.delete(category)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTag(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Remove tag from transactions
+            filtered.forEach { $0.removeTag(tag) }
+            // Delete tag
+            container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteTagWithTransactions(_ tag: Tag) async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        do {
+            // Get transactions with selected tag
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            let filtered = allTransactions.filter { $0.tags.contains(tag) }
+            // Delete transactions
+            filtered.forEach { deleteTransaction($0) }
+            // Delete tag
+            container.mainContext.delete(tag)
             try save()
         } catch {
             print(error)
