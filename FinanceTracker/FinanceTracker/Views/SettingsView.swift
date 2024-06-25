@@ -57,7 +57,7 @@ struct SettingsView: View {
             case .tags:
                 viewModel.getTagsView()
             case .appearance:
-                inDevelopmentPlaceholder
+                viewModel.getAppearanceView()
             case .data:
                 inDevelopmentPlaceholder
             }

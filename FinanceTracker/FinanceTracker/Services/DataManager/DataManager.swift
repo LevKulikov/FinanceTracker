@@ -61,7 +61,7 @@ protocol DataManagerProtocol: AnyObject {
     func getPreferredColorScheme() -> ColorScheme?
 }
 
-final class DataManager: DataManagerProtocol {
+final class DataManager: DataManagerProtocol, ObservableObject {
     //MARK: - Properties
     private let container: ModelContainer
     private let settingsManager: any SettingsManagerProtocol
@@ -79,7 +79,7 @@ final class DataManager: DataManagerProtocol {
     }
     
     //MARK: Only for DataManager properties
-    @Published private(set) var preferredColorScheme: ColorScheme? = nil
+    @Published private(set) var preferredColorScheme: ColorScheme?
     
     //MARK: - Init
     init(container: ModelContainer) {
@@ -228,10 +228,8 @@ final class DataManager: DataManagerProtocol {
     }
     
     func setPreferredColorScheme(_ colorScheme: ColorScheme?) {
+        preferredColorScheme = colorScheme
         settingsManager.setPreferredColorScheme(colorScheme)
-        withAnimation {
-            preferredColorScheme = colorScheme
-        }
     }
     
     func getPreferredColorScheme() -> ColorScheme? {

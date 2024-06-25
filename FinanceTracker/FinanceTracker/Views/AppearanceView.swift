@@ -54,10 +54,11 @@ struct AppearanceView: View {
                 }
             }
             .frame(width: 27, height: 27)
-            .onTapGesture {
-                guard viewModel.preferredColorScheme != colorScheme else { return }
-                viewModel.setPreferredColorScheme(colorScheme)
-            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard viewModel.preferredColorScheme != colorScheme else { return }
+            viewModel.setPreferredColorScheme(colorScheme)
         }
     }
 }
