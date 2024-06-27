@@ -17,6 +17,7 @@ protocol AddingSpendIcomeViewModelDelegate: AnyObject {
 }
 
 enum FetchErrors: Error {
+    case unableToFetchTransactions
     case unableToFetchCategories
     case unableToFetchTags
     case unableToFetchBalanceAccounts
