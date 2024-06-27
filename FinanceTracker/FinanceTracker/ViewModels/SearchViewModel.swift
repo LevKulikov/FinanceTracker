@@ -28,12 +28,23 @@ final class SearchViewModel: ObservableObject {
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
     private let calendar = Calendar.current
+    private var searchDispatchWorkItem: DispatchWorkItem?
     private var allTransactions: [Transaction] = []
     private var allCategories: [Category] = []
     
     //MARK: UI props
     // To filter
-    @Published var searchText: String = ""
+    @Published var searchText: String = "" {
+        didSet {
+            searchDispatchWorkItem?.cancel()
+            searchDispatchWorkItem = DispatchWorkItem { [weak self] in
+                self?.filterAndSetTransactions()
+            }
+            if let searchDispatchWorkItem {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: searchDispatchWorkItem)
+            }
+        }
+    }
     @Published var filterTransactionType: TransactionFilterTypes = .both {
         didSet {
             guard filterTransactionType != oldValue else { return }
