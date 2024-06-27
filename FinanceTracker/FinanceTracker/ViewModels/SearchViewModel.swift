@@ -6,3 +6,16 @@
 //
 
 import Foundation
+
+protocol SearchViewModelDelegate: AnyObject {
+    
+}
+
+final class SearchViewModel: ObservableObject {
+    //MARK: - Properties
+    
+    //MARK: - Initializer
+    
+    //MARK: - Methods
+    
+}
