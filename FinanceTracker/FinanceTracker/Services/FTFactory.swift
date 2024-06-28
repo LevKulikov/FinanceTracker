@@ -86,4 +86,11 @@ struct FTFactory {
         viewModel.delegate = delegate
         return AnyView(ManageDataView(viewModel: viewModel))
     }
+    
+    static func createSearchView(dataManager: some DataManagerProtocol, delegate: (any SearchViewModelDelegate)?, tabBarDelegateActoin: ((CustomTabViewModelDelegate) -> Void)? = nil) -> AnyView {
+        let viewModel = SearchViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        tabBarDelegateActoin?(viewModel)
+        return AnyView(SearchView(viewModel: viewModel))
+    }
 }

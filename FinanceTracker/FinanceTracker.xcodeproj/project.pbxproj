@@ -229,8 +229,8 @@
 				731EE8232C0A157E006C7B0F /* FTFormatters.swift */,
 				738D752D2C111A2D00198521 /* FTAppAssets.swift */,
 				73C562FC2C17A2DD00FCB65D /* FTFactory.swift */,
-				73F629292C02098C00E9FEB9 /* DataManager */,
 				73CCF3DC2C29F81B009D8001 /* SettingsManager.swift */,
+				73F629292C02098C00E9FEB9 /* DataManager */,
 			);
 			path = Services;
 			sourceTree = "<group>";

@@ -330,3 +330,27 @@ final class SearchViewModel: ObservableObject {
         }
     }
 }
+
+//MARK: - Extensions
+extension SearchViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        return "SearchViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateFromSettings(for section: SettingsSection) {
+        DispatchQueue.main.async { [weak self] in
+            switch section {
+            case .appearance:
+                break
+            default:
+                self?.fetchAllData(competionHandler:  {
+                    self?.filterAndSetTransactions()
+                })
+            }
+        }
+    }
+}

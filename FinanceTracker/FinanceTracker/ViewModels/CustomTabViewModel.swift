@@ -54,6 +54,12 @@ final class CustomTabViewModel: ObservableObject {
         return FTFactory.createStatisticsView(dataManager: dataManager)
     }
     
+    func getSearchView() -> some View {
+        return FTFactory.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
+    }
+    
     func getSettingsView() -> some View {
         return FTFactory.createSettingsView(dataManager: dataManager, delegate: self)
     }
@@ -99,5 +105,12 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
     
     func didUpdateSettingsSection(_ section: SettingsSection) {
         delegates.forEach { $0.object?.didUpdateFromSettings(for: section) }
+    }
+}
+
+//MARK: Extension for SearchViewModelDelegate
+extension CustomTabViewModel: SearchViewModelDelegate {
+    func didUpdatedTransactionsList() {
+        delegates.forEach { $0.object?.didUpdateFromSettings(for: .data) }
     }
 }
