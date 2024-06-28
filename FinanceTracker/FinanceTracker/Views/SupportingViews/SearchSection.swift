@@ -28,13 +28,10 @@ struct SearchSection: View {
     var body: some View {
         Section {
             ForEach(transactionGroupData.transactions) { transaction in
-                HStack {
-                    Text(transaction.category.name)
-                    
-                    Spacer()
-                    
-                    Text(FTFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
-                }
+                SearchTransactionRow(transaction: transaction)
+                    .onTapGesture {
+                        onTapAction(transaction)
+                    }
             }
         } header: {
             headerView
