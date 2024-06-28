@@ -11,6 +11,8 @@ import SwiftUI
 
 protocol SearchViewModelDelegate: AnyObject {
     func didUpdatedTransactionsList()
+    
+    func hideTabBar(_ hide: Bool)
 }
 
 enum DateFilterType: String, CaseIterable {
@@ -143,6 +145,10 @@ final class SearchViewModel: ObservableObject {
                 filterTags.append(tag)
             }
         }
+    }
+    
+    func hideTabBar(_ hide: Bool) {
+        delegate?.hideTabBar(hide)
     }
     
     //MARK: Private props

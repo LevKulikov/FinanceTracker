@@ -13,7 +13,7 @@ struct SearchSection: View {
     let onTapAction: (Transaction) -> Void
     
     private let calendar = Calendar.current
-    @State private var haveSameCurrency = false
+    @State private var haveSameCurrency: Bool = true
     @State private var totalSpending: Float?
     @State private var totalIncome: Float?
     
@@ -22,8 +22,6 @@ struct SearchSection: View {
         self.transactionGroupData = transactionGroupData
         self.onTapAction = onTapAction
         checkTransactionsCurrency()
-        calculateTotalSpending()
-        calculateTotalIncome()
     }
     
     //MARK: Body
@@ -42,6 +40,10 @@ struct SearchSection: View {
             headerView
         } footer: {
             footerView
+        }
+        .onAppear {
+            calculateTotalSpending()
+            calculateTotalIncome()
         }
     }
     
@@ -86,6 +88,7 @@ struct SearchSection: View {
             let incomeTransactions = transactionGroupData.transactions.filter { $0.type == .income }
             guard !incomeTransactions.isEmpty else { return }
             let sumValue = incomeTransactions.map { $0.value }.reduce(0, +)
+            
             DispatchQueue.main.async {
                 totalIncome = sumValue
             }
@@ -98,6 +101,7 @@ struct SearchSection: View {
             let spendingTransactions = transactionGroupData.transactions.filter { $0.type == .spending }
             guard !spendingTransactions.isEmpty else { return }
             let sumValue = spendingTransactions.map { $0.value }.reduce(0, +)
+            
             DispatchQueue.main.async {
                 totalSpending = sumValue
             }

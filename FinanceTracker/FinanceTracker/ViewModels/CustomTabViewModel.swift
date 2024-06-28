@@ -113,4 +113,10 @@ extension CustomTabViewModel: SearchViewModelDelegate {
     func didUpdatedTransactionsList() {
         delegates.forEach { $0.object?.didUpdateFromSettings(for: .data) }
     }
+    
+    func hideTabBar(_ hide: Bool) {
+        withAnimation {
+            showTabBar = !hide
+        }
+    }
 }

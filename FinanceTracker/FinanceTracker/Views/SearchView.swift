@@ -13,6 +13,7 @@ struct SearchView: View {
     @StateObject private var viewModel: SearchViewModel
     @State private var navigationPath = NavigationPath()
     @State private var showMoreFilters = false
+    @State private var searchIsPreseneted: Bool = false
     
     //MARK: - Initializer
     init(viewModel: SearchViewModel) {
@@ -41,8 +42,11 @@ struct SearchView: View {
                         .controlSize(.large)
                 }
             }
+            .onChange(of: searchIsPreseneted) {
+                viewModel.hideTabBar(searchIsPreseneted)
+            }
         }
-        .searchable(text: $viewModel.searchText, prompt: Text("Any text or number"))
+        .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
     }
     
     //MARK: - Computed View props
