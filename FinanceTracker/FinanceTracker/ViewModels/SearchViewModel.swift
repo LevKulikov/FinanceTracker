@@ -125,7 +125,19 @@ final class SearchViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    
+    func addRemoveTag(_ tag: Tag) {
+        if filterTags.contains(tag) {
+            withAnimation {
+                filterTags.removeAll {
+                    $0 == tag
+                }
+            }
+        } else {
+            withAnimation {
+                filterTags.append(tag)
+            }
+        }
+    }
     
     //MARK: Private props
     private func filterAndSetTransactions() {
