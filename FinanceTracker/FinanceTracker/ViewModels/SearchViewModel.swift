@@ -21,6 +21,12 @@ enum DateFilterType: String, CaseIterable {
     case customDateRange = "Date range"
 }
 
+struct TransactionGroupedData: Identifiable {
+    let id: String = UUID().uuidString
+    let date: Date
+    let transactions: [Transaction]
+}
+
 final class SearchViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
@@ -41,7 +47,7 @@ final class SearchViewModel: ObservableObject {
                 self?.filterAndSetTransactions()
             }
             if let searchDispatchWorkItem {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: searchDispatchWorkItem)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: searchDispatchWorkItem)
             }
         }
     }
@@ -114,7 +120,7 @@ final class SearchViewModel: ObservableObject {
     
     //For UI
     @Published private(set) var isListCalculating: Bool = false
-    @Published private(set) var filteredTransactions: [Transaction] = []
+    @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -229,12 +235,23 @@ final class SearchViewModel: ObservableObject {
                     }
             }
             
-            var sortedData = searchData.sorted { $0.date > $1.date }
+            let sortedGroupedData = searchData
+                .grouped { trans in
+                    let year = self.calendar.component(.year, from: trans.date)
+                    let month = self.calendar.component(.month, from: trans.date)
+                    let day = self.calendar.component(.day, from: trans.date)
+                    return DateComponents(year: year, month: month, day: day)
+                }
+                .map { dictTuple in
+                    let date = self.calendar.date(from: dictTuple.key) ?? .now
+                    return TransactionGroupedData(date: date, transactions: dictTuple.value)
+                }
+                .sorted { $0.date > $1.date }
             
             DispatchQueue.main.async {
                 self.isListCalculating = false
                 withAnimation {
-                    self.filteredTransactions = sortedData
+                    self.filteredTransactionGroups = sortedGroupedData
                 }
             }
         }

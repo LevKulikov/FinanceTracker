@@ -27,8 +27,20 @@ struct SearchView: View {
                 
                 showFilterButton
                     .padding(.vertical)
+                
+                ForEach(viewModel.filteredTransactionGroups) { transGroup in
+                    SearchSection(transactionGroupData: transGroup) { transaction in
+                        print(transaction.category.name)
+                    }
+                }
             }
             .navigationTitle("Search")
+            .overlay {
+                if viewModel.isListCalculating {
+                    ProgressView()
+                        .controlSize(.large)
+                }
+            }
         }
         .searchable(text: $viewModel.searchText, prompt: Text("Any text or number"))
     }
@@ -52,8 +64,10 @@ struct SearchView: View {
                 switch viewModel.dateFilterType {
                 case .day:
                     DatePicker("One day picker", selection: $viewModel.filterDate, displayedComponents: .date)
+                        .labelsHidden()
                 case .week:
                     DatePicker("Week picker", selection: $viewModel.filterDate, displayedComponents: .date)
+                        .labelsHidden()
                 case .month:
                     MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
                 case .year:
@@ -182,6 +196,10 @@ struct SearchView: View {
                             }
                             .tag(Optional(category))
                         }
+                    }
+                    
+                    Button("All") {
+                        viewModel.filterCategory = nil
                     }
                 }
                 .modifier(RoundedRectMenu())
