@@ -12,6 +12,7 @@ struct AddingSpendIcomeView: View {
     var namespace: Namespace.ID
     @Namespace private var privateNamespace
     @Binding var action: ActionWithTransaction
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: AddingSpendIcomeViewModel
     @State private var showMoreCategories = false
     @State private var showUpdatingCategoryView: Category?
@@ -480,6 +481,7 @@ struct AddingSpendIcomeView: View {
     
     private func closeView() {
         dismissKeyboardFocus()
+        dismiss()
         withAnimation(.snappy(duration: 0.35)) {
             action = .none
         }

@@ -151,6 +151,18 @@ final class SearchViewModel: ObservableObject {
         delegate?.hideTabBar(hide)
     }
     
+    func getTransactionView(for transaction: Transaction) -> some View {
+        @Namespace var namespace
+        
+        return FTFactory.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
+    }
+    
+    func refetchData() {
+        fetchAllData(competionHandler:  { [weak self] in
+            self?.filterAndSetTransactions()
+        })
+    }
+    
     //MARK: Private props
     private func filterAndSetTransactions() {
         DispatchQueue.main.async { [weak self] in
@@ -231,9 +243,10 @@ final class SearchViewModel: ObservableObject {
                         }
                         
                         // if searchText is text
+                        guard let balanceAccount = trans.balanceAccount, let category = trans.category else { return false }
                         
-                        let baNameHasSuchString = trans.balanceAccount.name.contains(self.searchText)
-                        let catNameHasSuchString = trans.category.name.contains(self.searchText)
+                        let baNameHasSuchString = balanceAccount.name.contains(self.searchText)
+                        let catNameHasSuchString = category.name.contains(self.searchText)
                         let tagsHaveSuchString = trans.tags.map { $0.name }.joined().contains(self.searchText)
                         let commentHasSuchString = trans.comment.contains(self.searchText)
                         
@@ -357,6 +370,34 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                     self?.filterAndSetTransactions()
                 })
             }
+        }
+    }
+}
+
+extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
+    func addedNewTransaction(_ transaction: Transaction) {
+        delegate?.didUpdatedTransactionsList()
+        Task {
+            await fetchTransactions()
+        }
+    }
+    
+    func updateTransaction(_ transaction: Transaction) {
+        delegate?.didUpdatedTransactionsList()
+        Task {
+            await fetchTransactions()
+            filterAndSetTransactions()
+        }
+    }
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        return
+    }
+    
+    func categoryUpdated() {
+        delegate?.didUpdatedTransactionsList()
+        Task {
+            await fetchCategories()
         }
     }
 }

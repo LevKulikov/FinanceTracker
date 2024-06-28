@@ -74,8 +74,11 @@ struct SearchSection: View {
     private func checkTransactionsCurrency() {
         let transactions = transactionGroupData.transactions
         guard let first = transactions.first else { return }
-        let checkCurrency = first.balanceAccount.currency
-        let ifOtherExists = transactions.contains { $0.balanceAccount.currency != checkCurrency }
+        let checkCurrency = first.balanceAccount?.currency
+        let ifOtherExists = transactions.contains { trans in
+            guard let balanceAccount = trans.balanceAccount else { return false }
+            return balanceAccount.currency != checkCurrency
+        }
         haveSameCurrency = !ifOtherExists
     }
     

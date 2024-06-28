@@ -131,6 +131,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             Task {
                 do {
                     try await dataManager.save()
+                    delegate?.updateTransaction(transactionToUpdate)
                 } catch {
                     completionHanler?(.contextSaveError)
                 }
@@ -147,6 +148,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             )
             Task {
                 await dataManager.insert(newTransaction)
+                delegate?.updateTransaction(newTransaction)
             }
         }
         
@@ -196,6 +198,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         guard let transactionToUpdate else { return }
         Task {
             await dataManager.deleteTransaction(transactionToUpdate)
+            delegate?.updateTransaction(transactionToUpdate)
             DispatchQueue.main.async {
                 completionHandler?()
             }
@@ -287,7 +290,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         value = transaction.value
         valueString = String(value).replacing(".", with: ",")
         date = transaction.date
-        balanceAccount = transaction.balanceAccount
+        balanceAccount = transaction.balanceAccount ?? .emptyBalanceAccount
         category = transaction.category
         tags = transaction.tags
     }

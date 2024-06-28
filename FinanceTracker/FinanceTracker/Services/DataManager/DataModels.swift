@@ -151,8 +151,8 @@ final class Transaction {
     var comment: String
     var value: Float
     var date: Date
-    private(set) var balanceAccount: BalanceAccount!
-    private(set) var category: Category!
+    private(set) var balanceAccount: BalanceAccount?
+    private(set) var category: Category?
     private(set) var tags: [Tag] = []
     
     //MARK: Computed Properties

@@ -14,6 +14,7 @@ struct SearchView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showMoreFilters = false
     @State private var searchIsPreseneted: Bool = false
+    @State private var showTransaction: Transaction?
     
     //MARK: - Initializer
     init(viewModel: SearchViewModel) {
@@ -31,8 +32,17 @@ struct SearchView: View {
                 
                 ForEach(viewModel.filteredTransactionGroups) { transGroup in
                     SearchSection(transactionGroupData: transGroup) { transaction in
-                        print(transaction.category.name)
+                        showTransaction = transaction
                     }
+                }
+                
+                Section {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 40)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowSeparator(.hidden)
                 }
             }
             .navigationTitle("Search")
@@ -44,6 +54,12 @@ struct SearchView: View {
             }
             .onChange(of: searchIsPreseneted) {
                 viewModel.hideTabBar(searchIsPreseneted)
+            }
+            .fullScreenCover(item: $showTransaction) { transaction in
+                viewModel.getTransactionView(for: transaction)
+            }
+            .onAppear {
+                viewModel.refetchData()
             }
         }
         .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))

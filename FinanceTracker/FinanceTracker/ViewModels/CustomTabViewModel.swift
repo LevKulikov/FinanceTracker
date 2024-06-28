@@ -85,6 +85,12 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
             }
         }
     }
+    
+    func didUpdateTransactionList() {
+        delegates.forEach {
+            $0.object?.didUpdateFromSettings(for: .data)
+        }
+    }
 }
 
 //MARK: Extension for SettingsViewModelDelegate

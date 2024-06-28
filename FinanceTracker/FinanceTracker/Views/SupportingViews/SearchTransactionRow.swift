@@ -20,8 +20,8 @@ struct SearchTransactionRow: View {
                 VStack(alignment: .leading) {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(transaction.category.name)
-                            Text(transaction.balanceAccount.name)
+                            Text(transaction.category?.name ?? "Err")
+                            Text(transaction.balanceAccount?.name ?? "Err")
                                 .foregroundStyle(.secondary)
                                 .font(.footnote)
                         }
@@ -69,7 +69,7 @@ struct SearchTransactionRow: View {
         
         if let category = transaction.category, let uiImage = FTAppAssets.iconUIImage(name: category.iconName) {
             Circle()
-                .fill(LinearGradient(colors: [transaction.category.color, .clear], startPoint: .leading, endPoint: .trailing))
+                .fill(LinearGradient(colors: [transaction.category?.color ?? .clear, .clear], startPoint: .leading, endPoint: .trailing))
                 .overlay {
                     Image(uiImage: uiImage)
                         .resizable()

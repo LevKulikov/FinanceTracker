@@ -13,6 +13,7 @@ import Combine
 
 protocol SpendIncomeViewModelDelegate: AnyObject {
     func didSelectAction(_ action: ActionWithTransaction)
+    func didUpdateTransactionList()
 }
 
 enum ActionWithTransaction: Equatable {
@@ -61,6 +62,7 @@ final class SpendIncomeViewModel: ObservableObject {
         didSet {
             didSelectAction(action: actionSelected)
             if case .none = actionSelected {
+                delegate?.didUpdateTransactionList()
                 fetchAllData { [weak self] in
                     self?.filterGroupSortTransactions()
                 }
@@ -184,7 +186,7 @@ final class SpendIncomeViewModel: ObservableObject {
                 .grouped { $0.category }
                 .map { $0.value }
                 .sorted {
-                    $0.first!.category.name < $1.first!.category.name
+                    ($0.first!.category?.name ?? "Err") < ($1.first!.category?.name ?? "Err")
                 }
             
             let sumValue = changedTransactions.flatMap{$0}.map{$0.value}.reduce(0, +)
@@ -247,15 +249,20 @@ final class SpendIncomeViewModel: ObservableObject {
 
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
-    func addedNewTransaction(_ transaction: Transaction) {}
+    func addedNewTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+    }
     
-    func updateTransaction(_ transaction: Transaction) {}
+    func updateTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+    }
     
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }
     
     func categoryUpdated() {
+        delegate?.didUpdateTransactionList()
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }
