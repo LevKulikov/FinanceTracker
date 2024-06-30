@@ -259,8 +259,8 @@
 				73CCF3E02C2B2D25009D8001 /* AppearanceView.swift */,
 				73CCF3E42C2B533C009D8001 /* ManageDataView.swift */,
 				73D000D52C2DC2F400AACFCE /* SearchView.swift */,
-				73F629312C039CE800E9FEB9 /* SupportingViews */,
 				73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */,
+				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";

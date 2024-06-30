@@ -70,6 +70,12 @@ final class CustomTabViewModel: ObservableObject {
         return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
     
+    func getWelcomeView() -> some View {
+        let viewModel = WelcomeViewModel(dataManager: dataManager)
+        return WelcomeView(viewModel: viewModel)
+    }
+    
+    //MARK: Private methods
     private func addDelegate(object: some CustomTabViewModelDelegate) {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))

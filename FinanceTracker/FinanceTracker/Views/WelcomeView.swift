@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: WelcomeViewModel
     
     //MARK: - Initializer
@@ -20,7 +21,11 @@ struct WelcomeView: View {
     var body: some View {
         VStack {
             HStack {
+                Spacer()
                 
+                Button("Close", systemImage: "xmark") {
+                    closeView()
+                }
             }
             
             Spacer()
@@ -30,6 +35,9 @@ struct WelcomeView: View {
     //MARK: - Computed props
     
     //MARK: - Methods
+    private func closeView() {
+        dismiss()
+    }
 }
 
 #Preview {
