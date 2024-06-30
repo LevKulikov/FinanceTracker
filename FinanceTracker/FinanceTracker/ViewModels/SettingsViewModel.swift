@@ -9,15 +9,16 @@ import Foundation
 import SwiftUI
 
 protocol SettingsViewModelDelegate: AnyObject {
-    func didSelectSetting(_ setting: SettingsSection?)
+    func didSelectSetting(_ setting: SettingsSectionAndDataType?)
     
-    func didUpdateSettingsSection(_ section: SettingsSection)
+    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType)
 }
 
-enum SettingsSection {
+enum SettingsSectionAndDataType {
     case categories
     case balanceAccounts
     case tags
+    case transactions
     case appearance
     case data
 }
@@ -32,7 +33,7 @@ final class SettingsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     
     //MARK: Published props
-    @Published var selectedSettings: SettingsSection? {
+    @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
             delegate?.didSelectSetting(selectedSettings)
         }

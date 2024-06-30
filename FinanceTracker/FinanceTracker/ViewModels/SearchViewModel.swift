@@ -358,9 +358,11 @@ extension SearchViewModel: CustomTabViewModelDelegate {
         return
     }
     
-    func didUpdateFromSettings(for section: SettingsSection) {
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
         DispatchQueue.main.async { [weak self] in
-            switch section {
+            switch dataType {
             case .appearance:
                 break
             default:

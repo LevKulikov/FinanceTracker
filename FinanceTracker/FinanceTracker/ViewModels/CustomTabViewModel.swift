@@ -14,7 +14,14 @@ protocol CustomTabViewModelDelegate: AnyObject {
     
     func addButtonPressed()
     
-    func didUpdateFromSettings(for section: SettingsSection)
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+}
+
+enum TabViewType: Equatable {
+    case spendIncomeView
+    case searchView
+    case statisticsView
+    case settingsView
 }
 
 final class CustomTabViewModel: ObservableObject {
@@ -88,15 +95,14 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     
     func didUpdateTransactionList() {
         delegates.forEach {
-            $0.object?.didUpdateFromSettings(for: .data)
-            print($0.object?.id)
+            $0.object?.didUpdateData(for: .data, from: .spendIncomeView)
         }
     }
 }
 
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
-    func didSelectSetting(_ setting: SettingsSection?) {
+    func didSelectSetting(_ setting: SettingsSectionAndDataType?) {
         DispatchQueue.main.async { [weak self] in
             if setting == nil {
                 withAnimation {
@@ -110,8 +116,8 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
         }
     }
     
-    func didUpdateSettingsSection(_ section: SettingsSection) {
-        delegates.forEach { $0.object?.didUpdateFromSettings(for: section) }
+    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
+        delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
     }
 }
 
@@ -119,8 +125,7 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
 extension CustomTabViewModel: SearchViewModelDelegate {
     func didUpdatedTransactionsList() {
         delegates.forEach {
-            $0.object?.didUpdateFromSettings(for: .data)
-            print($0.object?.id)
+            $0.object?.didUpdateData(for: .data, from: .searchView)
         }
     }
     

@@ -282,8 +282,10 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         addButtonPressedFromTabBar()
     }
     
-    func didUpdateFromSettings(for section: SettingsSection) {
-        switch section {
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        switch dataType {
         case .balanceAccounts:
             Task {
                 await fetchBalanceAccounts()

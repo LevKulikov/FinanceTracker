@@ -60,6 +60,8 @@ struct SettingsView: View {
                 viewModel.getAppearanceView()
             case .data:
                 viewModel.getManageDataView()
+            case .transactions:
+                EmptyView()
             }
         } else {
             noSelectionView
@@ -85,15 +87,15 @@ struct SettingsView: View {
     
     private var enitiesSection: some View {
         Section("Entities") {
-            NavigationLink(value: SettingsSection.balanceAccounts) {
+            NavigationLink(value: SettingsSectionAndDataType.balanceAccounts) {
                 Label("Balance Accounts", systemImage: "person.crop.circle")
             }
             
-            NavigationLink(value: SettingsSection.categories) {
+            NavigationLink(value: SettingsSectionAndDataType.categories) {
                 Label("Categories", systemImage: "star.square.on.square")
             }
             
-            NavigationLink(value: SettingsSection.tags) {
+            NavigationLink(value: SettingsSectionAndDataType.tags) {
                 Label("Tags", systemImage: "number")
             }
         }
@@ -101,11 +103,11 @@ struct SettingsView: View {
     
     private var appSettingsSection: some View {
         Section("App and Data") {
-            NavigationLink(value: SettingsSection.appearance) {
+            NavigationLink(value: SettingsSectionAndDataType.appearance) {
                 Label("Appearance", systemImage: "circle.righthalf.filled")
             }
             
-            NavigationLink(value: SettingsSection.data) {
+            NavigationLink(value: SettingsSectionAndDataType.data) {
                 Label("Stored data", systemImage: "cylinder.split.1x2")
             }
         }
