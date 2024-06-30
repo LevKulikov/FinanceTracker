@@ -152,7 +152,7 @@ final class SearchViewModel: ObservableObject {
     }
     
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
-        return FTFactory.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
+        return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
     func refetchData() {

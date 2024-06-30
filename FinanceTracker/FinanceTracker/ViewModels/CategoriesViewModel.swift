@@ -44,7 +44,7 @@ final class CategoriesViewModel: ObservableObject {
     }
     
     func getAddingBalanceAccountView(for action: ActionWithCategory) -> some View {
-        return FTFactory.createAddingCategoryView(dataManager: dataManager, transactionType: caterotyType, action: action, delegate: self)
+        return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: caterotyType, action: action, delegate: self)
     }
     
     func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) {

@@ -206,11 +206,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     func getAddingCategoryView(action: ActionWithCategory) -> some View {
-        return FTFactory.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
+        return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
     }
     
     func getAddingBalanceAccountView() -> some View {
-        return FTFactory.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
+        return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
     
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {

@@ -51,7 +51,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getStatisticsView() -> some View {
-        return FTFactory.createStatisticsView(dataManager: dataManager)
+        return FTFactory.shared.createStatisticsView(dataManager: dataManager)
     }
     
     // This method does not use FTFactory as viewModel need to be set as delegate, using FTFactory avoids this action
@@ -63,7 +63,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getSettingsView() -> some View {
-        return FTFactory.createSettingsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
     
     private func addDelegate(object: some CustomTabViewModelDelegate) {

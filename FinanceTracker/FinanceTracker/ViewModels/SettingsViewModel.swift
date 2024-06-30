@@ -45,23 +45,23 @@ final class SettingsViewModel: ObservableObject {
     
     //MARK: - Methods
     func getBalanceAccountsView() -> some View {
-        return FTFactory.createBalanceAccountsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
     
     func getCategoriesView() -> some View {
-        return FTFactory.createCategoriesView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createCategoriesView(dataManager: dataManager, delegate: self)
     }
     
     func getTagsView() -> some View {
-        return FTFactory.createTagsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
     
     func getAppearanceView() -> some View {
-        return FTFactory.createAppearanceView(dataManager: dataManager)
+        return FTFactory.shared.createAppearanceView(dataManager: dataManager)
     }
     
     func getManageDataView() -> some View {
-        return FTFactory.createManageDataView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createManageDataView(dataManager: dataManager, delegate: self)
     }
 }
 
