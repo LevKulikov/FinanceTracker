@@ -44,22 +44,19 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
-        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-        viewModel.delegate = self
-        addDelegate(object: viewModel)
-        return SpendIncomeView(viewModel: viewModel, namespace: namespace)
+        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
     }
     
     func getStatisticsView() -> some View {
         return FTFactory.shared.createStatisticsView(dataManager: dataManager)
     }
     
-    // This method does not use FTFactory as viewModel need to be set as delegate, using FTFactory avoids this action
     func getSearchView() -> some View {
-        let viewModel = SearchViewModel(dataManager: dataManager)
-        viewModel.delegate = self
-        addDelegate(object: viewModel)
-        return SearchView(viewModel: viewModel)
+        return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
     }
     
     func getSettingsView() -> some View {

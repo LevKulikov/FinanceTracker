@@ -9,10 +9,12 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-struct FTFactory {
+final class FTFactory {
     static let shared = FTFactory()
     
-    
+    //Instances to save view model for tabview, to not to create new one every time
+    private var spendIncomeViewModel: SpendIncomeViewModel?
+    private var searchViewModel: SearchViewModel?
     
     private init() {}
     
@@ -21,11 +23,18 @@ struct FTFactory {
         return CustomTabView(viewModel: viewModel)
     }
     
-    func createSpendIncomeView(dataManager: some DataManagerProtocol, delegate: (some SpendIncomeViewModelDelegate)?, namespace: Namespace.ID) -> some View {
+    func createSpendIncomeView(dataManager: some DataManagerProtocol, delegate: (some SpendIncomeViewModelDelegate)?, namespace: Namespace.ID, actionWithViewModel: ((SpendIncomeViewModel) -> Void)? = nil) -> AnyView {
+        if let spendIncomeViewModel {
+            spendIncomeViewModel.delegate = delegate
+            actionWithViewModel?(spendIncomeViewModel)
+            return AnyView(SpendIncomeView(viewModel: spendIncomeViewModel, namespace: namespace))
+        }
+        
         let viewModel = SpendIncomeViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
-        
-        return SpendIncomeView(viewModel: viewModel, namespace: namespace)
+        spendIncomeViewModel = viewModel
+        actionWithViewModel?(viewModel)
+        return AnyView(SpendIncomeView(viewModel: viewModel, namespace: namespace))
     }
     
     func createAddingSpendIcomeView(
@@ -93,9 +102,17 @@ struct FTFactory {
         return AnyView(ManageDataView(viewModel: viewModel))
     }
     
-    func createSearchView(dataManager: some DataManagerProtocol, delegate: (any SearchViewModelDelegate)?) -> AnyView {
+    func createSearchView(dataManager: some DataManagerProtocol, delegate: (any SearchViewModelDelegate)?, actionWithViewModel: ((SearchViewModel) -> Void)? = nil) -> AnyView {
+        if let searchViewModel {
+            searchViewModel.delegate = delegate
+            actionWithViewModel?(searchViewModel)
+            return AnyView(SearchView(viewModel: searchViewModel))
+        }
+        
         let viewModel = SearchViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
+        searchViewModel = viewModel
+        actionWithViewModel?(viewModel)
         return AnyView(SearchView(viewModel: viewModel))
     }
 }
