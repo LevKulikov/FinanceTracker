@@ -13,6 +13,7 @@ import Combine
 
 protocol SpendIncomeViewModelDelegate: AnyObject {
     func didSelectAction(_ action: ActionWithTransaction)
+    func didUpdateTransactionList()
 }
 
 enum ActionWithTransaction: Equatable {
@@ -60,10 +61,7 @@ final class SpendIncomeViewModel: ObservableObject {
     @Published var actionSelected: ActionWithTransaction = .none {
         didSet {
             didSelectAction(action: actionSelected)
-            if case .none = actionSelected {
-                fetchAllData { [weak self] in
-                    self?.filterGroupSortTransactions()
-                }
+            if actionSelected == .none {
                 enableTapsWithDeadline()
             }
         }
@@ -137,7 +135,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {        
-        return FTFactory.createAddingSpendIcomeView(
+        return FTFactory.shared.createAddingSpendIcomeView(
             dataManager: dataManager,
             transactionType: transactionsTypeSelected, 
             balanceAccount: balanceAccountToFilter,
@@ -184,7 +182,7 @@ final class SpendIncomeViewModel: ObservableObject {
                 .grouped { $0.category }
                 .map { $0.value }
                 .sorted {
-                    $0.first!.category.name < $1.first!.category.name
+                    ($0.first!.category?.name ?? "Err") < ($1.first!.category?.name ?? "Err")
                 }
             
             let sumValue = changedTransactions.flatMap{$0}.map{$0.value}.reduce(0, +)
@@ -247,15 +245,27 @@ final class SpendIncomeViewModel: ObservableObject {
 
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
-    func addedNewTransaction(_ transaction: Transaction) {}
+    func addedNewTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
+    }
     
-    func updateTransaction(_ transaction: Transaction) {}
+    func updateTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
+        enableTapsWithDeadline()
+    }
     
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }
     
     func categoryUpdated() {
+        delegate?.didUpdateTransactionList()
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }
@@ -272,8 +282,10 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         addButtonPressedFromTabBar()
     }
     
-    func didUpdateFromSettings(for section: SettingsSection) {
-        switch section {
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        switch dataType {
         case .balanceAccounts:
             Task {
                 await fetchBalanceAccounts()

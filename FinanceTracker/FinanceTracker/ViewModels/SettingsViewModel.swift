@@ -9,15 +9,16 @@ import Foundation
 import SwiftUI
 
 protocol SettingsViewModelDelegate: AnyObject {
-    func didSelectSetting(_ setting: SettingsSection?)
+    func didSelectSetting(_ setting: SettingsSectionAndDataType?)
     
-    func didUpdateSettingsSection(_ section: SettingsSection)
+    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType)
 }
 
-enum SettingsSection {
+enum SettingsSectionAndDataType {
     case categories
     case balanceAccounts
     case tags
+    case transactions
     case appearance
     case data
 }
@@ -32,7 +33,7 @@ final class SettingsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     
     //MARK: Published props
-    @Published var selectedSettings: SettingsSection? {
+    @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
             delegate?.didSelectSetting(selectedSettings)
         }
@@ -45,23 +46,23 @@ final class SettingsViewModel: ObservableObject {
     
     //MARK: - Methods
     func getBalanceAccountsView() -> some View {
-        return FTFactory.createBalanceAccountsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
     
     func getCategoriesView() -> some View {
-        return FTFactory.createCategoriesView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createCategoriesView(dataManager: dataManager, delegate: self)
     }
     
     func getTagsView() -> some View {
-        return FTFactory.createTagsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
     
     func getAppearanceView() -> some View {
-        return FTFactory.createAppearanceView(dataManager: dataManager)
+        return FTFactory.shared.createAppearanceView(dataManager: dataManager)
     }
     
     func getManageDataView() -> some View {
-        return FTFactory.createManageDataView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createManageDataView(dataManager: dataManager, delegate: self)
     }
 }
 

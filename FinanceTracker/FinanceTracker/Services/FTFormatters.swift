@@ -26,4 +26,10 @@ struct FTFormatters {
     }
     
     private init() {}
+    
+    static func dayOfWeek(for date: Date) -> String? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE"
+        return dateFormatter.string(from: date).capitalized(with: .current)
+    }
 }

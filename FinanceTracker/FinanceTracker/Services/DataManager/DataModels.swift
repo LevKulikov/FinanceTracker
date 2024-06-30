@@ -117,6 +117,7 @@ final class Tag {
     @Attribute(.unique) let id: String
     var name: String
     @Attribute(.transformable(by: UIColorValueTransformer.self)) var uiColor: UIColor
+    var transactions: [Transaction] = []
     
     //MARK: Computed Properties
     var color: Color {
@@ -129,16 +130,17 @@ final class Tag {
     }
     
     //MARK: Init
-    init(id: String, name: String, uiColor: UIColor) {
+    init(id: String, name: String, uiColor: UIColor, transactions: [Transaction]) {
         self.id = id
         self.name = name
         self.uiColor = uiColor
+        self.transactions = transactions
     }
     
-    convenience init(name: String, color: Color? = nil) {
+    convenience init(name: String, color: Color? = nil, transactions: [Transaction] = []) {
         let id = UUID().uuidString
         let uiColor = UIColor(color == nil ? .init(uiColor: .random) : color!)
-        self.init(id: id, name: name, uiColor: uiColor)
+        self.init(id: id, name: name, uiColor: uiColor, transactions: transactions)
     }
 }
 
@@ -151,9 +153,9 @@ final class Transaction {
     var comment: String
     var value: Float
     var date: Date
-    private(set) var balanceAccount: BalanceAccount!
-    private(set) var category: Category!
-    private(set) var tags: [Tag] = []
+    private(set) var balanceAccount: BalanceAccount?
+    private(set) var category: Category?
+    @Relationship(inverse: \Tag.transactions) private(set) var tags: [Tag] = []
     
     //MARK: Computed Properties
     var type: TransactionsType? {

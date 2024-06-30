@@ -36,8 +36,7 @@ struct CustomTabView: View  {
             viewModel.getStatisticsView()
                 .tag(2)
             
-            Label("In develop", systemImage: "gearshape.2")
-                .font(.largeTitle)
+            viewModel.getSearchView()
                 .tag(3)
             
             viewModel.getSettingsView()

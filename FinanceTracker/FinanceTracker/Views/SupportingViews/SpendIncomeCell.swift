@@ -15,7 +15,7 @@ struct SpendIncomeCell: View {
         HStack {
             categoryImage
             
-            Text(transaction.category.name)
+            Text(transaction.category?.name ?? "Err")
                 .font(.title3)
                 .lineLimit(1)
             
@@ -28,7 +28,7 @@ struct SpendIncomeCell: View {
                     .lineLimit(1)
 //                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
                 
-                Text(transaction.balanceAccount.currency)
+                Text(transaction.balanceAccount?.currency ?? "Err")
                     .font(.footnote)
                     .padding(.bottom, 2.6)
                     .lineLimit(1)
@@ -50,7 +50,7 @@ struct SpendIncomeCell: View {
         
         if let category = transaction.category, let uiImage = FTAppAssets.iconUIImage(name: category.iconName) {
             Circle()
-                .fill(LinearGradient(colors: [transaction.category.color, .clear], startPoint: .leading, endPoint: .trailing))
+                .fill(LinearGradient(colors: [transaction.category?.color ?? .clear, .clear], startPoint: .leading, endPoint: .trailing))
                 .overlay {
                     Image(uiImage: uiImage)
                         .resizable()

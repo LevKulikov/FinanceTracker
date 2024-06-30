@@ -14,7 +14,14 @@ protocol CustomTabViewModelDelegate: AnyObject {
     
     func addButtonPressed()
     
-    func didUpdateFromSettings(for section: SettingsSection)
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+}
+
+enum TabViewType: Equatable {
+    case spendIncomeView
+    case searchView
+    case statisticsView
+    case settingsView
 }
 
 final class CustomTabViewModel: ObservableObject {
@@ -44,23 +51,29 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
-        let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-        viewModel.delegate = self
-        addDelegate(object: viewModel)
-        return SpendIncomeView(viewModel: viewModel, namespace: namespace)
+        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
     }
     
     func getStatisticsView() -> some View {
-        return FTFactory.createStatisticsView(dataManager: dataManager)
+        return FTFactory.shared.createStatisticsView(dataManager: dataManager)
+    }
+    
+    func getSearchView() -> some View {
+        return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
     }
     
     func getSettingsView() -> some View {
-        return FTFactory.createSettingsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
     
     private func addDelegate(object: some CustomTabViewModelDelegate) {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
+        delegates = delegates.filter { $0.object != nil }
     }
 }
 
@@ -79,11 +92,17 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
             }
         }
     }
+    
+    func didUpdateTransactionList() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .data, from: .spendIncomeView)
+        }
+    }
 }
 
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
-    func didSelectSetting(_ setting: SettingsSection?) {
+    func didSelectSetting(_ setting: SettingsSectionAndDataType?) {
         DispatchQueue.main.async { [weak self] in
             if setting == nil {
                 withAnimation {
@@ -97,7 +116,22 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
         }
     }
     
-    func didUpdateSettingsSection(_ section: SettingsSection) {
-        delegates.forEach { $0.object?.didUpdateFromSettings(for: section) }
+    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
+        delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
+    }
+}
+
+//MARK: Extension for SearchViewModelDelegate
+extension CustomTabViewModel: SearchViewModelDelegate {
+    func didUpdatedTransactionsList() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .data, from: .searchView)
+        }
+    }
+    
+    func hideTabBar(_ hide: Bool) {
+        withAnimation {
+            showTabBar = !hide
+        }
     }
 }

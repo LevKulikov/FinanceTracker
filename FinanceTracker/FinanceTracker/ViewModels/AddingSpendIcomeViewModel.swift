@@ -17,6 +17,7 @@ protocol AddingSpendIcomeViewModelDelegate: AnyObject {
 }
 
 enum FetchErrors: Error {
+    case unableToFetchTransactions
     case unableToFetchCategories
     case unableToFetchTags
     case unableToFetchBalanceAccounts
@@ -130,6 +131,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             Task {
                 do {
                     try await dataManager.save()
+                    delegate?.updateTransaction(transactionToUpdate)
                 } catch {
                     completionHanler?(.contextSaveError)
                 }
@@ -146,6 +148,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             )
             Task {
                 await dataManager.insert(newTransaction)
+                delegate?.updateTransaction(newTransaction)
             }
         }
         
@@ -195,6 +198,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         guard let transactionToUpdate else { return }
         Task {
             await dataManager.deleteTransaction(transactionToUpdate)
+            delegate?.updateTransaction(transactionToUpdate)
             DispatchQueue.main.async {
                 completionHandler?()
             }
@@ -202,11 +206,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     func getAddingCategoryView(action: ActionWithCategory) -> some View {
-        return FTFactory.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
+        return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
     }
     
     func getAddingBalanceAccountView() -> some View {
-        return FTFactory.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
+        return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
     
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
@@ -286,7 +290,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         value = transaction.value
         valueString = String(value).replacing(".", with: ",")
         date = transaction.date
-        balanceAccount = transaction.balanceAccount
+        balanceAccount = transaction.balanceAccount ?? .emptyBalanceAccount
         category = transaction.category
         tags = transaction.tags
     }

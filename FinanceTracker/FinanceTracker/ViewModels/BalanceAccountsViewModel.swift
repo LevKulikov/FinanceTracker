@@ -61,7 +61,7 @@ final class BalanceAccountsViewModel: ObservableObject {
     }
     
     func getAddingBalanceAccountView(for action: ActionWithBalanceAccaunt) -> some View {
-        return FTFactory.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
+        return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
     }
     
     //TODO: Implement balance account deletion
