@@ -27,4 +27,5 @@ final class WelcomeViewModel: ObservableObject {
     //MARK: - Methods
     
     //MARK: Private methods
+    
 }
