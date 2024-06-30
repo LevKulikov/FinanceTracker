@@ -174,35 +174,7 @@ struct AddingBalanceAccauntView: View {
     }
     
     private var iconsListView: some View {
-        VStack {
-            HStack {
-                Text("All Icons")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                Button("Close") {
-                    showMoreIcons.toggle()
-                }
-            }
-            .padding(.top, 20)
-            .padding(.horizontal, 25)
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 55, maximum: 75))], spacing: 20) {
-                    ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
-                        getIconItem(for: iconName)
-                            .onTapGesture {
-                                showMoreIcons.toggle()
-                                withAnimation {
-                                    viewModel.iconName = iconName
-                                }
-                            }
-                    }
-                }
-            }
-        }
+        WideIconPickerView(showPicker: $showMoreIcons, selectIcon: $viewModel.iconName, onSelectColorTint: viewModel.color)
     }
     
     private var colorPickerSection: some View {
