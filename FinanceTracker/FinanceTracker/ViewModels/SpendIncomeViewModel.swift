@@ -61,11 +61,7 @@ final class SpendIncomeViewModel: ObservableObject {
     @Published var actionSelected: ActionWithTransaction = .none {
         didSet {
             didSelectAction(action: actionSelected)
-            if case .none = actionSelected {
-                delegate?.didUpdateTransactionList()
-                fetchAllData { [weak self] in
-                    self?.filterGroupSortTransactions()
-                }
+            if actionSelected == .none {
                 enableTapsWithDeadline()
             }
         }
@@ -251,10 +247,17 @@ final class SpendIncomeViewModel: ObservableObject {
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
         delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
     }
     
     func updateTransaction(_ transaction: Transaction) {
         delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
+        enableTapsWithDeadline()
     }
     
     func transactionsTypeReselected(to newType: TransactionsType) {

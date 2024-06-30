@@ -56,11 +56,11 @@ struct SearchView: View {
                 viewModel.hideTabBar(searchIsPreseneted)
             }
             .fullScreenCover(item: $showTransaction) { transaction in
-                viewModel.getTransactionView(for: transaction)
+                viewModel.getTransactionView(for: transaction, namespace: namespace)
             }
-            .onAppear {
-                viewModel.refetchData()
-            }
+//            .onAppear {
+//                viewModel.refetchData()
+//            }
         }
         .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
     }

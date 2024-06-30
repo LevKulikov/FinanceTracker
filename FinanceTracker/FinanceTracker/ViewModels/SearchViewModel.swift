@@ -151,9 +151,7 @@ final class SearchViewModel: ObservableObject {
         delegate?.hideTabBar(hide)
     }
     
-    func getTransactionView(for transaction: Transaction) -> some View {
-        @Namespace var namespace
-        
+    func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
@@ -353,7 +351,7 @@ final class SearchViewModel: ObservableObject {
 //MARK: - Extensions
 extension SearchViewModel: CustomTabViewModelDelegate {
     var id: String {
-        return "SearchViewModel"
+        "SearchViewModel"
     }
     
     func addButtonPressed() {

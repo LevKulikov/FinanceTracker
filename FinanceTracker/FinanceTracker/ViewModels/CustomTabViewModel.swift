@@ -54,10 +54,12 @@ final class CustomTabViewModel: ObservableObject {
         return FTFactory.createStatisticsView(dataManager: dataManager)
     }
     
+    // This method does not use FTFactory as viewModel need to be set as delegate, using FTFactory avoids this action
     func getSearchView() -> some View {
-        return FTFactory.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
-            self?.addDelegate(object: viewModel)
-        }
+        let viewModel = SearchViewModel(dataManager: dataManager)
+        viewModel.delegate = self
+        addDelegate(object: viewModel)
+        return SearchView(viewModel: viewModel)
     }
     
     func getSettingsView() -> some View {
@@ -67,6 +69,7 @@ final class CustomTabViewModel: ObservableObject {
     private func addDelegate(object: some CustomTabViewModelDelegate) {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
+        delegates = delegates.filter { $0.object != nil }
     }
 }
 
@@ -89,6 +92,7 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didUpdateTransactionList() {
         delegates.forEach {
             $0.object?.didUpdateFromSettings(for: .data)
+            print($0.object?.id)
         }
     }
 }
@@ -117,7 +121,10 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
 //MARK: Extension for SearchViewModelDelegate
 extension CustomTabViewModel: SearchViewModelDelegate {
     func didUpdatedTransactionsList() {
-        delegates.forEach { $0.object?.didUpdateFromSettings(for: .data) }
+        delegates.forEach {
+            $0.object?.didUpdateFromSettings(for: .data)
+            print($0.object?.id)
+        }
     }
     
     func hideTabBar(_ hide: Bool) {
