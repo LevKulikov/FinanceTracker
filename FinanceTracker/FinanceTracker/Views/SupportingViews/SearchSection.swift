@@ -21,7 +21,6 @@ struct SearchSection: View {
     init(transactionGroupData: TransactionGroupedData, onTapAction: @escaping (Transaction) -> Void) {
         self.transactionGroupData = transactionGroupData
         self.onTapAction = onTapAction
-        checkTransactionsCurrency()
     }
     
     //MARK: Body
@@ -39,6 +38,7 @@ struct SearchSection: View {
             footerView
         }
         .onAppear {
+            checkTransactionsCurrency()
             calculateTotalSpending()
             calculateTotalIncome()
         }

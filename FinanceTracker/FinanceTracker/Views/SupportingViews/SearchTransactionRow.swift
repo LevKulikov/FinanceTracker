@@ -21,17 +21,26 @@ struct SearchTransactionRow: View {
                     HStack {
                         VStack(alignment: .leading) {
                             Text(transaction.category?.name ?? "Err")
+                                .lineLimit(1)
                             Text(transaction.balanceAccount?.name ?? "Err")
                                 .foregroundStyle(.secondary)
                                 .font(.footnote)
+                                .lineLimit(2)
                         }
                         
                         Spacer()
                         
-                        Text(FTFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
-                            .layoutPriority(1)
-                            .bold()
-                            .foregroundStyle(transaction.type == .spending ? .red : .green)
+                        HStack(alignment: .bottom, spacing: 3) {
+                            Text(FTFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
+                                .bold()
+                                .foregroundStyle(transaction.type == .spending ? .red : .green)
+                            
+                            Text(transaction.balanceAccount?.currency ?? "Err")
+                                .foregroundStyle(.secondary)
+                                .font(.footnote)
+                        }
+                        .layoutPriority(1)
+                        .lineLimit(1)
                     }
                     
                     if !transaction.tags.isEmpty {
@@ -42,6 +51,7 @@ struct SearchTransactionRow: View {
                                 Text("# \(tag.name)")
                                     .foregroundStyle(.secondary)
                                     .font(.caption2)
+                                    .lineLimit(1)
                                     .padding(.horizontal, 7)
                                     .padding(.vertical, 5)
                                     .background {
@@ -54,6 +64,7 @@ struct SearchTransactionRow: View {
                                 Text("+\(tags.count - maxNumberOfTags)")
                                     .foregroundStyle(.secondary)
                                     .font(.caption2)
+                                    .lineLimit(1)
                             }
                         }
                     }
