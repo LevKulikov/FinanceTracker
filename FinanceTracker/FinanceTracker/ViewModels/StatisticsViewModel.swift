@@ -228,7 +228,7 @@ final class StatisticsViewModel: ObservableObject {
     private func calculateTotalForBalanceAccount() {
         guard isCalculationAllowed else { return }
         
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+        DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             var totalValue = self.transactions
                 .filter { $0.balanceAccount == self.balanceAccountToFilter }
@@ -258,7 +258,7 @@ final class StatisticsViewModel: ObservableObject {
             self?.pieDataIsCalculating = true
         }
         
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+        DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             var returnData = self.transactions
                 .filter { $0.type == self.pieChartTransactionType && $0.balanceAccount == self.balanceAccountToFilter }
