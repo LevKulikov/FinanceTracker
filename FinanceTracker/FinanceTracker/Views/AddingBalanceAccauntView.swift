@@ -75,7 +75,7 @@ struct AddingBalanceAccauntView: View {
         .overlay(alignment: .bottom) {
             if !isKeyboardActive {
                 addButton
-                    .offset(y: userDevice == .phone ? 0 : -50)
+                    .offset(y: userDevice == .phone ? 0 : -60)
             }
         }
     }
