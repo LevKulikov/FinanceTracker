@@ -15,6 +15,7 @@ struct AddingCategoryView: View {
     @State private var showPreview = false
     @State private var categoryIsAdded = false
     @State private var showMoreIcons = false
+    private let userDevice = FTAppAssets.currentUserDevise
     private var isKeyboardActive: Bool {
         nameTextFieldFocus
     }
@@ -85,6 +86,7 @@ struct AddingCategoryView: View {
         .overlay(alignment: .bottom) {
             if !isKeyboardActive {
                 addButton
+                    .offset(y: userDevice == .phone ? 0 : -60)
             }
         }
         .overlay {

@@ -15,6 +15,7 @@ struct AddingBalanceAccauntView: View {
     @FocusState private var balanceTextFieldFocus
     @FocusState private var currencyTextFieldFocus
     @State private var showMoreIcons = false
+    private let userDevice = FTAppAssets.currentUserDevise
     private var canBeAddedOrUpdated: Bool {
         guard !viewModel.name.isEmpty else { return false }
         guard !viewModel.currency.isEmpty else { return false }
@@ -74,6 +75,7 @@ struct AddingBalanceAccauntView: View {
         .overlay(alignment: .bottom) {
             if !isKeyboardActive {
                 addButton
+                    .offset(y: userDevice == .phone ? 0 : -50)
             }
         }
     }
