@@ -11,6 +11,7 @@ struct BalanceAccountsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: BalanceAccountsViewModel
     @State private var deleteBalanceAccountFlag: BalanceAccount?
+    @State private var differentCurrencyDeleteBalanceAccount: BalanceAccount?
     @State private var navigationPath = NavigationPath()
     private var canDeleteBalanceAccount: Bool {
         guard let defaultBalanceAccount = viewModel.defaultBalanceAccount else { return false }
@@ -42,6 +43,21 @@ struct BalanceAccountsView: View {
                     }
                 }
             }
+            .alert(
+                "Different currency",
+                isPresented: .init(get: { differentCurrencyDeleteBalanceAccount != nil }, set: { _ in differentCurrencyDeleteBalanceAccount = nil }),
+                actions: {
+                    Button("Continue", role: .destructive) {
+                        if let differentCurrencyDeleteBalanceAccount {
+                            viewModel.deleteBalanceAccount(differentCurrencyDeleteBalanceAccount)
+                        }
+                    }
+                    
+                    Button("Cancel", role: .cancel, action: {})
+                },
+                message: {
+                    Text("Selected (\(differentCurrencyDeleteBalanceAccount?.currency ?? "Err")) and Default (\(viewModel.defaultBalanceAccount?.currency ?? "Err")) balance accounts have different currency. Moved transactions will change currency to \(viewModel.defaultBalanceAccount?.currency ?? "Err"). Continue?")
+                })
             .confirmationDialog(
                 canDeleteBalanceAccount ? "Delete balance account?" : "Unable to delete",
                 isPresented: .init(get: { deleteBalanceAccountFlag != nil }, set: { _ in deleteBalanceAccountFlag = nil }),
@@ -128,6 +144,10 @@ struct BalanceAccountsView: View {
         if let defaultBalanceAccount = viewModel.defaultBalanceAccount, let balanceAccount {
             if defaultBalanceAccount != balanceAccount {
                 Button("Delete only balance account", role: .destructive) {
+                    guard viewModel.checkIfDefaultBalanceAccountHasSameCurrency(with: balanceAccount) else {
+                        differentCurrencyDeleteBalanceAccount = balanceAccount
+                        return
+                    }
                     viewModel.deleteBalanceAccount(balanceAccount)
                 }
                 Button("Delete with transactions", role: .destructive) {

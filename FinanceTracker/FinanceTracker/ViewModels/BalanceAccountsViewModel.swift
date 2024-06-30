@@ -52,6 +52,10 @@ final class BalanceAccountsViewModel: ObservableObject {
         }
     }
     
+    func checkIfDefaultBalanceAccountHasSameCurrency(with balanceAccount: BalanceAccount) -> Bool {
+        return balanceAccount.currency == defaultBalanceAccount?.currency
+    }
+    
     func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
         Task { @MainActor in
             dataManager.deleteBalanceAccountWithTransactions(balanceAccount)
