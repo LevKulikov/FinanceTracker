@@ -11,6 +11,7 @@ import SwiftUI
 
 protocol DataManagerProtocol: AnyObject {
     var tagDefaultColor: Color? { get set }
+    var isFirstLaunch: Bool { get set }
     
     @MainActor
     func save() throws
@@ -81,6 +82,15 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         
         set {
             settingsManager.setTagDefaultColor(newValue)
+        }
+    }
+    
+    var isFirstLaunch: Bool {
+        get {
+            settingsManager.isFirstLaunch()
+        }
+        set {
+            settingsManager.setFirstLaunch(newValue)
         }
     }
     
