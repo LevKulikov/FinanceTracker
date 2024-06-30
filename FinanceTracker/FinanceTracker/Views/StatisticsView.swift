@@ -63,8 +63,16 @@ struct StatisticsView: View {
                 Menu(viewModel.balanceAccountToFilter.name) {
                     Picker("Picker title", selection: $viewModel.balanceAccountToFilter) {
                         ForEach(viewModel.balanceAccounts) { balanceAccount in
-                            Text(balanceAccount.name)
-                                .tag(balanceAccount)
+                            HStack {
+                                Text(balanceAccount.name)
+                                
+                                if let uiImage = FTAppAssets.iconUIImage(name: balanceAccount.iconName) {
+                                    Image(uiImage: uiImage)
+                                } else {
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .tag(balanceAccount)
                         }
                     }
                 }
