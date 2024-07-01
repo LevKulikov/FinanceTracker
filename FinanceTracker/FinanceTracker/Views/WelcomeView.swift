@@ -11,6 +11,20 @@ struct WelcomeView: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: WelcomeViewModel
+    @State private var selection: Int = 0
+    @State private var showCreateBalanceAccount = false
+    private var buttonGradientStopLoaction: CGFloat {
+        let pageNumber = CGFloat(selection + 1)
+        let count = CGFloat(viewModel.models.count)
+        return (pageNumber/count)
+    }
+    private var buttonText: String {
+        if selection < viewModel.models.count - 1 {
+            return "Next"
+        } else {
+            return "Create"
+        }
+    }
     
     //MARK: - Initializer
     init(viewModel: WelcomeViewModel) {
@@ -19,17 +33,55 @@ struct WelcomeView: View {
     
     //MARK: - Body
     var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                
-                Button("Close", systemImage: "xmark") {
-                    closeView()
+        TabView(selection: $selection.animation()) {
+            ForEach(0..<viewModel.models.count) { index in
+                SingleExampleView(model: viewModel.models[index])
+                    .tag(index)
+                    .padding(.vertical)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .indexViewStyle(.page(backgroundDisplayMode: .never))
+        .padding(.bottom, 15)
+        .ignoresSafeArea(edges: .bottom)
+        .overlay(alignment: .topTrailing) {
+            Button("Skip", systemImage: "arrowshape.turn.up.forward.fill") {
+                withAnimation {
+                    selection = viewModel.models.count - 1
                 }
             }
-            
-            Spacer()
+            .padding(.trailing)
+            .foregroundStyle(.secondary)
         }
+        .overlay(alignment: .bottom) {
+            Button {
+                bottomButtonAction()
+            } label: {
+                Text(buttonText)
+                    .blendMode(.difference)
+                    .font(.title2)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 40)
+                    .background {
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    stops: [.init(color: .blue.opacity(0.7), location: buttonGradientStopLoaction), .init(color: .clear, location: 01)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .stroke(Color.secondary)
+                    }
+            }
+        }
+        .fullScreenCover(isPresented: $showCreateBalanceAccount, onDismiss: {
+            closeView()
+        }, content: {
+            NavigationStack {
+                viewModel.getAddingBalanceAccauntView()
+            }
+        })
     }
     
     //MARK: - Computed props
@@ -37,6 +89,16 @@ struct WelcomeView: View {
     //MARK: - Methods
     private func closeView() {
         dismiss()
+    }
+    
+    private func bottomButtonAction() {
+        if selection < viewModel.models.count - 1 {
+            withAnimation {
+                selection += 1
+            }
+        } else {
+            showCreateBalanceAccount = true
+        }
     }
 }
 
