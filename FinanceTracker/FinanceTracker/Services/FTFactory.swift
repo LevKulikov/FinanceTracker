@@ -15,8 +15,15 @@ final class FTFactory {
     //Instances to save view model for tabview, to not to create new one every time
     private var spendIncomeViewModel: SpendIncomeViewModel?
     private var searchViewModel: SearchViewModel?
+    private var statisticsViewModel: StatisticsViewModel?
     
     private init() {}
+    
+    func createWelcomeView(dataManager: some DataManagerProtocol, delegate: (some WelcomeViewModelDelegate)?) -> AnyView {
+        let viewModel = WelcomeViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(WelcomeView(viewModel: viewModel))
+    }
     
     func createCustomTabView(dataManager: some DataManagerProtocol) -> some View {
         let viewModel = CustomTabViewModel(dataManager: dataManager)
@@ -62,8 +69,15 @@ final class FTFactory {
         return AnyView(AddingBalanceAccauntView(viewModel: viewModel))
     }
     
-    func createStatisticsView(dataManager: some DataManagerProtocol) -> AnyView {
+    func createStatisticsView(dataManager: some DataManagerProtocol, actionWithViewModel: ((StatisticsViewModel) -> Void)? = nil) -> AnyView {
+        if let statisticsViewModel {
+            actionWithViewModel?(statisticsViewModel)
+            return AnyView(StatisticsView(viewModel: statisticsViewModel))
+        }
+        
         let viewModel = StatisticsViewModel(dataManager: dataManager)
+        statisticsViewModel = viewModel
+        actionWithViewModel?(viewModel)
         return AnyView(StatisticsView(viewModel: viewModel))
     }
     
@@ -96,13 +110,13 @@ final class FTFactory {
         return AnyView(AppearanceView(viewModel: viewModel))
     }
     
-    func createManageDataView(dataManager: some DataManagerProtocol, delegate: (any ManageDataViewModelDelegate)?) -> AnyView {
+    func createManageDataView(dataManager: some DataManagerProtocol, delegate: (some ManageDataViewModelDelegate)?) -> AnyView {
         let viewModel = ManageDataViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
         return AnyView(ManageDataView(viewModel: viewModel))
     }
     
-    func createSearchView(dataManager: some DataManagerProtocol, delegate: (any SearchViewModelDelegate)?, actionWithViewModel: ((SearchViewModel) -> Void)? = nil) -> AnyView {
+    func createSearchView(dataManager: some DataManagerProtocol, delegate: (some SearchViewModelDelegate)?, actionWithViewModel: ((SearchViewModel) -> Void)? = nil) -> AnyView {
         if let searchViewModel {
             searchViewModel.delegate = delegate
             actionWithViewModel?(searchViewModel)

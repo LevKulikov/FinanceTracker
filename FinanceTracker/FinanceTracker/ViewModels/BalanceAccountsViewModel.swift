@@ -98,7 +98,7 @@ final class BalanceAccountsViewModel: ObservableObject {
 //MARK: - Extensions
 //MARK: Extension for AddingBalanceAccountViewModelDelegate
 extension BalanceAccountsViewModel: AddingBalanceAccountViewModelDelegate {
-    func didUpdateBalanceAccount() {
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
         fetchData()
         delegate?.didUpdatedBalanceAccountsList()
     }

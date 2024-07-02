@@ -376,7 +376,7 @@ extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
 }
 
 extension AddingSpendIcomeViewModel: AddingBalanceAccountViewModelDelegate {
-    func didUpdateBalanceAccount() {
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
         Task {
             await fetchBalanceAccounts()
         }

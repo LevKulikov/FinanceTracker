@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 protocol WelcomeViewModelDelegate: AnyObject {
-    
+    func didCreateBalanceAccount()
 }
 
 struct ExampleModel: Identifiable {
@@ -21,6 +21,7 @@ struct ExampleModel: Identifiable {
 
 final class WelcomeViewModel: ObservableObject {
     //MARK: - Properties
+    weak var delegate: (any WelcomeViewModelDelegate)?
     let models: [ExampleModel] = [
         .init(
             title: "Simple",
@@ -57,13 +58,18 @@ final class WelcomeViewModel: ObservableObject {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
     
+    func welcomeIsPassed() {
+        dataManager.isFirstLaunch = false
+    }
+    
     //MARK: Private methods
     
 }
 
 //MARK: - Extensions
 extension WelcomeViewModel: AddingBalanceAccountViewModelDelegate {
-    func didUpdateBalanceAccount() {
-        //TODO: Complete
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
+        dataManager.setDefaultBalanceAccount(balanceAccount)
+        delegate?.didCreateBalanceAccount()
     }
 }

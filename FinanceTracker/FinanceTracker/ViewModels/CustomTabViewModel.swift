@@ -22,6 +22,7 @@ enum TabViewType: Equatable {
     case searchView
     case statisticsView
     case settingsView
+    case welcomeView
 }
 
 final class CustomTabViewModel: ObservableObject {
@@ -39,10 +40,12 @@ final class CustomTabViewModel: ObservableObject {
     
     //MARK: Published props
     @Published var showTabBar = true
+    @Published var isFirstLaunch = false
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        self.isFirstLaunch = dataManager.isFirstLaunch
     }
     
     //MARK: - Methods
@@ -57,7 +60,9 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getStatisticsView() -> some View {
-        return FTFactory.shared.createStatisticsView(dataManager: dataManager)
+        return FTFactory.shared.createStatisticsView(dataManager: dataManager) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
     }
     
     func getSearchView() -> some View {
@@ -71,8 +76,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getWelcomeView() -> some View {
-        let viewModel = WelcomeViewModel(dataManager: dataManager)
-        return WelcomeView(viewModel: viewModel)
+        return FTFactory.shared.createWelcomeView(dataManager: dataManager, delegate: self)
     }
     
     //MARK: Private methods
@@ -138,6 +142,15 @@ extension CustomTabViewModel: SearchViewModelDelegate {
     func hideTabBar(_ hide: Bool) {
         withAnimation {
             showTabBar = !hide
+        }
+    }
+}
+
+//MARK: Extension for WelcomeViewModelDelegate
+extension CustomTabViewModel: WelcomeViewModelDelegate {
+    func didCreateBalanceAccount() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .balanceAccounts, from: .welcomeView)
         }
     }
 }

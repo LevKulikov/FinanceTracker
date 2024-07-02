@@ -363,12 +363,34 @@ extension SearchViewModel: CustomTabViewModelDelegate {
         
         DispatchQueue.main.async { [weak self] in
             switch dataType {
-            case .appearance:
-                break
-            default:
+            case .balanceAccounts:
+                Task {
+                    await self?.fetchBalanceAccounts()
+                }
+                
+            case .categories:
+                Task {
+                    await self?.fetchCategories()
+                }
+                
+            case .tags:
+                Task {
+                    await self?.fetchTags()
+                }
+                
+            case .transactions:
+                Task {
+                    await self?.fetchTransactions()
+                    self?.filterAndSetTransactions()
+                }
+                
+            case .data:
                 self?.fetchAllData(competionHandler:  {
                     self?.filterAndSetTransactions()
                 })
+                
+            case .appearance:
+                break
             }
         }
     }

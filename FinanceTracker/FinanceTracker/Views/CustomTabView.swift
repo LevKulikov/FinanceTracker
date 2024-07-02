@@ -13,9 +13,6 @@ struct CustomTabView: View  {
     @Namespace private var namespace
     @StateObject private var viewModel: CustomTabViewModel
     @State private var tabSelection = 1
-    @State private var showWelcomeView = false
-    //TODO: Delete firstAppear after feture implemetation
-    @State private var firstAppear = true
     private var availableYOffset: CGFloat {
         if FTAppAssets.currnetUserDeviseName == "iPhone SE (3rd generation)" {
             return 5
@@ -51,13 +48,7 @@ struct CustomTabView: View  {
                 .offset(y: availableYOffset)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
-        .onAppear {
-            //TODO: Check if it is the first launch
-            guard firstAppear else { return }
-            firstAppear = false
-            showWelcomeView = true
-        }
-        .fullScreenCover(isPresented: $showWelcomeView) {
+        .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
             viewModel.getWelcomeView()
         }
     }

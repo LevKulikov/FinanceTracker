@@ -102,6 +102,7 @@ struct WelcomeView: View {
     
     //MARK: - Methods
     private func closeView() {
+        viewModel.welcomeIsPassed()
         dismiss()
     }
     
