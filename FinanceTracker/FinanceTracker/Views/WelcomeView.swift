@@ -45,35 +45,16 @@ struct WelcomeView: View {
         .padding(.bottom, 15)
         .ignoresSafeArea(edges: .bottom)
         .overlay(alignment: .topTrailing) {
-            Button("Skip", systemImage: "arrowshape.turn.up.forward.fill") {
-                withAnimation {
-                    selection = viewModel.models.count - 1
+            skipButton
+                .padding(.trailing)
+                .contextMenu {
+                    Button("Close") {
+                        closeView()
+                    }
                 }
-            }
-            .padding(.trailing)
-            .foregroundStyle(.secondary)
         }
         .overlay(alignment: .bottom) {
-            Button {
-                bottomButtonAction()
-            } label: {
-                Text(buttonText)
-                    .blendMode(.difference)
-                    .font(.title2)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 40)
-                    .background {
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    stops: [.init(color: .blue.opacity(0.7), location: buttonGradientStopLoaction), .init(color: .clear, location: 01)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .stroke(Color.secondary)
-                    }
-            }
+            bottomButton
         }
         .fullScreenCover(isPresented: $showCreateBalanceAccount, onDismiss: {
             closeView()
@@ -85,6 +66,39 @@ struct WelcomeView: View {
     }
     
     //MARK: - Computed props
+    private var skipButton: some View {
+        Button("Skip", systemImage: "arrowshape.turn.up.forward.fill") {
+            withAnimation {
+                selection = viewModel.models.count - 1
+            }
+        }
+        .foregroundStyle(.secondary)
+    }
+    
+    private var bottomButton: some View {
+        Button {
+            bottomButtonAction()
+        } label: {
+            Text(buttonText)
+                .blendMode(.difference)
+                .font(.title2)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 40)
+                .background {
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                stops: [.init(color: .blue.opacity(0.7), location: buttonGradientStopLoaction), .init(color: .clear, location: 01)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .stroke(Color.secondary)
+                        .shadow(color: .blue, radius: selection == viewModel.models.count - 1 ? 10 : 0)
+                }
+        }
+        .bold(selection == viewModel.models.count - 1)
+    }
     
     //MARK: - Methods
     private func closeView() {

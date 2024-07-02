@@ -32,6 +32,11 @@ final class WelcomeViewModel: ObservableObject {
             text: "Track your finances with customizable graphs",
             imageName: "statistics page example"),
         .init(
+            title: "Open source",
+            text: "Completely open source, all information is stored on your device. No need to worry about privacy!",
+            imageName: "open source example"
+        ),
+        .init(
             title: "First step",
             text: "Create your balance account to start",
             imageName: "confirm image gray")
