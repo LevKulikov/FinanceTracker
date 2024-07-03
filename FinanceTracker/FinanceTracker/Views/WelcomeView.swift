@@ -47,11 +47,6 @@ struct WelcomeView: View {
         .overlay(alignment: .topTrailing) {
             skipButton
                 .padding(.trailing)
-                .contextMenu {
-                    Button("Close") {
-                        closeView()
-                    }
-                }
         }
         .overlay(alignment: .bottom) {
             bottomButton

@@ -294,7 +294,9 @@ struct AddingSpendIcomeView: View {
             wideCategoryPickerView
         }
         .sheet(item: $showUpdatingCategoryView) { categoryToUpdate in
-            viewModel.getAddingCategoryView(action: .update(categoryToUpdate))
+            NavigationStack {
+                viewModel.getAddingCategoryView(action: .update(categoryToUpdate))
+            }
         }
     }
     
