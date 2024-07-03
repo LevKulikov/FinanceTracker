@@ -196,7 +196,7 @@ final class SearchViewModel: ObservableObject {
                     
                     var containsNeededTag = true
                     if !self.filterTags.isEmpty {
-                        containsNeededTag = trans.tags.contains(self.filterTags)
+                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.contains(self.filterTags.sorted { $0.name < $1.name })
                     }
                     
                     return (sameBA && sameCategory && containsNeededTag)

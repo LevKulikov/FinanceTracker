@@ -144,7 +144,6 @@ struct TransactionBarChart: View {
         self.transactionsData = transactionsData
         self._perDate = perDate
         self._transactionType = transactionType
-        setYScaleRange()
     }
     
     //MARK: - Body
@@ -279,11 +278,6 @@ struct TransactionBarChart: View {
             RoundedRectangle(cornerRadius: 7)
                 .stroke(Color(.secondarySystemBackground))
                 .fill(Color(.systemBackground))
-        }
-        .padding(.top, 5)
-        .background {
-            RoundedRectangle(cornerRadius: 7)
-                .fill(Color(.secondarySystemBackground))
         }
     }
     
