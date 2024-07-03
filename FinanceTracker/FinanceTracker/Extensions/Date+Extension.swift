@@ -22,6 +22,12 @@ extension Date {
         return calendar.component(component, from: self)
     }
     
+    func endOfDay(calendar: Calendar = Calendar.current) -> Date? {
+        guard let nextDay = calendar.date(byAdding: .day, value: 1, to: self) else { return nil }
+        let startOfNextDay = calendar.startOfDay(for: nextDay)
+        return calendar.date(byAdding: .second, value: -1, to: startOfNextDay)
+    }
+    
     func startOfWeek(using calendar: Calendar = .current) -> Date? {
         calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date
     }

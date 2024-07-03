@@ -32,11 +32,11 @@ final class SpendIncomeViewModel: ObservableObject {
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
     private var transactions: [Transaction] = []
+    private let calendar = Calendar.current
+    private var cancelables = Set<AnyCancellable>()
     
     //MARK: Internal props
     weak var delegate: (any SpendIncomeViewModelDelegate)?
-    let calendar = Calendar.current
-    var cancelables = Set<AnyCancellable>()
     
     var availableDateRange: ClosedRange<Date> {
         FTAppAssets.availableDateRange
@@ -147,6 +147,16 @@ final class SpendIncomeViewModel: ObservableObject {
     
     func didSelectAction(action: ActionWithTransaction) {
         delegate?.didSelectAction(action)
+    }
+    
+    func setLastDateWithData() {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            let filtered = self?.transactions.filter { $0.balanceAccount == self?.balanceAccountToFilter }
+            guard let first = filtered?.first else { return }
+            DispatchQueue.main.async {
+                self?.dateSelected = first.date
+            }
+        }
     }
     
     //MARK: Private props

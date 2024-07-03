@@ -171,9 +171,11 @@ struct SpendIncomeView: View {
                     .contentShape([.hoverEffect, .contextMenuPreview], RoundedRectangle(cornerRadius: 8.0))
                     .contextMenu {
                         Button("Current date") {
-                            withAnimation {
-                                viewModel.dateSelected = .now
-                            }
+                            viewModel.dateSelected = .now
+                        }
+                        
+                        Button("Last date with \(viewModel.transactionsTypeSelected.rawValue)") {
+                            viewModel.setLastDateWithData()
                         }
                     }
             }
