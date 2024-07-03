@@ -66,6 +66,9 @@ protocol DataManagerProtocol: AnyObject {
     func setPreferredColorScheme(_ colorScheme: ColorScheme?)
     
     func getPreferredColorScheme() -> ColorScheme?
+    
+    @MainActor
+    func saveDefaultCategories()
 }
 
 final class DataManager: DataManagerProtocol, ObservableObject {
@@ -74,6 +77,24 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     private let settingsManager: any SettingsManagerProtocol
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
+    private let defaultSpendingCategories: [Category] = [
+        .init(type: .spending, name: "Groceries", iconName: "shopping-cart", color: .blue),
+        .init(type: .spending, name: "Сafes", iconName: "003-cutlery", color: .yellow),
+        .init(type: .spending, name: "Transport", iconName: "car", color: .orange),
+        .init(type: .spending, name: "Entertainments", iconName: "001-gamepad", color: .indigo),
+        .init(type: .spending, name: "Education", iconName: "016-book", color: .purple),
+        .init(type: .spending, name: "Health", iconName: "018-heart", color: .red),
+        .init(type: .spending, name: "Gifts", iconName: "031-gift", color: .mint),
+        .init(type: .spending, name: "Home", iconName: "home", color: .brown),
+        .init(type: .spending, name: "Family", iconName: "010-love-3", color: .pink),
+        .init(type: .spending, name: "Other", iconName: "047-upload", color: .red),
+    ]
+    private let defaultIncomeCategories: [Category] = [
+        .init(type: .income, name: "Gifts", iconName: "031-gift", color: .mint),
+        .init(type: .income, name: "Salary", iconName: "1-economy-004-economy", color: .green),
+        .init(type: .income, name: "Interest", iconName: "1-economy-007-bank", color: .purple),
+        .init(type: .income, name: "Other", iconName: "download", color: .green),
+    ]
     
     var tagDefaultColor: Color? {
         get {
@@ -273,6 +294,16 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     
     func getPreferredColorScheme() -> ColorScheme? {
         settingsManager.getPreferredColorScheme()
+    }
+    
+    func saveDefaultCategories() {
+        for category in defaultSpendingCategories {
+            insert(category)
+        }
+        
+        for category in defaultIncomeCategories {
+            insert(category)
+        }
     }
     
     //MARK: Private methods

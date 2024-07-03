@@ -61,6 +61,10 @@ struct AddingBalanceAccauntView: View {
                     .padding(.bottom)
                 
                 colorPickerSection
+                
+                Rectangle()
+                    .fill(.clear)
+                    .frame(height: 50)
             }
         }
         .navigationTitle(isAdding ? "New balance account" : "Balance account")

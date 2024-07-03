@@ -60,6 +60,9 @@ final class WelcomeViewModel: ObservableObject {
     
     func welcomeIsPassed() {
         dataManager.isFirstLaunch = false
+        Task {
+            await dataManager.saveDefaultCategories()
+        }
     }
     
     //MARK: Private methods
