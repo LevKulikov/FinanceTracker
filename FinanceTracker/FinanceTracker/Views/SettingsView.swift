@@ -114,7 +114,7 @@ struct SettingsView: View {
     }
     
     private var contactsSection: some View {
-        Section("Developer's contacts") {
+        Section("Developer") {
             Label("Telegram", systemImage: "paperplane")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -142,6 +142,10 @@ struct SettingsView: View {
                     
                     Button("Send mail", action: sendMailToDeveloper)
                 }
+            
+            Link(destination: URL(string: viewModel.codeSource)!) {
+                Label("Code source", systemImage: "chevron.left.forwardslash.chevron.right")
+            }
         }
     }
     

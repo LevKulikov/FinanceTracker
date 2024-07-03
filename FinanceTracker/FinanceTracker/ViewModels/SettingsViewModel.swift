@@ -28,6 +28,7 @@ final class SettingsViewModel: ObservableObject {
     weak var delegate: (any SettingsViewModelDelegate)?
     let developerTelegramUsername = "k_lev_s"
     let developerEmail = "levkulikov.appdev@gmail.com"
+    let codeSource = "https://github.com/LevKulikov/FinanceTracker.git"
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
