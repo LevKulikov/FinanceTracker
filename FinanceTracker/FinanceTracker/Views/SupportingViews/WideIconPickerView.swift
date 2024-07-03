@@ -40,6 +40,14 @@ struct WideIconPickerView: View {
                             }
                     }
                 }
+                
+                VStack {
+                    Text("Icons made by Freepik from")
+                    Text("www.flaticon.com")
+                }
+                .padding()
+                .padding(.top)
+                .foregroundStyle(.secondary)
             }
         }
     }
