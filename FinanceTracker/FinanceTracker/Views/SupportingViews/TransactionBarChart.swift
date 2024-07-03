@@ -130,7 +130,7 @@ struct TransactionBarChart: View {
         return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
     }
     
-    @State private var xScrollPosition: Date = .now
+    @State private var xScrollPosition: Date = (Date.now.endOfDay() ?? .now)
     @State private var yScale: ClosedRange<Float> = 0...50_000
     @State private var selection: Date?
     @State private var selectionBuffer: Date?
