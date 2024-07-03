@@ -48,6 +48,9 @@ struct CustomTabView: View  {
                 .offset(y: availableYOffset)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
+        .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
+            viewModel.getWelcomeView()
+        }
     }
     
     private var customTabView: some View {

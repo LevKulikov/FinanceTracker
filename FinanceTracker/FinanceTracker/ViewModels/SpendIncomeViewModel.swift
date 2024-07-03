@@ -287,8 +287,11 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         
         switch dataType {
         case .balanceAccounts:
-            Task {
-                await fetchBalanceAccounts()
+            Task { @MainActor in
+                fetchBalanceAccounts()
+                if tabView == .welcomeView {
+                    balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+                }
             }
         case .categories:
             Task {

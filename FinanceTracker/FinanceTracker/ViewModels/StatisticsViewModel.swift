@@ -541,3 +541,23 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
 }
+
+//MARK: - Extensions
+extension StatisticsViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        "StatisticsViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        //No reactive data update (because of high complexity), only setting default data
+        if tabView == .welcomeView {
+            DispatchQueue.main.async { [weak self] in
+                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+        }
+    }
+}

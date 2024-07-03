@@ -18,12 +18,17 @@ protocol SettingsManagerProtocol: AnyObject {
     func setPreferredColorScheme(_ colorScheme: ColorScheme?)
     
     func getPreferredColorScheme() -> ColorScheme?
+    
+    func setFirstLaunch(_ isFirst: Bool)
+    
+    func isFirstLaunch() -> Bool
 }
 
 final class SettingsManager: SettingsManagerProtocol {
     //MARK: - Properties
     private let tagDefaultColorKey = "tagDefaultColorKey"
     private let appColorSchemeUserDefaultsKey = "appColorSchemeUserDefaultsKey"
+    private let firstLaunchCkeckKey = "firstLaunchCkeckKey"
     
     //MARK: - Initializer
     init() {
@@ -76,5 +81,14 @@ final class SettingsManager: SettingsManagerProtocol {
         } else {
             return nil
         }
+    }
+    
+    func setFirstLaunch(_ isFirst: Bool) {
+        UserDefaults.standard.set(isFirst, forKey: firstLaunchCkeckKey)
+    }
+    
+    func isFirstLaunch() -> Bool {
+        guard let isFirst = UserDefaults.standard.value(forKey: firstLaunchCkeckKey) as? Bool else { return true }
+        return isFirst
     }
 }
