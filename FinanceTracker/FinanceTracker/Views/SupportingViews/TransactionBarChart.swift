@@ -87,9 +87,8 @@ struct TransactionBarChart: View {
         let calendar = Calendar.current
         switch perDate {
         case .perDay:
-            let dateComp = calendar.dateComponents([.year], from: .now)
-            let startDate = calendar.date(from: dateComp) ?? .now
-            return startDate...Date.now
+            let startDate = calendar.date(byAdding: .month, value: -4, to: .now) ?? .now
+            return startDate...(Date.now.endOfDay() ?? .now)
         case .perWeek:
             let startDate = calendar.date(byAdding: .year, value: -2, to: .now) ?? .now
             let endDate = calendar.date(byAdding: .weekOfMonth, value: 1, to: .now) ?? .now
