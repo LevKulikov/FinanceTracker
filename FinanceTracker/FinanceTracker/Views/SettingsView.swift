@@ -38,7 +38,7 @@ struct SettingsView: View {
             
             contactsSection
             
-            Text("__Finance Tracker__\nVersion: idk 🫤")
+            Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.tertiary)
                 .listRowBackground(Color.clear)
