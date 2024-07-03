@@ -245,11 +245,15 @@ struct TransactionBarChart: View {
         }
         .onChange(of: perDate) {
             setSelected(nil, date: nil)
-            adaptYAxisScaleToVisibleData()
+            withAnimation {
+                xScrollPosition = .now
+            }
         }
         .onChange(of: transactionType) {
             setSelected(nil, date: nil)
-            adaptYAxisScaleToVisibleData()
+            withAnimation {
+                xScrollPosition = .now
+            }
         }
     }
     
