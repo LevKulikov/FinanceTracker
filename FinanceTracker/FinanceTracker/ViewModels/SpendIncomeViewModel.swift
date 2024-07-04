@@ -68,15 +68,16 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     @Published var transactionsTypeSelected: TransactionsType = .spending {
         didSet {
-            fetchAllData { [weak self] in
-                self?.filterGroupSortTransactions(animated: true)
-            }
+            filterGroupSortTransactions(animated: true)
         }
     }
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var dateSelected: Date = .now {
         didSet {
-            filterGroupSortTransactions()
+            Task {
+                await fetchTransactions()
+                filterGroupSortTransactions()
+            }
         }
     }
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
@@ -178,13 +179,13 @@ final class SpendIncomeViewModel: ObservableObject {
     /// - Parameters:
     ///   - date: provide value to filter by date, if nil the method filters by selected from UI date
     ///   - balanceAccount: provide value to filter by balance account, if nil the method filters by selected from UI balance acount
-    private func filterGroupSortTransactions(date: Date? = nil, balanceAccount: BalanceAccount? = nil, animated: Bool = false) {
+    private func filterGroupSortTransactions(type: TransactionsType? = nil, balanceAccount: BalanceAccount? = nil, animated: Bool = false) {
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self else { return }
             
             let changedTransactions = self.transactions
                 .filter {
-                    self.calendar.isDate($0.date, equalTo: date ?? self.dateSelected, toGranularity: .day)
+                    $0.type == (type ?? self.transactionsTypeSelected)
                 }
                 .filter {
                     $0.balanceAccount == balanceAccount ?? self.balanceAccountToFilter
@@ -221,11 +222,12 @@ final class SpendIncomeViewModel: ObservableObject {
     
     @MainActor
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
-        // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
-        let rawValue = transactionsTypeSelected.rawValue
+        let startOfSelectedDate = calendar.startOfDay(for: dateSelected)
+        let endOfSelectedDate = dateSelected.endOfDay() ?? dateSelected
+        let dateRange = (startOfSelectedDate...endOfSelectedDate)
         
         let predicate = #Predicate<Transaction> {
-            $0.typeRawValue == rawValue
+            (startOfSelectedDate...endOfSelectedDate).contains($0.date)
         }
         
         let descriptor = FetchDescriptor<Transaction>(
@@ -306,6 +308,7 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         case .categories:
             Task {
                 await fetchTransactions()
+                filterGroupSortTransactions()
             }
         case .data:
             fetchAllData { [weak self] in
@@ -333,7 +336,7 @@ extension SpendIncomeViewModel {
         $transactionsTypeSelected
             .sink { [weak self] newTransactionType in
                 self?.fetchAllData {
-                    self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+                    self?.filterGroupSortTransactions()
                 }
             }
             .store(in: &cancelables)
@@ -345,7 +348,7 @@ extension SpendIncomeViewModel {
                 self?.didSelectAction(action: newAction)
                 if case .none = newAction {
                     self?.fetchAllData {
-                        self?.filterGroupSortTransactions(date: nil, balanceAccount: nil)
+                        self?.filterGroupSortTransactions()
                     }
                     self?.enableTapsWithDeadline()
                 }
@@ -356,7 +359,7 @@ extension SpendIncomeViewModel {
     private func sinkOnDate() {
         $dateSelected
             .sink { [weak self] newDate in
-                self?.filterGroupSortTransactions(date: newDate, balanceAccount: nil)
+                self?.filterGroupSortTransactions()
             }
             .store(in: &cancelables)
     }
@@ -364,7 +367,7 @@ extension SpendIncomeViewModel {
     private func sinkOnBalanceAccount() {
         $balanceAccountToFilter
             .sink { [weak self] newBalanceAccount in
-                self?.filterGroupSortTransactions(date: nil, balanceAccount: newBalanceAccount)
+                self?.filterGroupSortTransactions()
             }
             .store(in: &cancelables)
     }
