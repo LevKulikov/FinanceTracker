@@ -35,7 +35,7 @@ final class WelcomeViewModel: ObservableObject {
         .init(
             title: "Open source",
             text: "Completely open source, all information is stored on your device. No need to worry about privacy!",
-            imageName: "open source example"
+            imageName: "github in safari"
         ),
         .init(
             title: "First step",
