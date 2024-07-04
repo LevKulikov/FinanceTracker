@@ -512,10 +512,11 @@ final class StatisticsViewModel: ObservableObject {
     ///Fetches all transactions and sets to transactions
     @MainActor
     private func fetchTransactions() async {
-        let descriptor = FetchDescriptor<Transaction>(
+        var descriptor = FetchDescriptor<Transaction>(
             predicate: nil,
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category]
         
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
