@@ -39,6 +39,31 @@ final class SearchViewModel: ObservableObject {
     private var searchDispatchWorkItem: DispatchWorkItem?
     private var allTransactions: [Transaction] = []
     private var allCategories: [Category] = []
+    /// For transactions predicate
+    private var dateFilterRange: ClosedRange<Date> {
+        switch dateFilterType {
+        case .day:
+            let startDate = filterDate.startOfDay()
+            let endDate = filterDate.endOfDay() ?? filterDate
+            return startDate...endDate
+        case .week:
+            let startDate = filterDate.startOfWeek() ?? filterDate
+            let endDate = filterDate.endOfWeek() ?? filterDate
+            return startDate...endDate
+        case .month:
+            let startDate = filterDate.startOfMonth() ?? filterDate
+            let endDate = filterDate.endOfMonth() ?? filterDate
+            return startDate...endDate
+        case .year:
+            let startDate = filterDate.startOfYear() ?? filterDate
+            let endDate = filterDate.endOfYear() ?? filterDate
+            return startDate...endDate
+        case .customDateRange:
+            let startDate = filterDateStart.startOfDay()
+            let endDate = filterDateEnd.endOfDay() ?? filterDateEnd
+            return startDate...endDate
+        }
+    }
     
     //MARK: UI props
     // To filter
@@ -80,25 +105,37 @@ final class SearchViewModel: ObservableObject {
     @Published var dateFilterType: DateFilterType = .month {
         didSet {
             guard dateFilterType != oldValue else { return }
-            filterAndSetTransactions()
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
         }
     }
     @Published var filterDate: Date = .now {
         didSet {
             guard filterDate != oldValue else { return }
-            filterAndSetTransactions()
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
         }
     }
     @Published var filterDateStart: Date = .now {
         didSet {
             guard filterDateStart != oldValue else { return }
-            filterAndSetTransactions()
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
         }
     }
     @Published var filterDateEnd: Date = .now {
         didSet {
             guard filterDateEnd != oldValue else { return }
-            filterAndSetTransactions()
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
         }
     }
     
@@ -201,25 +238,6 @@ final class SearchViewModel: ObservableObject {
                     
                     return (sameBA && sameCategory && containsNeededTag)
                 }
-                //Filter by date
-                .filter { trans in
-                    switch self.dateFilterType {
-                    case .day:
-                        return self.calendar.isDate(trans.date, equalTo: self.filterDate, toGranularity: .day)
-                    case .week:
-                        let startOfWeekOfTrans = trans.date.startOfWeek() ?? .now
-                        let startOfWeekOfFilter = self.filterDate.startOfWeek() ?? .now
-                        return self.calendar.isDate(startOfWeekOfTrans, equalTo: startOfWeekOfFilter, toGranularity: .day)
-                    case .month:
-                        return self.calendar.isDate(trans.date, equalTo: self.filterDate, toGranularity: .month)
-                    case .year:
-                        return self.calendar.isDate(trans.date, equalTo: self.filterDate, toGranularity: .year)
-                    case .customDateRange:
-                        let lowerBound = self.calendar.startOfDay(for: self.filterDateStart)
-                        let higherBound = self.calendar.startOfDay(for: self.calendar.date(byAdding: .day, value: 1, to: self.filterDateEnd) ?? self.filterDateEnd)
-                        return (lowerBound...higherBound).contains(trans.date)
-                    }
-                }
             
             var searchData = filteredData
             if !self.searchText.isEmpty {
@@ -276,16 +294,22 @@ final class SearchViewModel: ObservableObject {
     
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil, competionHandler: (() -> Void)? = nil) {
         Task {
-            await fetchTransactions(errorHandler: errorHandler)
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
             await fetchBalanceAccounts(errorHandler: errorHandler)
+            await fetchTransactions(errorHandler: errorHandler)
             competionHandler?()
         }
     }
     
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedTransactions: [Transaction] = await fetch() else {
+        let lowerBound = dateFilterRange.lowerBound
+        let upperBound = dateFilterRange.upperBound
+        let predicate = #Predicate<Transaction> {
+            (lowerBound...upperBound).contains($0.date)
+        }
+        
+        guard let fetchedTransactions: [Transaction] = await fetch(withPredicate: predicate) else {
             errorHandler?(FetchErrors.unableToFetchTransactions)
             return
         }
@@ -293,39 +317,42 @@ final class SearchViewModel: ObservableObject {
         allTransactions = fetchedTransactions
     }
     
-    @MainActor
     private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
         guard let fetchedCategories: [Category] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
         
-        withAnimation(.snappy) {
-            allCategories = fetchedCategories
+        DispatchQueue.main.async { [weak self] in
+            withAnimation(.snappy) {
+                self?.allCategories = fetchedCategories
+            }
         }
     }
     
-    @MainActor
     private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
         guard let fetchedTags: [Tag] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
         }
         
-        withAnimation(.snappy) {
-            allTags = fetchedTags
+        DispatchQueue.main.async { [weak self] in
+            withAnimation(.snappy) {
+                self?.allTags = fetchedTags
+            }
         }
     }
     
-    @MainActor
     private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
         guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch(sortWithString: \.name) else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
         
-        withAnimation(.snappy) {
-            allBalanceAccounts = fetchedBalanceAccounts
+        DispatchQueue.main.async { [weak self] in
+            withAnimation(.snappy) {
+                self?.allBalanceAccounts = fetchedBalanceAccounts
+            }
         }
     }
     
@@ -361,37 +388,35 @@ extension SearchViewModel: CustomTabViewModelDelegate {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .searchView else { return }
         
-        DispatchQueue.main.async { [weak self] in
-            switch dataType {
-            case .balanceAccounts:
-                Task {
-                    await self?.fetchBalanceAccounts()
-                }
-                
-            case .categories:
-                Task {
-                    await self?.fetchCategories()
-                }
-                
-            case .tags:
-                Task {
-                    await self?.fetchTags()
-                }
-                
-            case .transactions:
-                Task {
-                    await self?.fetchTransactions()
-                    self?.filterAndSetTransactions()
-                }
-                
-            case .data:
-                self?.fetchAllData(competionHandler:  {
-                    self?.filterAndSetTransactions()
-                })
-                
-            case .appearance:
-                break
+        switch dataType {
+        case .balanceAccounts:
+            Task {
+                await fetchBalanceAccounts()
             }
+            
+        case .categories:
+            Task {
+                await fetchCategories()
+            }
+            
+        case .tags:
+            Task {
+                await fetchTags()
+            }
+            
+        case .transactions:
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
+            
+        case .data:
+            fetchAllData(competionHandler:  { [weak self] in
+                self?.filterAndSetTransactions()
+            })
+            
+        case .appearance:
+            break
         }
     }
 }
@@ -401,6 +426,7 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
         delegate?.didUpdatedTransactionsList()
         Task {
             await fetchTransactions()
+            filterAndSetTransactions()
         }
     }
     
