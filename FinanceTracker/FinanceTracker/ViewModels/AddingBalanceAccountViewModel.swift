@@ -31,6 +31,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     @Published private(set) var action: ActionWithBalanceAccaunt = .none
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var balanceString: String = ""
+    @Published private(set) var isFetching = false
     
     //MARK: Category props to set
     @Published var name: String = ""
@@ -70,7 +71,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
                 return
             }
             
-            let balanceToSet = calculateNeededBalance()
+            let balanceToSet = !isFetching ? calculateNeededBalance() : balance
             
             balanceAccountToUpdate.name = name
             balanceAccountToUpdate.currency = currency
@@ -91,7 +92,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
         }
     }
     
-    //MARK: Private props
+    //MARK: Private methods
     private func setData() {
         switch action {
         case .none, .add:
@@ -103,10 +104,21 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             balance = balanceAccount.balance
             iconName = balanceAccount.iconName
             color = balanceAccount.color
-            Task { @MainActor in
-                await setTransactionsChanges()
-                let totalBalance = balance + transactionsChanges
-                balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
+            
+            isFetching = true
+            
+            let settingBalanceStringClosure = {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    let totalBalance = balance + transactionsChanges
+                    balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
+                    isFetching = false
+                }
+            }
+            
+            Task.detached(priority: .high) { [weak self] in
+                await self?.setTransactionsChanges()
+                settingBalanceStringClosure()
             }
         }
     }
@@ -123,7 +135,6 @@ final class AddingBalanceAccountViewModel: ObservableObject {
         }
     }
     
-    @MainActor
     private func setTransactionsChanges() async {
         await fetchTransactionsWithBalanceAccount(errorHandler: nil)
         let changes = calulateTransactionsChanges()
@@ -140,7 +151,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
         let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
         
         do {
-            let fetchedTransactions = try await dataManager.fetch(descriptor)
+            let fetchedTransactions = try await dataManager.fetchFromBackground(descriptor)
             transactionWithBalanceAccount = fetchedTransactions
         } catch {
             errorHandler?(error)
