@@ -495,14 +495,15 @@ final class StatisticsViewModel: ObservableObject {
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @escaping () -> Void) {
         Task {
-            await fetchTransactions()
             await fetchBalanceAccounts()
-            completionHandler()
+            Task.detached(priority: .background) { [weak self] in
+                await self?.fetchTransactions()
+                completionHandler()
+            }
         }
     }
     
     ///Fetches all transactions and sets to transactions
-    @MainActor
     private func fetchTransactions() async {
         let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
         let predicate = #Predicate<Transaction> { trans in
@@ -516,7 +517,7 @@ final class StatisticsViewModel: ObservableObject {
         descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
         
         do {
-            let fetchedTranses = try dataManager.fetch(descriptor)
+            let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
             transactions = fetchedTranses
         } catch {
             print("StatisticsViewModel: Unable to fetch transactions")
