@@ -77,6 +77,8 @@ final class StatisticsViewModel: ObservableObject {
             refreshData()
         }
     }
+    /// Flag to determine if data is currently fetching, works in fetchAllData method
+    @Published private(set) var isFetchingData = false
     
     //MARK: For pie chart
     /// Data Array to be provided in pie chart
@@ -494,11 +496,20 @@ final class StatisticsViewModel: ObservableObject {
     /// Fetches all data and executes completion handler
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @escaping () -> Void) {
+        isFetchingData = true
+        
+        let localCompletion = { [weak self] in
+            DispatchQueue.main.async {
+                self?.isFetchingData = false
+            }
+            completionHandler()
+        }
+        
         Task {
             await fetchBalanceAccounts()
             Task.detached(priority: .background) { [weak self] in
                 await self?.fetchTransactions()
-                completionHandler()
+                localCompletion()
             }
         }
     }

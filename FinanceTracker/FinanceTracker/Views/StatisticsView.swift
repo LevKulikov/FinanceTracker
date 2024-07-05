@@ -40,8 +40,13 @@ struct StatisticsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Refresh", systemImage: "arrow.clockwise") {
-                        viewModel.refreshData()
+                    if viewModel.isFetchingData {
+                        ProgressView()
+                            .controlSize(.regular)
+                    } else {
+                        Button("Refresh", systemImage: "arrow.clockwise") {
+                            viewModel.refreshData()
+                        }
                     }
                 }
             }
