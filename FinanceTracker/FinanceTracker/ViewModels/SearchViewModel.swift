@@ -297,11 +297,14 @@ final class SearchViewModel: ObservableObject {
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
             await fetchBalanceAccounts(errorHandler: errorHandler)
-            await fetchTransactions(errorHandler: errorHandler)
-            competionHandler?()
+            Task.detached(priority: .background) { [weak self] in
+                await self?.fetchTransactions(errorHandler: errorHandler)
+                competionHandler?()
+            }
         }
     }
     
+    /// Fetches from background and does not use local fetch method
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         let lowerBound = dateFilterRange.lowerBound
         let upperBound = dateFilterRange.upperBound
@@ -309,12 +312,13 @@ final class SearchViewModel: ObservableObject {
             (lowerBound...upperBound).contains($0.date)
         }
         
-        guard let fetchedTransactions: [Transaction] = await fetch(withPredicate: predicate) else {
-            errorHandler?(FetchErrors.unableToFetchTransactions)
-            return
+        let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        do {
+            let fetchedTransactions: [Transaction] = try await dataManager.fetchFromBackground(descriptor)
+            allTransactions = fetchedTransactions
+        } catch {
+            errorHandler?(error)
         }
-        
-        allTransactions = fetchedTransactions
     }
     
     private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
