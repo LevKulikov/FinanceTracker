@@ -28,7 +28,6 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     weak var delegate: (any AddingBalanceAccountViewModelDelegate)?
     
     //MARK: Published props
-    //TODO: Published property "action" is changed from background thread when action is .update(_). I dnk why, but the issue should be solved
     @Published private(set) var action: ActionWithBalanceAccaunt = .none
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var balanceString: String = ""
@@ -104,7 +103,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             balance = balanceAccount.balance
             iconName = balanceAccount.iconName
             color = balanceAccount.color
-            Task {
+            Task { @MainActor in
                 await setTransactionsChanges()
                 let totalBalance = balance + transactionsChanges
                 balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
@@ -134,14 +133,15 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     private func fetchTransactionsWithBalanceAccount(errorHandler: ((Error) -> Void)?) async {
         guard let balanceAccountToUpdate else { return }
         
-        //Because of problems with predicate (it does not support multiple keypath and is unable to convert PredicateExpresion)
-        //fetch descriptor fetches all transaction, and afterwords ViewModel filters fetched array
-        let descriptor = FetchDescriptor<Transaction>()
+        let copyBalanceAccountId = balanceAccountToUpdate.persistentModelID
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
         
         do {
             let fetchedTransactions = try await dataManager.fetch(descriptor)
-            let filteredTransactions = fetchedTransactions.filter { $0.balanceAccount == balanceAccountToUpdate }
-            transactionWithBalanceAccount = filteredTransactions
+            transactionWithBalanceAccount = fetchedTransactions
         } catch {
             errorHandler?(error)
         }
