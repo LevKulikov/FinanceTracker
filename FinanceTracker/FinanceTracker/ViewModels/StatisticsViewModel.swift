@@ -228,7 +228,7 @@ final class StatisticsViewModel: ObservableObject {
         
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
-            var totalValue = self.transactions
+            let totalValue = self.transactions
                 .map {
                     switch $0.type! {
                     case .spending:
@@ -495,8 +495,8 @@ final class StatisticsViewModel: ObservableObject {
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @escaping () -> Void) {
         Task {
-            await fetchBalanceAccounts()
             await fetchTransactions()
+            await fetchBalanceAccounts()
             completionHandler()
         }
     }
@@ -513,7 +513,7 @@ final class StatisticsViewModel: ObservableObject {
             predicate: predicate,
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
-        descriptor.relationshipKeyPathsForPrefetching = [\.category]
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
         
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)

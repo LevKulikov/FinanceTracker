@@ -90,7 +90,6 @@ final class SpendIncomeViewModel: ObservableObject {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
             DispatchQueue.main.async {
                 self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
@@ -224,16 +223,17 @@ final class SpendIncomeViewModel: ObservableObject {
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         let startOfSelectedDate = calendar.startOfDay(for: dateSelected)
         let endOfSelectedDate = dateSelected.endOfDay() ?? dateSelected
-        let dateRange = (startOfSelectedDate...endOfSelectedDate)
         
         let predicate = #Predicate<Transaction> {
             (startOfSelectedDate...endOfSelectedDate).contains($0.date)
         }
         
-        let descriptor = FetchDescriptor<Transaction>(
+        var descriptor = FetchDescriptor<Transaction>(
             predicate: predicate,
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
+        
         do {
             let fetchedTranses = try dataManager.fetch(descriptor)
             transactions = fetchedTranses
