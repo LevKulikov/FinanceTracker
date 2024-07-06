@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SearchView: View {
     //MARK: - Properties
+    @Environment(\.colorScheme) var colorScheme
     @Namespace private var namespace
     @StateObject private var viewModel: SearchViewModel
     @State private var navigationPath = NavigationPath()
@@ -137,6 +138,7 @@ struct SearchView: View {
                     .buttonStyle(.bordered)
                     .foregroundStyle(.secondary)
                 }
+                .transition(.blurReplace)
                 
                 filtersView
             }
@@ -264,7 +266,7 @@ struct SearchView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
+                .fill(colorScheme == .light ? Color(.systemBackground) : Color(.systemGray6))
                 .matchedGeometryEffect(id: "moreFilterBackground", in: namespace)
         }
     }

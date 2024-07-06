@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TagsView: View {
     //MARK: - Properties
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel: TagsViewModel
     @State private var showAddingRow = false
     @FocusState private var tagChangeTextFieldFocused
@@ -244,9 +245,9 @@ struct TagsView: View {
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(
-            viewModel.tagSelected == tag ? LinearGradient(colors: [Color(.systemBackground)], startPoint: .leading, endPoint: .trailing) :
+            viewModel.tagSelected == tag ? LinearGradient(colors: [colorScheme == .light ? Color(.systemBackground) : Color(.systemGray6)], startPoint: .leading, endPoint: .trailing) :
             LinearGradient(
-                stops: [.init(color: Color(.systemBackground), location: 0.3), .init(color: tag.color, location: 1)],
+                stops: [.init(color: colorScheme == .light ? Color(.systemBackground) : Color(.systemGray6), location: 0.3), .init(color: tag.color, location: 1)],
                 startPoint: .leading,
                 endPoint: .trailing
             )
