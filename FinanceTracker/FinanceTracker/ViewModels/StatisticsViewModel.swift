@@ -66,7 +66,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: Published
     /// All transactions
-    @Published private(set) var transactions: [Transaction] = []
+    private var transactions: [Transaction] = []
     /// All balance accounts
     @Published private(set) var balanceAccounts: [BalanceAccount] = []
     /// Total value of balance of set account (initial balance + income - spendings)
@@ -77,6 +77,8 @@ final class StatisticsViewModel: ObservableObject {
             refreshData()
         }
     }
+    /// Flag to determine if data is currently fetching, works in fetchAllData method
+    @Published private(set) var isFetchingData = false
     
     //MARK: For pie chart
     /// Data Array to be provided in pie chart
@@ -135,10 +137,8 @@ final class StatisticsViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        refreshData { [weak self] in
-            DispatchQueue.main.async {
-                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
-            }
+        DispatchQueue.main.async { [weak self] in
+            self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
         }
     }
     
@@ -230,8 +230,7 @@ final class StatisticsViewModel: ObservableObject {
         
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
-            var totalValue = self.transactions
-                .filter { $0.balanceAccount == self.balanceAccountToFilter }
+            let totalValue = self.transactions
                 .map {
                     switch $0.type! {
                     case .spending:
@@ -240,9 +239,7 @@ final class StatisticsViewModel: ObservableObject {
                         return $0.value
                     }
                 }
-                .reduce(0, +)
-            
-            totalValue += balanceAccountToFilter.balance
+                .reduce(balanceAccountToFilter.balance, +)
             
             DispatchQueue.main.async {
                 self.totalForBalanceAccount = totalValue
@@ -261,8 +258,9 @@ final class StatisticsViewModel: ObservableObject {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             var returnData = self.transactions
-                .filter { $0.type == self.pieChartTransactionType && $0.balanceAccount == self.balanceAccountToFilter }
                 .filter { singleTransaction in
+                    guard singleTransaction.type == self.pieChartTransactionType else { return false }
+                    
                     switch self.pieChartMenuDateFilterSelected {
                     case .day:
                         return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .day)
@@ -309,10 +307,6 @@ final class StatisticsViewModel: ObservableObject {
             
             let availableBarData = self.transactions
                 .filter { singleTransaction in
-                    guard singleTransaction.balanceAccount == self.balanceAccountToFilter else {
-                        return false
-                    }
-                    
                     switch self.barChartTransactionTypeFilter {
                     case .both:
                         return true
@@ -502,23 +496,39 @@ final class StatisticsViewModel: ObservableObject {
     /// Fetches all data and executes completion handler
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @escaping () -> Void) {
+        isFetchingData = true
+        
+        let localCompletion = { [weak self] in
+            DispatchQueue.main.async {
+                self?.isFetchingData = false
+            }
+            completionHandler()
+        }
+        
         Task {
             await fetchBalanceAccounts()
-            await fetchTransactions()
-            completionHandler()
+            Task.detached(priority: .background) { [weak self] in
+                await self?.fetchTransactions()
+                localCompletion()
+            }
         }
     }
     
     ///Fetches all transactions and sets to transactions
-    @MainActor
     private func fetchTransactions() async {
-        let descriptor = FetchDescriptor<Transaction>(
-            predicate: nil,
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        let predicate = #Predicate<Transaction> { trans in
+            trans.balanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
             sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
         )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
         
         do {
-            let fetchedTranses = try dataManager.fetch(descriptor)
+            let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
             transactions = fetchedTranses
         } catch {
             print("StatisticsViewModel: Unable to fetch transactions")

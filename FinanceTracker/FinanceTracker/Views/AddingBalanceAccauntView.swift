@@ -116,13 +116,19 @@ struct AddingBalanceAccauntView: View {
                 .fontWeight(.medium)
             
             HStack {
-                TextField("0", text: $viewModel.balanceString)
+                TextField(viewModel.isFetching ? "Please wait" : "0", text: $viewModel.balanceString)
                     .onChange(of: viewModel.balanceString, onChangeOfBalanceString)
                     .focused($balanceTextFieldFocus)
                     .keyboardType(.decimalPad)
                     .autocorrectionDisabled()
                     .font(.title2)
                     .textFieldStyle(.roundedBorder)
+                    .disabled(viewModel.isFetching)
+                    .overlay(alignment: .trailing) {
+                        if viewModel.isFetching {
+                            ProgressView().padding(.trailing)
+                        }
+                    }
                 
                 TextField("USD", text: $viewModel.currency)
                     .focused($currencyTextFieldFocus)

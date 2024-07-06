@@ -59,6 +59,8 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
     
+    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel
+    
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
     func getDefaultBalanceAccount() -> BalanceAccount?
@@ -257,6 +259,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         do {
             try container.mainContext.delete(model: Transaction.self)
             try container.mainContext.delete(model: BalanceAccount.self)
+            UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
             try container.mainContext.delete(model: Tag.self)
             try save()
@@ -272,10 +275,15 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
         let fetchedData = try container.mainContext.fetch(descriptor)
-        if let balanceAccountsData = fetchedData as? [BalanceAccount] {
-            balanceAccounts = balanceAccountsData
+        if T.self is BalanceAccount.Type {
+            balanceAccounts = fetchedData as? [BalanceAccount] ?? []
         }
         return fetchedData
+    }
+    
+    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel {
+        let actor = BackgroundDataActor(modelContainer: container)
+        return try await actor.fetch(descriptor)
     }
     
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
