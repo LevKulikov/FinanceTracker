@@ -18,4 +18,12 @@ actor BackgroundDataActor {
     func insert<T>(_ model: T) where T : PersistentModel {
         modelContext.insert(model)
     }
+    
+    func save() throws {
+        try modelContext.save()
+    }
+    
+    func delete<T>(_ model: T) where T : PersistentModel {
+        modelContext.delete(model)
+    }
 }

@@ -16,8 +16,12 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func save() throws
     
+    func saveFromBackground() async throws
+    
     @MainActor
     func deleteTransaction(_ transaction: Transaction)
+    
+    func deleteTransactionFromBackground(_ transaction: Transaction) async
     
     /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
@@ -55,6 +59,8 @@ protocol DataManagerProtocol: AnyObject {
     
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
+    
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel
     
     @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
@@ -139,8 +145,26 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         try container.mainContext.save()
     }
     
+    func saveFromBackground() async throws {
+        if let backgroundActor {
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            try await backgroundActor!.save()
+        }
+    }
+    
     func deleteTransaction(_ transaction: Transaction) {
         container.mainContext.delete(transaction)
+    }
+    
+    func deleteTransactionFromBackground(_ transaction: Transaction) async {
+        if let backgroundActor {
+            await backgroundActor.delete(transaction)
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.delete(transaction)
+        }
     }
     
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
@@ -277,6 +301,15 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     
     func insert<T>(_ model: T) where T : PersistentModel {
         container.mainContext.insert(model)
+    }
+    
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel {
+        if let backgroundActor {
+            await backgroundActor.insert(model)
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.insert(model)
+        }
     }
     
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
