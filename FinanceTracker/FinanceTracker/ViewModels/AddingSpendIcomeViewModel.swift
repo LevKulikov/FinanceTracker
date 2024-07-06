@@ -43,6 +43,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     
     //MARK: Properties
     private let dataManager: any DataManagerProtocol
+    private let dataThread: DataManager.DataThread
     weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
     var action: ActionWithTransaction = .none {
         didSet {
@@ -98,8 +99,9 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     //MARK: Initializer
-    init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
+    init(dataManager: some DataManagerProtocol, use dataThread: DataManager.DataThread, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
         self.dataManager = dataManager
+        self.dataThread = dataThread
         self._transactionsTypeSelected = Published(wrappedValue: transactionsTypeSelected)
         self._balanceAccount = Published(wrappedValue: balanceAccount)
         fetchAllData()
@@ -130,7 +132,12 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             transactionToUpdate.comment = comment
             Task {
                 do {
-                    try await dataManager.save()
+                    switch dataThread {
+                    case .main:
+                        try await dataManager.save()
+                    case .global:
+                        try await dataManager.saveFromBackground()
+                    }
                     delegate?.updateTransaction(transactionToUpdate)
                 } catch {
                     completionHanler?(.contextSaveError)
@@ -147,7 +154,12 @@ final class AddingSpendIcomeViewModel: ObservableObject {
                 tags: tags
             )
             Task {
-                await dataManager.insert(newTransaction)
+                switch dataThread {
+                case .main:
+                    await dataManager.insert(newTransaction)
+                case .global:
+                    await dataManager.insertFromBackground(newTransaction)
+                }
                 delegate?.updateTransaction(newTransaction)
             }
         }
@@ -189,7 +201,12 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             addRemoveTag(newTag)
         }
         Task {
-            await dataManager.insert(newTag)
+            switch dataThread {
+            case .main:
+                await dataManager.insert(newTag)
+            case .global:
+                await dataManager.insertFromBackground(newTag)
+            }
             await fetchTags()
         }
     }
@@ -197,7 +214,17 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     func deleteUpdatedTransaction(completionHandler: (() -> Void)?) {
         guard let transactionToUpdate else { return }
         Task {
-            await dataManager.deleteTransaction(transactionToUpdate)
+            switch dataThread {
+            case .main:
+                await dataManager.deleteTransaction(transactionToUpdate)
+            case .global:
+                do {
+                    try await dataManager.deleteTransactionFromBackground(transactionToUpdate)
+                } catch {
+                    print("AddingSpendIcomeViewModel: deleteUpdatedTransaction: Error while deleting (from global): \(error)")
+                    return
+                }
+            }
             delegate?.updateTransaction(transactionToUpdate)
             DispatchQueue.main.async {
                 completionHandler?()
@@ -271,7 +298,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
+            var fetchedItems: [T] = []
+            switch dataThread {
+            case .main:
+                fetchedItems = try await dataManager.fetch(descriptor)
+            case .global:
+                fetchedItems = try await dataManager.fetchFromBackground(descriptor)
+            }
             //to show the last added data at the first places
             if sort.isEmpty {
                 fetchedItems.reverse()

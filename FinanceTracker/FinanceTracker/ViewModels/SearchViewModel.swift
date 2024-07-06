@@ -189,7 +189,7 @@ final class SearchViewModel: ObservableObject {
     }
     
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
-        return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
+        return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
     func refetchData() {
@@ -220,20 +220,21 @@ final class SearchViewModel: ObservableObject {
                     }
                 }
                 //Filter by balance account, category and tags
+                //Uses id to compare because of different context used for fetching
                 .filter { trans in
                     var sameBA = true
                     if let filterBA = self.filterBalanceAccount {
-                        sameBA = trans.balanceAccount == filterBA
+                        sameBA = trans.balanceAccount?.id == filterBA.id
                     }
                     
                     var sameCategory = true
                     if let filterCat = self.filterCategory {
-                        sameCategory = trans.category == filterCat
+                        sameCategory = trans.category?.id == filterCat.id
                     }
                     
                     var containsNeededTag = true
                     if !self.filterTags.isEmpty {
-                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.contains(self.filterTags.sorted { $0.name < $1.name })
+                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(self.filterTags.sorted { $0.name < $1.name }.map { $0.id })
                     }
                     
                     return (sameBA && sameCategory && containsNeededTag)
@@ -304,7 +305,6 @@ final class SearchViewModel: ObservableObject {
         }
     }
     
-    /// Fetches from background and does not use local fetch method
     private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
         let lowerBound = dateFilterRange.lowerBound
         let upperBound = dateFilterRange.upperBound
@@ -348,7 +348,7 @@ final class SearchViewModel: ObservableObject {
     }
     
     private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch(sortWithString: \.name) else {
+        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
@@ -360,17 +360,14 @@ final class SearchViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
-            sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]
+            sortBy: []
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
-            if keyPath == nil {
-                fetchedItems.reverse()
-            }
+            let fetchedItems = try await dataManager.fetch(descriptor)
             return fetchedItems
         } catch {
             print(error.localizedDescription)

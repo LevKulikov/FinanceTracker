@@ -16,8 +16,12 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func save() throws
     
+    func saveFromBackground() async throws
+    
     @MainActor
     func deleteTransaction(_ transaction: Transaction)
+    
+    func deleteTransactionFromBackground(_ transaction: Transaction) async throws
     
     /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
@@ -56,6 +60,8 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func insert<T>(_ model: T) where T : PersistentModel
     
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel
+    
     @MainActor
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
     
@@ -74,8 +80,14 @@ protocol DataManagerProtocol: AnyObject {
 }
 
 final class DataManager: DataManagerProtocol, ObservableObject {
+    enum DataThread: Equatable {
+        case main
+        case global
+    }
+    
     //MARK: - Properties
     private let container: ModelContainer
+    private var backgroundActor: BackgroundDataActor?
     private let settingsManager: any SettingsManagerProtocol
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
@@ -133,8 +145,28 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         try container.mainContext.save()
     }
     
+    func saveFromBackground() async throws {
+        if let backgroundActor {
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            try await backgroundActor!.save()
+        }
+    }
+    
     func deleteTransaction(_ transaction: Transaction) {
         container.mainContext.delete(transaction)
+    }
+    
+    func deleteTransactionFromBackground(_ transaction: Transaction) async throws {
+        if let backgroundActor {
+            await backgroundActor.delete(transaction)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.delete(transaction)
+            try await backgroundActor!.save()
+        }
     }
     
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
@@ -273,6 +305,15 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         container.mainContext.insert(model)
     }
     
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel {
+        if let backgroundActor {
+            await backgroundActor.insert(model)
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.insert(model)
+        }
+    }
+    
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
         let fetchedData = try container.mainContext.fetch(descriptor)
         if T.self is BalanceAccount.Type {
@@ -281,9 +322,14 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         return fetchedData
     }
     
+    /// Should be firstly used from background thread. Otherwise it will be execute from main thread
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel {
-        let actor = BackgroundDataActor(modelContainer: container)
-        return try await actor.fetch(descriptor)
+        if let backgroundActor {
+            return try await backgroundActor.fetch(descriptor)
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            return try await backgroundActor!.fetch(descriptor)
+        }
     }
     
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {

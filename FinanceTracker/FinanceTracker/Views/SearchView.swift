@@ -16,6 +16,7 @@ struct SearchView: View {
     @State private var showMoreFilters = false
     @State private var searchIsPreseneted: Bool = false
     @State private var showTransaction: Transaction?
+    @State private var showRefreshAlert = false
     
     //MARK: - Initializer
     init(viewModel: SearchViewModel) {
@@ -59,9 +60,16 @@ struct SearchView: View {
             .fullScreenCover(item: $showTransaction) { transaction in
                 viewModel.getTransactionView(for: transaction, namespace: namespace)
             }
-//            .onAppear {
-//                viewModel.refetchData()
-//            }
+            .refreshable {
+                showRefreshAlert = true
+            }
+            .confirmationDialog("Refresh?", isPresented: $showRefreshAlert, titleVisibility: .visible) {
+                Button("Yes, refresh") {
+                    viewModel.refetchData()
+                }
+            } message: {
+                Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, push button to refresh")
+            }
         }
         .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
     }
