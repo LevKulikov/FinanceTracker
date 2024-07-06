@@ -174,10 +174,6 @@ struct SpendIncomeView: View {
                         Button("Current date") {
                             viewModel.dateSelected = .now
                         }
-                        
-                        Button("Last date with \(viewModel.transactionsTypeSelected.rawValue)") {
-                            viewModel.setLastDateWithData()
-                        }
                     }
             }
             
