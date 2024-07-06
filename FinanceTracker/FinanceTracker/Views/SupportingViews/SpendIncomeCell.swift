@@ -82,12 +82,7 @@ struct SpendIncomeCell: View {
                 color: .yellow
             ),
         category:
-            Category(
-                type: .spending,
-                name: "TestCat",
-                iconName: "testIcon",
-                color: .green
-            ),
+                .emptyCategory,
         tags: []
     )
     

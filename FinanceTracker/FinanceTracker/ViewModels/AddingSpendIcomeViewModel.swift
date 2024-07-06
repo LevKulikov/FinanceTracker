@@ -230,7 +230,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             $0.typeRawValue == rawValue
         }
         
-        guard let fetchedCategories = await fetch(withPredicate: predicate) else {
+        guard let fetchedCategories = await fetch(withPredicate: predicate, sort: [SortDescriptor(\.placement)]) else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
@@ -254,7 +254,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     
     @MainActor
     private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch(sortWithString: \.name) else {
+        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
@@ -264,15 +264,16 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sort: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
-            sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]
+            sortBy: sort
         )
         
         do {
             var fetchedItems = try await dataManager.fetch(descriptor)
-            if keyPath == nil {
+            //to show the last added data at the first places
+            if sort.isEmpty {
                 fetchedItems.reverse()
             }
             return fetchedItems

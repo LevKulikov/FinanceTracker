@@ -28,6 +28,14 @@ final class CategoriesViewModel: ObservableObject {
     //MARK: Published props
     @Published private(set) var allCategories: [Category] = []
     @Published var caterotyType: TransactionsType = .spending
+    @Published var startReordering = false {
+        didSet {
+            if startReordering {
+                categoreisToReorder = filteredCategories
+            }
+        }
+    }
+    @Published private(set) var categoreisToReorder: [Category] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -63,10 +71,29 @@ final class CategoriesViewModel: ObservableObject {
         }
     }
     
+    func moveCategoryPlacement(from: IndexSet, to: Int) {
+        categoreisToReorder.move(fromOffsets: from, toOffset: to)
+    }
+    
+    func saveReordering(refetchAfter: Bool) {
+        defer { categoreisToReorder = [] }
+        categoreisToReorder.forEach { category in
+            guard let newIndex = categoreisToReorder.firstIndex(of: category) else { return }
+            category.placement = newIndex
+        }
+        Task {
+            try await dataManager.save()
+            if refetchAfter {
+                await fetchCategories()
+            }
+        }
+    }
+    
     //MARK: Private methods
     @MainActor
     private func fetchCategories(withAnimation animated: Bool = false, errorHandler: (() -> Void)? = nil) async {
-        let descriptor = FetchDescriptor<Category>()
+        let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.placement)])
+        
         do {
             let fetchedData = try dataManager.fetch(descriptor)
             if animated {
