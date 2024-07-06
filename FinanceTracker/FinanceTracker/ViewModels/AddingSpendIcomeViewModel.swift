@@ -43,6 +43,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     
     //MARK: Properties
     private let dataManager: any DataManagerProtocol
+    private let dataThread: DataManager.DataThread
     weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
     var action: ActionWithTransaction = .none {
         didSet {
@@ -98,8 +99,9 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     //MARK: Initializer
-    init(dataManager: some DataManagerProtocol, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
+    init(dataManager: some DataManagerProtocol, use dataThread: DataManager.DataThread, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
         self.dataManager = dataManager
+        self.dataThread = dataThread
         self._transactionsTypeSelected = Published(wrappedValue: transactionsTypeSelected)
         self._balanceAccount = Published(wrappedValue: balanceAccount)
         fetchAllData()
@@ -271,7 +273,13 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
+            var fetchedItems: [T] = []
+            switch dataThread {
+            case .main:
+                fetchedItems = try await dataManager.fetch(descriptor)
+            case .global:
+                fetchedItems = try await dataManager.fetchFromBackground(descriptor)
+            }
             //to show the last added data at the first places
             if sort.isEmpty {
                 fetchedItems.reverse()

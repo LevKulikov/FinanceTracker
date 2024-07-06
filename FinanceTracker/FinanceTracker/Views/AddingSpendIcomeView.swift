@@ -494,7 +494,7 @@ struct AddingSpendIcomeView: View {
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let transactionsTypeSelected: TransactionsType = .spending
-    let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
+    let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, use: .main, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
     
     @Namespace var namespace
     @State var action: ActionWithTransaction = .add(.now)

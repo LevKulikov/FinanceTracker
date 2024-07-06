@@ -74,8 +74,14 @@ protocol DataManagerProtocol: AnyObject {
 }
 
 final class DataManager: DataManagerProtocol, ObservableObject {
+    enum DataThread: Equatable {
+        case main
+        case global
+    }
+    
     //MARK: - Properties
     private let container: ModelContainer
+    private var backgroundActor: BackgroundDataActor?
     private let settingsManager: any SettingsManagerProtocol
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
@@ -281,9 +287,14 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         return fetchedData
     }
     
+    /// Should be firstly used from background thread. Otherwise it will be execute from main thread
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel {
-        let actor = BackgroundDataActor(modelContainer: container)
-        return try await actor.fetch(descriptor)
+        if let backgroundActor {
+            return try await backgroundActor.fetch(descriptor)
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            return try await backgroundActor!.fetch(descriptor)
+        }
     }
     
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
