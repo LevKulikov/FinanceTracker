@@ -367,7 +367,7 @@ final class SearchViewModel: ObservableObject {
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
+            let fetchedItems = try await dataManager.fetch(descriptor)
             return fetchedItems
         } catch {
             print(error.localizedDescription)

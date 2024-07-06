@@ -21,7 +21,7 @@ protocol DataManagerProtocol: AnyObject {
     @MainActor
     func deleteTransaction(_ transaction: Transaction)
     
-    func deleteTransactionFromBackground(_ transaction: Transaction) async
+    func deleteTransactionFromBackground(_ transaction: Transaction) async throws
     
     /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
@@ -158,12 +158,14 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         container.mainContext.delete(transaction)
     }
     
-    func deleteTransactionFromBackground(_ transaction: Transaction) async {
+    func deleteTransactionFromBackground(_ transaction: Transaction) async throws {
         if let backgroundActor {
             await backgroundActor.delete(transaction)
+            try await backgroundActor.save()
         } else {
             backgroundActor = BackgroundDataActor(modelContainer: container)
             await backgroundActor!.delete(transaction)
+            try await backgroundActor!.save()
         }
     }
     
