@@ -42,7 +42,8 @@ struct SpendIncomeView: View {
                         GroupedSpendIncomeCell(
                             transactions: transactionArray,
                             namespace: namespace,
-                            closeGroupFlag: $closeAllOpenedGroup
+                            closeGroupFlag: $closeAllOpenedGroup,
+                            totalValue: viewModel.transactionsValueSum
                         ) { transaction in
                             guard viewModel.tapEnabled else { return }
                             viewModel.tapEnabled = false

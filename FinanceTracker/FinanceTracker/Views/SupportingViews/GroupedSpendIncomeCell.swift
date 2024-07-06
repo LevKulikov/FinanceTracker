@@ -11,6 +11,7 @@ struct GroupedSpendIncomeCell: View {
     var transactions: [Transaction]
     var namespace: Namespace.ID
     @Binding var closeGroupFlag: Bool
+    let totalValue: Float
     var onTapTransaction: (Transaction) -> Void
     var closeOpenHandler: ((Bool) -> Void)?
     
@@ -25,30 +26,41 @@ struct GroupedSpendIncomeCell: View {
     private var transactionsValueSum: Float {
         transactions.map { $0.value }.reduce(0, +)
     }
+    private var percentageInt: Int {
+        let transValue = transactions.map { $0.value }.reduce(0, +)
+        let percentage = transValue/totalValue
+        return Int(percentage * 100)
+    }
     private var colorToSet: Color {
-        guard transactions.count > 0, let categoryColor = mutualCategory?.color else { return .clear}
-        let count = transactions.count
-        guard count < colorLimit else { return categoryColor.opacity(0.9) }
-        let opacity: Double = Double(colorLimit)/10 + Double(count-1)/10
-        return categoryColor.opacity(opacity)
+        guard let categoryColor = mutualCategory?.color else { return .clear}
+        let opacity: Double = Double(percentageInt)/100
+        let minLimit: Double = 0.5
+        let maxLimit: Double = 0.7
+        return categoryColor.opacity(opacity > minLimit ? (opacity < maxLimit ? opacity : maxLimit) : minLimit)
     }
     private var gradientStopLocations: (colorStop: CGFloat, grayStop: CGFloat) {
-        guard transactions.count > 0 else { return (0, 1)}
-        let count = transactions.count
-        guard count < colorLimit else { return (0.6, 1) }
-        let first: CGFloat = 0.05 + CGFloat(count)/10
-        let second: CGFloat = 0.9 - CGFloat(colorLimit - count)/10
+//        guard transactions.count > 0 else { return (0, 1)}
+//        let count = transactions.count
+//        guard count < colorLimit else { return (0.6, 1) }
+//        let first: CGFloat = 0.05 + CGFloat(count)/10
+//        let second: CGFloat = 0.9 - CGFloat(colorLimit - count)/10
+//        return (first, second)
+        
+        let first: CGFloat = 0 + CGFloat(percentageInt)/100
+        let second: CGFloat = 1.25 - CGFloat(100 - percentageInt)/100
         return (first, second)
     }
     
     init(transactions: [Transaction], 
          namespace: Namespace.ID,
          closeGroupFlag: Binding<Bool>,
+         totalValue: Float,
          onTapTransaction: @escaping (Transaction) -> Void,
          closeOpenHandler: ((Bool) -> Void)? = nil) {
         self.transactions = transactions
         self.namespace = namespace
         self._closeGroupFlag = closeGroupFlag
+        self.totalValue = totalValue
         self.onTapTransaction = onTapTransaction
         self.closeOpenHandler = closeOpenHandler
     }
@@ -110,8 +122,9 @@ struct GroupedSpendIncomeCell: View {
                     .padding(.bottom, 2.6)
                     .lineLimit(1)
                 
-                Text("(\(transactions.count))")
+                Text("\(percentageInt)%")
                     .font(.footnote)
+                    .foregroundStyle(.secondary)
                     .padding(.bottom, 2.6)
             }
             .layoutPriority(1)
@@ -185,7 +198,7 @@ struct GroupedSpendIncomeCell: View {
     @Namespace var namespace
     @State var flag = false
     
-    return GroupedSpendIncomeCell(transactions: viewModel.filteredGroupedTranactions.first ?? [], namespace: namespace, closeGroupFlag: $flag) {
+    return GroupedSpendIncomeCell(transactions: viewModel.filteredGroupedTranactions.first ?? [], namespace: namespace, closeGroupFlag: $flag, totalValue: 100) {
         print($0.typeRawValue)
     }
 }
