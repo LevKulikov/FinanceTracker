@@ -36,7 +36,8 @@ final class AddingCategoryViewModel: ObservableObject {
             type: transactionType,
             name: name,
             iconName: iconName,
-            color: categoryColor
+            color: categoryColor, 
+            placement: 0
         )
     }
     
@@ -79,7 +80,8 @@ final class AddingCategoryViewModel: ObservableObject {
                 type: transactionType,
                 name: name,
                 iconName: iconName,
-                color: categoryColor
+                color: categoryColor, 
+                placement: availableCategories.count + 1
             )
             Task {
                 await dataManager.insert(newCategory)

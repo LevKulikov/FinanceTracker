@@ -14,6 +14,7 @@ struct CategoriesView: View {
     }
     
     //MARK: - Properties
+    @Environment(\.colorScheme) var colorScheme
     @Namespace private var namespace
     @StateObject private var viewModel: CategoriesViewModel
     @State private var navigationPath = NavigationPath()
@@ -51,20 +52,32 @@ struct CategoriesView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 120))]) {
-                    ForEach(viewModel.filteredCategories) { category in
-                        CategoryItemView(category: category, selectedCategory: .constant(nil))
-                            .onTapGesture {
-                                navigationPath.append(ActionWithCategory.update(category))
-                            }
-                            .contextMenu {
-                                Button("Delete", systemImage: "trash", role: .destructive) {
-                                    categoryToDeleteFlag = category
+                VStack {
+                    HStack {
+                        Button {
+                            viewModel.startReordering = true
+                        } label: {
+                            Label("Reorder", systemImage: "list.dash")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding()
+                    .buttonStyle(.bordered)
+                    
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 120))]) {
+                        ForEach(viewModel.filteredCategories) { category in
+                            CategoryItemView(category: category, selectedCategory: .constant(nil))
+                                .onTapGesture {
+                                    navigationPath.append(ActionWithCategory.update(category))
                                 }
-                            }
+                                .contextMenu {
+                                    Button("Delete", systemImage: "trash", role: .destructive) {
+                                        categoryToDeleteFlag = category
+                                    }
+                                }
+                        }
                     }
                 }
-                .padding(.vertical)
             }
             .navigationTitle("Categories")
             .navigationDestination(for: ActionWithCategory.self) { action in
@@ -86,6 +99,9 @@ struct CategoriesView: View {
                     .presentationDetents([.height(350)])
                     .presentationBackground(Material.thin)
                     .presentationCornerRadius(30)
+            }
+            .sheet(isPresented: $viewModel.startReordering) {
+                reorderView
             }
             .confirmationDialog(
                 "Delete category?",
@@ -120,6 +136,59 @@ struct CategoriesView: View {
         .labelsHidden()
         .pickerStyle(.segmented)
         .frame(maxWidth: 250)
+    }
+    
+    private var reorderView: some View {
+        VStack(spacing: 0) {
+            Text("Drag and drop to reorder")
+                .padding()
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(.secondary)
+                .bold()
+                .background {
+                    Rectangle()
+                        .fill(colorScheme == .light ? Color(.systemGray6) : .clear)
+                }
+            
+            List {
+                ForEach(viewModel.categoreisToReorder) { category in
+                    HStack {
+                        FTAppAssets.iconImageOrEpty(name: category.iconName)
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(category.color)
+                        
+                        Text(category.name)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "line.3.horizontal")
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .onMove(perform: { from, to in
+                    viewModel.moveCategoryPlacement(from: from, to: to)
+                })
+                
+                Section {
+                    Rectangle()
+                        .fill(.clear)
+                        .listRowBackground(Color.clear)
+                }
+            }
+        }
+        .overlay(alignment: .bottom) {
+            Button {
+                viewModel.saveReordering(refetchAfter: true)
+                viewModel.startReordering = false
+            } label: {
+                Text("Save")
+                    .frame(height: 25)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding()
+            .padding(.horizontal)
+        }
     }
     
     private var replacmentView: some View {

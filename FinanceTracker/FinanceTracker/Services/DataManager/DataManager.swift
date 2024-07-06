@@ -80,22 +80,22 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
     private let defaultSpendingCategories: [Category] = [
-        .init(type: .spending, name: "Groceries", iconName: "shopping-cart", color: .blue),
-        .init(type: .spending, name: "Сafes", iconName: "003-cutlery", color: .yellow),
-        .init(type: .spending, name: "Transport", iconName: "car", color: .orange),
-        .init(type: .spending, name: "Entertainments", iconName: "001-gamepad", color: .indigo),
-        .init(type: .spending, name: "Education", iconName: "016-book", color: .purple),
-        .init(type: .spending, name: "Health", iconName: "018-heart", color: .red),
-        .init(type: .spending, name: "Gifts", iconName: "031-gift", color: .mint),
-        .init(type: .spending, name: "Home", iconName: "home", color: .brown),
-        .init(type: .spending, name: "Family", iconName: "010-love-3", color: .pink),
-        .init(type: .spending, name: "Other", iconName: "047-upload", color: .red),
+        .init(type: .spending, name: "Groceries", iconName: "shopping-cart", color: .blue, placement: 1),
+        .init(type: .spending, name: "Сafes", iconName: "003-cutlery", color: .yellow, placement: 2),
+        .init(type: .spending, name: "Transport", iconName: "car", color: .orange, placement: 3),
+        .init(type: .spending, name: "Entertainments", iconName: "001-gamepad", color: .indigo, placement: 4),
+        .init(type: .spending, name: "Education", iconName: "016-book", color: .purple, placement: 5),
+        .init(type: .spending, name: "Health", iconName: "018-heart", color: .red, placement: 6),
+        .init(type: .spending, name: "Gifts", iconName: "031-gift", color: .mint, placement: 7),
+        .init(type: .spending, name: "Home", iconName: "home", color: .brown, placement: 8),
+        .init(type: .spending, name: "Family", iconName: "010-love-3", color: .pink, placement: 9),
+        .init(type: .spending, name: "Other", iconName: "047-upload", color: .red, placement: 10),
     ]
     private let defaultIncomeCategories: [Category] = [
-        .init(type: .income, name: "Gifts", iconName: "031-gift", color: .mint),
-        .init(type: .income, name: "Salary", iconName: "1-economy-004-economy", color: .green),
-        .init(type: .income, name: "Interest", iconName: "1-economy-007-bank", color: .purple),
-        .init(type: .income, name: "Other", iconName: "download", color: .green),
+        .init(type: .income, name: "Gifts", iconName: "031-gift", color: .mint, placement: 3),
+        .init(type: .income, name: "Salary", iconName: "1-economy-004-economy", color: .green, placement: 1),
+        .init(type: .income, name: "Interest", iconName: "1-economy-007-bank", color: .purple, placement: 2),
+        .init(type: .income, name: "Other", iconName: "download", color: .green, placement: 4),
     ]
     
     var tagDefaultColor: Color? {

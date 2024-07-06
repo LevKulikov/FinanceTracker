@@ -61,13 +61,14 @@ final class BalanceAccount {
 //MARK: - Category Model
 @Model
 final class Category {
-    static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear)
+    static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear, placement: 0)
     
     //MARK: Properties
     @Attribute(.unique) let id: String
     var typeRawValue: String
     var name: String
     var iconName: String
+    var placement: Int = 0
     @Attribute(.transformable(by: UIColorValueTransformer.self)) var uiColor: UIColor
     
     //MARK: Computed Properties
@@ -94,19 +95,20 @@ final class Category {
     }
     
     //MARK: Init
-    init(id: String, typeRawValue: String, name: String, iconName: String, uiColor: UIColor) {
+    init(id: String, typeRawValue: String, name: String, iconName: String, placement: Int, uiColor: UIColor) {
         self.id = id
         self.typeRawValue = typeRawValue
         self.name = name
         self.iconName = iconName
+        self.placement = placement
         self.uiColor = uiColor
     }
     
-    convenience init(type: TransactionsType, name: String, iconName: String, color: Color) {
+    convenience init(type: TransactionsType, name: String, iconName: String, color: Color, placement: Int) {
         let id = UUID().uuidString
         let typeRawValue = type.rawValue
         let uiColor = UIColor(color)
-        self.init(id: id, typeRawValue: typeRawValue, name: name, iconName: iconName, uiColor: uiColor)
+        self.init(id: id, typeRawValue: typeRawValue, name: name, iconName: iconName, placement: placement, uiColor: uiColor)
     }
 }
 
