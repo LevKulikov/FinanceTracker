@@ -41,8 +41,23 @@ struct TransactionBarChart: View {
     @Binding var perDate: BarChartPerDateFilter
     @Binding var transactionType: TransactionFilterTypes
     
+    private var maxVisibleBars: Int {
+        let isBothTypesShown = transactionType == .both
+        if FTAppAssets.currentUserDevise == .phone {
+            return isBothTypesShown ? 5 : 10
+        }
+        let windowWidth = FTAppAssets.getWindowSize().width
+        
+        switch windowWidth {
+        case ...430:
+            return isBothTypesShown ? 5 : 10
+        default:
+            let ratio = 430 / (isBothTypesShown ? 5 : 10)
+            return Int(windowWidth) / ratio
+        }
+    }
     private var maxXVisibleLenth: Int {
-        let multiplier = transactionType == .both ? 5 : 10
+        let multiplier = maxVisibleBars
         let seconds: Int
         switch perDate {
         case .perDay:

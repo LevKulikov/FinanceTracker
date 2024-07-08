@@ -65,6 +65,12 @@ struct FTAppAssets {
         return windowScene.screen.bounds.size
     }
     
+    static func getWindowSize() -> CGSize {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
+        guard let size = windowScene.keyWindow?.frame.size else { return .zero }
+        return size
+    }
+    
     private static func getIconNames() -> [String] {
         let fileManager = FileManager.default
         let bundleURL = Bundle.main.bundleURL

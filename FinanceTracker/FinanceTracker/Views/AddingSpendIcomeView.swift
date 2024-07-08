@@ -45,6 +45,15 @@ struct AddingSpendIcomeView: View {
         !showAddingBalanceAccountView && (showUpdatingCategoryView == nil)
     }
     private var userIdiom: UIUserInterfaceIdiom { UIDevice.current.userInterfaceIdiom }
+    private var frameMaxWidthHeight: (maxWidth: CGFloat, maxHeight: CGFloat) {
+        if userIdiom == .phone {
+            return (maxWidth: .infinity, maxHeight: .infinity)
+        }
+        let windowSize = FTAppAssets.getWindowSize()
+        let width: CGFloat = 600
+        let height: CGFloat = windowSize.width > width ? 900 : .infinity
+        return (maxWidth: width, maxHeight: height)
+    }
     
     //MARK: Init
     init(action: Binding<ActionWithTransaction>, namespace: Namespace.ID, viewModel: AddingSpendIcomeViewModel) {
@@ -107,7 +116,7 @@ struct AddingSpendIcomeView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .frame(maxWidth: 600, maxHeight: 900)
+            .frame(maxWidth: frameMaxWidthHeight.maxWidth, maxHeight: frameMaxWidthHeight.maxHeight)
             .background {
                 if userIdiom == .phone {
                     Rectangle()
