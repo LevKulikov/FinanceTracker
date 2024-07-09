@@ -11,6 +11,8 @@ import SwiftUI
 struct FTAppAssets {
     //MARK: Properteis
     static var defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
+    static var maxCustomSheetWidth: CGFloat = 600
+    static var maxCustomSheetHeight: CGFloat = 900
     
     static var availableDateRange: ClosedRange<Date> {
         Date(timeIntervalSince1970: 0)...(Date.now.endOfDay() ?? .now)

@@ -17,6 +17,12 @@ struct SearchView: View {
     @State private var searchIsPreseneted: Bool = false
     @State private var showTransaction: Transaction?
     @State private var showRefreshAlert = false
+    private var maxFiltersWidth: CGFloat {
+        if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
+            return 370
+        }
+        return .infinity
+    }
     
     //MARK: - Initializer
     init(viewModel: SearchViewModel) {
@@ -76,35 +82,42 @@ struct SearchView: View {
     
     //MARK: - Computed View props
     private var headerView: some View {
-        VStack {
-            HStack {
-                Menu(viewModel.dateFilterType == .customDateRange ? "DR" : viewModel.dateFilterType.rawValue) {
-                    Picker("Date type", selection: $viewModel.dateFilterType) {
-                        ForEach(DateFilterType.allCases, id: \.rawValue) { dateType in
-                            Text(dateType.rawValue)
-                                .tag(dateType)
+        HStack {
+            if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
+                Spacer()
+            }
+            
+            VStack {
+                HStack {
+                    Menu(viewModel.dateFilterType == .customDateRange ? "DR" : viewModel.dateFilterType.rawValue, systemImage: "chevron.up.chevron.down") {
+                        Picker("Date type", selection: $viewModel.dateFilterType) {
+                            ForEach(DateFilterType.allCases, id: \.rawValue) { dateType in
+                                Text(dateType.rawValue)
+                                    .tag(dateType)
+                            }
                         }
                     }
-                }
-                .modifier(RoundedRectMenu())
-                
-                Spacer()
-                
-                switch viewModel.dateFilterType {
-                case .day:
-                    DatePicker("One day picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
-                        .labelsHidden()
-                case .week:
-                    DatePicker("Week picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
-                        .labelsHidden()
-                case .month:
-                    MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
-                case .year:
-                    MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .year)
-                case .customDateRange:
-                    DateRangePicker(startDate: $viewModel.filterDateStart, endDate: $viewModel.filterDateEnd, dateRange: FTAppAssets.availableDateRange)
+                    .foregroundStyle(.primary)
+                    
+                    Spacer()
+                    
+                    switch viewModel.dateFilterType {
+                    case .day:
+                        DatePicker("One day picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
+                            .labelsHidden()
+                    case .week:
+                        DatePicker("Week picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
+                            .labelsHidden()
+                    case .month:
+                        MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
+                    case .year:
+                        MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .year)
+                    case .customDateRange:
+                        DateRangePicker(startDate: $viewModel.filterDateStart, endDate: $viewModel.filterDateEnd, dateRange: FTAppAssets.availableDateRange)
+                    }
                 }
             }
+            .frame(maxWidth: maxFiltersWidth)
         }
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -112,44 +125,51 @@ struct SearchView: View {
     }
     
     private var showFilterButton: some View {
-        VStack {
-            if !showMoreFilters {
-                Button {
-                    withAnimation {
-                        showMoreFilters = true
-                    }
-                } label: {
-                    Text("Show more filter")
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 8)
-                        .background {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(.secondarySystemFill))
-                        }
-                        .matchedGeometryEffect(id: "moreFilterBackground", in: namespace)
-                }
-            } else {
-                HStack {
-                    Text("Filters")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                    
-                    Spacer()
-                    
-                    Button("Hide", systemImage: "chevron.up") {
-                        withAnimation {
-                            showMoreFilters = false
-                        }
-                    }
-                    .font(.caption)
-                    .buttonBorderShape(.capsule)
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.secondary)
-                }
-                .transition(.blurReplace)
-                
-                filtersView
+        HStack {
+            if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
+                Spacer()
             }
+            
+            VStack {
+                if !showMoreFilters {
+                    Button {
+                        withAnimation {
+                            showMoreFilters = true
+                        }
+                    } label: {
+                        Text("Show more filter")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 8)
+                            .background {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.secondarySystemFill))
+                            }
+                            .matchedGeometryEffect(id: "moreFilterBackground", in: namespace)
+                    }
+                } else {
+                    HStack {
+                        Text("Filters")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                        
+                        Spacer()
+                        
+                        Button("Hide", systemImage: "chevron.up") {
+                            withAnimation {
+                                showMoreFilters = false
+                            }
+                        }
+                        .font(.caption)
+                        .buttonBorderShape(.capsule)
+                        .buttonStyle(.bordered)
+                        .foregroundStyle(.secondary)
+                    }
+                    .transition(.blurReplace)
+                    
+                    filtersView
+                }
+            }
+            .frame(maxWidth: maxFiltersWidth)
         }
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

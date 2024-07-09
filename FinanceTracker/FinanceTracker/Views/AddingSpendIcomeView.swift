@@ -50,8 +50,8 @@ struct AddingSpendIcomeView: View {
             return (maxWidth: .infinity, maxHeight: .infinity)
         }
         let windowSize = FTAppAssets.getWindowSize()
-        let width: CGFloat = 600
-        let height: CGFloat = windowSize.width > width ? 900 : .infinity
+        let width: CGFloat = FTAppAssets.maxCustomSheetWidth
+        let height: CGFloat = windowSize.width > width ? FTAppAssets.maxCustomSheetHeight : .infinity
         return (maxWidth: width, maxHeight: height)
     }
     
