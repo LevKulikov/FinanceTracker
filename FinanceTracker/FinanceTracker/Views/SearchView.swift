@@ -68,7 +68,7 @@ struct SearchView: View {
                     viewModel.refetchData()
                 }
             } message: {
-                Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, push button to refresh")
+                Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")
             }
         }
         .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))

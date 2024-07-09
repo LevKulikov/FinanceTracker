@@ -46,6 +46,7 @@ struct CustomTabView: View  {
         .overlay(alignment: .bottom) {
             customTabView
                 .offset(y: availableYOffset)
+                .disabled(!viewModel.showTabBar)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
         .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
