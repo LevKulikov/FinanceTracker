@@ -29,7 +29,7 @@ extension Date {
     func endOfDay(calendar: Calendar = Calendar.current) -> Date? {
         guard let nextDay = calendar.date(byAdding: .day, value: 1, to: self) else { return nil }
         let startOfNextDay = calendar.startOfDay(for: nextDay)
-        return calendar.date(byAdding: .nanosecond, value: -1, to: startOfNextDay)
+        return calendar.date(byAdding: .nanosecond, value: -50_000_000, to: startOfNextDay)
     }
     
     func startOfWeek(using calendar: Calendar = .current) -> Date? {

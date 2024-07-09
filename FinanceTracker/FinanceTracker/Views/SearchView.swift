@@ -92,10 +92,10 @@ struct SearchView: View {
                 
                 switch viewModel.dateFilterType {
                 case .day:
-                    DatePicker("One day picker", selection: $viewModel.filterDate, displayedComponents: .date)
+                    DatePicker("One day picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
                         .labelsHidden()
                 case .week:
-                    DatePicker("Week picker", selection: $viewModel.filterDate, displayedComponents: .date)
+                    DatePicker("Week picker", selection: $viewModel.filterDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
                         .labelsHidden()
                 case .month:
                     MonthYearPicker(date: $viewModel.filterDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)

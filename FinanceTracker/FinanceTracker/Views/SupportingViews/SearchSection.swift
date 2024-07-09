@@ -26,7 +26,7 @@ struct SearchSection: View {
     //MARK: Body
     var body: some View {
         Section {
-            ForEach(transactionGroupData.transactions) { transaction in
+            ForEach(transactionGroupData.transactions.reversed()) { transaction in
                 SearchTransactionRow(transaction: transaction)
                     .onTapGesture {
                         onTapAction(transaction)
