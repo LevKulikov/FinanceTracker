@@ -24,19 +24,20 @@ struct CategoriesView: View {
     /// Category to be replaced and deleted
     @State private var categoryToDelete: Category? {
         didSet {
-            if categoryToDelete == categoryToReplaceTo {
+            if let categoryToDelete, categoryToDelete == categoryToReplaceTo {
                 categoryToReplaceTo = nil
             }
         }
     }
     @State private var categoryToReplaceTo: Category? {
         didSet {
-            if categoryToDelete == categoryToReplaceTo {
+            if let categoryToReplaceTo, categoryToDelete == categoryToReplaceTo {
                 categoryToDelete = nil
             }
         }
     }
     @State private var whatIsReplaced: WhatIsReplaced?
+    @State private var rotateReplaceArrow = false
     
     private let deleteCategoryId = "deleteCategoryId"
     private let replaceToCategoryId = "replaceToCategoryId"
@@ -219,7 +220,7 @@ struct CategoriesView: View {
             }
             .buttonStyle(.bordered)
             .buttonBorderShape(.capsule)
-            .disabled(categoryToReplaceTo == nil)
+            .disabled((categoryToReplaceTo == nil || categoryToDelete == nil || categoryToReplaceTo == categoryToDelete))
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -227,6 +228,7 @@ struct CategoriesView: View {
                 whatIsReplaced = nil
             }
         }
+        .frame(maxWidth: 450, maxHeight: 400)
     }
     
     private var categoryToReplaceSelectionView: some View {
@@ -262,6 +264,16 @@ struct CategoriesView: View {
                 .font(.system(size: 50))
                 .padding(.horizontal)
                 .foregroundStyle(.secondary)
+                .rotationEffect(.degrees(rotateReplaceArrow ? 360 : 0))
+                .onTapGesture {
+//                    categoryToReplaceTo  categoryToDelete
+                    let buffer = categoryToReplaceTo
+                    withAnimation {
+                        rotateReplaceArrow.toggle()
+                        categoryToReplaceTo = categoryToDelete
+                        categoryToDelete = buffer
+                    }
+                }
             
             Spacer()
             
