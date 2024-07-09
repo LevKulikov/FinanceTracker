@@ -95,6 +95,21 @@ struct CategoriesView: View {
                     }
                 }
             }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        let xTrans = value.translation.width
+                        let screenWidth = FTAppAssets.getWindowSize().width
+                        // plus is back, minus is forward
+                        if abs(xTrans) > screenWidth / 4 {
+                            if xTrans > 0 {
+                                viewModel.caterotyType = .spending
+                            } else {
+                                viewModel.caterotyType = .income
+                            }
+                        }
+                    }
+            )
             .sheet(isPresented: $showReplacementSheet) {
                 replacmentView
                     .presentationDetents([.height(350)])
