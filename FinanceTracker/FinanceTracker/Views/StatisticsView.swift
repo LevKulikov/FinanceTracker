@@ -10,6 +10,12 @@ import SwiftUI
 struct StatisticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: StatisticsViewModel
+    private var windowWidth: CGFloat {
+        FTAppAssets.getWindowSize().width
+    }
+    private var pieChartHeight: CGFloat {
+        return 350
+    }
     
     //MARK: - Init
     init(viewModel: StatisticsViewModel) {
@@ -21,11 +27,19 @@ struct StatisticsView: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    totalValueSection
-                        .padding(.bottom)
-
-                    pieChartSection
-                        .padding(.bottom)
+                    if windowWidth <= FTAppAssets.maxCustomSheetWidth {
+                        totalValueSection
+                            .padding(.bottom)
+                        
+                        pieChartSection
+                            .padding(.bottom)
+                    } else {
+                        HStack {
+                            totalValueSection
+                            
+                            pieChartSection
+                        }
+                    }
                     
                     barChartSection
                     
@@ -95,6 +109,14 @@ struct StatisticsView: View {
                 
                 Spacer()
             }
+            
+            if windowWidth > FTAppAssets.maxCustomSheetWidth {
+                Divider()
+                
+                //TODO: Continue tags
+                
+                Spacer()
+            }
         }
         .padding()
         .background {
@@ -129,7 +151,6 @@ struct StatisticsView: View {
             }
             
             TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
-                .frame(height: 200)
                 .padding(.bottom)
             
             pieChartMenuDatePickerView
@@ -139,6 +160,7 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+        .frame(height: pieChartHeight)
     }
     
     private var pieChartMenuDatePickerView: some View {
