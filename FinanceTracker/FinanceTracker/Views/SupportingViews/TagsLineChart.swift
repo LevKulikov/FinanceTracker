@@ -18,7 +18,7 @@ struct TagsLineChart: View {
     //MARK: - Properties
     let tagData: [TagChartData]
     let maxValue: Float
-    private var rowHeight: CGFloat = 30
+    private var rowHeight: CGFloat = 27
     
     //MARK: - Init
     init(tagData: [TagChartData]) {
@@ -46,6 +46,7 @@ struct TagsLineChart: View {
             ForEach(tagData) { singleTagData in
                 Text("# \(singleTagData.tag.name)")
                     .foregroundStyle(.secondary)
+                    .font(.subheadline)
                     .lineLimit(1)
                     .padding(.horizontal)
                     .padding(.vertical, 5)
@@ -83,6 +84,7 @@ struct TagsLineChart: View {
             ForEach(tagData) { singleTagData in
                 Text(FTFormatters.numberFormatterWithDecimals.string(for: singleTagData.total) ?? "Err")
                     .foregroundStyle(.secondary)
+                    .font(.subheadline)
                     .frame(height: rowHeight)
             }
         }

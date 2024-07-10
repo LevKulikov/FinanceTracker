@@ -116,12 +116,11 @@ struct StatisticsView: View {
                 Spacer()
             }
             
+            Divider()
+            
+            tagsStatSection
+            
             if windowWidth > FTAppAssets.maxCustomSheetWidth {
-                Divider()
-                
-                //TODO: Continue tags
-                tagsStatSection
-                
                 Spacer()
             }
         }
@@ -183,7 +182,6 @@ struct StatisticsView: View {
             .buttonBorderShape(.capsule)
             .buttonStyle(.bordered)
         }
-        .font(.title2)
     }
     
     private var noOneTagIsUsedView: some View {
@@ -191,7 +189,6 @@ struct StatisticsView: View {
             Text("You do not have \(viewModel.transactionTypeForTags.rawValue) with tags")
         }
         .foregroundStyle(.secondary)
-        .font(.title2)
     }
     
     private var pieChartSection: some View {

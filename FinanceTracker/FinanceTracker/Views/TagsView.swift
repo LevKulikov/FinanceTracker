@@ -68,6 +68,7 @@ struct TagsView: View {
                             .foregroundStyle(.secondary)
                         
                         Button("Create tag") {
+                            tagAddingTextFieldFocused = !showAddingRow
                             withAnimation {
                                 showAddingRow.toggle()
                             }
