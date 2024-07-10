@@ -10,6 +10,10 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
+protocol StatisticsViewModelDelegate: AnyObject {
+    func showTabBar(_ show: Bool)
+}
+
 enum TransactionFilterTypes: String, Equatable, CaseIterable {
     case both = "Both types"
     case spending = "Spending"
@@ -40,7 +44,14 @@ final class StatisticsViewModel: ObservableObject {
         case barChart
     }
     
+    enum NavigationDestination: Hashable {
+        case tagsView
+    }
+    
     //MARK: - Properties
+    /// Delegate for StatisticsViewModel
+    weak var delegate: (any StatisticsViewModelDelegate)?
+    /// Current calendar
     let calendar = Calendar.current
     /// Defines if Pie Chart Date range can be moved backward
     var pieDateRangeCanBeMovedBack: Bool {
@@ -85,7 +96,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: For tags statistics
     /// Data array to be provided in tags statistics
-    @Published private(set) var tagsTotalData: [(tag: Tag, total: Float)] = []
+    @Published private(set) var tagsTotalData: [TagChartData] = []
     /// Transaction type to select of which transactins should be shown as total for tags data
     @Published var transactionTypeForTags: TransactionsType = .spending {
         didSet {
@@ -216,6 +227,10 @@ final class StatisticsViewModel: ObservableObject {
         balanceAccountToFilter = toset
     }
     
+    func getTagsView() -> some View {
+        return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
+    }
+    
     //MARK: Private methods
     /// Prevents recalculation of different data types until provided block of code is executed. This method is needed because of data calculation is caused by didSet observer
     /// - Parameters:
@@ -282,6 +297,9 @@ final class StatisticsViewModel: ObservableObject {
             guard !transactionsWithTags.isEmpty else {
                 DispatchQueue.main.async {
                     self.tagsDataIsCalculating = false
+                    withAnimation {
+                        self.tagsTotalData = []
+                    }
                 }
                 return
             }
@@ -300,7 +318,7 @@ final class StatisticsViewModel: ObservableObject {
                     for tuple in tagDict.value {
                         total += tuple.value
                     }
-                    return (tag: tagDict.key, total: total)
+                    return TagChartData(tag: tagDict.key, total: total)
                 }
                 .sorted { $0.total > $1.total}
             
@@ -631,7 +649,7 @@ final class StatisticsViewModel: ObservableObject {
     }
 }
 
-//MARK: - Extensions
+//MARK: - Extensions for CustomTabViewModelDelegate
 extension StatisticsViewModel: CustomTabViewModelDelegate {
     var id: String {
         "StatisticsViewModel"
@@ -647,6 +665,32 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             DispatchQueue.main.async { [weak self] in
                 self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
+        }
+    }
+}
+
+extension StatisticsViewModel: TagsViewModelDelegate {
+    func didDeleteTag() {
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTagWithTransactions() {
+        refreshData()
+    }
+    
+    func didAddTag() {
+        Task {
+            await fetchTags()
+        }
+    }
+    
+    func didUpdatedTag() {
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
         }
     }
 }

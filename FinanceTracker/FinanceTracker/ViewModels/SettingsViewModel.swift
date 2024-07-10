@@ -102,6 +102,14 @@ extension SettingsViewModel: TagsViewModelDelegate {
     func didDeleteTagWithTransactions() {
         delegate?.didUpdateSettingsSection(.data)
     }
+    
+    func didAddTag() {
+        delegate?.didUpdateSettingsSection(.tags)
+    }
+    
+    func didUpdatedTag() {
+        delegate?.didUpdateSettingsSection(.tags)
+    }
 }
 
 //MARK: Extension for ManageDataViewModelDelegate

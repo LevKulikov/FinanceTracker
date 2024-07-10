@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Charts
 
 struct StatisticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: StatisticsViewModel
+    @State private var showTagsView = false
     private var windowWidth: CGFloat {
         FTAppAssets.getWindowSize().width
     }
@@ -39,6 +41,7 @@ struct StatisticsView: View {
                             
                             pieChartSection
                         }
+                        .frame(maxHeight: pieChartHeight)
                     }
                     
                     barChartSection
@@ -65,6 +68,9 @@ struct StatisticsView: View {
                 }
             }
             .navigationTitle("Statistics")
+            .sheet(isPresented: $showTagsView) {
+                viewModel.getTagsView()
+            }
         }
     }
     
@@ -114,6 +120,7 @@ struct StatisticsView: View {
                 Divider()
                 
                 //TODO: Continue tags
+                tagsStatSection
                 
                 Spacer()
             }
@@ -123,6 +130,68 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+    }
+    
+    private var tagsStatSection: some View {
+        VStack {
+            HStack {
+                Text("Tags stats")
+                    .font(.title2)
+                    .bold()
+                
+                if viewModel.tagsDataIsCalculating {
+                    ProgressView()
+                        .padding(.leading, 5)
+                }
+                
+                Spacer()
+                
+                Menu(viewModel.transactionTypeForTags.rawValue) {
+                    Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
+                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
+                            Text(type.rawValue)
+                                .tag(type)
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            
+            if !viewModel.allTags.isEmpty {
+                if !viewModel.tagsTotalData.isEmpty {
+                    TagsLineChart(tagData: viewModel.tagsTotalData)
+                } else {
+                    noOneTagIsUsedView
+                }
+            } else {
+                noSavedTagsView
+            }
+        }
+    }
+    
+    private var noSavedTagsView: some View {
+        VStack {
+            Text("You do not have any saved tag.")
+                .foregroundStyle(.secondary)
+            
+            Text("It is good opportunity to try!")
+                .foregroundStyle(.secondary)
+            
+            Button("Create tag") {
+                showTagsView.toggle()
+            }
+            .buttonBorderShape(.capsule)
+            .buttonStyle(.bordered)
+        }
+        .font(.title2)
+    }
+    
+    private var noOneTagIsUsedView: some View {
+        VStack {
+            Text("You do not have \(viewModel.transactionTypeForTags.rawValue) with tags")
+        }
+        .foregroundStyle(.secondary)
+        .font(.title2)
     }
     
     private var pieChartSection: some View {
@@ -287,7 +356,6 @@ struct StatisticsView: View {
     }
     
     //MARK: - Methods
-    
 }
 
 #Preview {
