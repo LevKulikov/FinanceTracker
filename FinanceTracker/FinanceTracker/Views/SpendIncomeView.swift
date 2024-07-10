@@ -219,7 +219,7 @@ struct SpendIncomeView: View {
     
     private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
         let xTrans = value.translation.width
-        let screenWidth = FTAppAssets.getScreenSize().width
+        let screenWidth = FTAppAssets.getWindowSize().width
         // plus is back, minus is forward
         if abs(xTrans) > screenWidth / 4 {
             if xTrans > 0, viewModel.movingBackwardDateAvailable {

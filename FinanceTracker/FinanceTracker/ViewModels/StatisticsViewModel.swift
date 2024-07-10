@@ -10,6 +10,10 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
+protocol StatisticsViewModelDelegate: AnyObject {
+    func showTabBar(_ show: Bool)
+}
+
 enum TransactionFilterTypes: String, Equatable, CaseIterable {
     case both = "Both types"
     case spending = "Spending"
@@ -35,11 +39,19 @@ final class StatisticsViewModel: ObservableObject {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
         case totalValue
+        case tagsValue
         case pieChart
         case barChart
     }
     
+    enum NavigationDestination: Hashable {
+        case tagsView
+    }
+    
     //MARK: - Properties
+    /// Delegate for StatisticsViewModel
+    weak var delegate: (any StatisticsViewModelDelegate)?
+    /// Current calendar
     let calendar = Calendar.current
     /// Defines if Pie Chart Date range can be moved backward
     var pieDateRangeCanBeMovedBack: Bool {
@@ -63,10 +75,12 @@ final class StatisticsViewModel: ObservableObject {
     private var availableYearMonthWeekDates: [Date] = []
     /// Array of years with months and days those are available
     private var availableYearMonthDayDates: [Date] = []
-    
-    //MARK: Published
     /// All transactions
     private var transactions: [Transaction] = []
+    /// All tags
+    private(set) var allTags: [Tag] = []
+    
+    //MARK: Published
     /// All balance accounts
     @Published private(set) var balanceAccounts: [BalanceAccount] = []
     /// Total value of balance of set account (initial balance + income - spendings)
@@ -79,6 +93,18 @@ final class StatisticsViewModel: ObservableObject {
     }
     /// Flag to determine if data is currently fetching, works in fetchAllData method
     @Published private(set) var isFetchingData = false
+    
+    //MARK: For tags statistics
+    /// Data array to be provided in tags statistics
+    @Published private(set) var tagsTotalData: [TagChartData] = []
+    /// Transaction type to select of which transactins should be shown as total for tags data
+    @Published var transactionTypeForTags: TransactionsType = .spending {
+        didSet {
+            calculateTagsTotal()
+        }
+    }
+    /// Flag to identify if tags statistics data is currently being calculate
+    @Published private(set) var tagsDataIsCalculating: Bool = false
     
     //MARK: For pie chart
     /// Data Array to be provided in pie chart
@@ -147,6 +173,7 @@ final class StatisticsViewModel: ObservableObject {
     func refreshData(compeletionHandler: (() -> Void)? = nil) {
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
+            self?.calculateTagsTotal()
             self?.calculateDataForPieChart()
             self?.calculateDataForBarChart()
             compeletionHandler?()
@@ -200,6 +227,10 @@ final class StatisticsViewModel: ObservableObject {
         balanceAccountToFilter = toset
     }
     
+    func getTagsView() -> some View {
+        return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
+    }
+    
     //MARK: Private methods
     /// Prevents recalculation of different data types until provided block of code is executed. This method is needed because of data calculation is caused by didSet observer
     /// - Parameters:
@@ -212,12 +243,15 @@ final class StatisticsViewModel: ObservableObject {
         switch calculationData {
         case .totalValue:
             calculateTotalForBalanceAccount()
+        case .tagsValue:
+            calculateTagsTotal()
         case .pieChart:
             calculateDataForPieChart()
         case .barChart:
             calculateDataForBarChart()
         case .none:
             calculateTotalForBalanceAccount()
+            calculateTagsTotal()
             calculateDataForPieChart()
             calculateDataForBarChart()
         }
@@ -243,6 +277,56 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.totalForBalanceAccount = totalValue
+            }
+        }
+    }
+    
+    /// Calculate total value for all time tags spending or income
+    private func calculateTagsTotal() {
+        guard isCalculationAllowed else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.tagsDataIsCalculating = true
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+            let transactionsWithTags = self.transactions
+                .filter { !$0.tags.isEmpty && $0.type == self.transactionTypeForTags  }
+            
+            guard !transactionsWithTags.isEmpty else {
+                DispatchQueue.main.async {
+                    self.tagsDataIsCalculating = false
+                    withAnimation {
+                        self.tagsTotalData = []
+                    }
+                }
+                return
+            }
+            
+            let tagsData = transactionsWithTags
+                .flatMap { transaction in
+                    var tupleArray: [(tag: Tag, value: Float)] = []
+                    for tag in transaction.tags {
+                        tupleArray.append((tag: tag, value: transaction.value))
+                    }
+                    return tupleArray
+                }
+                .grouped { $0.tag }
+                .map { tagDict in
+                    var total: Float = 0
+                    for tuple in tagDict.value {
+                        total += tuple.value
+                    }
+                    return TagChartData(tag: tagDict.key, total: total)
+                }
+                .sorted { $0.total > $1.total}
+            
+            DispatchQueue.main.async {
+                self.tagsDataIsCalculating = false
+                withAnimation {
+                    self.tagsTotalData = tagsData
+                }
             }
         }
     }
@@ -508,13 +592,14 @@ final class StatisticsViewModel: ObservableObject {
         Task {
             await fetchBalanceAccounts()
             Task.detached(priority: .background) { [weak self] in
+                await self?.fetchTags()
                 await self?.fetchTransactions()
                 localCompletion()
             }
         }
     }
     
-    ///Fetches all transactions and sets to transactions
+    ///Fetches all transactions and sets to transactions, uses background fetching
     private func fetchTransactions() async {
         let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
         let predicate = #Predicate<Transaction> { trans in
@@ -531,7 +616,19 @@ final class StatisticsViewModel: ObservableObject {
             let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
             transactions = fetchedTranses
         } catch {
-            print("StatisticsViewModel: Unable to fetch transactions")
+            print("StatisticsViewModel: Unable to fetch transactions, error: \(error)")
+        }
+    }
+    
+    
+    /// Fetches all saved tags, uses background
+    private func fetchTags() async {
+        let descriptor = FetchDescriptor<Tag>()
+        do {
+            let fetchedTags = try await dataManager.fetchFromBackground(descriptor)
+            allTags = fetchedTags
+        } catch {
+            print("StatisticsViewModel: Unable to fetch tags, error: \(error)")
         }
     }
     
@@ -547,12 +644,12 @@ final class StatisticsViewModel: ObservableObject {
             let fetchedBalanceAccounts = try dataManager.fetch(descriptor)
             balanceAccounts = fetchedBalanceAccounts
         } catch {
-            print("StatisticsViewModel: Unable to fetch Balance Accounts")
+            print("StatisticsViewModel: Unable to fetch Balance Accounts, error: \(error)")
         }
     }
 }
 
-//MARK: - Extensions
+//MARK: - Extensions for CustomTabViewModelDelegate
 extension StatisticsViewModel: CustomTabViewModelDelegate {
     var id: String {
         "StatisticsViewModel"
@@ -568,6 +665,32 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             DispatchQueue.main.async { [weak self] in
                 self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
+        }
+    }
+}
+
+extension StatisticsViewModel: TagsViewModelDelegate {
+    func didDeleteTag() {
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTagWithTransactions() {
+        refreshData()
+    }
+    
+    func didAddTag() {
+        Task {
+            await fetchTags()
+        }
+    }
+    
+    func didUpdatedTag() {
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
         }
     }
 }

@@ -58,6 +58,27 @@ struct TagsView: View {
                     }
                 }
             }
+            .overlay {
+                if viewModel.tags.isEmpty, !showAddingRow {
+                    VStack {
+                        Text("You do not have any saved tag.")
+                            .foregroundStyle(.secondary)
+                        
+                        Text("It is good opportunity to try!")
+                            .foregroundStyle(.secondary)
+                        
+                        Button("Create tag") {
+                            tagAddingTextFieldFocused = !showAddingRow
+                            withAnimation {
+                                showAddingRow.toggle()
+                            }
+                        }
+                        .buttonBorderShape(.capsule)
+                        .buttonStyle(.bordered)
+                    }
+                    .font(.title2)
+                }
+            }
             .confirmationDialog(
                 "Delete tag?",
                 isPresented: .init(get: {tagDeletionFlag != nil}, set: { _ in tagDeletionFlag = nil }),

@@ -11,6 +11,8 @@ import SwiftUI
 struct FTAppAssets {
     //MARK: Properteis
     static var defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
+    static var maxCustomSheetWidth: CGFloat = 600
+    static var maxCustomSheetHeight: CGFloat = 900
     
     static var availableDateRange: ClosedRange<Date> {
         Date(timeIntervalSince1970: 0)...(Date.now.endOfDay() ?? .now)
@@ -63,6 +65,12 @@ struct FTAppAssets {
     static func getScreenSize() -> CGSize {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
         return windowScene.screen.bounds.size
+    }
+    
+    static func getWindowSize() -> CGSize {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return .zero }
+        guard let size = windowScene.keyWindow?.frame.size else { return .zero }
+        return size
     }
     
     private static func getIconNames() -> [String] {

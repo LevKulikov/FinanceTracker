@@ -41,8 +41,23 @@ struct TransactionBarChart: View {
     @Binding var perDate: BarChartPerDateFilter
     @Binding var transactionType: TransactionFilterTypes
     
+    private var maxVisibleBars: Int {
+        let isBothTypesShown = transactionType == .both
+        if FTAppAssets.currentUserDevise == .phone {
+            return isBothTypesShown ? 5 : 10
+        }
+        let windowWidth = FTAppAssets.getWindowSize().width
+        
+        switch windowWidth {
+        case ...430:
+            return isBothTypesShown ? 5 : 10
+        default:
+            let ratio = 430 / (isBothTypesShown ? 5 : 10)
+            return Int(windowWidth) / ratio
+        }
+    }
     private var maxXVisibleLenth: Int {
-        let multiplier = transactionType == .both ? 5 : 10
+        let multiplier = maxVisibleBars
         let seconds: Int
         switch perDate {
         case .perDay:
@@ -91,14 +106,14 @@ struct TransactionBarChart: View {
             return startDate...(Date.now.endOfDay() ?? .now)
         case .perWeek:
             let startDate = calendar.date(byAdding: .year, value: -2, to: .now) ?? .now
-            let endDate = calendar.date(byAdding: .weekOfMonth, value: 1, to: .now) ?? .now
+            let endDate = Date.now.endOfWeek() ?? .now
             return startDate...endDate
         case .perMonth:
             let startDate = calendar.date(byAdding: .year, value: -5, to: .now) ?? .now
-            let endDate = calendar.date(byAdding: .month, value: 1, to: .now) ?? .now
+            let endDate = Date.now.endOfMonth() ?? .now
             return startDate...endDate
         case .perYear:
-            let endDate = calendar.date(byAdding: .year, value: 1, to: .now) ?? .now
+            let endDate = Date.now.endOfYear() ?? .now
             return FTAppAssets.availableDateRange.lowerBound...endDate
         }
     }
@@ -130,6 +145,7 @@ struct TransactionBarChart: View {
         return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
     }
     
+    @Environment(\.colorScheme) var colorScheme
     @State private var xScrollPosition: Date = (Date.now.endOfDay() ?? .now)
     @State private var yScale: ClosedRange<Float> = 0...50_000
     @State private var selection: Date?
@@ -194,8 +210,8 @@ struct TransactionBarChart: View {
             case .perDay:
                 AxisMarks(values: .stride(by: .day)) { value in
                     if Calendar.current.component(.day, from: value.as(Date.self) ?? .now) == 1 {
-                        AxisGridLine().foregroundStyle(.black)
-                        AxisTick().foregroundStyle(.black)
+                        AxisGridLine().foregroundStyle(colorScheme == .light ? .black : .white)
+                        AxisTick().foregroundStyle(colorScheme == .light ? .black : .white)
                         AxisValueLabel(format: .dateTime.month())
                     } else {
                         AxisGridLine()
@@ -206,8 +222,8 @@ struct TransactionBarChart: View {
             case .perWeek:
                 AxisMarks(values: .stride(by: .weekOfYear)) { value in
                     if value.as(Date.self)!.isFirstWeekOfMonth() {
-                        AxisGridLine().foregroundStyle(.black)
-                        AxisTick().foregroundStyle(.black)
+                        AxisGridLine().foregroundStyle(colorScheme == .light ? .black : .white)
+                        AxisTick().foregroundStyle(colorScheme == .light ? .black : .white)
                         AxisValueLabel(format: .dateTime.month())
                     } else {
                         AxisGridLine()
@@ -218,8 +234,8 @@ struct TransactionBarChart: View {
             case .perMonth:
                 AxisMarks(values: .stride(by: .month)) { value in
                     if value.as(Date.self)!.isFirstMonthOfYear() {
-                        AxisGridLine().foregroundStyle(.black)
-                        AxisTick().foregroundStyle(.black)
+                        AxisGridLine().foregroundStyle(colorScheme == .light ? .black : .white)
+                        AxisTick().foregroundStyle(colorScheme == .light ? .black : .white)
                         AxisValueLabel(format: .dateTime.year(.twoDigits))
                     } else {
                         AxisGridLine()

@@ -12,6 +12,8 @@ import SwiftUI
 protocol TagsViewModelDelegate: AnyObject {
     func didDeleteTag()
     func didDeleteTagWithTransactions()
+    func didAddTag()
+    func didUpdatedTag()
 }
 
 final class TagsViewModel: ObservableObject {
@@ -87,6 +89,7 @@ final class TagsViewModel: ObservableObject {
         
         Task {
             await dataManager.insert(newTag)
+            delegate?.didAddTag()
             await fetchTags()
         }
     }
@@ -98,6 +101,7 @@ final class TagsViewModel: ObservableObject {
         Task {
             do {
                 try await dataManager.save()
+                delegate?.didUpdatedTag()
                 await fetchTags()
             } catch {
                 print(error)

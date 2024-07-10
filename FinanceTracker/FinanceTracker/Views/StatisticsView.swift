@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+import Charts
 
 struct StatisticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: StatisticsViewModel
+    @State private var showTagsView = false
+    private var windowWidth: CGFloat {
+        FTAppAssets.getWindowSize().width
+    }
+    private var pieChartHeight: CGFloat {
+        return 350
+    }
     
     //MARK: - Init
     init(viewModel: StatisticsViewModel) {
@@ -21,11 +29,20 @@ struct StatisticsView: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    totalValueSection
-                        .padding(.bottom)
-
-                    pieChartSection
-                        .padding(.bottom)
+                    if windowWidth <= FTAppAssets.maxCustomSheetWidth {
+                        totalValueSection
+                            .padding(.bottom)
+                        
+                        pieChartSection
+                            .padding(.bottom)
+                    } else {
+                        HStack {
+                            totalValueSection
+                            
+                            pieChartSection
+                        }
+                        .frame(maxHeight: pieChartHeight)
+                    }
                     
                     barChartSection
                     
@@ -51,6 +68,9 @@ struct StatisticsView: View {
                 }
             }
             .navigationTitle("Statistics")
+            .sheet(isPresented: $showTagsView) {
+                viewModel.getTagsView()
+            }
         }
     }
     
@@ -95,12 +115,80 @@ struct StatisticsView: View {
                 
                 Spacer()
             }
+            
+            Divider()
+            
+            tagsStatSection
+            
+            if windowWidth > FTAppAssets.maxCustomSheetWidth {
+                Spacer()
+            }
         }
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+    }
+    
+    private var tagsStatSection: some View {
+        VStack {
+            HStack {
+                Text("Tags stats")
+                    .font(.title2)
+                    .bold()
+                
+                if viewModel.tagsDataIsCalculating {
+                    ProgressView()
+                        .padding(.leading, 5)
+                }
+                
+                Spacer()
+                
+                Menu(viewModel.transactionTypeForTags.rawValue) {
+                    Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
+                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
+                            Text(type.rawValue)
+                                .tag(type)
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            
+            if !viewModel.allTags.isEmpty {
+                if !viewModel.tagsTotalData.isEmpty {
+                    TagsLineChart(tagData: viewModel.tagsTotalData)
+                } else {
+                    noOneTagIsUsedView
+                }
+            } else {
+                noSavedTagsView
+            }
+        }
+    }
+    
+    private var noSavedTagsView: some View {
+        VStack {
+            Text("You do not have any saved tag.")
+                .foregroundStyle(.secondary)
+            
+            Text("It is good opportunity to try!")
+                .foregroundStyle(.secondary)
+            
+            Button("Create tag") {
+                showTagsView.toggle()
+            }
+            .buttonBorderShape(.capsule)
+            .buttonStyle(.bordered)
+        }
+    }
+    
+    private var noOneTagIsUsedView: some View {
+        VStack {
+            Text("You do not have \(viewModel.transactionTypeForTags.rawValue) with tags")
+        }
+        .foregroundStyle(.secondary)
     }
     
     private var pieChartSection: some View {
@@ -129,7 +217,6 @@ struct StatisticsView: View {
             }
             
             TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
-                .frame(height: 200)
                 .padding(.bottom)
             
             pieChartMenuDatePickerView
@@ -139,6 +226,7 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+        .frame(height: pieChartHeight)
     }
     
     private var pieChartMenuDatePickerView: some View {
@@ -265,7 +353,6 @@ struct StatisticsView: View {
     }
     
     //MARK: - Methods
-    
 }
 
 #Preview {
