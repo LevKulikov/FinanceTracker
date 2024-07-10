@@ -49,6 +49,7 @@ struct TagsSectionView: View {
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.bordered)
                 .foregroundStyle(.secondary)
+                .hoverEffect(.highlight)
             }
             .padding(.horizontal, 10)
             
@@ -66,6 +67,7 @@ struct TagsSectionView: View {
                                 RoundedRectangle(cornerRadius: 7)
                                     .fill(tag.color.opacity(tagIdAdded ? 0.4 : 0.15))
                             }
+                            .hoverEffect(.highlight)
                             .onTapGesture {
                                 viewModel.addRemoveTag(tag)
                             }
@@ -76,6 +78,7 @@ struct TagsSectionView: View {
                             viewModel.createNewTag(andSelect: true)
                         }
                         .buttonStyle(.bordered)
+                        .hoverEffect(.highlight)
                         .padding(.vertical, -2)
                     }
                 }

@@ -144,6 +144,7 @@ struct GroupedSpendIncomeCell: View {
                 )
         }
         .padding(.horizontal)
+        .hoverEffect(.lift)
     }
     
     private var groupCellOpenedView: some View {
@@ -163,6 +164,7 @@ struct GroupedSpendIncomeCell: View {
             .buttonBorderShape(.capsule)
             .buttonStyle(.bordered)
             .foregroundStyle(.secondary)
+            .hoverEffect(.highlight)
         }
         .padding(.horizontal)
         .padding(.horizontal)

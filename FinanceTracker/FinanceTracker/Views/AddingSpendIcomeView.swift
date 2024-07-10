@@ -147,6 +147,7 @@ struct AddingSpendIcomeView: View {
             .overlay(alignment: .bottom) {
                 if !searchTagsTextFieldFocus && !commentTextFieldFocus {
                     addUpdateButton
+                        .hoverEffect(.lift)
                 }
             }
             .confirmationDialog("Delete transaction?", isPresented: $deletionAlert, titleVisibility: .visible, actions: {
@@ -197,6 +198,7 @@ struct AddingSpendIcomeView: View {
             .buttonBorderShape(.circle)
             .buttonStyle(.bordered)
             .foregroundStyle(.secondary)
+            .hoverEffect(.highlight)
         }
         .overlay(alignment: .leading) {
             if isUpdating {
@@ -207,6 +209,7 @@ struct AddingSpendIcomeView: View {
                 .buttonBorderShape(.circle)
                 .buttonStyle(.bordered)
                 .foregroundStyle(.red)
+                .hoverEffect(.highlight)
             }
         }
         .padding(.horizontal, 10)
@@ -261,6 +264,7 @@ struct AddingSpendIcomeView: View {
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.bordered)
                 .foregroundStyle(.secondary)
+                .hoverEffect(.highlight)
             }
             .padding(.horizontal, 10)
             
@@ -269,6 +273,7 @@ struct AddingSpendIcomeView: View {
                     HStack {
                         ForEach(viewModel.availableCategories) { categoryToSet in
                             CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
+                                .hoverEffect(.lift)
                                 .onTapGesture {
                                     withAnimation {
                                         viewModel.category = categoryToSet
@@ -322,6 +327,7 @@ struct AddingSpendIcomeView: View {
                     Button("Close") {
                         showMoreCategories = false
                     }
+                    .hoverEffect(.highlight)
                 }
                 .padding(.top, 20)
                 .padding(.horizontal, 25)
@@ -330,6 +336,7 @@ struct AddingSpendIcomeView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
                         ForEach(viewModel.availableCategories) { categoryToSet in
                             CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
+                                .hoverEffect(.lift)
                                 .onTapGesture {
                                     showMoreCategories = false
                                     withAnimation {
@@ -417,6 +424,7 @@ struct AddingSpendIcomeView: View {
             .buttonStyle(.bordered)
             .lineLimit(1)
             .foregroundStyle(.primary)
+            .hoverEffect(.highlight)
         }
         .padding(.horizontal, 10)
         .sheet(isPresented: $showAddingBalanceAccountView) {

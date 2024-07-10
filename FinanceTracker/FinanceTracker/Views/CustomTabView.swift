@@ -72,6 +72,7 @@ struct CustomTabView: View  {
             }
             .frame(width: buttonWidth)
             .foregroundStyle(tabSelection == 1 ? .blue : .secondary)
+            .hoverEffect(.highlight)
             
             Spacer()
             
@@ -88,6 +89,7 @@ struct CustomTabView: View  {
             }
             .frame(width: buttonWidth)
             .foregroundStyle(tabSelection == 2 ? .blue : .secondary)
+            .hoverEffect(.highlight)
             
             if tabSelection == 1 {
                 Spacer()
@@ -106,6 +108,8 @@ struct CustomTabView: View  {
                             .foregroundStyle(.white)
                     }
                 }
+                .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                .hoverEffect(.highlight)
             }
             
             Spacer()
@@ -123,6 +127,7 @@ struct CustomTabView: View  {
             }
             .frame(width: buttonWidth)
             .foregroundStyle(tabSelection == 3 ? .blue : .secondary)
+            .hoverEffect(.highlight)
             
             Spacer()
             
@@ -139,6 +144,7 @@ struct CustomTabView: View  {
             }
             .frame(width: buttonWidth)
             .foregroundStyle(tabSelection == 4 ? .blue : .secondary)
+            .hoverEffect(.highlight)
         }
         .padding(.horizontal, 5)
         .padding(.vertical, 15)
