@@ -160,7 +160,10 @@ struct StatisticsView: View {
             if !viewModel.allTags.isEmpty {
                 if !viewModel.tagsTotalData.isEmpty {
                     ScrollView {
-                        TagsLineChart(tagData: viewModel.tagsTotalData)
+                        TagsLineChart(tagData: viewModel.tagsTotalData) { tagData in
+                            //TODO: Continue
+                            print(tagData.tag.name)
+                        }
                     }
                     .scrollIndicators(.hidden)
                 } else {

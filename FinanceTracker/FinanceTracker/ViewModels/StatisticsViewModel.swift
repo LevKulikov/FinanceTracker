@@ -306,19 +306,21 @@ final class StatisticsViewModel: ObservableObject {
             
             let tagsData = transactionsWithTags
                 .flatMap { transaction in
-                    var tupleArray: [(tag: Tag, value: Float)] = []
+                    var tupleArray: [(tag: Tag, transaction: Transaction)] = []
                     for tag in transaction.tags {
-                        tupleArray.append((tag: tag, value: transaction.value))
+                        tupleArray.append((tag: tag, transaction: transaction))
                     }
                     return tupleArray
                 }
                 .grouped { $0.tag }
                 .map { tagDict in
                     var total: Float = 0
+                    var transactionsToSet: [Transaction] = []
                     for tuple in tagDict.value {
-                        total += tuple.value
+                        total += tuple.transaction.value
+                        transactionsToSet.append(tuple.transaction)
                     }
-                    return TagChartData(tag: tagDict.key, total: total)
+                    return TagChartData(tag: tagDict.key, total: total, transactions: transactionsToSet)
                 }
                 .sorted { $0.total > $1.total}
             

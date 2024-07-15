@@ -12,17 +12,20 @@ struct TagChartData: Identifiable, Equatable {
     let id = UUID().uuidString
     let tag: Tag
     let total: Float
+    let transactions: [Transaction]
 }
 
 struct TagsLineChart: View {
     //MARK: - Properties
-    let tagData: [TagChartData]
-    let maxValue: Float
+    private let tagData: [TagChartData]
+    private let onTagDataTap: ((TagChartData) -> Void)
+    private let maxValue: Float
     private var rowHeight: CGFloat = 27
     
     //MARK: - Init
-    init(tagData: [TagChartData]) {
+    init(tagData: [TagChartData], onTap: @escaping (TagChartData) -> Void) {
         self.tagData = tagData
+        self.onTagDataTap = onTap
         self.maxValue = tagData.map { $0.total }.max() ?? 0
     }
     
@@ -55,6 +58,9 @@ struct TagsLineChart: View {
                             .fill(singleTagData.tag.color.opacity(0.15))
                     }
                     .frame(height: rowHeight)
+                    .onTapGesture {
+                        onTagDataTap(singleTagData)
+                    }
             }
         }
         .frame(maxWidth: 130, alignment: .leading)
@@ -128,5 +134,7 @@ struct TagsLineChart: View {
 }
 
 #Preview {
-    TagsLineChart(tagData: [])
+    TagsLineChart(tagData: []) { _ in
+        
+    }
 }
