@@ -16,13 +16,13 @@ protocol TransactionListViewModelDelegate: AnyObject {
 final class TransactionListViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any TransactionListViewModelDelegate)?
+    let title: String
     @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
     @Published private(set) var isGroupingAndSortingProceeds = false
     
     //MARK: Private properties
     private let dataManager: any DataManagerProtocol
     private var transactions: [Transaction]
-    private let title: String
     private let threadToUse: DataManager.DataThread
     private let calendar = Calendar.current
     
