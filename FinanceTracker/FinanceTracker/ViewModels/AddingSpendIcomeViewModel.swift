@@ -12,6 +12,7 @@ import SwiftUI
 protocol AddingSpendIcomeViewModelDelegate: AnyObject {
     func addedNewTransaction(_ transaction: Transaction)
     func updateTransaction(_ transaction: Transaction)
+    func deletedTransaction(_ transaction: Transaction)
     func transactionsTypeReselected(to newType: TransactionsType)
     func categoryUpdated()
 }
@@ -225,7 +226,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
                     return
                 }
             }
-            delegate?.updateTransaction(transactionToUpdate)
+            delegate?.deletedTransaction(transactionToUpdate)
             DispatchQueue.main.async {
                 completionHandler?()
             }

@@ -263,6 +263,14 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
         enableTapsWithDeadline()
     }
     
+    func deletedTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
+        enableTapsWithDeadline()
+    }
+    
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }

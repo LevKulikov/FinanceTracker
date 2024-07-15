@@ -482,6 +482,14 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
         }
     }
     
+    func deletedTransaction(_ transaction: Transaction) {
+        delegate?.didUpdatedTransactionsList()
+        Task {
+            await fetchTransactions()
+            filterAndSetTransactions()
+        }
+    }
+    
     func transactionsTypeReselected(to newType: TransactionsType) {
         return
     }
