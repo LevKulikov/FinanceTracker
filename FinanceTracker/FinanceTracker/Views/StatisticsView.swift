@@ -129,6 +129,7 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+        .frame(maxHeight: pieChartHeight)
     }
     
     private var tagsStatSection: some View {
@@ -158,7 +159,10 @@ struct StatisticsView: View {
             
             if !viewModel.allTags.isEmpty {
                 if !viewModel.tagsTotalData.isEmpty {
-                    TagsLineChart(tagData: viewModel.tagsTotalData)
+                    ScrollView {
+                        TagsLineChart(tagData: viewModel.tagsTotalData)
+                    }
+                    .scrollIndicators(.hidden)
                 } else {
                     noOneTagIsUsedView
                 }
