@@ -61,6 +61,7 @@ struct CategoriesView: View {
                             Label("Reorder", systemImage: "list.dash")
                                 .frame(maxWidth: .infinity)
                         }
+                        .hoverEffect(.lift)
                     }
                     .padding()
                     .buttonStyle(.bordered)
@@ -68,6 +69,7 @@ struct CategoriesView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 120))]) {
                         ForEach(viewModel.filteredCategories) { category in
                             CategoryItemView(category: category, selectedCategory: .constant(nil))
+                                .hoverEffect(.lift)
                                 .onTapGesture {
                                     navigationPath.append(ActionWithCategory.update(category))
                                 }
