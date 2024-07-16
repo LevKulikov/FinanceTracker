@@ -49,6 +49,8 @@
 		73D000DE2C31DC4700AACFCE /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D000DD2C31DC4700AACFCE /* WelcomeViewModel.swift */; };
 		73D000E02C31DCCF00AACFCE /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */; };
 		73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D000E12C333E7000AACFCE /* SingleExampleView.swift */; };
+		73D0F05D2C45CF1200D50CFF /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */; };
+		73D0F05F2C45CF3F00D50CFF /* TransactionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
@@ -129,6 +131,8 @@
 		73D000DD2C31DC4700AACFCE /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 		73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		73D000E12C333E7000AACFCE /* SingleExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleExampleView.swift; sourceTree = "<group>"; };
+		73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
+		73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListViewModel.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -266,6 +270,7 @@
 				73CCF3E42C2B533C009D8001 /* ManageDataView.swift */,
 				73D000D52C2DC2F400AACFCE /* SearchView.swift */,
 				73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */,
+				73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -288,6 +293,7 @@
 				73CCF3E22C2B51AB009D8001 /* ManageDataViewModel.swift */,
 				73D000D32C2D804800AACFCE /* SearchViewModel.swift */,
 				73D000DD2C31DC4700AACFCE /* WelcomeViewModel.swift */,
+				73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -476,11 +482,13 @@
 				73D000DE2C31DC4700AACFCE /* WelcomeViewModel.swift in Sources */,
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
+				73D0F05F2C45CF3F00D50CFF /* TransactionListViewModel.swift in Sources */,
 				736389142C21C7FF00D6478E /* SettingsViewModel.swift in Sources */,
 				73731D5A2C10FC5F00A80355 /* AddingCategoryView.swift in Sources */,
 				738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */,
 				73CCF3D52C2765D6009D8001 /* CategoriesView.swift in Sources */,
 				73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */,
+				73D0F05D2C45CF1200D50CFF /* TransactionListView.swift in Sources */,
 				73D000D62C2DC2F400AACFCE /* SearchView.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,

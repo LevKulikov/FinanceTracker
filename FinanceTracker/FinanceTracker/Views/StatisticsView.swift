@@ -12,6 +12,7 @@ struct StatisticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: StatisticsViewModel
     @State private var showTagsView = false
+    @State private var showTransactionListWithData: TransactionListUIData?
     private var windowWidth: CGFloat {
         FTAppAssets.getWindowSize().width
     }
@@ -71,6 +72,11 @@ struct StatisticsView: View {
             .sheet(isPresented: $showTagsView) {
                 viewModel.getTagsView()
             }
+            .sheet(item: $showTransactionListWithData) {
+                viewModel.refreshDataIfNeeded()
+            } content: { transactionListData in
+                viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
+            }
         }
     }
     
@@ -129,6 +135,7 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color(.secondarySystemBackground))
         }
+        .frame(maxHeight: pieChartHeight)
     }
     
     private var tagsStatSection: some View {
@@ -158,7 +165,13 @@ struct StatisticsView: View {
             
             if !viewModel.allTags.isEmpty {
                 if !viewModel.tagsTotalData.isEmpty {
-                    TagsLineChart(tagData: viewModel.tagsTotalData)
+                    ScrollView {
+                        TagsLineChart(tagData: viewModel.tagsTotalData) { tagData in
+                            let title: String = "# \(tagData.tag.name)"
+                            showTransactionListWithData = TransactionListUIData(transactions: tagData.transactions, title: title)
+                        }
+                    }
+                    .scrollIndicators(.hidden)
                 } else {
                     noOneTagIsUsedView
                 }
@@ -216,8 +229,12 @@ struct StatisticsView: View {
                 .buttonStyle(.bordered)
             }
             
-            TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
-                .padding(.bottom)
+            TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { pieChartData in
+                let transactions = pieChartData.transactions
+                let title = pieChartData.category.name
+                showTransactionListWithData = TransactionListUIData(transactions: transactions, title: title)
+            }
+            .padding(.bottom)
             
             pieChartMenuDatePickerView
         }

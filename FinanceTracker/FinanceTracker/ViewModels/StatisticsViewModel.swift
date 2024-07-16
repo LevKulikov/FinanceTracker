@@ -12,6 +12,8 @@ import SwiftData
 
 protocol StatisticsViewModelDelegate: AnyObject {
     func showTabBar(_ show: Bool)
+    
+    func didUpdatedTransactionsListFromStatistics()
 }
 
 enum TransactionFilterTypes: String, Equatable, CaseIterable {
@@ -67,6 +69,8 @@ final class StatisticsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
+    /// Flag to determine if any transaction was updated from another view. Prevents multiple recalculations if several transactions were updated
+    private var isTransactionUpdatedFromAnotherView = false
     /// Array of years those are available
     private var availableYearDates: [Date] = []
     /// Array of years with months those are available
@@ -108,7 +112,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: For pie chart
     /// Data Array to be provided in pie chart
-    @Published private(set) var pieChartTransactionData: [(category: Category, sumValue: Float)] = []
+    @Published private(set) var pieChartTransactionData: [TransactionPieChartData] = []
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
@@ -180,6 +184,14 @@ final class StatisticsViewModel: ObservableObject {
         }
     }
     
+    /// Refreshes data if some changes occured, otherwise do nothing
+    /// - Parameter compeletionHandler: closure that is called at the end of refreshing
+    func refreshDataIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+        guard isTransactionUpdatedFromAnotherView else { return }
+        isTransactionUpdatedFromAnotherView = false
+        refreshData(compeletionHandler: compeletionHandler)
+    }
+    
     /// Moves date range consiquentely its size to back or forward
     /// - Parameter direction: direction to move date range
     func moveDateRange(direction: DateSettingDestination) {
@@ -221,14 +233,19 @@ final class StatisticsViewModel: ObservableObject {
         }, for: .pieChart)
     }
     
-    /// For preview only
-    func setAnyExistingBA() {
-        guard let toset = balanceAccounts.first else { return }
-        balanceAccountToFilter = toset
-    }
-    
+    /// Provides View for Tags settings
+    /// - Returns: View for tags settings
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
+    }
+    
+    /// Provides View for list of transactions
+    /// - Parameters:
+    ///   - transactions: transactions to be displayed in list
+    ///   - title: title to be set in the returned view
+    /// - Returns: TransactionListView with view model
+    func getTransactionListView(transactions: [Transaction], title: String) -> some View {
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: transactions, title: title, threadToUse: .global, delegate: self)
     }
     
     //MARK: Private methods
@@ -306,19 +323,21 @@ final class StatisticsViewModel: ObservableObject {
             
             let tagsData = transactionsWithTags
                 .flatMap { transaction in
-                    var tupleArray: [(tag: Tag, value: Float)] = []
+                    var tupleArray: [(tag: Tag, transaction: Transaction)] = []
                     for tag in transaction.tags {
-                        tupleArray.append((tag: tag, value: transaction.value))
+                        tupleArray.append((tag: tag, transaction: transaction))
                     }
                     return tupleArray
                 }
                 .grouped { $0.tag }
                 .map { tagDict in
                     var total: Float = 0
+                    var transactionsToSet: [Transaction] = []
                     for tuple in tagDict.value {
-                        total += tuple.value
+                        total += tuple.transaction.value
+                        transactionsToSet.append(tuple.transaction)
                     }
-                    return TagChartData(tag: tagDict.key, total: total)
+                    return TagChartData(tag: tagDict.key, total: total, transactions: transactionsToSet)
                 }
                 .sorted { $0.total > $1.total}
             
@@ -363,7 +382,8 @@ final class StatisticsViewModel: ObservableObject {
                 .grouped { $0.category }
                 .map { singleDict in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
-                    return (category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory)
+                    let transactions = singleDict.value
+                    return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
@@ -669,6 +689,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
     }
 }
 
+//MARK: - Extension for TagsViewModelDelegate
 extension StatisticsViewModel: TagsViewModelDelegate {
     func didDeleteTag() {
         Task {
@@ -692,5 +713,13 @@ extension StatisticsViewModel: TagsViewModelDelegate {
             await fetchTags()
             calculateTagsTotal()
         }
+    }
+}
+
+//MARK: - Extension for TransactionListViewModelDelegate
+extension StatisticsViewModel: TransactionListViewModelDelegate {
+    func didUpdatedTransaction() {
+        isTransactionUpdatedFromAnotherView = true
+        delegate?.didUpdatedTransactionsListFromStatistics()
     }
 }

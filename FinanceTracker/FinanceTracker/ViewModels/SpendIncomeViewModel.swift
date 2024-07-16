@@ -74,6 +74,7 @@ final class SpendIncomeViewModel: ObservableObject {
     @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
     @Published var dateSelected: Date = .now {
         didSet {
+            guard dateSelected.startOfDay() != oldValue.startOfDay() else { return }
             Task {
                 await fetchTransactions()
                 filterGroupSortTransactions()
@@ -263,6 +264,14 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
         enableTapsWithDeadline()
     }
     
+    func deletedTransaction(_ transaction: Transaction) {
+        delegate?.didUpdateTransactionList()
+        fetchAllData { [weak self] in
+            self?.filterGroupSortTransactions()
+        }
+        enableTapsWithDeadline()
+    }
+    
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }
@@ -308,7 +317,14 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
                     self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
                 }
             }
-        default:
+        case .transactions:
+            Task {
+                await fetchTransactions()
+                filterGroupSortTransactions()
+            }
+        case .tags:
+            break
+        case .appearance:
             break
         }
     }

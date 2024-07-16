@@ -28,6 +28,9 @@ struct GroupedSpendIncomeCell: View {
     }
     private var percentageInt: Int {
         let transValue = transactions.map { $0.value }.reduce(0, +)
+        guard totalValue > 0, totalValue != .infinity else {
+            return transValue > 0 ? 100 : 0
+        }
         let percentage = transValue/totalValue
         return Int(percentage * 100)
     }

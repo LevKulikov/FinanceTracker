@@ -8,29 +8,36 @@
 import SwiftUI
 import Charts
 
+struct TransactionPieChartData: Identifiable {
+    let id = UUID().uuidString
+    let category: Category
+    let sumValue: Float
+    let transactions: [Transaction]
+}
+
 struct TransactionPieChart: View {
     //MARK: - Properties
-    let transactionGroups: [(category: Category, sumValue: Float)]
-    
-    //MARK: Private pros
+    private let transactionsChartData: [TransactionPieChartData]
+    private let onCategoryDataTap: (TransactionPieChartData) -> Void
     private var sumOfValue: Float = 0
     @State private var selectedValue: Int?
     @State private var selectedCategoryId: String?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
     private var selectedCategoryPersentage: Int? {
         guard let selectedCategoryId else { return nil }
-        guard let data = transactionGroups.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
+        guard let data = transactionsChartData.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
         return calculatePercentage(for: data.sumValue)
     }
     private var selectedCategoryValue: Float? {
         guard let selectedCategoryId else { return nil }
-        guard let data = transactionGroups.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
+        guard let data = transactionsChartData.first(where: { $0.category.id == selectedCategoryId }) else { return nil }
         return data.sumValue
     }
     
     //MARK: - Init
-    init(transactionGroups: [(category: Category, sumValue: Float)]) {
-        self.transactionGroups = transactionGroups
+    init(transactionGroups: [TransactionPieChartData], onTap: @escaping (TransactionPieChartData) -> Void) {
+        self.transactionsChartData = transactionGroups
+        self.onCategoryDataTap = onTap
         sumOfValue = calculateTotalValue()
     }
     
@@ -38,8 +45,8 @@ struct TransactionPieChart: View {
     var body: some View {
         HStack {
             Chart {
-                if !transactionGroups.isEmpty {
-                    ForEach(transactionGroups, id: \.category) { singleData in
+                if !transactionsChartData.isEmpty {
+                    ForEach(transactionsChartData) { singleData in
                         let selectedFlag = isSelected(singleData.category)
                         
                         SectorMark(
@@ -77,8 +84,8 @@ struct TransactionPieChart: View {
         ScrollViewReader { proxy in 
             ScrollView {
                 VStack(alignment: .leading) {
-                    if !transactionGroups.isEmpty {
-                        ForEach(transactionGroups, id: \.category) {singleData in
+                    if !transactionsChartData.isEmpty {
+                        ForEach(transactionsChartData) {singleData in
                             let selectedFlag = isSelected(singleData.category)
                             
                             HStack {
@@ -93,6 +100,12 @@ struct TransactionPieChart: View {
                             .underline(selectedFlag, color: .secondary)
                             .onTapGesture {
                                 setSelectedCategory(selectedFlag ? nil : singleData.category)
+                            }
+                            .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 3))
+                            .contextMenu {
+                                Button("Show transactions", systemImage: "list.bullet") {
+                                    onCategoryDataTap(singleData)
+                                }
                             }
                             .id(singleData.category.id)
                         }
@@ -154,7 +167,7 @@ struct TransactionPieChart: View {
     }
     
     private func calculateTotalValue() -> Float {
-        let value = transactionGroups
+        let value = transactionsChartData
             .map { $0.sumValue }
             .reduce(0, +)
         
@@ -178,7 +191,7 @@ struct TransactionPieChart: View {
         guard let selectedValue else { return }
         var total: Float = 0
         
-        for element in transactionGroups {
+        for element in transactionsChartData {
             total += element.sumValue
             if Float(selectedValue) <= total {
                 setSelectedCategory(element.category)
@@ -206,7 +219,8 @@ struct TransactionPieChart: View {
 #Preview {
     let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
     @StateObject var viewModel = StatisticsViewModel(dataManager: dataManger)
-    viewModel.setAnyExistingBA()
     
-    return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
+    return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { _ in
+        
+    }
 }

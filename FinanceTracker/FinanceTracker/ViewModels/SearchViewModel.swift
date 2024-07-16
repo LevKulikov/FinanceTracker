@@ -38,6 +38,8 @@ final class SearchViewModel: ObservableObject {
     private let calendar = Calendar.current
     private var searchDispatchWorkItem: DispatchWorkItem?
     private var allTransactions: [Transaction] = []
+    /// Not grouped, only filtered, used for search filter
+    private var filteredTransaction: [Transaction] = []
     private var allCategories: [Category] = []
     /// For transactions predicate
     private var dateFilterRange: ClosedRange<Date> {
@@ -71,7 +73,7 @@ final class SearchViewModel: ObservableObject {
         didSet {
             searchDispatchWorkItem?.cancel()
             searchDispatchWorkItem = DispatchWorkItem { [weak self] in
-                self?.filterAndSetTransactions()
+                self?.filterTransactionsWithSearch()
             }
             if let searchDispatchWorkItem {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: searchDispatchWorkItem)
@@ -240,49 +242,13 @@ final class SearchViewModel: ObservableObject {
                     return (sameBA && sameCategory && containsNeededTag)
                 }
             
+            self.filteredTransaction = filteredData
             var searchData = filteredData
             if !self.searchText.isEmpty {
-                searchData = searchData
-                    .filter { trans in
-                        // If searchText is number
-                        var copyString = self.searchText
-                        
-                        if copyString.contains(",") {
-                            copyString.replace(",", with: ".")
-                        }
-                        
-                        if copyString.contains(" ") {
-                            copyString.replace(" ", with: "")
-                        }
-                        
-                        if let floatSearchNumber = Float(copyString) {
-                            return trans.value == floatSearchNumber
-                        }
-                        
-                        // if searchText is text
-                        guard let balanceAccount = trans.balanceAccount, let category = trans.category else { return false }
-                        
-                        let baNameHasSuchString = balanceAccount.name.contains(self.searchText)
-                        let catNameHasSuchString = category.name.contains(self.searchText)
-                        let tagsHaveSuchString = trans.tags.map { $0.name }.joined().contains(self.searchText)
-                        let commentHasSuchString = trans.comment.contains(self.searchText)
-                        
-                        return (baNameHasSuchString || catNameHasSuchString || tagsHaveSuchString || commentHasSuchString)
-                    }
+                searchData = self.getFilteredTransactionWithSearchText(arrayToFilter: searchData)
             }
             
-            let sortedGroupedData = searchData
-                .grouped { trans in
-                    let year = self.calendar.component(.year, from: trans.date)
-                    let month = self.calendar.component(.month, from: trans.date)
-                    let day = self.calendar.component(.day, from: trans.date)
-                    return DateComponents(year: year, month: month, day: day)
-                }
-                .map { dictTuple in
-                    let date = self.calendar.date(from: dictTuple.key) ?? .now
-                    return TransactionGroupedData(date: date, transactions: dictTuple.value)
-                }
-                .sorted { $0.date > $1.date }
+            let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
             
             DispatchQueue.main.async {
                 self.isListCalculating = false
@@ -291,6 +257,83 @@ final class SearchViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    private func filterTransactionsWithSearch() {
+        DispatchQueue.main.async { [weak self] in
+            self?.isListCalculating = true
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+            
+            if !self.searchText.isEmpty {
+                let searchFiltered = self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransaction)
+                let groups = self.groupAndSortTransactionArray(searchFiltered)
+                
+                DispatchQueue.main.async {
+                    self.isListCalculating = false
+                    withAnimation {
+                        self.filteredTransactionGroups = groups
+                    }
+                }
+            } else {
+                let groups = self.groupAndSortTransactionArray(filteredTransaction)
+                
+                DispatchQueue.main.async {
+                    self.isListCalculating = false
+                    withAnimation {
+                        self.filteredTransactionGroups = groups
+                    }
+                }
+            }
+        }
+    }
+    
+    private func getFilteredTransactionWithSearchText(arrayToFilter: [Transaction]) -> [Transaction] {
+        return arrayToFilter
+            .filter { trans in
+                // If searchText is number
+                var copyString = self.searchText
+                
+                if copyString.contains(",") {
+                    copyString.replace(",", with: ".")
+                }
+                
+                if copyString.contains(" ") {
+                    copyString.replace(" ", with: "")
+                }
+                
+                if let floatSearchNumber = Float(copyString) {
+                    return trans.value == floatSearchNumber
+                }
+                
+                // if searchText is text
+                guard let balanceAccount = trans.balanceAccount, let category = trans.category else { return false }
+                
+                let baNameHasSuchString = balanceAccount.name.localizedCaseInsensitiveContains(self.searchText)
+                let currencyHasSuchString = balanceAccount.currency.localizedCaseInsensitiveContains(self.searchText)
+                let catNameHasSuchString = category.name.localizedCaseInsensitiveContains(self.searchText)
+                let tagsHaveSuchString = trans.tags.map { $0.name }.joined().localizedCaseInsensitiveContains(self.searchText)
+                let commentHasSuchString = trans.comment.localizedCaseInsensitiveContains(self.searchText)
+                
+                return (baNameHasSuchString || currencyHasSuchString || catNameHasSuchString || tagsHaveSuchString || commentHasSuchString)
+            }
+    }
+    
+    private func groupAndSortTransactionArray(_ array: [Transaction]) -> [TransactionGroupedData] {
+        return array
+            .grouped { trans in
+                let year = self.calendar.component(.year, from: trans.date)
+                let month = self.calendar.component(.month, from: trans.date)
+                let day = self.calendar.component(.day, from: trans.date)
+                return DateComponents(year: year, month: month, day: day)
+            }
+            .map { dictTuple in
+                let date = self.calendar.date(from: dictTuple.key) ?? .now
+                return TransactionGroupedData(date: date, transactions: dictTuple.value)
+            }
+            .sorted { $0.date > $1.date }
     }
     
     private func fetchAllData(errorHandler: ((Error) -> Void)? = nil, competionHandler: (() -> Void)? = nil) {
@@ -432,6 +475,14 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func updateTransaction(_ transaction: Transaction) {
+        delegate?.didUpdatedTransactionsList()
+        Task {
+            await fetchTransactions()
+            filterAndSetTransactions()
+        }
+    }
+    
+    func deletedTransaction(_ transaction: Transaction) {
         delegate?.didUpdatedTransactionsList()
         Task {
             await fetchTransactions()
