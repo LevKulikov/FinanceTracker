@@ -17,9 +17,8 @@ struct TransactionPieChartData: Identifiable {
 
 struct TransactionPieChart: View {
     //MARK: - Properties
-    let transactionsChartData: [TransactionPieChartData]
-    
-    //MARK: Private pros
+    private let transactionsChartData: [TransactionPieChartData]
+    private let onCategoryDataTap: (TransactionPieChartData) -> Void
     private var sumOfValue: Float = 0
     @State private var selectedValue: Int?
     @State private var selectedCategoryId: String?
@@ -36,8 +35,9 @@ struct TransactionPieChart: View {
     }
     
     //MARK: - Init
-    init(transactionGroups: [TransactionPieChartData]) {
+    init(transactionGroups: [TransactionPieChartData], onTap: @escaping (TransactionPieChartData) -> Void) {
         self.transactionsChartData = transactionGroups
+        self.onCategoryDataTap = onTap
         sumOfValue = calculateTotalValue()
     }
     
@@ -100,6 +100,12 @@ struct TransactionPieChart: View {
                             .underline(selectedFlag, color: .secondary)
                             .onTapGesture {
                                 setSelectedCategory(selectedFlag ? nil : singleData.category)
+                            }
+                            .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 3))
+                            .contextMenu {
+                                Button("Show transactions", systemImage: "list.bullet") {
+                                    onCategoryDataTap(singleData)
+                                }
                             }
                             .id(singleData.category.id)
                         }
@@ -214,5 +220,7 @@ struct TransactionPieChart: View {
     let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
     @StateObject var viewModel = StatisticsViewModel(dataManager: dataManger)
     
-    return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
+    return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { _ in
+        
+    }
 }

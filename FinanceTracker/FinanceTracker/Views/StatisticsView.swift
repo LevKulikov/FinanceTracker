@@ -229,8 +229,12 @@ struct StatisticsView: View {
                 .buttonStyle(.bordered)
             }
             
-            TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
-                .padding(.bottom)
+            TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { pieChartData in
+                let transactions = pieChartData.transactions
+                let title = pieChartData.category.name
+                showTransactionListWithData = TransactionListUIData(transactions: transactions, title: title)
+            }
+            .padding(.bottom)
             
             pieChartMenuDatePickerView
         }
