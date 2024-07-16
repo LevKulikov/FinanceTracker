@@ -111,7 +111,7 @@ struct AddingBalanceAccauntView: View {
     
     private var balanceSection: some View {
         VStack(alignment: .leading) {
-            Text((isAdding ? "Initial balance" : "Current balance") + " and currency")
+            Text((isAdding ? String(localized: "Initial balance") : String(localized: "Current balance")) + String(localized: " and currency"))
                 .font(.title2)
                 .fontWeight(.medium)
             

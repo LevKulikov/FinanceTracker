@@ -169,7 +169,7 @@ struct SpendIncomeView: View {
                 Spacer()
                 
                 DatePicker("", selection: $viewModel.dateSelected.animation(.snappy(duration: 0.5)), in: viewModel.availableDateRange, displayedComponents: .date)
-                    .frame(maxWidth: 125)
+                    .frame(maxWidth: 125, alignment: .trailing)
                     .contentShape([.hoverEffect, .contextMenuPreview], RoundedRectangle(cornerRadius: 8.0))
                     .contextMenu {
                         Button("Current date") {
@@ -179,7 +179,7 @@ struct SpendIncomeView: View {
             }
             
             if viewModel.filteredGroupedTranactions.isEmpty {
-                Text("No \(viewModel.transactionsTypeSelected.rawValue) for this date")
+                Text("No \(viewModel.transactionsTypeSelected.localizedString) for this date")
                     .font(.title2)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)

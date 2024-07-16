@@ -36,7 +36,7 @@ struct AppearanceView: View {
     
     //MARK: - Methods
     @ViewBuilder
-    private func getRowFor(colorScheme: ColorScheme?, title: String) -> some View {
+    private func getRowFor(colorScheme: ColorScheme?, title: LocalizedStringResource) -> some View {
         HStack {
             Text(title)
             

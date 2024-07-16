@@ -24,22 +24,22 @@ final class WelcomeViewModel: ObservableObject {
     weak var delegate: (any WelcomeViewModelDelegate)?
     let models: [ExampleModel] = [
         .init(
-            title: "Simple",
-            text: "Easily add your expenses and income",
+            title: String(localized: "Simple"),
+            text: String(localized: "Easily add your expenses and income"),
             imageName: "list page example"
         ),
         .init(
-            title: "Graphs",
-            text: "Track your finances with customizable graphs",
+            title: String(localized: "Graphs"),
+            text: String(localized: "Track your finances with customizable graphs"),
             imageName: "statistics page example"),
         .init(
-            title: "Open source",
-            text: "Completely open source, all information is stored on your device. No need to worry about privacy!",
+            title: String(localized: "Open source"),
+            text: String(localized: "Completely open source, all information is stored on your device. No need to worry about privacy!"),
             imageName: "github in safari"
         ),
         .init(
-            title: "First step",
-            text: "Create your balance account to start",
+            title: String(localized: "First step"),
+            text: String(localized: "Create your balance account to start"),
             imageName: "confirm image gray")
     ]
     

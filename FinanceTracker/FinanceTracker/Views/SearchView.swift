@@ -203,7 +203,7 @@ struct SearchView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.filterBalanceAccount?.name ?? "All") {
+                Menu(viewModel.filterBalanceAccount?.name ?? String(localized: "All")) {
                     Picker("Balance account", selection: $viewModel.filterBalanceAccount) {
                         ForEach(viewModel.allBalanceAccounts) { balanceAccount in
                             HStack {
@@ -234,7 +234,7 @@ struct SearchView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.filterCategory?.name ?? "All") {
+                Menu(viewModel.filterCategory?.name ?? String(localized: "All")) {
                     Picker("Categories", selection: $viewModel.filterCategory) {
                         ForEach(viewModel.filterCategories) { category in
                             HStack {

@@ -202,7 +202,7 @@ struct StatisticsView: View {
     
     private var noOneTagIsUsedView: some View {
         VStack {
-            Text("You do not have \(viewModel.transactionTypeForTags.rawValue) with tags")
+            Text("You do not have \(viewModel.transactionTypeForTags.localizedString) with tags")
         }
         .foregroundStyle(.secondary)
     }
@@ -221,7 +221,7 @@ struct StatisticsView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.pieChartTransactionType.rawValue) {
+                Menu(String(localized: viewModel.pieChartTransactionType.localizedString)) {
                     Picker("Pie chart picker", selection: $viewModel.pieChartTransactionType) {
                         ForEach(TransactionsType.allCases, id: \.rawValue) { type in
                             Text(type.rawValue)

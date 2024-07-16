@@ -13,7 +13,7 @@ struct SpendIncomePicker: View {
     
     var body: some View {
         HStack {
-            Text(TransactionsType.spending.rawValue)
+            Text(TransactionsType.spending.localizedString)
                 .background {
                     if transactionsTypeSelected == .spending {
                         Capsule()
@@ -29,7 +29,7 @@ struct SpendIncomePicker: View {
             
             Spacer()
             
-            Text(TransactionsType.income.rawValue)
+            Text(TransactionsType.income.localizedString)
                 .background {
                     if transactionsTypeSelected == .income {
                         Capsule()

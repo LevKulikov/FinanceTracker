@@ -16,6 +16,15 @@ protocol Named {
 enum TransactionsType: String, CaseIterable {
     case spending = "Spendings"
     case income = "Income"
+    
+    var localizedString: LocalizedStringResource {
+        switch self {
+        case .spending:
+            return "Spendings"
+        case .income:
+            return "Income"
+        }
+    }
 }
 
 //MARK: - BalanceAccount Model
