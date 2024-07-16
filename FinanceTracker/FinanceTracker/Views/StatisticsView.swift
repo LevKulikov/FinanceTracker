@@ -153,7 +153,7 @@ struct StatisticsView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.transactionTypeForTags.rawValue) {
+                Menu(String(localized: viewModel.transactionTypeForTags.localizedString)) {
                     Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
                         ForEach(TransactionsType.allCases, id: \.rawValue) { type in
                             Text(type.rawValue)
