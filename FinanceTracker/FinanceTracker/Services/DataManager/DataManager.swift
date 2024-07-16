@@ -92,22 +92,22 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     private let defaultBalanceAccountIdKey = "defaultBalanceAccountIdKey"
     private var balanceAccounts: [BalanceAccount] = []
     private let defaultSpendingCategories: [Category] = [
-        .init(type: .spending, name: "Groceries", iconName: "shopping-cart", color: .blue, placement: 1),
-        .init(type: .spending, name: "Сafes", iconName: "003-cutlery", color: .yellow, placement: 2),
-        .init(type: .spending, name: "Transport", iconName: "car", color: .orange, placement: 3),
-        .init(type: .spending, name: "Entertainments", iconName: "001-gamepad", color: .indigo, placement: 4),
-        .init(type: .spending, name: "Education", iconName: "016-book", color: .purple, placement: 5),
-        .init(type: .spending, name: "Health", iconName: "018-heart", color: .red, placement: 6),
-        .init(type: .spending, name: "Gifts", iconName: "031-gift", color: .mint, placement: 7),
-        .init(type: .spending, name: "Home", iconName: "home", color: .brown, placement: 8),
-        .init(type: .spending, name: "Family", iconName: "010-love-3", color: .pink, placement: 9),
-        .init(type: .spending, name: "Other", iconName: "047-upload", color: .red, placement: 10),
+        .init(type: .spending, name: String(localized: "Groceries"), iconName: "shopping-cart", color: .blue, placement: 1),
+        .init(type: .spending, name: String(localized: "Сafes"), iconName: "003-cutlery", color: .yellow, placement: 2),
+        .init(type: .spending, name: String(localized: "Transport"), iconName: "car", color: .orange, placement: 3),
+        .init(type: .spending, name: String(localized: "Entertainments"), iconName: "001-gamepad", color: .indigo, placement: 4),
+        .init(type: .spending, name: String(localized: "Education"), iconName: "016-book", color: .purple, placement: 5),
+        .init(type: .spending, name: String(localized: "Health"), iconName: "018-heart", color: .red, placement: 6),
+        .init(type: .spending, name: String(localized: "Gifts"), iconName: "031-gift", color: .mint, placement: 7),
+        .init(type: .spending, name: String(localized: "Home"), iconName: "home", color: .brown, placement: 8),
+        .init(type: .spending, name: String(localized: "Family"), iconName: "010-love-3", color: .pink, placement: 9),
+        .init(type: .spending, name: String(localized: "Other"), iconName: "047-upload", color: .red, placement: 10),
     ]
     private let defaultIncomeCategories: [Category] = [
-        .init(type: .income, name: "Gifts", iconName: "031-gift", color: .mint, placement: 3),
-        .init(type: .income, name: "Salary", iconName: "1-economy-004-economy", color: .green, placement: 1),
-        .init(type: .income, name: "Interest", iconName: "1-economy-007-bank", color: .purple, placement: 2),
-        .init(type: .income, name: "Other", iconName: "download", color: .green, placement: 4),
+        .init(type: .income, name: String(localized: "Gifts"), iconName: "031-gift", color: .mint, placement: 3),
+        .init(type: .income, name: String(localized: "Salary"), iconName: "1-economy-004-economy", color: .green, placement: 1),
+        .init(type: .income, name: String(localized: "Interest"), iconName: "1-economy-007-bank", color: .purple, placement: 2),
+        .init(type: .income, name: String(localized: "Other"), iconName: "download", color: .green, placement: 4),
     ]
     
     var tagDefaultColor: Color? {

@@ -80,6 +80,7 @@ struct CategoriesView: View {
                                 }
                         }
                     }
+                    .padding(.horizontal)
                 }
             }
             .navigationTitle("Categories")
@@ -145,10 +146,10 @@ struct CategoriesView: View {
     //MARK: - Computed View Props
     private var typePickerView: some View {
         Picker("Type picker", selection: $viewModel.caterotyType) {
-            Text(TransactionsType.spending.rawValue)
+            Text(TransactionsType.spending.localizedString)
                 .tag(TransactionsType.spending)
             
-            Text(TransactionsType.income.rawValue)
+            Text(TransactionsType.income.localizedString)
                 .tag(TransactionsType.income)
         }
         .labelsHidden()

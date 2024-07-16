@@ -30,7 +30,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         case valueIsZero
         case contextSaveError
         
-        var localizedDescription: String {
+        var localizedDescription: LocalizedStringResource {
             switch self {
             case .categoryIsNil:
                 return "Category is not selected"

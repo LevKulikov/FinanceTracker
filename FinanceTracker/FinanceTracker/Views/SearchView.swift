@@ -89,9 +89,9 @@ struct SearchView: View {
             
             VStack {
                 HStack {
-                    Menu(viewModel.dateFilterType == .customDateRange ? "DR" : viewModel.dateFilterType.rawValue, systemImage: "chevron.up.chevron.down") {
+                    Menu(viewModel.dateFilterType == .customDateRange ? "DR" : String(localized: viewModel.dateFilterType.rawValue), systemImage: "chevron.up.chevron.down") {
                         Picker("Date type", selection: $viewModel.dateFilterType) {
-                            ForEach(DateFilterType.allCases, id: \.rawValue) { dateType in
+                            ForEach(DateFilterType.allCases) { dateType in
                                 Text(dateType.rawValue)
                                     .tag(dateType)
                             }
@@ -184,9 +184,9 @@ struct SearchView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.filterTransactionType.rawValue) {
+                Menu(String(localized: viewModel.filterTransactionType.rawValue)) {
                     Picker("Transaction type", selection: $viewModel.filterTransactionType) {
-                        ForEach(TransactionFilterTypes.allCases, id: \.rawValue) { type in
+                        ForEach(TransactionFilterTypes.allCases) { type in
                             Text(type.rawValue)
                                 .tag(type)
                         }
@@ -203,7 +203,7 @@ struct SearchView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.filterBalanceAccount?.name ?? "All") {
+                Menu(viewModel.filterBalanceAccount?.name ?? String(localized: "All")) {
                     Picker("Balance account", selection: $viewModel.filterBalanceAccount) {
                         ForEach(viewModel.allBalanceAccounts) { balanceAccount in
                             HStack {
@@ -234,7 +234,7 @@ struct SearchView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.filterCategory?.name ?? "All") {
+                Menu(viewModel.filterCategory?.name ?? String(localized: "All")) {
                     Picker("Categories", selection: $viewModel.filterCategory) {
                         ForEach(viewModel.filterCategories) { category in
                             HStack {

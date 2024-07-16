@@ -18,7 +18,7 @@ struct WelcomeView: View {
         let count = CGFloat(viewModel.models.count)
         return (pageNumber/count)
     }
-    private var buttonText: String {
+    private var buttonText: LocalizedStringResource {
         if selection < viewModel.models.count - 1 {
             return "Next"
         } else {

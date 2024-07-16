@@ -16,25 +16,37 @@ protocol StatisticsViewModelDelegate: AnyObject {
     func didUpdatedTransactionsListFromStatistics()
 }
 
-enum TransactionFilterTypes: String, Equatable, CaseIterable {
+enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
     case both = "Both types"
     case spending = "Spending"
     case income = "Income"
+    
+    var id: Self {
+        return self
+    }
 }
 
-enum PieChartDateFilter: String, Equatable, CaseIterable {
+enum PieChartDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
     case day = "For a day"
     case month = "For a month"
     case year = "For a year"
     case dateRange = "Date range"
     case allTime = "All time"
+    
+    var id: Self {
+        return self
+    }
 }
 
-enum BarChartPerDateFilter: String, Equatable, CaseIterable {
+enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
     case perDay = "Per day"
     case perWeek = "Per week"
     case perMonth = "Per month"
     case perYear = "Per year"
+    
+    var id: Self {
+        return self
+    }
 }
 
 final class StatisticsViewModel: ObservableObject {
