@@ -102,6 +102,7 @@ struct TransactionPieChart: View {
                                 setSelectedCategory(selectedFlag ? nil : singleData.category)
                             }
                             .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 3))
+                            .hoverEffect(.highlight)
                             .contextMenu {
                                 Button("Show transactions", systemImage: "list.bullet") {
                                     onCategoryDataTap(singleData)

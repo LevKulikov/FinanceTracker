@@ -57,6 +57,7 @@ struct TagsLineChart: View {
                         RoundedRectangle(cornerRadius: 7)
                             .fill(singleTagData.tag.color.opacity(0.15))
                     }
+                    .hoverEffect(.highlight)
                     .frame(height: rowHeight)
                     .onTapGesture {
                         onTagDataTap(singleTagData)

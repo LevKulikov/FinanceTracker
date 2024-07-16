@@ -109,6 +109,7 @@ struct StatisticsView: View {
                 }
                 .lineLimit(1)
                 .buttonStyle(.bordered)
+                .hoverEffect(.highlight)
             }
             
             HStack(alignment: .bottom) {
@@ -161,6 +162,7 @@ struct StatisticsView: View {
                     }
                 }
                 .buttonStyle(.bordered)
+                .hoverEffect(.highlight)
             }
             
             if !viewModel.allTags.isEmpty {
@@ -194,6 +196,7 @@ struct StatisticsView: View {
             }
             .buttonBorderShape(.capsule)
             .buttonStyle(.bordered)
+            .hoverEffect(.highlight)
         }
     }
     
@@ -227,6 +230,7 @@ struct StatisticsView: View {
                     }
                 }
                 .buttonStyle(.bordered)
+                .hoverEffect(.highlight)
             }
             
             TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { pieChartData in
@@ -262,6 +266,7 @@ struct StatisticsView: View {
                     }
                 }
                 .foregroundStyle(.primary)
+                .hoverEffect(.highlight)
                 
                 Spacer()
                 
@@ -287,6 +292,7 @@ struct StatisticsView: View {
                     }
                     .labelStyle(.iconOnly)
                     .font(.title2)
+                    .hoverEffect(.highlight)
                     .disabled(!viewModel.pieDateRangeCanBeMovedBack)
                     
                     Spacer()
@@ -300,6 +306,7 @@ struct StatisticsView: View {
                     }
                     .labelStyle(.iconOnly)
                     .font(.title2)
+                    .hoverEffect(.highlight)
                     .disabled(!viewModel.pieDateRangeCanBeMovedForward)
                 }
                 .padding(.top)
@@ -338,6 +345,7 @@ struct StatisticsView: View {
                     }
                 }
                 .buttonStyle(.bordered)
+                .hoverEffect(.highlight)
             }
             
             TransactionBarChart(
@@ -358,6 +366,7 @@ struct StatisticsView: View {
                     }
                 }
                 .foregroundStyle(.primary)
+                .hoverEffect(.highlight)
                 
                 Spacer()
             }
