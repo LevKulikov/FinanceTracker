@@ -15,12 +15,16 @@ protocol SearchViewModelDelegate: AnyObject {
     func hideTabBar(_ hide: Bool)
 }
 
-enum DateFilterType: String, CaseIterable {
+enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable {
     case day = "For a day"
     case week = "For a week"
     case month = "For a month"
     case year = "For a year"
     case customDateRange = "Date range"
+    
+    var id: Self {
+        return self
+    }
 }
 
 struct TransactionGroupedData: Identifiable {

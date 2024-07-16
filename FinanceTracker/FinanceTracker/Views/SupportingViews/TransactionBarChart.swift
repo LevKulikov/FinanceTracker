@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct TransactionBarChartData: Identifiable {
-    enum TransactionBarChartDataType: String {
+    enum TransactionBarChartDataType: LocalizedStringResource {
         case spending = "Spending"
         case income = "Income"
         case profit = "Profit"
@@ -170,24 +170,24 @@ struct TransactionBarChart: View {
                         x: .value("Date", transaction.date, unit: unit),
                         y: .value("Transaction", transaction.value)
                     )
-                    .foregroundStyle(by: .value("Type", transaction.type.rawValue))
-                    .position(by: .value("Type", transaction.type.rawValue), axis: .horizontal)
+                    .foregroundStyle(by: .value("Type", String(localized: transaction.type.rawValue)))
+                    .position(by: .value("Type", String(localized: transaction.type.rawValue)), axis: .horizontal)
                     
                     if let selectionBuffer {
                         RuleMark(x: .value("Date", selectionBuffer, unit: unit))
                             .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .fit(to: .chart))) {
                                 annotationPopover
                             }
-                            .foregroundStyle(by: .value("Type", transaction.type.rawValue))
+                            .foregroundStyle(by: .value("Type", String(localized: transaction.type.rawValue)))
                     }
                 }
             }
         }
         .chartForegroundStyleScale([
-            TransactionBarChartData.TransactionBarChartDataType.spending.rawValue : .red,
-            TransactionBarChartData.TransactionBarChartDataType.income.rawValue : .green,
-            TransactionBarChartData.TransactionBarChartDataType.profit.rawValue : .blue,
-            TransactionBarChartData.TransactionBarChartDataType.unknown.rawValue : .yellow,
+            String(localized:TransactionBarChartData.TransactionBarChartDataType.spending.rawValue) : .red,
+            String(localized:TransactionBarChartData.TransactionBarChartDataType.income.rawValue) : .green,
+            String(localized:TransactionBarChartData.TransactionBarChartDataType.profit.rawValue) : .blue,
+            String(localized:TransactionBarChartData.TransactionBarChartDataType.unknown.rawValue) : .yellow,
         ])
         .chartScrollTargetBehavior(
             .valueAligned(

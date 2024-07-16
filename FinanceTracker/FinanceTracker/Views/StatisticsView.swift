@@ -253,9 +253,9 @@ struct StatisticsView: View {
     private var pieChartMenuDatePickerView: some View {
         VStack {
             HStack {
-                Menu(viewModel.pieChartMenuDateFilterSelected.rawValue, systemImage: "chevron.up.chevron.down") {
+                Menu(String(localized: viewModel.pieChartMenuDateFilterSelected.rawValue), systemImage: "chevron.up.chevron.down") {
                     Picker("Pie chart date type picker", selection: $viewModel.pieChartMenuDateFilterSelected) {
-                        ForEach(PieChartDateFilter.allCases, id: \.rawValue) { dateFilterType in
+                        ForEach(PieChartDateFilter.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
                                 .tag(dateFilterType)
                         }
@@ -336,9 +336,9 @@ struct StatisticsView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.barChartTransactionTypeFilter.rawValue) {
+                Menu(String(localized: viewModel.barChartTransactionTypeFilter.rawValue)) {
                     Picker("Bar chart picker", selection: $viewModel.barChartTransactionTypeFilter) {
-                        ForEach(TransactionFilterTypes.allCases, id: \.rawValue) { type in
+                        ForEach(TransactionFilterTypes.allCases) { type in
                             Text(type.rawValue)
                                 .tag(type)
                         }
@@ -357,9 +357,9 @@ struct StatisticsView: View {
             .padding(.bottom)
             
             HStack {
-                Menu(viewModel.barChartPerDateFilter.rawValue, systemImage: "chevron.up.chevron.down") {
+                Menu(String(localized: viewModel.barChartPerDateFilter.rawValue), systemImage: "chevron.up.chevron.down") {
                     Picker("Bar chart date sride type picker", selection: $viewModel.barChartPerDateFilter) {
-                        ForEach(BarChartPerDateFilter.allCases, id: \.rawValue) { dateFilterType in
+                        ForEach(BarChartPerDateFilter.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
                                 .tag(dateFilterType)
                         }
