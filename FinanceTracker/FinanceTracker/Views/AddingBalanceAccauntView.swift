@@ -157,6 +157,7 @@ struct AddingBalanceAccauntView: View {
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.bordered)
                 .foregroundStyle(.secondary)
+                .hoverEffect(.highlight)
             }
             .padding(.horizontal)
             
@@ -166,6 +167,8 @@ struct AddingBalanceAccauntView: View {
                     LazyHGrid(rows: [GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace)), GridItem(.fixed(gridSpace))], spacing: 20) {
                         ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
                             getIconItem(for: iconName)
+                                .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                                .hoverEffect(.highlight)
                                 .id(iconName)
                                 .onTapGesture {
                                     withAnimation {
@@ -202,12 +205,16 @@ struct AddingBalanceAccauntView: View {
             HStack {
                 ForEach(FTAppAssets.defaultColors, id: \.self) { defaultColor in
                     getColorItem(for: defaultColor)
+                        .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                        .hoverEffect(.highlight)
                     
                     Spacer()
                 }
                 
                 ColorPicker("", selection: $viewModel.color)
                     .labelsHidden()
+                    .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                    .hoverEffect(.highlight)
                     .overlay {
                         if !FTAppAssets.defaultColors.contains(viewModel.color) {
                             Image(systemName: "checkmark")
@@ -245,6 +252,7 @@ struct AddingBalanceAccauntView: View {
                         .stroke(canBeAddedOrUpdated ? .blue : .gray)
                 }
         }
+        .hoverEffect(.lift)
         .disabled(!canBeAddedOrUpdated)
         .offset(y: -5)
     }

@@ -158,6 +158,7 @@ struct TagsView: View {
                     }
                 }
                 .tint(.red)
+                .hoverEffect(.highlight)
                 
                 Button("Save") {
                     viewModel.createNewTag()
@@ -168,6 +169,7 @@ struct TagsView: View {
                     }
                 }
                 .tint(.blue)
+                .hoverEffect(.highlight)
             }
             .buttonStyle(.bordered)
             .buttonBorderShape(.capsule)
@@ -195,6 +197,8 @@ struct TagsView: View {
                     
                     ColorPicker("Color for tag", selection: $viewModel.tagColor)
                         .labelsHidden()
+                        .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                        .hoverEffect(.highlight)
                         .matchedGeometryEffect(id: "tagColor" + tag.id, in: namespace)
                 }
                 .padding(.top)
@@ -208,6 +212,7 @@ struct TagsView: View {
                             tagChangeTextFieldFocused = false
                         }
                     }
+                    .hoverEffect(.highlight)
                     .matchedGeometryEffect(id: "cancelButton" + tag.id, in: namespace)
                     .tint(.red)
                     
@@ -218,6 +223,7 @@ struct TagsView: View {
                             tagChangeTextFieldFocused = false
                         }
                     }
+                    .hoverEffect(.highlight)
                     .matchedGeometryEffect(id: "saveButton" + tag.id, in: namespace)
                     .tint(.blue)
                 }

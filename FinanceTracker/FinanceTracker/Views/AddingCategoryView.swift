@@ -116,6 +116,7 @@ struct AddingCategoryView: View {
                     showPreview.toggle()
                 }
             }
+            .hoverEffect(.highlight)
         }
         .padding(.horizontal)
     }
@@ -200,6 +201,7 @@ struct AddingCategoryView: View {
                 .buttonBorderShape(.capsule)
                 .buttonStyle(.bordered)
                 .foregroundStyle(.secondary)
+                .hoverEffect(.highlight)
             }
             .padding(.horizontal)
             
@@ -210,6 +212,8 @@ struct AddingCategoryView: View {
                         ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
                             getIconItem(for: iconName)
                                 .id(iconName)
+                                .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                                .hoverEffect(.highlight)
                                 .scrollTargetLayout()
                                 .onTapGesture {
                                     withAnimation {
@@ -246,12 +250,16 @@ struct AddingCategoryView: View {
             HStack {
                 ForEach(FTAppAssets.defaultColors, id: \.self) { defaultColor in
                     getColorItem(for: defaultColor)
+                        .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                        .hoverEffect(.highlight)
                     
                     Spacer()
                 }
                 
                 ColorPicker("", selection: $viewModel.categoryColor)
                     .labelsHidden()
+                    .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                    .hoverEffect(.highlight)
                     .overlay {
                         if !FTAppAssets.defaultColors.contains(viewModel.categoryColor) {
                             Image(systemName: "checkmark")
@@ -294,6 +302,7 @@ struct AddingCategoryView: View {
                         .stroke(canBeAdded ? .blue : .gray)
                 }
         }
+        .hoverEffect(.lift)
         .disabled(!canBeAdded)
         .offset(y: -5)
     }

@@ -22,6 +22,7 @@ struct SpendIncomePicker: View {
                             .matchedGeometryEffect(id: "transactionsTypeSelect", in: namespace)
                     }
                 }
+                .hoverEffect(.lift)
                 .onTapGesture {
                     setTransactionType(.spending)
                 }
@@ -37,6 +38,7 @@ struct SpendIncomePicker: View {
                             .matchedGeometryEffect(id: "transactionsTypeSelect", in: namespace)
                     }
                 }
+                .hoverEffect(.lift)
                 .onTapGesture {
                     setTransactionType(.income)
                 }

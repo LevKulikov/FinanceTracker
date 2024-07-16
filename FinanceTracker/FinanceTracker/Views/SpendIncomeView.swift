@@ -100,6 +100,7 @@ struct SpendIncomeView: View {
                 }
                 .labelStyle(.iconOnly)
                 .font(.title)
+                .hoverEffect(.highlight)
                 .disabled(!viewModel.movingBackwardDateAvailable)
                 .padding(.leading)
                 .scaleEffect(reversedScaleProgress, anchor: .topLeading)
@@ -120,6 +121,7 @@ struct SpendIncomeView: View {
                 }
                 .labelStyle(.iconOnly)
                 .font(.title)
+                .hoverEffect(.highlight)
                 .disabled(!viewModel.movingForwardDateAvailable)
                 .padding(.trailing)
                 .scaleEffect(reversedScaleProgress, anchor: .topTrailing)
@@ -152,8 +154,7 @@ struct SpendIncomeView: View {
                         .font(.title)
                 }
                 .foregroundStyle(.primary)
-
-                
+                .hoverEffect(.highlight)
                 
                 Spacer()
             }

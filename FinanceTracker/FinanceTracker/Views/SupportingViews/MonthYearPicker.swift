@@ -67,6 +67,7 @@ struct MonthYearPicker: View {
                 .onTapGesture(count: 20, perform: {
                     // prevents iOS 17 bug
                 })
+                .hoverEffect(.highlight)
             }
             
             let yearNumber = calendar.component(.year, from: date)
@@ -80,6 +81,7 @@ struct MonthYearPicker: View {
             .onTapGesture(count: 20, perform: {
                 // prevents iOS 17 bug
             })
+            .hoverEffect(.highlight)
         }
         .buttonStyle(.bordered)
         .foregroundStyle(.primary)

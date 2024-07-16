@@ -24,6 +24,7 @@ struct WideIconPickerView: View {
                 Button("Close") {
                     showPicker.toggle()
                 }
+                .hoverEffect(.highlight)
             }
             .padding(.top, 20)
             .padding(.horizontal, 25)
@@ -32,6 +33,8 @@ struct WideIconPickerView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 55, maximum: 75))], spacing: 20) {
                     ForEach(FTAppAssets.defaultIconNames, id: \.self) { iconName in
                         getIconItem(for: iconName)
+                            .contentShape([.hoverEffect, .contextMenuPreview], Circle())
+                            .hoverEffect(.highlight)
                             .onTapGesture {
                                 showPicker.toggle()
                                 withAnimation {
