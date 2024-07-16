@@ -98,6 +98,7 @@ struct SearchView: View {
                         }
                     }
                     .foregroundStyle(.primary)
+                    .hoverEffect(.highlight)
                     
                     Spacer()
                     
@@ -163,6 +164,7 @@ struct SearchView: View {
                         .buttonBorderShape(.capsule)
                         .buttonStyle(.bordered)
                         .foregroundStyle(.secondary)
+                        .hoverEffect(.highlight)
                     }
                     .transition(.blurReplace)
                     
@@ -266,6 +268,7 @@ struct SearchView: View {
                     Button("Clear selection") {
                         viewModel.filterTags = []
                     }
+                    .hoverEffect(.highlight)
                 }
             }
             
@@ -283,6 +286,7 @@ struct SearchView: View {
                                 RoundedRectangle(cornerRadius: 7)
                                     .fill(tag.color.opacity(tagIdAdded ? 0.4 : 0.15))
                             }
+                            .hoverEffect(.highlight)
                             .onTapGesture {
                                 viewModel.addRemoveTag(tag)
                             }
@@ -308,6 +312,7 @@ struct RoundedRectMenu: ViewModifier {
         content
             .lineLimit(1)
             .buttonStyle(.bordered)
+            .hoverEffect(.highlight)
     }
 }
 
