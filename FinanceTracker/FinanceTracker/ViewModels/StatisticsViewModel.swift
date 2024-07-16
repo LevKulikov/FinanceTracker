@@ -112,7 +112,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: For pie chart
     /// Data Array to be provided in pie chart
-    @Published private(set) var pieChartTransactionData: [(category: Category, sumValue: Float)] = []
+    @Published private(set) var pieChartTransactionData: [TransactionPieChartData] = []
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
@@ -382,7 +382,8 @@ final class StatisticsViewModel: ObservableObject {
                 .grouped { $0.category }
                 .map { singleDict in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
-                    return (category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory)
+                    let transactions = singleDict.value
+                    return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
