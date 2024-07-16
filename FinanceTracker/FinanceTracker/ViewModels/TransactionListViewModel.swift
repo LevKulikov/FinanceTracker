@@ -13,6 +13,13 @@ protocol TransactionListViewModelDelegate: AnyObject {
     func didUpdatedTransaction()
 }
 
+/// Struct is only for convenience of providing data
+struct TransactionListUIData: Identifiable {
+    let id = UUID().uuidString
+    let transactions: [Transaction]
+    let title: String
+}
+
 final class TransactionListViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any TransactionListViewModelDelegate)?

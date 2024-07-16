@@ -12,6 +12,7 @@ struct StatisticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: StatisticsViewModel
     @State private var showTagsView = false
+    @State private var showTransactionListWithData: TransactionListUIData?
     private var windowWidth: CGFloat {
         FTAppAssets.getWindowSize().width
     }
@@ -70,6 +71,9 @@ struct StatisticsView: View {
             .navigationTitle("Statistics")
             .sheet(isPresented: $showTagsView) {
                 viewModel.getTagsView()
+            }
+            .sheet(item: $showTransactionListWithData) { transactionListData in
+                viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
             }
         }
     }
@@ -161,8 +165,8 @@ struct StatisticsView: View {
                 if !viewModel.tagsTotalData.isEmpty {
                     ScrollView {
                         TagsLineChart(tagData: viewModel.tagsTotalData) { tagData in
-                            //TODO: Continue
-                            print(tagData.tag.name)
+                            let title: String = "# \(tagData.tag.name)"
+                            showTransactionListWithData = TransactionListUIData(transactions: tagData.transactions, title: title)
                         }
                     }
                     .scrollIndicators(.hidden)

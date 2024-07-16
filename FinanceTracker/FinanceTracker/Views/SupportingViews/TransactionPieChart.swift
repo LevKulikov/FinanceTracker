@@ -206,7 +206,6 @@ struct TransactionPieChart: View {
 #Preview {
     let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
     @StateObject var viewModel = StatisticsViewModel(dataManager: dataManger)
-    viewModel.setAnyExistingBA()
     
     return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
 }

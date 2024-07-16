@@ -221,14 +221,19 @@ final class StatisticsViewModel: ObservableObject {
         }, for: .pieChart)
     }
     
-    /// For preview only
-    func setAnyExistingBA() {
-        guard let toset = balanceAccounts.first else { return }
-        balanceAccountToFilter = toset
-    }
-    
+    /// Provides View for Tags settings
+    /// - Returns: View for tags settings
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
+    }
+    
+    /// Provides View for list of transactions
+    /// - Parameters:
+    ///   - transactions: transactions to be displayed in list
+    ///   - title: title to be set in the returned view
+    /// - Returns: TransactionListView with view model
+    func getTransactionListView(transactions: [Transaction], title: String) -> some View {
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: transactions, title: title, threadToUse: .global, delegate: self)
     }
     
     //MARK: Private methods
@@ -671,6 +676,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
     }
 }
 
+//MARK: - Extension for TagsViewModelDelegate
 extension StatisticsViewModel: TagsViewModelDelegate {
     func didDeleteTag() {
         Task {
@@ -694,5 +700,12 @@ extension StatisticsViewModel: TagsViewModelDelegate {
             await fetchTags()
             calculateTagsTotal()
         }
+    }
+}
+
+//MARK: - Extension for TransactionListViewModelDelegate
+extension StatisticsViewModel: TransactionListViewModelDelegate {
+    func didUpdatedTransaction() {
+        
     }
 }
