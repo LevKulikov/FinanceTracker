@@ -60,7 +60,7 @@ final class CustomTabViewModel: ObservableObject {
     }
     
     func getStatisticsView() -> some View {
-        return FTFactory.shared.createStatisticsView(dataManager: dataManager) { [weak self] viewModel in
+        return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
@@ -106,6 +106,21 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didUpdateTransactionList() {
         delegates.forEach {
             $0.object?.didUpdateData(for: .data, from: .spendIncomeView)
+        }
+    }
+}
+
+//MARK: Extension for StatisticsViewModelDelegate
+extension CustomTabViewModel: StatisticsViewModelDelegate {
+    func showTabBar(_ show: Bool) {
+        withAnimation {
+            showTabBar = show
+        }
+    }
+    
+    func didUpdatedTransactionsListFromStatistics() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .statisticsView)
         }
     }
 }

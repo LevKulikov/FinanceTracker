@@ -72,7 +72,9 @@ struct StatisticsView: View {
             .sheet(isPresented: $showTagsView) {
                 viewModel.getTagsView()
             }
-            .sheet(item: $showTransactionListWithData) { transactionListData in
+            .sheet(item: $showTransactionListWithData) {
+                viewModel.refreshDataIfNeeded()
+            } content: { transactionListData in
                 viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
             }
         }

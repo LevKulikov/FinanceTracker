@@ -70,13 +70,15 @@ final class FTFactory {
         return AnyView(AddingBalanceAccauntView(viewModel: viewModel))
     }
     
-    func createStatisticsView(dataManager: some DataManagerProtocol, actionWithViewModel: ((StatisticsViewModel) -> Void)? = nil) -> AnyView {
+    func createStatisticsView(dataManager: some DataManagerProtocol, delegate: (some StatisticsViewModelDelegate)? = nil, actionWithViewModel: ((StatisticsViewModel) -> Void)? = nil) -> AnyView {
         if let statisticsViewModel {
             actionWithViewModel?(statisticsViewModel)
+            statisticsViewModel.delegate = delegate
             return AnyView(StatisticsView(viewModel: statisticsViewModel))
         }
         
         let viewModel = StatisticsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
         statisticsViewModel = viewModel
         actionWithViewModel?(viewModel)
         return AnyView(StatisticsView(viewModel: viewModel))

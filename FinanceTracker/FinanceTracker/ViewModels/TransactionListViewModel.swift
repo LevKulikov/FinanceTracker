@@ -97,6 +97,7 @@ extension TransactionListViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func deletedTransaction(_ transaction: Transaction) {
+        delegate?.didUpdatedTransaction()
         transactions.removeAll { transaction.id == $0.id }
         setTransactionGroups()
     }

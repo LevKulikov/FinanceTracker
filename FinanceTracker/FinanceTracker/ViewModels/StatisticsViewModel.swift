@@ -12,6 +12,8 @@ import SwiftData
 
 protocol StatisticsViewModelDelegate: AnyObject {
     func showTabBar(_ show: Bool)
+    
+    func didUpdatedTransactionsListFromStatistics()
 }
 
 enum TransactionFilterTypes: String, Equatable, CaseIterable {
@@ -67,6 +69,8 @@ final class StatisticsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
+    /// Flag to determine if any transaction was updated from another view. Prevents multiple recalculations if several transactions were updated
+    private var isTransactionUpdatedFromAnotherView = false
     /// Array of years those are available
     private var availableYearDates: [Date] = []
     /// Array of years with months those are available
@@ -178,6 +182,14 @@ final class StatisticsViewModel: ObservableObject {
             self?.calculateDataForBarChart()
             compeletionHandler?()
         }
+    }
+    
+    /// Refreshes data if some changes occured, otherwise do nothing
+    /// - Parameter compeletionHandler: closure that is called at the end of refreshing
+    func refreshDataIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+        guard isTransactionUpdatedFromAnotherView else { return }
+        isTransactionUpdatedFromAnotherView = false
+        refreshData(compeletionHandler: compeletionHandler)
     }
     
     /// Moves date range consiquentely its size to back or forward
@@ -706,6 +718,7 @@ extension StatisticsViewModel: TagsViewModelDelegate {
 //MARK: - Extension for TransactionListViewModelDelegate
 extension StatisticsViewModel: TransactionListViewModelDelegate {
     func didUpdatedTransaction() {
-        
+        isTransactionUpdatedFromAnotherView = true
+        delegate?.didUpdatedTransactionsListFromStatistics()
     }
 }
