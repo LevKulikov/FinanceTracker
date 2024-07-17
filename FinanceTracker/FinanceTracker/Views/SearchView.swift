@@ -145,6 +145,7 @@ struct SearchView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(.secondarySystemFill))
                             }
+                            .hoverEffect(.lift)
                             .matchedGeometryEffect(id: "moreFilterBackground", in: namespace)
                     }
                 } else {

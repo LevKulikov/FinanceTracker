@@ -24,6 +24,17 @@ enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, I
     var id: Self {
         return self
     }
+    
+    var binaryTransactionType: TransactionsType? {
+        switch self {
+        case .both:
+            return nil
+        case .spending:
+            return .spending
+        case .income:
+            return .income
+        }
+    }
 }
 
 enum PieChartDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
