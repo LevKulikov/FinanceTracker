@@ -32,6 +32,7 @@
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
 		73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */; };
 		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
+		73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90462C499571002267F4 /* BudgetCardViewModel.swift */; };
 		73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */; };
 		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
 		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
@@ -118,6 +119,7 @@
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
 		73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsViewModel.swift; sourceTree = "<group>"; };
 		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
+		73AE90462C499571002267F4 /* BudgetCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCardViewModel.swift; sourceTree = "<group>"; };
 		73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
 		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
@@ -306,6 +308,7 @@
 				73D000DD2C31DC4700AACFCE /* WelcomeViewModel.swift */,
 				73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */,
 				73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */,
+				73AE90462C499571002267F4 /* BudgetCardViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -536,6 +539,7 @@
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				73CCF3E32C2B51AB009D8001 /* ManageDataViewModel.swift in Sources */,
+				73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				73D000DA2C2EED3500AACFCE /* SearchTransactionRow.swift in Sources */,
