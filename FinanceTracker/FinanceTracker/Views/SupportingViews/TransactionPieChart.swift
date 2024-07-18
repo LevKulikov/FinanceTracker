@@ -64,7 +64,7 @@ struct TransactionPieChart: View {
                     }
                 } else {
                     SectorMark(
-                        angle: .value("Empy", 100),
+                        angle: .value("Empty", 100),
                         innerRadius: .ratio(0.65),
                         outerRadius: .ratio(0.95)
                     )
@@ -155,18 +155,6 @@ struct TransactionPieChart: View {
     }
     
     //MARK: - Methods
-    @ViewBuilder
-    private func getAnnotationPopover(value: Float) -> some View {
-        let percentage = calculatePercentage(for: value)
-        
-        Text("\(percentage)%")
-            .transaction { $0.animation = nil }
-            .padding(.vertical, 5)
-            .padding(.horizontal, 10)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-    
     private func calculateTotalValue() -> Float {
         let value = transactionsChartData
             .map { $0.sumValue }
@@ -176,6 +164,12 @@ struct TransactionPieChart: View {
     }
     
     private func calculatePercentage(for value: Float) -> Int {
+        guard !sumOfValue.isNaN, sumOfValue != .infinity else {
+            return sumOfValue > 0 ? 100 : 0
+        }
+        guard !sumOfValue.isNaN, value != .infinity else {
+            return value == .infinity ? 100 : 0
+        }
         return Int(value/sumOfValue * 100)
     }
     

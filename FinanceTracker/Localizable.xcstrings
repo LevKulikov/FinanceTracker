@@ -864,6 +864,7 @@
       }
     },
     "Empy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1448,7 +1449,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доход"
+            "value" : "Прибыль"
           }
         }
       }

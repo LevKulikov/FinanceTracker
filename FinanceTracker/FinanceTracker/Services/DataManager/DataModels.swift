@@ -13,7 +13,7 @@ protocol Named {
     var name: String { get set }
 }
 
-enum TransactionsType: String, CaseIterable {
+enum TransactionsType: String, CaseIterable, Identifiable {
     case spending = "Spendings"
     case income = "Income"
     
@@ -24,6 +24,10 @@ enum TransactionsType: String, CaseIterable {
         case .income:
             return "Income"
         }
+    }
+    
+    var id: Self {
+        return self
     }
 }
 

@@ -127,7 +127,7 @@ final class StatisticsViewModel: ObservableObject {
     /// Transaction type to select of which transactins should be shown as total for tags data
     @Published var transactionTypeForTags: TransactionsType = .spending {
         didSet {
-            calculateTagsTotal()
+            calculateTagsTotal(animated: true)
         }
     }
     /// Flag to identify if tags statistics data is currently being calculate
@@ -139,31 +139,31 @@ final class StatisticsViewModel: ObservableObject {
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
-            calculateDataForPieChart()
+            calculateDataForPieChart(animated: true)
         }
     }
     /// Which type of date filtering is selected for pie chart
     @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .month {
         didSet {
-            calculateDataForPieChart()
+            calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart DatePicker (for a single day, month or year )
     @Published var pieChartDate: Date = .now {
         didSet {
-            calculateDataForPieChart()
+            calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, start date
     @Published var pieChartDateStart: Date = .now {
         didSet {
-            calculateDataForPieChart()
+            calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, end date
     @Published var pieChartDateEnd: Date = .now {
         didSet {
-            calculateDataForPieChart()
+            calculateDataForPieChart(animated: true)
         }
     }
     /// Flag to identify if pie chart data is currently being calculate
@@ -175,13 +175,13 @@ final class StatisticsViewModel: ObservableObject {
     /// Filter by transactions type (adding both case) to display in bar chart
     @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
         didSet {
-            calculateDataForBarChart()
+            calculateDataForBarChart(animated: true)
         }
     }
     /// Filter to select per which type of date to be diplayed in bar chart
     @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
         didSet {
-            calculateDataForBarChart()
+            calculateDataForBarChart(animated: true)
         }
     }
     /// Flag to identify if bar chart data is currently being calculate
@@ -200,7 +200,7 @@ final class StatisticsViewModel: ObservableObject {
     func refreshData(compeletionHandler: (() -> Void)? = nil) {
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
-            self?.calculateTagsTotal()
+            self?.calculateTagsTotal(animated: true)
             self?.calculateDataForPieChart()
             self?.calculateDataForBarChart()
             compeletionHandler?()
@@ -322,7 +322,7 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Calculate total value for all time tags spending or income
-    private func calculateTagsTotal() {
+    private func calculateTagsTotal(animated: Bool = false) {
         guard isCalculationAllowed else { return }
         
         DispatchQueue.main.async { [weak self] in
@@ -337,7 +337,11 @@ final class StatisticsViewModel: ObservableObject {
             guard !transactionsWithTags.isEmpty else {
                 DispatchQueue.main.async {
                     self.tagsDataIsCalculating = false
-                    withAnimation {
+                    if animated {
+                        withAnimation {
+                            self.tagsTotalData = []
+                        }
+                    } else {
                         self.tagsTotalData = []
                     }
                 }
@@ -374,7 +378,7 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Calculates data for pie chart and sets it with animation
-    private func calculateDataForPieChart() {
+    private func calculateDataForPieChart(animated: Bool = false) {
         guard isCalculationAllowed else { return }
         
         DispatchQueue.main.async { [weak self] in
@@ -413,7 +417,11 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.pieDataIsCalculating = false
-                withAnimation {
+                if animated {
+                    withAnimation {
+                        self.pieChartTransactionData = returnData
+                    }
+                } else {
                     self.pieChartTransactionData = returnData
                 }
             }
@@ -421,7 +429,7 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Calculates data for bar chart and sets it with animation
-    private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility)) {
+    private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility), animated: Bool = false) {
         guard isCalculationAllowed else { return }
         
         DispatchQueue.main.async { [weak self] in
@@ -503,7 +511,11 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.barDataIsCalculating = false
-                withAnimation {
+                if animated {
+                    withAnimation {
+                        self.barChartTransactionData = availableBarData
+                    }
+                } else {
                     self.barChartTransactionData = availableBarData
                 }
             }

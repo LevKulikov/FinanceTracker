@@ -155,8 +155,8 @@ struct StatisticsView: View {
                 
                 Menu(String(localized: viewModel.transactionTypeForTags.localizedString)) {
                     Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
-                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
-                            Text(type.rawValue)
+                        ForEach(TransactionsType.allCases) { type in
+                            Text(type.localizedString)
                                 .tag(type)
                         }
                     }
@@ -223,8 +223,8 @@ struct StatisticsView: View {
                 
                 Menu(String(localized: viewModel.pieChartTransactionType.localizedString)) {
                     Picker("Pie chart picker", selection: $viewModel.pieChartTransactionType) {
-                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
-                            Text(type.rawValue)
+                        ForEach(TransactionsType.allCases) { type in
+                            Text(type.localizedString)
                                 .tag(type)
                         }
                     }
