@@ -37,10 +37,12 @@ struct BudgetCard: View {
             HStack {
                 FTAppAssets.iconImageOrEpty(name: budgetIconName)
                     .scaledToFit()
-                    .frame(width: 30, height: 30)
                     .foregroundStyle(Color.orange)
+                    .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
+                    .frame(width: 30, height: 30)
                 
                 Text(budgetName)
+                    .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
                     .bold()
                 
                 Spacer()
@@ -48,23 +50,29 @@ struct BudgetCard: View {
                 Text(viewModel.budget.period.localizedString)
                     .foregroundStyle(.secondary)
                     .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
             }
             .padding(.horizontal)
             
             lineChart
                 .padding(.horizontal)
                 .padding(.vertical, 7)
+                .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
             
             HStack {
                 Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
+                    .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
                 Text(budgetCurrency)
+                    .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
                 
                 Spacer()
                 
                 Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
                     .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
                 Text(budgetCurrency)
                     .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
             }
             .font(.subheadline)
             .padding(.horizontal)
@@ -73,6 +81,7 @@ struct BudgetCard: View {
         .background {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.secondarySystemBackground))
+                .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
         }
     }
     
