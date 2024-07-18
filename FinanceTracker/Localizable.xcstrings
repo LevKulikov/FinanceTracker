@@ -379,6 +379,9 @@
     "Budget total" : {
 
     },
+    "Bugets" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "ru" : {
@@ -1078,9 +1081,6 @@
           }
         }
       }
-    },
-    "Hello, World!" : {
-
     },
     "Hide" : {
       "localizations" : {

@@ -65,6 +65,11 @@ final class BudgetsViewModel: ObservableObject {
         }
     }
     
+    func getBudgetCard(for budget: Budget, namespace: Namespace.ID) -> some View {
+        let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: budget)
+        return BudgetCard(viewModel: viewModel, namespace: namespace)
+    }
+    
     //MARK: Private methods
     private func initialFetchData() {
         Task { @MainActor in

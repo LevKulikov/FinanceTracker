@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BudgetsView: View {
     //MARK: - Properties
+    @Namespace private var namespace
     @StateObject private var viewModel: BudgetsViewModel
     
     //MARK: - Initializer
@@ -18,10 +19,57 @@ struct BudgetsView: View {
     
     //MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ScrollView {
+                headerView
+                    .padding(.horizontal)
+                
+                ForEach(viewModel.budgets) { budget in
+                    viewModel.getBudgetCard(for: budget, namespace: namespace)
+                }
+                .padding()
+            }
+            .scrollIndicators(.hidden)
+            .navigationTitle("Bugets")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add", systemImage: "plus") {
+                        //TODO: Continue
+                    }
+                }
+            }
+        }
     }
     
     //MARK: - Computed View Properties
+    private var headerView: some View {
+        HStack {
+            Text("Balance Account")
+                .bold()
+                .font(.title3)
+                .layoutPriority(1)
+            
+            Spacer()
+            
+            Menu(viewModel.selectedBalanceAccount.name) {
+                Picker("Balance account", selection: $viewModel.selectedBalanceAccount) {
+                    ForEach(viewModel.allBalanceAccounts) { balanceAccount in
+                        HStack {
+                            Text(balanceAccount.name)
+                            
+                            if let uiImage = FTAppAssets.iconUIImage(name: balanceAccount.iconName) {
+                                Image(uiImage: uiImage)
+                            } else {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                        .tag(balanceAccount)
+                    }
+                }
+            }
+            .modifier(RoundedRectMenu())
+        }
+    }
     
     //MARK: - Methods
 }
