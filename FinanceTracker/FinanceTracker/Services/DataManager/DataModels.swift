@@ -219,6 +219,8 @@ final class Transaction {
 
 @Model
 final class Budget {
+    static let empty = Budget(name: "empty", value: 1000, period: .week, category: nil, balanceAccount: .emptyBalanceAccount)
+    
     enum Period: CaseIterable, Identifiable, Codable {
         case week
         case month
