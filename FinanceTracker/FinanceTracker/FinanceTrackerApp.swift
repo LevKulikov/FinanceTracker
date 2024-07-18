@@ -39,6 +39,7 @@ struct FinanceTrackerApp: App {
             Category.self,
             Tag.self,
             Transaction.self,
+            Budget.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

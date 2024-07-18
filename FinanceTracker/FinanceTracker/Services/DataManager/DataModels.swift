@@ -219,13 +219,24 @@ final class Transaction {
 
 @Model
 final class Budget {
-    enum Period: LocalizedStringResource, CaseIterable, Identifiable, Codable {
-        case week = "For a week"
-        case month = "For a month"
-        case year = "For a year"
+    enum Period: CaseIterable, Identifiable, Codable {
+        case week
+        case month
+        case year
         
         var id: Self {
             return self
+        }
+        
+        var localizedString: LocalizedStringResource {
+            switch self {
+            case .week:
+                return "For a week"
+            case .month:
+                return "For a month"
+            case .year:
+                return "For a year"
+            }
         }
     }
     
