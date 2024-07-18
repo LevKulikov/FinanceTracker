@@ -51,7 +51,7 @@ final class BudgetsViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
         self.dataManager = dataManager
-        initialFetchData()
+        initialFetchData(setDefaultBalanceAccount: false)
     }
     
     //MARK: - Methods
@@ -71,11 +71,13 @@ final class BudgetsViewModel: ObservableObject {
     }
     
     //MARK: Private methods
-    private func initialFetchData() {
+    private func initialFetchData(setDefaultBalanceAccount: Bool) {
         Task { @MainActor in
             isFetching = true
             await fetchBalanceAccounts()
-            selectedBalanceAccount = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            if setDefaultBalanceAccount {
+                selectedBalanceAccount = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
             await fetchBudgets()
             isFetching = false
         }

@@ -469,6 +469,8 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                 self?.filterAndSetTransactions()
             })
             
+        case .budgets:
+            break
         case .appearance:
             break
         }

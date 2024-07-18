@@ -30,7 +30,7 @@ struct BudgetsView: View {
                 .padding()
             }
             .scrollIndicators(.hidden)
-            .navigationTitle("Bugets")
+            .navigationTitle("Budgets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {

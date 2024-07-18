@@ -373,13 +373,16 @@
         }
       }
     },
+    "Budget" : {
+
+    },
     "Budget name" : {
 
     },
     "Budget total" : {
 
     },
-    "Bugets" : {
+    "Budgets" : {
 
     },
     "Cancel" : {
@@ -1817,6 +1820,9 @@
           }
         }
       }
+    },
+    "Tabs" : {
+
     },
     "Tag name" : {
       "localizations" : {

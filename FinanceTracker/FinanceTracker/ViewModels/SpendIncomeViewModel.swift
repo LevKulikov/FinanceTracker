@@ -324,6 +324,8 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
             }
         case .tags:
             break
+        case .budgets:
+            break
         case .appearance:
             break
         }
