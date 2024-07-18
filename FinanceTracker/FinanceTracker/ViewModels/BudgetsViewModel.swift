@@ -14,6 +14,17 @@ protocol BudgetsViewModelDelegate: AnyObject {
     
 }
 
+struct BudgetCardViewData: Identifiable {
+    let id = UUID().uuidString
+    let budget: Budget
+    let transactions: [Transaction]
+}
+
+enum ActionWithBudget: Equatable {
+    case add
+    case update(Budget)
+}
+
 //MARK: - ViewModel class
 final class BudgetsViewModel: ObservableObject {
     //MARK: - Properties
@@ -23,13 +34,19 @@ final class BudgetsViewModel: ObservableObject {
     private let dataManager: any DataManagerProtocol
     
     //MARK: Published props
+    @Published var action: ActionWithBudget?
     @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            
+            Task {
+                isFetching = true
+                await fetchBudgets()
+                isFetching = false
+            }
         }
     }
     @Published private (set) var allBalanceAccounts: [BalanceAccount] = []
     @Published private(set) var budgets: [Budget] = []
+    @Published private(set) var isFetching = false
     
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
@@ -40,8 +57,10 @@ final class BudgetsViewModel: ObservableObject {
     //MARK: - Methods
     func refreshData(compeletionHandler: (() -> Void)? = nil) {
         Task {
+            isFetching = true
             await fetchBalanceAccounts()
             await fetchBudgets()
+            isFetching = false
             compeletionHandler?()
         }
     }
@@ -49,9 +68,11 @@ final class BudgetsViewModel: ObservableObject {
     //MARK: Private methods
     private func initialFetchData() {
         Task { @MainActor in
+            isFetching = true
             await fetchBalanceAccounts()
             selectedBalanceAccount = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             await fetchBudgets()
+            isFetching = false
         }
     }
     
