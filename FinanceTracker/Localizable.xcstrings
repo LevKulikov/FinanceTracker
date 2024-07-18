@@ -373,6 +373,12 @@
         }
       }
     },
+    "Budget name" : {
+
+    },
+    "Budget total" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "ru" : {
