@@ -31,6 +31,7 @@
 		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
 		73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */; };
+		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
 		73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */; };
 		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
 		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
@@ -116,6 +117,7 @@
 		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
 		73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsViewModel.swift; sourceTree = "<group>"; };
+		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
 		73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
 		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				73D000D52C2DC2F400AACFCE /* SearchView.swift */,
 				73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */,
 				73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */,
+				73AE90442C499092002267F4 /* BudgetsView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -504,6 +507,7 @@
 				73D000D62C2DC2F400AACFCE /* SearchView.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
+				73AE90452C499092002267F4 /* BudgetsView.swift in Sources */,
 				73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */,
 				73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */,
 				73CCF3DB2C29C506009D8001 /* TagsView.swift in Sources */,
