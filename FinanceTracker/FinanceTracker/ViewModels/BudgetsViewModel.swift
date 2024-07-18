@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+protocol BudgetsViewModelDelegate: AnyObject {
+    
+}
+
+final class BudgetsViewModel: ObservableObject {
+    
+}
