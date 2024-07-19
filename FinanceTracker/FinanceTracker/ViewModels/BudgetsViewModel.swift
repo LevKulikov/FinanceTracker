@@ -37,10 +37,10 @@ final class BudgetsViewModel: ObservableObject {
     @Published var action: ActionWithBudget?
     @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            Task {
-                isFetching = true
-                await fetchBudgets()
-                isFetching = false
+            Task.detached { @MainActor [weak self] in
+                self?.isFetching = true
+                await self?.fetchBudgets()
+                self?.isFetching = false
             }
         }
     }
@@ -51,7 +51,7 @@ final class BudgetsViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
         self.dataManager = dataManager
-        initialFetchData(setDefaultBalanceAccount: false)
+        initialFetchData()
     }
     
     //MARK: - Methods
@@ -71,14 +71,12 @@ final class BudgetsViewModel: ObservableObject {
     }
     
     //MARK: Private methods
-    private func initialFetchData(setDefaultBalanceAccount: Bool) {
+    /// Does not fetch budgets because of they are fetched from selectedBalanceAccount observer
+    private func initialFetchData() {
         Task { @MainActor in
             isFetching = true
             await fetchBalanceAccounts()
-            if setDefaultBalanceAccount {
-                selectedBalanceAccount = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
-            }
-            await fetchBudgets()
+            selectedBalanceAccount = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             isFetching = false
         }
     }
