@@ -52,6 +52,9 @@ protocol DataManagerProtocol: AnyObject {
     func deleteTagWithTransactions(_ tag: Tag) async
     
     @MainActor
+    func deleteBudget(_ budget: Budget) async
+    
+    @MainActor
     func deleteAllTransactions() async
     
     @MainActor
@@ -270,6 +273,16 @@ final class DataManager: DataManagerProtocol, ObservableObject {
             filtered.forEach { deleteTransaction($0) }
             // Delete tag
             container.mainContext.delete(tag)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    func deleteBudget(_ budget: Budget) async {
+        do {
+            container.mainContext.delete(budget)
             try save()
         } catch {
             print(error)

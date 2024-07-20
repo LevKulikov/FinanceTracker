@@ -173,6 +173,9 @@
         }
       }
     },
+    "Additional tags" : {
+
+    },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
         "ru" : {
@@ -323,6 +326,9 @@
         }
       }
     },
+    "Balance account picker" : {
+
+    },
     "Balance Accounts" : {
       "localizations" : {
         "ru" : {
@@ -372,6 +378,24 @@
           }
         }
       }
+    },
+    "Budget" : {
+
+    },
+    "Budget name" : {
+
+    },
+    "Budget name (Optional)" : {
+
+    },
+    "Budget period" : {
+
+    },
+    "Budget total" : {
+
+    },
+    "Budgets" : {
+
     },
     "Cancel" : {
       "localizations" : {
@@ -723,6 +747,9 @@
         }
       }
     },
+    "Delete budget?" : {
+
+    },
     "Delete category only" : {
       "localizations" : {
         "ru" : {
@@ -1014,6 +1041,9 @@
         }
       }
     },
+    "For all categories" : {
+
+    },
     "Forward" : {
       "localizations" : {
         "ru" : {
@@ -1223,6 +1253,9 @@
           }
         }
       }
+    },
+    "New budget" : {
+
     },
     "New category" : {
       "localizations" : {
@@ -1730,6 +1763,9 @@
         }
       }
     },
+    "Some save error happened" : {
+
+    },
     "Some save error occured" : {
       "localizations" : {
         "ru" : {
@@ -1979,6 +2015,9 @@
           }
         }
       }
+    },
+    "Transactions" : {
+
     },
     "Transport" : {
       "localizations" : {

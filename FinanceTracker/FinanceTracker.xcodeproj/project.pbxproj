@@ -14,6 +14,9 @@
 		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
 		732F594E2C46FC9F0087C59A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594D2C46FC9F0087C59A /* Localizable.xcstrings */; };
 		732F59502C4712B00087C59A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594F2C4712B00087C59A /* InfoPlist.xcstrings */; };
+		733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */; };
+		733397C22C4C05CA00BAE878 /* AddingBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C12C4C05CA00BAE878 /* AddingBudgetView.swift */; };
+		733397C42C4C07EE00BAE878 /* WideCategoryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */; };
 		73356E462C3881C300CC0D90 /* BackgroundDataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */; };
 		73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */; };
 		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
@@ -30,6 +33,10 @@
 		73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */; };
 		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
+		73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */; };
+		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
+		73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90462C499571002267F4 /* BudgetCardViewModel.swift */; };
+		73AE90492C499B05002267F4 /* BudgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90482C499B05002267F4 /* BudgetCard.swift */; };
 		73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */; };
 		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
 		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
@@ -98,6 +105,9 @@
 		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		732F594D2C46FC9F0087C59A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		732F594F2C4712B00087C59A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBudgetViewModel.swift; sourceTree = "<group>"; };
+		733397C12C4C05CA00BAE878 /* AddingBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBudgetView.swift; sourceTree = "<group>"; };
+		733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WideCategoryPickerView.swift; sourceTree = "<group>"; };
 		73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDataActor.swift; sourceTree = "<group>"; };
 		73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsLineChart.swift; sourceTree = "<group>"; };
 		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
@@ -114,6 +124,10 @@
 		73731D5B2C10FC9500A80355 /* AddingCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingCategoryViewModel.swift; sourceTree = "<group>"; };
 		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
+		73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsViewModel.swift; sourceTree = "<group>"; };
+		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
+		73AE90462C499571002267F4 /* BudgetCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCardViewModel.swift; sourceTree = "<group>"; };
+		73AE90482C499B05002267F4 /* BudgetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCard.swift; sourceTree = "<group>"; };
 		73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
 		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
@@ -277,6 +291,8 @@
 				73D000D52C2DC2F400AACFCE /* SearchView.swift */,
 				73D000DF2C31DCCF00AACFCE /* WelcomeView.swift */,
 				73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */,
+				73AE90442C499092002267F4 /* BudgetsView.swift */,
+				733397C12C4C05CA00BAE878 /* AddingBudgetView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -300,6 +316,9 @@
 				73D000D32C2D804800AACFCE /* SearchViewModel.swift */,
 				73D000DD2C31DC4700AACFCE /* WelcomeViewModel.swift */,
 				73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */,
+				73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */,
+				73AE90462C499571002267F4 /* BudgetCardViewModel.swift */,
+				733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -341,6 +360,8 @@
 				73D000DB2C31CD2E00AACFCE /* WideIconPickerView.swift */,
 				73D000E12C333E7000AACFCE /* SingleExampleView.swift */,
 				73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */,
+				73AE90482C499B05002267F4 /* BudgetCard.swift */,
+				733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -501,6 +522,7 @@
 				73D000D62C2DC2F400AACFCE /* SearchView.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
+				73AE90452C499092002267F4 /* BudgetsView.swift in Sources */,
 				73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */,
 				73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */,
 				73CCF3DB2C29C506009D8001 /* TagsView.swift in Sources */,
@@ -508,6 +530,7 @@
 				73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */,
 				73CCF3E52C2B533C009D8001 /* ManageDataView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
+				733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */,
 				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
 				73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */,
 				73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */,
@@ -520,14 +543,18 @@
 				735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */,
 				73CCF3DF2C2B2C99009D8001 /* AppearanceViewModel.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */,
+				73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */,
 				736821C92C075B5200FFD5FD /* SpendIncomeCell.swift in Sources */,
 				73CCF3D92C29C419009D8001 /* TagsViewModel.swift in Sources */,
 				73CCF3E12C2B2D25009D8001 /* AppearanceView.swift in Sources */,
+				73AE90492C499B05002267F4 /* BudgetCard.swift in Sources */,
+				733397C22C4C05CA00BAE878 /* AddingBudgetView.swift in Sources */,
 				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
 				7363891A2C246B7D00D6478E /* BalanceAccountsView.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				73CCF3E32C2B51AB009D8001 /* ManageDataViewModel.swift in Sources */,
+				73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				73D000DA2C2EED3500AACFCE /* SearchTransactionRow.swift in Sources */,
@@ -540,6 +567,7 @@
 				73D000DC2C31CD2E00AACFCE /* WideIconPickerView.swift in Sources */,
 				7363891C2C246BA400D6478E /* BalanceAccountsViewModel.swift in Sources */,
 				73356E462C3881C300CC0D90 /* BackgroundDataActor.swift in Sources */,
+				733397C42C4C07EE00BAE878 /* WideCategoryPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

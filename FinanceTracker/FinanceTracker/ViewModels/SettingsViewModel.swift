@@ -21,6 +21,7 @@ enum SettingsSectionAndDataType {
     case transactions
     case appearance
     case data
+    case budgets
 }
 
 final class SettingsViewModel: ObservableObject {
@@ -67,6 +68,10 @@ final class SettingsViewModel: ObservableObject {
     
     func getManageDataView() -> some View {
         return FTFactory.shared.createManageDataView(dataManager: dataManager, delegate: self)
+    }
+    
+    func getBudgetsView() -> some View {
+        return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
     }
 }
 
@@ -120,5 +125,24 @@ extension SettingsViewModel: ManageDataViewModelDelegate {
     
     func didDeleteAllData() {
         delegate?.didUpdateSettingsSection(.data)
+    }
+}
+
+//MARK: Extensions for
+extension SettingsViewModel: BudgetsViewModelDelegate {
+    func didUpdateTransaction() {
+        delegate?.didUpdateSettingsSection(.transactions)
+    }
+    
+    func didAddBudget(_ budget: Budget) {
+        
+    }
+    
+    func didUpdateBudget(_ budget: Budget) {
+        
+    }
+    
+    func didDeleteBudget(_ budget: Budget) {
+        
     }
 }
