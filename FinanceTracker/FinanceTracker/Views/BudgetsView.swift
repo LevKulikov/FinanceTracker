@@ -33,7 +33,7 @@ struct BudgetsView: View {
                     
                     ForEach(viewModel.budgets) { budget in
                         viewModel.getBudgetCard(for: budget, namespace: namespace) { budgetCardData in
-                            Button("Details") {
+                            Button("Details", systemImage: "list.bullet.clipboard") {
                                 
                             }
                             
@@ -56,6 +56,20 @@ struct BudgetsView: View {
             }
             .scrollIndicators(.hidden)
             .navigationTitle("Budgets")
+            .confirmationDialog(
+                "Delete budget?",
+                isPresented: .init(get: { deletionAlertItem != nil }, set: { _ in deletionAlertItem = nil }),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let deletionAlertItem {
+                            viewModel.deleteBudget(deletionAlertItem)
+                        }
+                    }
+                },
+                message: {
+                    Text("This action is irretable")
+                })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {

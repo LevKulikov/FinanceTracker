@@ -744,6 +744,9 @@
         }
       }
     },
+    "Delete budget?" : {
+
+    },
     "Delete category only" : {
       "localizations" : {
         "ru" : {

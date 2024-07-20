@@ -77,6 +77,16 @@ final class BudgetsViewModel: ObservableObject {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .update(budget: budget), delegate: self)
     }
     
+    func deleteBudget(_ budget: Budget) {
+        Task {
+            await dataManager.deleteBudget(budget)
+            delegate?.didDeleteBudget(budget)
+        }
+        withAnimation {
+            budgets.removeAll { $0 == budget }
+        }
+    }
+    
     //MARK: Private methods
     /// Does not fetch budgets because of they are fetched from selectedBalanceAccount observer
     private func initialFetchData() {
