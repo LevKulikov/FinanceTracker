@@ -10,11 +10,11 @@ import SwiftData
 import SwiftUI
 
 protocol AddingBudgetViewModelDelegate: AnyObject {
-    func didAddBudget()
+    func didAddBudget(_ newBudget: Budget)
     
-    func didUpdateBudget()
+    func didUpdateBudget(_ updatedBudget: Budget)
     
-    func didDeleteBudget()
+    func didDeleteBudget(_ deletedBudget: Budget)
 }
 
 enum ActionWithBudget: Equatable {
@@ -46,6 +46,42 @@ final class AddingBudgetViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    func saveBudget(completionHandler: (() -> Void)? = nil) throws {
+        switch action {
+        case .none:
+            completionHandler?()
+        case .add:
+            let newBudget = Budget(
+                name: name,
+                value: value,
+                period: period,
+                category: category,
+                balanceAccount: balanceAccount
+            )
+            Task { @MainActor in
+                dataManager.insert(newBudget)
+                delegate?.didAddBudget(newBudget)
+                completionHandler?()
+            }
+        case .update:
+            guard let budgetToUpdate else {
+                print("budgetToUpdate is nil, though action is .update")
+                return
+            }
+            
+            budgetToUpdate.name = name
+            budgetToUpdate.value = value
+            budgetToUpdate.period = period
+            budgetToUpdate.setCategory(category)
+            budgetToUpdate.setBalanceAccount(balanceAccount)
+            
+            Task { @MainActor in
+                try dataManager.save()
+                delegate?.didUpdateBudget(budgetToUpdate)
+                completionHandler?()
+            }
+        }
+    }
     
     //MARK: Private methods
     private func setBudgetData() {
