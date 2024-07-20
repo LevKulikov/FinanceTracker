@@ -323,6 +323,9 @@
         }
       }
     },
+    "Balance account picker" : {
+
+    },
     "Balance Accounts" : {
       "localizations" : {
         "ru" : {
@@ -380,6 +383,9 @@
 
     },
     "Budget name (Optional)" : {
+
+    },
+    "Budget period" : {
 
     },
     "Budget total" : {
@@ -1749,6 +1755,9 @@
           }
         }
       }
+    },
+    "Some save error happened" : {
+
     },
     "Some save error occured" : {
       "localizations" : {

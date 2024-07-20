@@ -30,6 +30,7 @@ final class AddingBudgetViewModel: ObservableObject {
     //MARK: Published props
     @Published private(set) var action: ActionWithBudget
     @Published private(set) var allCategories: [Category] = []
+    @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
     @Published var name: String = ""
     @Published var valueString = ""
     @Published var value: Float = 0
@@ -90,6 +91,7 @@ final class AddingBudgetViewModel: ObservableObject {
     private func setBudgetData() {
         Task { @MainActor in
             await fetchCategories()
+            await fetchBalanceAccounts()
         }
         
         switch action {
@@ -119,6 +121,17 @@ final class AddingBudgetViewModel: ObservableObject {
         do {
             let fetchedCategories = try dataManager.fetch(descriptor)
             allCategories = fetchedCategories
+        } catch {
+            errorHandler?(error)
+        }
+    }
+    
+    @MainActor
+    func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+        let descriptor = FetchDescriptor<BalanceAccount>()
+        do {
+            let fetchedBAs = try dataManager.fetch(descriptor)
+            allBalanceAccounts = fetchedBAs
         } catch {
             errorHandler?(error)
         }

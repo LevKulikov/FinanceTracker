@@ -9,8 +9,10 @@ import SwiftUI
 
 struct AddingBudgetView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: AddingBudgetViewModel
     @State private var showCategoryPicker = false
+    @State private var saveAlert = false
     @FocusState private var nameTextFieldFocus
     @FocusState private var valueTextFieldFocus
     private var isAdding: Bool {
@@ -18,6 +20,9 @@ struct AddingBudgetView: View {
             return true
         }
         return false
+    }
+    private var canBeAddedOrUpdated: Bool {
+        viewModel.value > 0
     }
     
     //MARK: - Initializer
@@ -38,6 +43,10 @@ struct AddingBudgetView: View {
                 .padding(.bottom)
             
             categoryAndPeriodSection
+                .padding(.bottom)
+            
+            balanceAccountSection
+                .padding(.bottom)
             
             Rectangle()
                 .fill(.clear)
@@ -60,6 +69,21 @@ struct AddingBudgetView: View {
                 .presentationCornerRadius(30)
 
         }
+        .alert("Some save error happened", isPresented: $saveAlert) {
+            Button("Ok") {}
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                
+                Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboard)
+                    .foregroundStyle(.secondary)
+                    .labelsHidden()
+            }
+        }
+        .overlay(alignment: .bottom) {
+            addButton
+        }
     }
     
     //MARK: - Computed view props
@@ -74,7 +98,7 @@ struct AddingBudgetView: View {
             }
             .padding(.horizontal)
             
-            TextField("Budget name (Optional)", text: $viewModel.name, prompt: Text("Enter name here"))
+            TextField("Budget name", text: $viewModel.name, prompt: Text("Budget name (Optional)"))
                 .focused($nameTextFieldFocus)
                 .font(.title2)
                 .padding(.horizontal)
@@ -115,6 +139,7 @@ struct AddingBudgetView: View {
             HStack {
                 Text("Category")
                     .font(.title3)
+                    .layoutPriority(1)
                 
                 Spacer()
                 
@@ -130,10 +155,17 @@ struct AddingBudgetView: View {
                 .modifier(RoundedRectMenu())
                 .tint(viewModel.category == nil ? .blue : viewModel.category!.color)
             }
+            .padding(.bottom)
             
-            Divider()
             
-            
+            Picker("Budget period", selection: $viewModel.period) {
+                ForEach(Budget.Period.allCases) { period in
+                    Text(period.localizedString)
+                        .tag(period)
+                }
+            }
+            .labelStyle(.iconOnly)
+            .pickerStyle(.segmented)
         }
         .padding()
         .background {
@@ -141,6 +173,64 @@ struct AddingBudgetView: View {
                 .fill(.ultraThinMaterial)
         }
         .padding(.horizontal, 10)
+    }
+    
+    private var balanceAccountSection: some View {
+        HStack {
+            Text("Balance account")
+                .font(.title3)
+                .layoutPriority(1)
+            
+            Spacer()
+            
+            Menu(viewModel.balanceAccount.name) {
+                Picker("Balance account picker", selection: $viewModel.balanceAccount) {
+                    ForEach(viewModel.allBalanceAccounts) { balanceAccount in
+                        HStack {
+                            Text(balanceAccount.name)
+                            
+                            if let uiImage = FTAppAssets.iconUIImage(name: balanceAccount.iconName) {
+                                Image(uiImage: uiImage)
+                            } else {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                        .tag(balanceAccount)
+                    }
+                }
+            }
+            .modifier(RoundedRectMenu())
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15.0)
+                .fill(.ultraThinMaterial)
+        }
+        .padding(.horizontal, 10)
+    }
+    
+    private var addButton: some View {
+        Button {
+            do {
+                try viewModel.saveBudget {
+                    dismiss()
+                }
+            } catch {
+                saveAlert = true
+            }
+        } label: {
+            Label(isAdding ? "Add" : "Update", systemImage: isAdding ? "plus" : "pencil.and.outline")
+                .frame(width: 170, height: 50)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .stroke(canBeAddedOrUpdated ? .blue : .gray)
+                }
+        }
+        .hoverEffect(.lift)
+        .disabled(!canBeAddedOrUpdated)
+        .offset(y: -5)
+        .ignoresSafeArea(.keyboard)
     }
     
     //MARK: - Methods
@@ -166,6 +256,11 @@ struct AddingBudgetView: View {
         if let firstChar = copyString.first, firstChar == "0" {
             viewModel.valueString.removeFirst()
         }
+    }
+    
+    private func dismissKeyboard() {
+        nameTextFieldFocus = false
+        valueTextFieldFocus = false
     }
 }
 
