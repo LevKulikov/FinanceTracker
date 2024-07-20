@@ -73,7 +73,7 @@ final class BudgetCardViewModel: ObservableObject {
         
         let predicate = #Predicate<Transaction> { transaction in
             if (startDate...endDate).contains(transaction.date) {
-                return transaction.category?.id == categoryId
+                return categoryId != nil ? transaction.category?.id == categoryId : true
             } else {
                 return false
             }

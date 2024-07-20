@@ -35,11 +35,13 @@ struct BudgetCard: View {
     var body: some View {
         VStack {
             HStack {
-                FTAppAssets.iconImageOrEpty(name: budgetIconName)
-                    .scaledToFit()
-                    .foregroundStyle(Color.orange)
-                    .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
-                    .frame(width: 30, height: 30)
+                if viewModel.budget.category != nil {
+                    FTAppAssets.iconImageOrEpty(name: budgetIconName)
+                        .scaledToFit()
+                        .foregroundStyle(Color.orange)
+                        .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
+                        .frame(width: 30, height: 30)
+                }
                 
                 Text(budgetName)
                     .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
