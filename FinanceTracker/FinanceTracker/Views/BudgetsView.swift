@@ -94,6 +94,21 @@ struct BudgetsView: View {
                         .controlSize(.large)
                 }
             }
+            .overlay {
+                if viewModel.budgets.isEmpty {
+                    ContentUnavailableView {
+                        Label("No budgets", systemImage: "dollarsign.square")
+                    } description: {
+                        Text("You don't have any saved budgets yet. Good opportunity to give it a try!")
+                    } actions: {
+                        Button("Add budget") {
+                            navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                        }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.capsule)
+                    }
+                }
+            }
             .sheet(item: $budgetDataForDetails) {
                 viewModel.refreshIfNeeded()
             } content: { budgetData in

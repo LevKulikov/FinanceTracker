@@ -60,6 +60,15 @@ struct SearchView: View {
                         .controlSize(.large)
                 }
             }
+            .overlay {
+                if viewModel.filteredTransactionGroups.isEmpty {
+                    if searchIsPreseneted {
+                        ContentUnavailableView("No results for \"\(viewModel.searchText)\"", systemImage: "magnifyingglass", description: Text("There is not a matching transaction"))
+                    } else {
+                        ContentUnavailableView("No transactions", systemImage: "magnifyingglass", description: Text("There are no saved transactions for this date"))
+                    }
+                }
+            }
             .onChange(of: searchIsPreseneted) {
                 viewModel.hideTabBar(searchIsPreseneted)
             }
