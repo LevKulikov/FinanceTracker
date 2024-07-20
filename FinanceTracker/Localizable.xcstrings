@@ -153,6 +153,16 @@
         }
       }
     },
+    "Add budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить бюджет"
+          }
+        }
+      }
+    },
     "Add new" : {
       "localizations" : {
         "ru" : {
@@ -173,8 +183,15 @@
         }
       }
     },
-    "Additional tags" : {
-
+    "Additional tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительные вкладки"
+          }
+        }
+      }
     },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
@@ -327,7 +344,14 @@
       }
     },
     "Balance account picker" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер счета"
+          }
+        }
+      }
     },
     "Balance Accounts" : {
       "localizations" : {
@@ -380,22 +404,64 @@
       }
     },
     "Budget" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджет"
+          }
+        }
+      }
     },
     "Budget name" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета"
+          }
+        }
+      }
     },
     "Budget name (Optional)" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета (Опционально)"
+          }
+        }
+      }
     },
     "Budget period" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер бюджета"
+          }
+        }
+      }
     },
     "Budget total" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма бюджета"
+          }
+        }
+      }
     },
     "Budgets" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджеты"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -748,7 +814,14 @@
       }
     },
     "Delete budget?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить бюджет?"
+          }
+        }
+      }
     },
     "Delete category only" : {
       "localizations" : {
@@ -893,9 +966,15 @@
     "Empy" : {
       "extractionState" : "stale",
       "localizations" : {
-        "ru" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Empty"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "Пустой"
           }
         }
@@ -1042,7 +1121,14 @@
       }
     },
     "For all categories" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для всех категорий"
+          }
+        }
+      }
     },
     "Forward" : {
       "localizations" : {
@@ -1255,7 +1341,14 @@
       }
     },
     "New budget" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый бюджет"
+          }
+        }
+      }
     },
     "New category" : {
       "localizations" : {
@@ -1283,6 +1376,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет транзакций типа %@ на указанную дату"
+          }
+        }
+      }
+    },
+    "No budgets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет бюджетов"
+          }
+        }
+      }
+    },
+    "No results for \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет результатов для \"%@\""
+          }
+        }
+      }
+    },
+    "No transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет транзакций"
           }
         }
       }
@@ -1764,7 +1887,14 @@
       }
     },
     "Some save error happened" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла некая ошибка сохранения"
+          }
+        }
+      }
     },
     "Some save error occured" : {
       "localizations" : {
@@ -1906,6 +2036,26 @@
         }
       }
     },
+    "There are no saved transactions for this date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет сохраненных транзакций на выбранную дату"
+          }
+        }
+      }
+    },
+    "There is not a matching transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подходящих транзакций"
+          }
+        }
+      }
+    },
     "This action is irretable" : {
       "localizations" : {
         "ru" : {
@@ -2017,7 +2167,14 @@
       }
     },
     "Transactions" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции"
+          }
+        }
+      }
     },
     "Transport" : {
       "localizations" : {
@@ -2080,7 +2237,14 @@
       }
     },
     "Unknown error" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
+          }
+        }
+      }
     },
     "Update" : {
       "localizations" : {
@@ -2198,6 +2362,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "У вас нет сохраненных тегов."
+          }
+        }
+      }
+    },
+    "You don't have any saved budgets yet. Good opportunity to give it a try!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас пока нет сохраненных бюджетов. Хорошая возможность попробовать!"
           }
         }
       }
