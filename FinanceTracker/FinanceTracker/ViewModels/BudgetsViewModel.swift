@@ -65,6 +65,11 @@ final class BudgetsViewModel: ObservableObject {
         return BudgetCard(viewModel: viewModel, namespace: namespace)
     }
     
+    func getAddingBudgetView() -> some View {
+        let viewModel = AddingBudgetViewModel(action: .add(selectedBalanceAccount), dataManager: dataManager)
+        return AddingBudgetView(viewModel: viewModel)
+    }
+    
     //MARK: Private methods
     /// Does not fetch budgets because of they are fetched from selectedBalanceAccount observer
     private func initialFetchData() {

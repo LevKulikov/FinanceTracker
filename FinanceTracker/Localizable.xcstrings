@@ -379,6 +379,9 @@
     "Budget name" : {
 
     },
+    "Budget name (Optional)" : {
+
+    },
     "Budget total" : {
 
     },
@@ -1025,6 +1028,9 @@
         }
       }
     },
+    "For all categories" : {
+
+    },
     "Forward" : {
       "localizations" : {
         "ru" : {
@@ -1234,6 +1240,9 @@
           }
         }
       }
+    },
+    "New budget" : {
+
     },
     "New category" : {
       "localizations" : {

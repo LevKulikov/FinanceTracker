@@ -51,7 +51,6 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             switch action {
             case .add(let providedDate):
                 date = providedDate
-                //TODO: set default values to balanceAccount
             case .update(let transaction):
                 transactionToUpdate = transaction
                 setTransactionPropertiesToViewModel(transaction: transaction)

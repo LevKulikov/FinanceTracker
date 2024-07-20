@@ -17,7 +17,7 @@ protocol AddingBudgetViewModelDelegate: AnyObject {
     func didDeleteBudget(_ deletedBudget: Budget)
 }
 
-enum ActionWithBudget: Equatable {
+enum ActionWithBudget: Equatable, Hashable {
     case none
     case add(BalanceAccount)
     case update(budget: Budget)
@@ -29,7 +29,9 @@ final class AddingBudgetViewModel: ObservableObject {
     
     //MARK: Published props
     @Published private(set) var action: ActionWithBudget
+    @Published private(set) var allCategories: [Category] = []
     @Published var name: String = ""
+    @Published var valueString = ""
     @Published var value: Float = 0
     @Published var period: Budget.Period = .month
     @Published var category: Category?
@@ -43,6 +45,7 @@ final class AddingBudgetViewModel: ObservableObject {
     init(action: ActionWithBudget, dataManager: any DataManagerProtocol) {
         self._action = Published(wrappedValue: action)
         self.dataManager = dataManager
+        setBudgetData()
     }
     
     //MARK: - Methods
@@ -85,6 +88,10 @@ final class AddingBudgetViewModel: ObservableObject {
     
     //MARK: Private methods
     private func setBudgetData() {
+        Task { @MainActor in
+            await fetchCategories()
+        }
+        
         switch action {
         case .none:
             break
@@ -97,6 +104,23 @@ final class AddingBudgetViewModel: ObservableObject {
             period = budget.period
             category = budget.category
             balanceAccount = budget.balanceAccount ?? .emptyBalanceAccount
+        }
+    }
+    
+    @MainActor
+    func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+        let typeRawValue = TransactionsType.spending.rawValue
+        let predicate = #Predicate<Category> {
+            $0.typeRawValue == typeRawValue
+        }
+        
+        let descriptor = FetchDescriptor<Category>(predicate: predicate)
+        
+        do {
+            let fetchedCategories = try dataManager.fetch(descriptor)
+            allCategories = fetchedCategories
+        } catch {
+            errorHandler?(error)
         }
     }
 }

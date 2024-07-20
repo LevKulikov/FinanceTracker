@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct BudgetsView: View {
+//    enum ActionWithBudgetNavPath: Hashable {
+//        case add
+//        case update(Bud)
+//    }
+    
     //MARK: - Properties
     @Namespace private var namespace
     @StateObject private var viewModel: BudgetsViewModel
+    @State private var navigationPath = NavigationPath()
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -19,7 +25,7 @@ struct BudgetsView: View {
     
     //MARK: - Body
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ScrollView {
                 headerView
                     .padding(.horizontal)
@@ -34,9 +40,12 @@ struct BudgetsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {
-                        //TODO: Continue
+                        navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                     }
                 }
+            }
+            .navigationDestination(for: ActionWithBudget.self) { action in
+                viewModel.getAddingBudgetView()
             }
         }
     }
