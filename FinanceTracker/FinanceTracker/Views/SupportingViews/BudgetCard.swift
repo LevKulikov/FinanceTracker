@@ -13,7 +13,7 @@ struct BudgetCard: View {
     var namespace: Namespace.ID
     @StateObject private var viewModel: BudgetCardViewModel
     private var categoryColor: Color {
-        viewModel.budget.category?.color ?? .clear
+        viewModel.budget.category?.color ?? .blue
     }
     private var budgetName: String {
         viewModel.budget.name.isEmpty ? viewModel.budget.category?.name ?? "Empty" : viewModel.budget.name
@@ -23,6 +23,9 @@ struct BudgetCard: View {
     }
     private var budgetCurrency: String {
         viewModel.budget.balanceAccount?.currency ?? ""
+    }
+    private var isBudgetOver: Bool {
+        viewModel.totalValue > viewModel.budget.value
     }
     
     //MARK: - Initializer
@@ -38,7 +41,7 @@ struct BudgetCard: View {
                 if viewModel.budget.category != nil {
                     FTAppAssets.iconImageOrEpty(name: budgetIconName)
                         .scaledToFit()
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(categoryColor)
                         .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
                         .frame(width: 30, height: 30)
                 }
@@ -47,6 +50,10 @@ struct BudgetCard: View {
                     .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
                     .bold()
                 
+                if viewModel.isProcessing {
+                    ProgressView()
+                }
+                
                 Spacer()
                 
                 Text(viewModel.budget.period.localizedString)
@@ -54,17 +61,17 @@ struct BudgetCard: View {
                     .layoutPriority(1)
                     .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
             }
-            .padding(.horizontal)
             
             lineChart
-                .padding(.horizontal)
                 .padding(.vertical, 7)
                 .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
             
             HStack {
                 Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
+                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
                     .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
                 Text(budgetCurrency)
+                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
                     .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
                 
                 Spacer()
@@ -77,7 +84,6 @@ struct BudgetCard: View {
                     .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
             }
             .font(.subheadline)
-            .padding(.horizontal)
         }
         .padding()
         .background {

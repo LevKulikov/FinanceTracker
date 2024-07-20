@@ -26,6 +26,7 @@ final class BudgetCardViewModel: ObservableObject {
     init(dataManager: any DataManagerProtocol, budget: Budget) {
         self.dataManager = dataManager
         self.budget = budget
+        fetchAndCalculate()
     }
     
     //MARK: - Methods
@@ -69,15 +70,20 @@ final class BudgetCardViewModel: ObservableObject {
             endDate = .now.endOfYear() ?? .now
         }
         
+        let forSpecificCategory = budget.category != nil ? true : false
         let categoryId = budget.category?.id
         let balanceAccountId = budget.balanceAccount?.id
         
         let predicate = #Predicate<Transaction> { transaction in
             if (startDate...endDate).contains(transaction.date) {
-                if (categoryId != nil ? transaction.category?.id == categoryId : true) {
-                    return transaction.balanceAccount?.id == balanceAccountId
+                if forSpecificCategory {
+                    if transaction.category?.id == categoryId {
+                        return transaction.balanceAccount?.id == balanceAccountId
+                    } else {
+                        return false
+                    }
                 } else {
-                    return false
+                    return transaction.balanceAccount?.id == balanceAccountId
                 }
             } else {
                 return false

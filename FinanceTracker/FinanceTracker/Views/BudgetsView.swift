@@ -27,13 +27,20 @@ struct BudgetsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ScrollView {
-                headerView
+                VStack {
+                    headerView
+                        .padding([.horizontal, .bottom])
+                    
+                    ForEach(viewModel.budgets) { budget in
+                        viewModel.getBudgetCard(for: budget, namespace: namespace)
+                            .padding(.vertical, 5)
+                    }
                     .padding(.horizontal)
-                
-                ForEach(viewModel.budgets) { budget in
-                    viewModel.getBudgetCard(for: budget, namespace: namespace)
+                    
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 50)
                 }
-                .padding()
             }
             .scrollIndicators(.hidden)
             .navigationTitle("Budgets")
