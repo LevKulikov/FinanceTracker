@@ -14,15 +14,10 @@ protocol BudgetsViewModelDelegate: AnyObject {
     
 }
 
-struct BudgetCardViewData: Identifiable {
+struct BudgetCardViewData: Identifiable, Hashable {
     let id = UUID().uuidString
     let budget: Budget
     let transactions: [Transaction]
-}
-
-enum ActionWithBudget: Equatable {
-    case add
-    case update(Budget)
 }
 
 //MARK: - ViewModel class

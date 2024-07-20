@@ -14,6 +14,7 @@
 		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
 		732F594E2C46FC9F0087C59A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594D2C46FC9F0087C59A /* Localizable.xcstrings */; };
 		732F59502C4712B00087C59A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594F2C4712B00087C59A /* InfoPlist.xcstrings */; };
+		733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */; };
 		73356E462C3881C300CC0D90 /* BackgroundDataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */; };
 		73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */; };
 		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
@@ -102,6 +103,7 @@
 		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		732F594D2C46FC9F0087C59A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		732F594F2C4712B00087C59A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBudgetViewModel.swift; sourceTree = "<group>"; };
 		73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDataActor.swift; sourceTree = "<group>"; };
 		73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsLineChart.swift; sourceTree = "<group>"; };
 		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 				73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */,
 				73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */,
 				73AE90462C499571002267F4 /* BudgetCardViewModel.swift */,
+				733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -521,6 +524,7 @@
 				73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */,
 				73CCF3E52C2B533C009D8001 /* ManageDataView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
+				733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */,
 				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
 				73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */,
 				73731D5C2C10FC9500A80355 /* AddingCategoryViewModel.swift in Sources */,
