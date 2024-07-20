@@ -13,6 +13,7 @@ struct BudgetsView: View {
     @StateObject private var viewModel: BudgetsViewModel
     @State private var navigationPath = NavigationPath()
     @State private var deletionAlertItem: Budget?
+    @State private var budgetDataForDetails: BudgetCardViewData?
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -33,8 +34,8 @@ struct BudgetsView: View {
                     
                     ForEach(viewModel.budgets) { budget in
                         viewModel.getBudgetCard(for: budget, namespace: namespace) { budgetCardData in
-                            Button("Details", systemImage: "list.bullet.clipboard") {
-                                
+                            Button("Transactions", systemImage: "list.bullet.clipboard") {
+                                budgetDataForDetails = budgetCardData
                             }
                             
                             Button("Update", systemImage: "pencil.and.outline") {
@@ -93,6 +94,12 @@ struct BudgetsView: View {
                         .controlSize(.large)
                 }
             }
+            .sheet(item: $budgetDataForDetails) {
+                viewModel.refreshIfNeeded()
+            } content: { budgetData in
+                viewModel.getTransactionsListView(for: budgetData)
+            }
+
         }
     }
     

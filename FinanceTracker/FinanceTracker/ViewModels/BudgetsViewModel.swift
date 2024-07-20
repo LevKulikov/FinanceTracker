@@ -16,6 +16,8 @@ protocol BudgetsViewModelDelegate: AnyObject {
     func didUpdateBudget(_ budget: Budget)
     
     func didDeleteBudget(_ budget: Budget)
+    
+    func didUpdateTransaction()
 }
 
 struct BudgetCardViewData: Identifiable, Hashable {
@@ -31,6 +33,7 @@ final class BudgetsViewModel: ObservableObject {
     
     //MARK: Private properties
     private let dataManager: any DataManagerProtocol
+    private var neededToBeRefreshed = false
     
     //MARK: Published props
     @Published var action: ActionWithBudget?
@@ -54,8 +57,14 @@ final class BudgetsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    func refreshIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+        guard neededToBeRefreshed else { return }
+        neededToBeRefreshed = false
+        refreshData(compeletionHandler: compeletionHandler)
+    }
+    
     func refreshData(compeletionHandler: (() -> Void)? = nil) {
-        Task {
+        Task { @MainActor in
             isFetching = true
             await fetchBalanceAccounts()
             await fetchBudgets()
@@ -75,6 +84,12 @@ final class BudgetsViewModel: ObservableObject {
     
     func getUpdaingBudgetView(for budget: Budget) -> some View {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .update(budget: budget), delegate: self)
+    }
+    
+    func getTransactionsListView(for budgetData: BudgetCardViewData) -> some View {
+        let budget = budgetData.budget
+        let title = budget.name.isEmpty ? budget.category?.name ?? "For all categories" : budget.name
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self)
     }
     
     func deleteBudget(_ budget: Budget) {
@@ -151,5 +166,17 @@ extension BudgetsViewModel: AddingBudgetViewModelDelegate {
     
     func didDeleteBudget(_ deletedBudget: Budget) {
         delegate?.didDeleteBudget(deletedBudget)
+    }
+}
+
+extension BudgetsViewModel: TransactionListViewModelDelegate {
+    func didUpdatedTransaction() {
+        delegate?.didUpdateTransaction()
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
     }
 }

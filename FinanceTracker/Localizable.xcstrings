@@ -173,6 +173,9 @@
         }
       }
     },
+    "Additional tags" : {
+
+    },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
         "ru" : {
@@ -816,9 +819,6 @@
           }
         }
       }
-    },
-    "Details" : {
-
     },
     "Developer" : {
       "localizations" : {
@@ -1845,9 +1845,6 @@
         }
       }
     },
-    "Tabs" : {
-
-    },
     "Tag name" : {
       "localizations" : {
         "ru" : {
@@ -2017,6 +2014,9 @@
           }
         }
       }
+    },
+    "Transactions" : {
+
     },
     "Transport" : {
       "localizations" : {

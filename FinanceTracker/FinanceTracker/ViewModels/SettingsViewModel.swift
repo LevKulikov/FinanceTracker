@@ -129,7 +129,11 @@ extension SettingsViewModel: ManageDataViewModelDelegate {
 }
 
 //MARK: Extensions for
-extension SettingsViewModel: BudgetsViewModelDelegate {    
+extension SettingsViewModel: BudgetsViewModelDelegate {
+    func didUpdateTransaction() {
+        delegate?.didUpdateSettingsSection(.transactions)
+    }
+    
     func didAddBudget(_ budget: Budget) {
         
     }

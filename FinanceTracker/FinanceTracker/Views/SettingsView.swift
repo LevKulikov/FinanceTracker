@@ -106,9 +106,9 @@ struct SettingsView: View {
     }
     
     private var tabsSection: some View {
-        Section("Tabs") {
+        Section("Additional tags") {
             NavigationLink(value: SettingsSectionAndDataType.budgets) {
-                Label("Budget", systemImage: "xmark")
+                Label("Budget", systemImage: "dollarsign.square")
             }
         }
     }
