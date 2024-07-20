@@ -29,9 +29,21 @@ final class BudgetCardViewModel: ObservableObject {
         fetchAndCalculate()
     }
     
-    //MARK: - Methods
+    /// If there is no need to fetch transactions for the budget
+    init(dataManager: any DataManagerProtocol, budget: Budget, transactions: [Transaction]) {
+        self.dataManager = dataManager
+        self.budget = budget
+        self.transactions = transactions
+        Task {
+            await calculateTotalValue()
+        }
+    }
     
-    //MARK: Private methods
+    //MARK: - Methods
+    func getBudgetCardData() -> BudgetCardViewData {
+        BudgetCardViewData(budget: budget, transactions: transactions)
+    }
+    
     func fetchAndCalculate(compeletionHandler: (() -> Void)? = nil) {
         isProcessing = true
         Task {
@@ -44,6 +56,7 @@ final class BudgetCardViewModel: ObservableObject {
         }
     }
     
+    //MARK: Private methods
     private func calculateTotalValue() async {
         let value = transactions.map { $0.value }.reduce(0, +)
         

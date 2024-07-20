@@ -7,16 +7,12 @@
 
 import SwiftUI
 
-struct BudgetsView: View {
-//    enum ActionWithBudgetNavPath: Hashable {
-//        case add
-//        case update(Bud)
-//    }
-    
+struct BudgetsView: View {    
     //MARK: - Properties
     @Namespace private var namespace
     @StateObject private var viewModel: BudgetsViewModel
     @State private var navigationPath = NavigationPath()
+    @State private var deletionAlertItem: Budget?
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -29,11 +25,27 @@ struct BudgetsView: View {
             ScrollView {
                 VStack {
                     headerView
+                        .padding(.horizontal)
+                    
+                    Divider()
                         .padding([.horizontal, .bottom])
                     
+                    
                     ForEach(viewModel.budgets) { budget in
-                        viewModel.getBudgetCard(for: budget, namespace: namespace)
-                            .padding(.vertical, 5)
+                        viewModel.getBudgetCard(for: budget, namespace: namespace) { budgetCardData in
+                            Button("Details") {
+                                
+                            }
+                            
+                            Button("Update", systemImage: "pencil.and.outline") {
+                                navigationPath.append(ActionWithBudget.update(budget: budget))
+                            }
+                            
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                deletionAlertItem = budget
+                            }
+                        }
+                        .padding(.vertical, 5)
                     }
                     .padding(.horizontal)
                     
@@ -52,7 +64,20 @@ struct BudgetsView: View {
                 }
             }
             .navigationDestination(for: ActionWithBudget.self) { action in
-                viewModel.getAddingBudgetView()
+                switch action {
+                case .add:
+                    viewModel.getAddingBudgetView()
+                case .update(let budget):
+                    viewModel.getUpdaingBudgetView(for: budget)
+                case .none:
+                    EmptyView()
+                }
+            }
+            .overlay {
+                if viewModel.isFetching {
+                    ProgressView()
+                        .controlSize(.large)
+                }
             }
         }
     }

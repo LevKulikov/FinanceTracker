@@ -147,4 +147,10 @@ final class FTFactory {
         actionWithViewModel?(viewModel)
         return AnyView(BudgetsView(viewModel: viewModel))
     }
+    
+    func createAddingBudgetView(dataManager: some DataManagerProtocol, action: ActionWithBudget, delegate: (some AddingBudgetViewModelDelegate)? = nil) -> AnyView {
+        let viewModel = AddingBudgetViewModel(action: action, dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(AddingBudgetView(viewModel: viewModel))
+    }
 }

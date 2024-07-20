@@ -103,6 +103,7 @@ final class AddingBudgetViewModel: ObservableObject {
             budgetToUpdate = budget
             name = budget.name
             value = budget.value
+            valueString = FTFormatters.numberFormatterWithDecimals.string(for: budget.value) ?? String(budget.value)
             period = budget.period
             category = budget.category
             balanceAccount = budget.balanceAccount ?? .emptyBalanceAccount
@@ -116,7 +117,7 @@ final class AddingBudgetViewModel: ObservableObject {
             $0.typeRawValue == typeRawValue
         }
         
-        let descriptor = FetchDescriptor<Category>(predicate: predicate)
+        let descriptor = FetchDescriptor<Category>(predicate: predicate, sortBy: [SortDescriptor(\.placement)])
         
         do {
             let fetchedCategories = try dataManager.fetch(descriptor)

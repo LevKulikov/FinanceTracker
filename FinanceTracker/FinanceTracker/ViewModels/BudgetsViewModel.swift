@@ -11,7 +11,11 @@ import SwiftUI
 
 //MARK: - Delegate protocol
 protocol BudgetsViewModelDelegate: AnyObject {
+    func didAddBudget(_ budget: Budget)
     
+    func didUpdateBudget(_ budget: Budget)
+    
+    func didDeleteBudget(_ budget: Budget)
 }
 
 struct BudgetCardViewData: Identifiable, Hashable {
@@ -60,14 +64,17 @@ final class BudgetsViewModel: ObservableObject {
         }
     }
     
-    func getBudgetCard(for budget: Budget, namespace: Namespace.ID) -> some View {
+    func getBudgetCard<MenuItems: View>(for budget: Budget, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) -> some View {
         let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: budget)
-        return BudgetCard(viewModel: viewModel, namespace: namespace)
+        return BudgetCard(viewModel: viewModel, namespace: namespace,  menuItems: menuItems)
     }
     
     func getAddingBudgetView() -> some View {
-        let viewModel = AddingBudgetViewModel(action: .add(selectedBalanceAccount), dataManager: dataManager)
-        return AddingBudgetView(viewModel: viewModel)
+        return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .add(selectedBalanceAccount), delegate: self)
+    }
+    
+    func getUpdaingBudgetView(for budget: Budget) -> some View {
+        return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .update(budget: budget), delegate: self)
     }
     
     //MARK: Private methods
@@ -116,3 +123,23 @@ final class BudgetsViewModel: ObservableObject {
 }
 
 //MARK: - Extensions
+//MARK: Extension for AddingBudgetViewModelDelegate
+extension BudgetsViewModel: AddingBudgetViewModelDelegate {
+    func didAddBudget(_ newBudget: Budget) {
+        delegate?.didAddBudget(newBudget)
+        Task { @MainActor in
+            isFetching = true
+            await fetchBudgets()
+            isFetching = false
+        }
+    }
+    
+    func didUpdateBudget(_ updatedBudget: Budget) {
+        delegate?.didUpdateBudget(updatedBudget)
+        guard let index = budgets.firstIndex(of: updatedBudget) else { return }
+    }
+    
+    func didDeleteBudget(_ deletedBudget: Budget) {
+        delegate?.didDeleteBudget(deletedBudget)
+    }
+}

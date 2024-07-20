@@ -8,15 +8,16 @@
 import SwiftUI
 import Charts
 
-struct BudgetCard: View {
+struct BudgetCard<MenuItems: View>: View {
     //MARK: - Properties
-    var namespace: Namespace.ID
+    private var namespace: Namespace.ID
+    private let menuItems: (BudgetCardViewData) -> MenuItems
     @StateObject private var viewModel: BudgetCardViewModel
     private var categoryColor: Color {
         viewModel.budget.category?.color ?? .blue
     }
     private var budgetName: String {
-        viewModel.budget.name.isEmpty ? viewModel.budget.category?.name ?? "Empty" : viewModel.budget.name
+        viewModel.budget.name.isEmpty ? viewModel.budget.category?.name ?? "All categories" : viewModel.budget.name
     }
     private var budgetIconName: String {
         viewModel.budget.category?.iconName ?? ""
@@ -29,67 +30,76 @@ struct BudgetCard: View {
     }
     
     //MARK: - Initializer
-    init(viewModel: BudgetCardViewModel, namespace: Namespace.ID) {
+    init(viewModel: BudgetCardViewModel, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self.namespace = namespace
+        self.menuItems = menuItems
     }
     
     //MARK: - Body
     var body: some View {
-        VStack {
-            HStack {
-                if viewModel.budget.category != nil {
-                    FTAppAssets.iconImageOrEpty(name: budgetIconName)
-                        .scaledToFit()
-                        .foregroundStyle(categoryColor)
-                        .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
-                        .frame(width: 30, height: 30)
+        Menu {
+            menuItems(viewModel.getBudgetCardData())
+        } label: {
+            VStack {
+                HStack {
+                    if viewModel.budget.category != nil {
+                        FTAppAssets.iconImageOrEpty(name: budgetIconName)
+                            .scaledToFit()
+                            .foregroundStyle(categoryColor)
+                            .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
+                            .frame(width: 30, height: 30)
+                    }
+                    
+                    Text(budgetName)
+                        .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
+                        .bold()
+                    
+                    if viewModel.isProcessing {
+                        ProgressView()
+                    }
+                    
+                    Spacer()
+                    
+                    Text(viewModel.budget.period.localizedString)
+                        .foregroundStyle(.secondary)
+                        .layoutPriority(1)
+                        .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
                 }
                 
-                Text(budgetName)
-                    .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
-                    .bold()
+                lineChart
+                    .padding(.vertical, 7)
+                    .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
                 
-                if viewModel.isProcessing {
-                    ProgressView()
+                HStack {
+                    Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
+                        .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                        .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
+                    Text(budgetCurrency)
+                        .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                        .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
+                    
+                    Spacer()
+                    
+                    Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
+                        .layoutPriority(1)
+                        .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
+                    Text(budgetCurrency)
+                        .layoutPriority(1)
+                        .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
                 }
-                
-                Spacer()
-                
-                Text(viewModel.budget.period.localizedString)
-                    .foregroundStyle(.secondary)
-                    .layoutPriority(1)
-                    .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
+                .font(.subheadline)
             }
-            
-            lineChart
-                .padding(.vertical, 7)
-                .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
-            
-            HStack {
-                Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
-                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
-                    .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
-                Text(budgetCurrency)
-                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
-                    .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
-                
-                Spacer()
-                
-                Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
-                    .layoutPriority(1)
-                    .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
-                Text(budgetCurrency)
-                    .layoutPriority(1)
-                    .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
+            .padding()
+            .background {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.secondarySystemBackground))
+                    .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
             }
-            .font(.subheadline)
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.secondarySystemBackground))
-                .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
+        .foregroundStyle(.primary)
+        .onChange(of: viewModel.budget.category) {
+            viewModel.fetchAndCalculate()
         }
     }
     
@@ -127,6 +137,9 @@ struct BudgetCard: View {
     let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
     let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: .empty)
     @Namespace var namespace
+    @State var flag = false
     
-    return BudgetCard(viewModel: viewModel, namespace: namespace)
+    return BudgetCard(viewModel: viewModel, namespace: namespace) { _ in
+        EmptyView()
+    }
 }
