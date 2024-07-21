@@ -106,7 +106,10 @@ final class BudgetCardViewModel: ObservableObject {
         let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
         
         do {
-            let fetchedTransactions = try await dataManager.fetchFromBackground(descriptor)
+            var fetchedTransactions = try await dataManager.fetchFromBackground(descriptor)
+            if !forSpecificCategory {
+                fetchedTransactions = fetchedTransactions.filter { $0.type == .spending }
+            }
             transactions = fetchedTransactions
         } catch {
             errorHandler?(error)
