@@ -38,6 +38,18 @@ struct SearchView: View {
                 showFilterButton
                     .padding(.vertical)
                 
+                if !viewModel.isListCalculating, viewModel.filteredTransactionGroups.isEmpty {
+                    if searchIsPreseneted {
+                        ContentUnavailableView("No results for \"\(viewModel.searchText)\"", systemImage: "magnifyingglass", description: Text("There is not a matching transaction"))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    } else {
+                        ContentUnavailableView("No transactions", systemImage: "magnifyingglass", description: Text("There are no saved transactions for this date"))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
+                }
+                
                 ForEach(viewModel.filteredTransactionGroups) { transGroup in
                     SearchSection(transactionGroupData: transGroup) { transaction in
                         showTransaction = transaction
@@ -58,15 +70,6 @@ struct SearchView: View {
                 if viewModel.isListCalculating {
                     ProgressView()
                         .controlSize(.large)
-                }
-            }
-            .overlay {
-                if viewModel.filteredTransactionGroups.isEmpty {
-                    if searchIsPreseneted {
-                        ContentUnavailableView("No results for \"\(viewModel.searchText)\"", systemImage: "magnifyingglass", description: Text("There is not a matching transaction"))
-                    } else {
-                        ContentUnavailableView("No transactions", systemImage: "magnifyingglass", description: Text("There are no saved transactions for this date"))
-                    }
                 }
             }
             .onChange(of: searchIsPreseneted) {

@@ -31,6 +31,19 @@ struct BudgetsView: View {
                     Divider()
                         .padding([.horizontal, .bottom])
                     
+                    if !viewModel.isFetching, viewModel.budgets.isEmpty {
+                        ContentUnavailableView {
+                            Label("No budgets", systemImage: "dollarsign.square")
+                        } description: {
+                            Text("You don't have any saved budgets yet. Good opportunity to give it a try!")
+                        } actions: {
+                            Button("Add budget") {
+                                navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                            }
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.capsule)
+                        }
+                    }
                     
                     ForEach(viewModel.budgets) { budget in
                         viewModel.getBudgetCard(for: budget, namespace: namespace) { budgetCardData in
@@ -92,21 +105,6 @@ struct BudgetsView: View {
                 if viewModel.isFetching {
                     ProgressView()
                         .controlSize(.large)
-                }
-            }
-            .overlay {
-                if viewModel.budgets.isEmpty {
-                    ContentUnavailableView {
-                        Label("No budgets", systemImage: "dollarsign.square")
-                    } description: {
-                        Text("You don't have any saved budgets yet. Good opportunity to give it a try!")
-                    } actions: {
-                        Button("Add budget") {
-                            navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
-                        }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                    }
                 }
             }
             .sheet(item: $budgetDataForDetails) {
