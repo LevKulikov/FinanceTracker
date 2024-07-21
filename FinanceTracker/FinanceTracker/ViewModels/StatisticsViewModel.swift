@@ -198,11 +198,13 @@ final class StatisticsViewModel: ObservableObject {
     //MARK: - Methods
     /// Refreshes all data
     func refreshData(compeletionHandler: (() -> Void)? = nil) {
+        print("refreshData, started")
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
             self?.calculateTagsTotal(animated: true)
-            self?.calculateDataForPieChart()
+            self?.calculateDataForPieChart(animated: true)
             self?.calculateDataForBarChart()
+            print("refreshData, ended")
             compeletionHandler?()
         }
     }
@@ -298,15 +300,16 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Calculates total value (initial balance + income - spendings) for Balance Account and sets value to totalForBalanceAccount
-    /// - Warning: .map uses forse unwraping of transaction type
     private func calculateTotalForBalanceAccount() {
         guard isCalculationAllowed else { return }
-        
+        print("calculateTotalForBalanceAccount, started")
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
+            print("calculateTotalForBalanceAccount, started to calculate totalValue")
             let totalValue = self.transactions
                 .map {
-                    switch $0.type! {
+                    guard let transType = $0.type else { return Float(0)}
+                    switch transType {
                     case .spending:
                         return -$0.value
                     case .income:
@@ -316,7 +319,9 @@ final class StatisticsViewModel: ObservableObject {
                 .reduce(balanceAccountToFilter.balance, +)
             
             DispatchQueue.main.async {
+                print("calculateTotalForBalanceAccount, provided data")
                 self.totalForBalanceAccount = totalValue
+                print("calculateTotalForBalanceAccount, ended")
             }
         }
     }
@@ -324,17 +329,19 @@ final class StatisticsViewModel: ObservableObject {
     /// Calculate total value for all time tags spending or income
     private func calculateTagsTotal(animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        
+        print("calculateTagsTotal, started to calculate data for tags chart")
         DispatchQueue.main.async { [weak self] in
             self?.tagsDataIsCalculating = true
         }
         
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
+            print("calculateTagsTotal, started to calculate data for transactionsWithTags")
             let transactionsWithTags = self.transactions
                 .filter { !$0.tags.isEmpty && $0.type == self.transactionTypeForTags  }
             
             guard !transactionsWithTags.isEmpty else {
+                print("calculateTagsTotal, started to providing data due guard statement")
                 DispatchQueue.main.async {
                     self.tagsDataIsCalculating = false
                     if animated {
@@ -344,10 +351,12 @@ final class StatisticsViewModel: ObservableObject {
                     } else {
                         self.tagsTotalData = []
                     }
+                    print("calculateTagsTotal, ended due guard statement")
                 }
                 return
             }
             
+            print("calculateTagsTotal, started to calcuate tagsData")
             let tagsData = transactionsWithTags
                 .flatMap { transaction in
                     var tupleArray: [(tag: Tag, transaction: Transaction)] = []
@@ -368,11 +377,13 @@ final class StatisticsViewModel: ObservableObject {
                 }
                 .sorted { $0.total > $1.total}
             
+            print("calculateTagsTotal, started to providing data to tags chart")
             DispatchQueue.main.async {
                 self.tagsDataIsCalculating = false
                 withAnimation {
                     self.tagsTotalData = tagsData
                 }
+                print("calculateTagsTotal, ended")
             }
         }
     }
@@ -380,13 +391,14 @@ final class StatisticsViewModel: ObservableObject {
     /// Calculates data for pie chart and sets it with animation
     private func calculateDataForPieChart(animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        
+        print("calculateDataForPieChart, started to calculate data for pie chart")
         DispatchQueue.main.async { [weak self] in
             self?.pieDataIsCalculating = true
         }
         
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
+            print("calculateDataForPieChart, started to calculate returnData")
             var returnData = self.transactions
                 .filter { singleTransaction in
                     guard singleTransaction.type == self.pieChartTransactionType else { return false }
@@ -413,9 +425,11 @@ final class StatisticsViewModel: ObservableObject {
                     return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
+            print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                print("calculateDataForPieChart, started to provide data for pie chart")
                 self.pieDataIsCalculating = false
                 if animated {
                     withAnimation {
@@ -424,6 +438,7 @@ final class StatisticsViewModel: ObservableObject {
                 } else {
                     self.pieChartTransactionData = returnData
                 }
+                print("calculateDataForPieChart, ended")
             }
         }
     }
@@ -431,7 +446,7 @@ final class StatisticsViewModel: ObservableObject {
     /// Calculates data for bar chart and sets it with animation
     private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility), animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        
+        print("calculateDataForBarChart, started to calculate data for bar chart")
         DispatchQueue.main.async { [weak self] in
             self?.barDataIsCalculating = true
         }
@@ -439,7 +454,7 @@ final class StatisticsViewModel: ObservableObject {
         // This is utility because of high calculation compexity
         thread.async { [weak self] in
             guard let self else { return }
-            
+            print("calculateDataForBarChart, started to calculate availableBarData")
             let availableBarData = self.transactions
                 .filter { singleTransaction in
                     switch self.barChartTransactionTypeFilter {
@@ -510,6 +525,7 @@ final class StatisticsViewModel: ObservableObject {
             //let filledBarData = addEmptyDataTo(availableBarData)
             
             DispatchQueue.main.async {
+                print("calculateDataForBarChart, providing data for bar chart")
                 self.barDataIsCalculating = false
                 if animated {
                     withAnimation {
@@ -518,6 +534,7 @@ final class StatisticsViewModel: ObservableObject {
                 } else {
                     self.barChartTransactionData = availableBarData
                 }
+                print("calculateDataForBarChart, ended")
             }
         }
     }
@@ -636,19 +653,28 @@ final class StatisticsViewModel: ObservableObject {
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @escaping () -> Void) {
         isFetchingData = true
-        
+        print("fetchAllData, started")
         let localCompletion = { [weak self] in
+            print("fetchAllData, started to provide data on main thread")
             DispatchQueue.main.async {
                 self?.isFetchingData = false
             }
+            print("fetchAllData, ended")
             completionHandler()
+            print("fetchAllData, ended competion handler")
         }
         
         Task {
+            print("fetchAllData, started to fetch BAs")
             await fetchBalanceAccounts()
+            print("fetchAllData, ended to fetch BAs")
             Task.detached(priority: .background) { [weak self] in
+                print("fetchAllData, started to fetch tags")
                 await self?.fetchTags()
+                print("fetchAllData, ended to fetch tags")
+                print("fetchAllData, started to fetch transactions")
                 await self?.fetchTransactions()
+                print("fetchAllData, ended to fetch transactions")
                 localCompletion()
             }
         }

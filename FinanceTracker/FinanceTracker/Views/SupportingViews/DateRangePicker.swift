@@ -42,10 +42,12 @@ struct DateRangePicker: View {
     var body: some View {
         HStack {
             DatePicker("Start date", selection: $startDate, in: startDateRange, displayedComponents: .date)
+                .datePickerStyle(.compact)
             
             Image(systemName: "arrow.left.and.right")
             
             DatePicker("End date", selection: $endDate, in: endDateRange, displayedComponents: .date)
+                .datePickerStyle(.compact)
         }
         .labelsHidden()
     }
