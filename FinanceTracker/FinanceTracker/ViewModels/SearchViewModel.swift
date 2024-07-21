@@ -87,6 +87,12 @@ final class SearchViewModel: ObservableObject {
     @Published var filterTransactionType: TransactionFilterTypes = .both {
         didSet {
             guard filterTransactionType != oldValue else { return }
+            if let filterCategoryType = filterCategory?.type, let selectedType = filterTransactionType.binaryTransactionType {
+                if filterCategoryType != selectedType {
+                    filterCategory = nil
+                    return
+                }
+            }
             filterAndSetTransactions()
         }
     }
@@ -463,6 +469,8 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                 self?.filterAndSetTransactions()
             })
             
+        case .budgets:
+            break
         case .appearance:
             break
         }

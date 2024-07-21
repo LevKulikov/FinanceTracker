@@ -13,7 +13,7 @@ protocol Named {
     var name: String { get set }
 }
 
-enum TransactionsType: String, CaseIterable {
+enum TransactionsType: String, CaseIterable, Identifiable {
     case spending = "Spendings"
     case income = "Income"
     
@@ -24,6 +24,10 @@ enum TransactionsType: String, CaseIterable {
         case .income:
             return "Income"
         }
+    }
+    
+    var id: Self {
+        return self
     }
 }
 
@@ -214,6 +218,66 @@ final class Transaction {
     
     func removeTag(_ tag: Tag) {
         tags.removeAll { $0 == tag }
+    }
+}
+
+@Model
+final class Budget {
+    static let empty = Budget(name: "empty", value: 1000, period: .week, category: nil, balanceAccount: .emptyBalanceAccount)
+    
+    enum Period: CaseIterable, Identifiable, Codable {
+        case week
+        case month
+        case year
+        
+        var id: Self {
+            return self
+        }
+        
+        var localizedString: LocalizedStringResource {
+            switch self {
+            case .week:
+                return "For a week"
+            case .month:
+                return "For a month"
+            case .year:
+                return "For a year"
+            }
+        }
+    }
+    
+    //MARK: - Properties
+    @Attribute(.unique) let id: String
+    var name: String
+    var value: Float
+    var period: Period
+    /// Nil meens that budget is for all categories
+    private(set) var category: Category?
+    private(set) var balanceAccount: BalanceAccount?
+    
+    //MARK: - Initializer
+    init(id: String, name: String, value: Float, period: Period, category: Category?, balanceAccount: BalanceAccount) {
+        self.id = id
+        self.name = name
+        self.value = value
+        self.period = period
+        setCategory(category)
+        setBalanceAccount(balanceAccount)
+    }
+    
+    convenience init(name: String, value: Float, period: Period, category: Category?, balanceAccount: BalanceAccount) {
+        let id = UUID().uuidString
+        self.init(id: id, name: name, value: value, period: period, category: category, balanceAccount: balanceAccount)
+    }
+    
+    //MARK: - Methods
+    /// Set nil if budget is for all categories
+    func setCategory(_ category: Category?) {
+        self.category = category
+    }
+    
+    func setBalanceAccount(_ balanceAccount: BalanceAccount) {
+        self.balanceAccount = balanceAccount
     }
 }
 

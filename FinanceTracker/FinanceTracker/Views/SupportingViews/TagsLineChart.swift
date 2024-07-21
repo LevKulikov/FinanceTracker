@@ -80,6 +80,10 @@ struct TagsLineChart: View {
                 .chartXAxis(.hidden)
                 .chartYAxis(.hidden)
                 .frame(height: 10)
+                .mask {
+                    Capsule()
+                        .frame(height: 7)
+                }
                 .chartXScale(domain: 0...maxValue)
                 .frame(height: rowHeight)
             }

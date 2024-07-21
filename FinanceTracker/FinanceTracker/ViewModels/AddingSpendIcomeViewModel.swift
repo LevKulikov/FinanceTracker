@@ -30,7 +30,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         case valueIsZero
         case contextSaveError
         
-        var localizedDescription: LocalizedStringResource {
+        var saveErrorLocalizedDescription: LocalizedStringResource {
             switch self {
             case .categoryIsNil:
                 return "Category is not selected"
@@ -51,7 +51,6 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             switch action {
             case .add(let providedDate):
                 date = providedDate
-                //TODO: set default values to balanceAccount
             case .update(let transaction):
                 transactionToUpdate = transaction
                 setTransactionPropertiesToViewModel(transaction: transaction)

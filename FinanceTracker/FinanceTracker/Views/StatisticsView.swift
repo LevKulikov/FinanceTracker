@@ -61,10 +61,7 @@ struct StatisticsView: View {
                     if viewModel.isFetchingData {
                         ProgressView()
                             .controlSize(.regular)
-                    } else {
-                        Button("Refresh", systemImage: "arrow.clockwise") {
-                            viewModel.refreshData()
-                        }
+                            .scaleEffect(1.3, anchor: .trailing)
                     }
                 }
             }
@@ -77,6 +74,9 @@ struct StatisticsView: View {
             } content: { transactionListData in
                 viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
             }
+            .onAppear {
+                viewModel.refreshDataIfNeeded()
+            }
         }
     }
     
@@ -88,6 +88,11 @@ struct StatisticsView: View {
                     .font(.title2)
                     .bold()
                     .layoutPriority(1)
+                
+                if viewModel.totalIsCalculating {
+                    ProgressView()
+                        .padding(.leading, 5)
+                }
                 
                 Spacer()
                 
@@ -155,8 +160,8 @@ struct StatisticsView: View {
                 
                 Menu(String(localized: viewModel.transactionTypeForTags.localizedString)) {
                     Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
-                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
-                            Text(type.rawValue)
+                        ForEach(TransactionsType.allCases) { type in
+                            Text(type.localizedString)
                                 .tag(type)
                         }
                     }
@@ -223,8 +228,8 @@ struct StatisticsView: View {
                 
                 Menu(String(localized: viewModel.pieChartTransactionType.localizedString)) {
                     Picker("Pie chart picker", selection: $viewModel.pieChartTransactionType) {
-                        ForEach(TransactionsType.allCases, id: \.rawValue) { type in
-                            Text(type.rawValue)
+                        ForEach(TransactionsType.allCases) { type in
+                            Text(type.localizedString)
                                 .tag(type)
                         }
                     }

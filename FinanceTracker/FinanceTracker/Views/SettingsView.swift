@@ -34,6 +34,8 @@ struct SettingsView: View {
         List(selection: $viewModel.selectedSettings) {
             enitiesSection
             
+            tabsSection
+            
             appSettingsSection
             
             contactsSection
@@ -62,6 +64,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
+            case .budgets:
+                viewModel.getBudgetsView()
             }
         } else {
             noSelectionView
@@ -97,6 +101,14 @@ struct SettingsView: View {
             
             NavigationLink(value: SettingsSectionAndDataType.tags) {
                 Label("Tags", systemImage: "number")
+            }
+        }
+    }
+    
+    private var tabsSection: some View {
+        Section("Additional tabs") {
+            NavigationLink(value: SettingsSectionAndDataType.budgets) {
+                Label("Budgets", systemImage: "dollarsign.square")
             }
         }
     }

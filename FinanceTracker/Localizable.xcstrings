@@ -153,6 +153,16 @@
         }
       }
     },
+    "Add budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить бюджет"
+          }
+        }
+      }
+    },
     "Add new" : {
       "localizations" : {
         "ru" : {
@@ -169,6 +179,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить тег"
+          }
+        }
+      }
+    },
+    "Additional tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительные вкладки"
           }
         }
       }
@@ -199,6 +219,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Все"
+          }
+        }
+      }
+    },
+    "All categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все категории"
           }
         }
       }
@@ -323,6 +353,16 @@
         }
       }
     },
+    "Balance account picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер счета"
+          }
+        }
+      }
+    },
     "Balance Accounts" : {
       "localizations" : {
         "ru" : {
@@ -369,6 +409,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Оба типа"
+          }
+        }
+      }
+    },
+    "Budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджет"
+          }
+        }
+      }
+    },
+    "Budget name" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета"
+          }
+        }
+      }
+    },
+    "Budget name (Optional)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета (Опционально)"
+          }
+        }
+      }
+    },
+    "Budget period" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер бюджета"
+          }
+        }
+      }
+    },
+    "Budget total" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма бюджета"
+          }
+        }
+      }
+    },
+    "Budgets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджеты"
           }
         }
       }
@@ -723,6 +823,16 @@
         }
       }
     },
+    "Delete budget?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить бюджет?"
+          }
+        }
+      }
+    },
     "Delete category only" : {
       "localizations" : {
         "ru" : {
@@ -864,10 +974,17 @@
       }
     },
     "Empy" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "ru" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Empty"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "Пустой"
           }
         }
@@ -1009,6 +1126,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Год"
+          }
+        }
+      }
+    },
+    "For all categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для всех категорий"
           }
         }
       }
@@ -1223,6 +1350,16 @@
         }
       }
     },
+    "New budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый бюджет"
+          }
+        }
+      }
+    },
     "New category" : {
       "localizations" : {
         "ru" : {
@@ -1249,6 +1386,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет транзакций типа %@ на указанную дату"
+          }
+        }
+      }
+    },
+    "No budgets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет бюджетов"
+          }
+        }
+      }
+    },
+    "No results for \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет результатов для \"%@\""
+          }
+        }
+      }
+    },
+    "No transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет транзакций"
           }
         }
       }
@@ -1448,7 +1615,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Доход"
+            "value" : "Прибыль"
           }
         }
       }
@@ -1474,6 +1641,7 @@
       }
     },
     "Refresh" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1684,7 +1852,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Больше вильтров"
+            "value" : "Больше фильтров"
           }
         }
       }
@@ -1725,6 +1893,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Некоторые существующие категории"
+          }
+        }
+      }
+    },
+    "Some save error happened" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла некая ошибка сохранения"
           }
         }
       }
@@ -1869,6 +2047,26 @@
         }
       }
     },
+    "There are no saved transactions for this date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет сохраненных транзакций на выбранную дату"
+          }
+        }
+      }
+    },
+    "There is not a matching transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подходящих транзакций"
+          }
+        }
+      }
+    },
     "This action is irretable" : {
       "localizations" : {
         "ru" : {
@@ -1979,6 +2177,16 @@
         }
       }
     },
+    "Transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции"
+          }
+        }
+      }
+    },
     "Transport" : {
       "localizations" : {
         "ru" : {
@@ -2035,6 +2243,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неизвестно"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
           }
         }
       }
@@ -2155,6 +2373,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "У вас нет сохраненных тегов."
+          }
+        }
+      }
+    },
+    "You don't have any saved budgets yet. Good opportunity to give it a try!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас пока нет сохраненных бюджетов. Хорошая возможность попробовать!"
           }
         }
       }

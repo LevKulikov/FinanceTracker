@@ -161,7 +161,7 @@ struct AddingSpendIcomeView: View {
                 Text("This action is irretable")
             })
             .alert(
-                "\(saveError?.localizedDescription ?? "Unknown error")",
+                "\(saveError?.saveErrorLocalizedDescription ?? "Unknown error")",
                 isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil } )
             ) {
                 Button("Ok") {}
@@ -315,63 +315,24 @@ struct AddingSpendIcomeView: View {
     }
     
     private var wideCategoryPickerView: some View {
-        NavigationStack {
-            VStack {
-                HStack {
-                    Text("All Categories")
-                        .font(.title2)
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Button("Close") {
-                        showMoreCategories = false
-                    }
-                    .hoverEffect(.highlight)
+        WideCategoryPickerView(
+            categories: viewModel.availableCategories,
+            selecetedCategory: $viewModel.category,
+            show: $showMoreCategories,
+            addingNavigationView: viewModel.getAddingCategoryView(action: .add)) { category in
+                showMoreCategories = false
+                withAnimation {
+                    viewModel.category = category
                 }
-                .padding(.top, 20)
-                .padding(.horizontal, 25)
-                
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 110))]) {
-                        ForEach(viewModel.availableCategories) { categoryToSet in
-                            CategoryItemView(category: categoryToSet, selectedCategory: $viewModel.category)
-                                .hoverEffect(.lift)
-                                .onTapGesture {
-                                    showMoreCategories = false
-                                    withAnimation {
-                                        viewModel.category = categoryToSet
-                                    }
-                                }
-                                .contextMenu {
-                                    Button("Update", systemImage: "pencil.and.outline") {
-                                        showMoreCategories = false
-                                        showUpdatingCategoryView = categoryToSet
-                                    }
-                                }
-                        }
-                        
-                        NavigationLink {
-                            viewModel.getAddingCategoryView(action: .add)
-                        } label: {
-                            Image(systemName: "plus")
-                                .foregroundStyle(.white)
-                                .font(.system(size: 50, weight: .medium))
-                                .padding(8)
-                                .background {
-                                    Circle()
-                                        .fill(.blue)
-                                }
-                        }
-                        .frame(width: 100, height: 130)
-                    }
+            } contextMenuContent: { category in
+                Button("Update", systemImage: "pencil.and.outline") {
+                    showMoreCategories = false
+                    showUpdatingCategoryView = category
                 }
-                .contentMargins(10, for: .scrollContent)
             }
-        }
-        .presentationBackground(Material.thin)
-        .presentationDetents([.medium, .large])
-        .presentationCornerRadius(30)
+            .presentationBackground(Material.thin)
+            .presentationDetents([.medium, .large])
+            .presentationCornerRadius(30)
     }
     
     private var datePicker: some View {

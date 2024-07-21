@@ -51,13 +51,13 @@ struct SearchSection: View {
     private var footerView: some View {
         HStack {
             if let totalIncome {
-                Text("\(TransactionsType.income.rawValue): \(FTFormatters.numberFormatterWithDecimals.string(for: totalIncome) ?? "0")")
+                Text("\(TransactionsType.income.localizedString): \(FTFormatters.numberFormatterWithDecimals.string(for: totalIncome) ?? "0")")
             }
             
             Spacer()
             
             if let totalSpending {
-                Text("\(TransactionsType.spending.rawValue): \(FTFormatters.numberFormatterWithDecimals.string(for: totalSpending) ?? "0")")
+                Text("\(TransactionsType.spending.localizedString): \(FTFormatters.numberFormatterWithDecimals.string(for: totalSpending) ?? "0")")
             }
         }
     }
