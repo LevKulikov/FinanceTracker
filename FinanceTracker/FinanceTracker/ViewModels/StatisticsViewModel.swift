@@ -112,6 +112,8 @@ final class StatisticsViewModel: ObservableObject {
     @Published private(set) var balanceAccounts: [BalanceAccount] = []
     /// Total value of balance of set account (initial balance + income - spendings)
     @Published private(set) var totalForBalanceAccount: Float = 0
+    /// Flag to identify total for balance account value is currently being calculate
+    @Published private(set) var totalIsCalculating = false
     /// Balance Account to filter all data
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
         didSet {
@@ -303,6 +305,10 @@ final class StatisticsViewModel: ObservableObject {
     private func calculateTotalForBalanceAccount() {
         guard isCalculationAllowed else { return }
         print("calculateTotalForBalanceAccount, started")
+        DispatchQueue.main.async { [weak self] in
+            self?.totalIsCalculating = true
+        }
+        
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             print("calculateTotalForBalanceAccount, started to calculate totalValue")
@@ -320,6 +326,7 @@ final class StatisticsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 print("calculateTotalForBalanceAccount, provided data")
+                self.totalIsCalculating = false
                 self.totalForBalanceAccount = totalValue
                 print("calculateTotalForBalanceAccount, ended")
             }

@@ -89,6 +89,11 @@ struct StatisticsView: View {
                     .bold()
                     .layoutPriority(1)
                 
+                if viewModel.totalIsCalculating {
+                    ProgressView()
+                        .padding(.leading, 5)
+                }
+                
                 Spacer()
                 
                 Menu(viewModel.balanceAccountToFilter.name) {
