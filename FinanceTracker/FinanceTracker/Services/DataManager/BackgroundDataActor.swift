@@ -26,4 +26,12 @@ actor BackgroundDataActor {
     func delete<T>(_ model: T) where T : PersistentModel {
         modelContext.delete(model)
     }
+    
+    func deleteTransactionById(_ transaction: Transaction) throws {
+        let trId = transaction.id
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == trId })
+        let arr = try fetch(descr)
+        guard let backTr = arr.first else { return }
+        delete(backTr)
+    }
 }

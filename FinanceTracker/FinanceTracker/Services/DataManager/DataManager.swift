@@ -159,6 +159,16 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     
     func deleteTransaction(_ transaction: Transaction) {
         container.mainContext.delete(transaction)
+        // Because of iOS 18 Beta bug of SwiftData, it is needed to delete transaction from both main and background contexts
+        if #available(iOS 18.0, *) {
+            Task {
+                do {
+                    try await deleteTransactionById(transaction)
+                } catch {
+                    print(error)
+                }
+            }
+        }
     }
     
     func deleteTransactionFromBackground(_ transaction: Transaction) async throws {
@@ -315,15 +325,28 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {
-        container.mainContext.insert(model)
+        do {
+            container.mainContext.insert(model)
+            try save()
+        } catch {
+            print(error)
+            return
+        }
     }
     
     func insertFromBackground<T>(_ model: T) async where T : PersistentModel {
-        if let backgroundActor {
-            await backgroundActor.insert(model)
-        } else {
-            backgroundActor = BackgroundDataActor(modelContainer: container)
-            await backgroundActor!.insert(model)
+        do {
+            if let backgroundActor {
+                await backgroundActor.insert(model)
+                try await backgroundActor.save()
+            } else {
+                backgroundActor = BackgroundDataActor(modelContainer: container)
+                await backgroundActor!.insert(model)
+                try await backgroundActor!.save()
+            }
+        } catch {
+            print(error)
+            return
         }
     }
     
@@ -379,6 +402,17 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         Task {
             let data = try await fetch(descriptor)
             balanceAccounts = data
+        }
+    }
+    
+    private func deleteTransactionById(_ transaction: Transaction) async throws {
+        if let backgroundActor {
+            try await backgroundActor.deleteTransactionById(transaction)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            try await backgroundActor!.deleteTransactionById(transaction)
+            try await backgroundActor!.save()
         }
     }
 }

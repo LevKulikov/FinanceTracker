@@ -158,9 +158,7 @@ struct CustomTabView: View  {
     
     //MARK: - Methods
     private func selectTab(_ tabId: Int) {
-        withAnimation(.snappy(duration: 0.5)) {
-            tabSelection = tabId
-        }
+        tabSelection = tabId
     }
 }
 
