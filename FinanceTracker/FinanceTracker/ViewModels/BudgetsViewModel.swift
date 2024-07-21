@@ -88,7 +88,7 @@ final class BudgetsViewModel: ObservableObject {
     
     func getTransactionsListView(for budgetData: BudgetCardViewData) -> some View {
         let budget = budgetData.budget
-        let title = budget.name.isEmpty ? budget.category?.name ?? "For all categories" : budget.name
+        let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self)
     }
     
@@ -161,7 +161,6 @@ extension BudgetsViewModel: AddingBudgetViewModelDelegate {
     
     func didUpdateBudget(_ updatedBudget: Budget) {
         delegate?.didUpdateBudget(updatedBudget)
-        guard let index = budgets.firstIndex(of: updatedBudget) else { return }
     }
     
     func didDeleteBudget(_ deletedBudget: Budget) {

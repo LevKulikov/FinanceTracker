@@ -17,7 +17,7 @@ struct BudgetCard<MenuItems: View>: View {
         viewModel.budget.category?.color ?? .blue
     }
     private var budgetName: String {
-        viewModel.budget.name.isEmpty ? viewModel.budget.category?.name ?? "All categories" : viewModel.budget.name
+        viewModel.budget.name.isEmpty ? viewModel.budget.category?.name ?? String(localized: "All categories") : viewModel.budget.name
     }
     private var budgetIconName: String {
         viewModel.budget.category?.iconName ?? ""
@@ -54,6 +54,8 @@ struct BudgetCard<MenuItems: View>: View {
                     Text(budgetName)
                         .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
                         .bold()
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                     
                     if viewModel.isProcessing {
                         ProgressView()
@@ -66,6 +68,7 @@ struct BudgetCard<MenuItems: View>: View {
                         .layoutPriority(1)
                         .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
                 }
+                .frame(minHeight: 30)
                 
                 lineChart
                     .padding(.vertical, 7)

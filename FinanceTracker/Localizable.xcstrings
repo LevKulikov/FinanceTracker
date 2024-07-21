@@ -223,6 +223,16 @@
         }
       }
     },
+    "All categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все категории"
+          }
+        }
+      }
+    },
     "All Categories" : {
       "localizations" : {
         "ru" : {
