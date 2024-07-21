@@ -748,11 +748,29 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
     }
     
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
-        //No reactive data update (because of high complexity), only setting default data
         if tabView == .welcomeView {
             DispatchQueue.main.async { [weak self] in
                 self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        switch dataType {
+        case .categories:
+            isTransactionUpdatedFromAnotherView = true
+        case .balanceAccounts:
+            isTransactionUpdatedFromAnotherView = true
+        case .tags:
+            isTransactionUpdatedFromAnotherView = true
+        case .transactions:
+            isTransactionUpdatedFromAnotherView = true
+        case .appearance:
+            return
+        case .data:
+            isTransactionUpdatedFromAnotherView = true
+        case .budgets:
+            return
         }
     }
 }

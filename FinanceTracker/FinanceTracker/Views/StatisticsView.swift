@@ -61,10 +61,7 @@ struct StatisticsView: View {
                     if viewModel.isFetchingData {
                         ProgressView()
                             .controlSize(.regular)
-                    } else {
-                        Button("Refresh", systemImage: "arrow.clockwise") {
-                            viewModel.refreshData()
-                        }
+                            .scaleEffect(1.3, anchor: .trailing)
                     }
                 }
             }
@@ -76,6 +73,9 @@ struct StatisticsView: View {
                 viewModel.refreshDataIfNeeded()
             } content: { transactionListData in
                 viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
+            }
+            .onAppear {
+                viewModel.refreshDataIfNeeded()
             }
         }
     }
