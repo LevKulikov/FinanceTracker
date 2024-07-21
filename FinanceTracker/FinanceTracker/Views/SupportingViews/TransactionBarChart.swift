@@ -8,7 +8,7 @@
 import SwiftUI
 import Charts
 
-struct TransactionBarChartData: Identifiable {
+struct TransactionBarChartData: Identifiable, Hashable {
     enum TransactionBarChartDataType: LocalizedStringResource {
         case spending = "Spending"
         case income = "Income"
@@ -37,9 +37,9 @@ struct TransactionBarChartData: Identifiable {
 
 struct TransactionBarChart: View {
     //MARK: Properties
-    let transactionsData: [[TransactionBarChartData]]
-    @Binding var perDate: BarChartPerDateFilter
-    @Binding var transactionType: TransactionFilterTypes
+    private let transactionsData: [[TransactionBarChartData]]
+    @Binding private var perDate: BarChartPerDateFilter
+    @Binding private var transactionType: TransactionFilterTypes
     
     private var maxVisibleBars: Int {
         let isBothTypesShown = transactionType == .both
@@ -102,14 +102,17 @@ struct TransactionBarChart: View {
         let calendar = Calendar.current
         switch perDate {
         case .perDay:
-            let startDate = calendar.date(byAdding: .month, value: -4, to: .now) ?? .now
+            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -2 : -3, to: .now) ?? .now
+            if let day = calendar.dateComponents([.day], from: .now).day, day < 11 {
+                startDate = startDate.startOfMonth() ?? .now
+            }
             return startDate...(Date.now.endOfDay() ?? .now)
         case .perWeek:
-            let startDate = calendar.date(byAdding: .year, value: -2, to: .now) ?? .now
+            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -1 : -2, to: .now) ?? .now
             let endDate = Date.now.endOfWeek() ?? .now
             return startDate...endDate
         case .perMonth:
-            let startDate = calendar.date(byAdding: .year, value: -5, to: .now) ?? .now
+            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -3 : -5, to: .now) ?? .now
             let endDate = Date.now.endOfMonth() ?? .now
             return startDate...endDate
         case .perYear:
@@ -203,6 +206,7 @@ struct TransactionBarChart: View {
         .chartXSelection(value: $selection)
         .onChange(of: selection, selectTransactionData)
         .onChange(of: xScrollPosition) {
+            setSelected(nil, date: nil)
             adaptYAxisScaleToVisibleData()
         }
         .chartXAxis {
@@ -258,16 +262,23 @@ struct TransactionBarChart: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .onChange(of: perDate) {
+        .onChange(of: transactionsData, {
             setSelected(nil, date: nil)
-            withAnimation {
-                xScrollPosition = .now
+            adaptYAxisScaleToVisibleData(isInitial: true) {
+                withAnimation {
+                    xScrollPosition = .now
+                }
             }
-        }
-        .onChange(of: transactionType) {
-            setSelected(nil, date: nil)
-            withAnimation {
-                xScrollPosition = .now
+        })
+        .onAppear {
+            if xScrollPosition.startOfDay() == Date.now.startOfDay() {
+                adaptYAxisScaleToVisibleData(isInitial: true) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation {
+                            xScrollPosition = .now
+                        }
+                    }
+                }
             }
         }
     }
@@ -349,17 +360,26 @@ struct TransactionBarChart: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: cancleDispatchWorkItem!)
     }
     
-    private func adaptYAxisScaleToVisibleData() {
+    private func adaptYAxisScaleToVisibleData(isInitial: Bool = false, delayForInitial: Double = 0.5, compeletionHandler: (() -> Void)? = nil) {
         yScaleDispatchWorkItem?.cancel()
         yScaleDispatchWorkItem = DispatchWorkItem {
             setYScaleRange(withAnimation: true)
+            compeletionHandler?()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: yScaleDispatchWorkItem!)
+        if isInitial {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delayForInitial) {
+                let startDate: Date = .now.addingTimeInterval(-Double(maxXVisibleLenth))
+                setYScaleRange(withAnimation: true, scrollStart: startDate)
+                compeletionHandler?()
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: yScaleDispatchWorkItem!)
+        }
     }
     
-    private func setYScaleRange(withAnimation animated: Bool = false) {
+    private func setYScaleRange(withAnimation animated: Bool = false, scrollStart: Date? = nil) {
         let values = transactionsData.flatMap { $0 }.filter {
-            (xScrollPosition.addingTimeInterval(-3600)...xScrollPositionEnd.addingTimeInterval(-3600)).contains($0.date)
+            ((scrollStart ?? xScrollPosition).addingTimeInterval(-3600)...(scrollStart?.addingTimeInterval(Double(maxXVisibleLenth)) ?? xScrollPositionEnd).addingTimeInterval(-3600)).contains($0.date)
         }.map { $0.value }
         guard var minValue = values.min(), var maxValue = values.max() else { return }
         if minValue > 0 { minValue = 0 }
