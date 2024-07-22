@@ -44,7 +44,13 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.tertiary)
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 .multilineTextAlignment(.center)
+            
+            Rectangle()
+                .fill(.clear)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
     }
     
