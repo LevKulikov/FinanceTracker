@@ -1736,7 +1736,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Заголовок напоминания"
+            "value" : "Время напоминания"
           }
         }
       }
@@ -1746,7 +1746,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Время напоминания"
+            "value" : "Заголовок напоминания"
           }
         }
       }
