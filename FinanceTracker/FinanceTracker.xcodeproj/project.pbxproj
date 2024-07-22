@@ -19,6 +19,8 @@
 		733397C42C4C07EE00BAE878 /* WideCategoryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */; };
 		733397C62C4DA01200BAE878 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C52C4DA01200BAE878 /* NotificationManager.swift */; };
 		733397C82C4EB6B600BAE878 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C72C4EB6B600BAE878 /* NotificationsViewModel.swift */; };
+		733397CA2C4EF12E00BAE878 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397C92C4EF12E00BAE878 /* NotificationsView.swift */; };
+		733397CC2C4EF3CD00BAE878 /* UIApplication+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */; };
 		73356E462C3881C300CC0D90 /* BackgroundDataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */; };
 		73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */; };
 		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
@@ -112,6 +114,8 @@
 		733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WideCategoryPickerView.swift; sourceTree = "<group>"; };
 		733397C52C4DA01200BAE878 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		733397C72C4EB6B600BAE878 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
+		733397C92C4EF12E00BAE878 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extension.swift"; sourceTree = "<group>"; };
 		73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDataActor.swift; sourceTree = "<group>"; };
 		73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsLineChart.swift; sourceTree = "<group>"; };
 		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
@@ -298,6 +302,7 @@
 				73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */,
 				73AE90442C499092002267F4 /* BudgetsView.swift */,
 				733397C12C4C05CA00BAE878 /* AddingBudgetView.swift */,
+				733397C92C4EF12E00BAE878 /* NotificationsView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -345,6 +350,7 @@
 				73F629222C01F01000E9FEB9 /* UIColor+Extension.swift */,
 				731EE8252C0B88E9006C7B0F /* Date+Extension.swift */,
 				736389172C22F5AF00D6478E /* GlobalMethods.swift */,
+				733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -548,6 +554,7 @@
 				73C562FD2C17A2DD00FCB65D /* FTFactory.swift in Sources */,
 				736389182C22F5AF00D6478E /* GlobalMethods.swift in Sources */,
 				735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */,
+				733397CA2C4EF12E00BAE878 /* NotificationsView.swift in Sources */,
 				73CCF3DF2C2B2C99009D8001 /* AppearanceViewModel.swift in Sources */,
 				731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */,
 				73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */,
@@ -563,6 +570,7 @@
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				73CCF3E32C2B51AB009D8001 /* ManageDataViewModel.swift in Sources */,
 				73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */,
+				733397CC2C4EF3CD00BAE878 /* UIApplication+Extension.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
 				73D000DA2C2EED3500AACFCE /* SearchTransactionRow.swift in Sources */,

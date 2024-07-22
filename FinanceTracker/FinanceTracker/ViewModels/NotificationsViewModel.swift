@@ -26,7 +26,11 @@ final class NotificationsViewModel: ObservableObject {
     }
     @Published var notificationTitle: String
     @Published var notificationBody: String
-    @Published var notificationTime: Date
+    @Published var notificationTime: Date {
+        didSet {
+            saveNotificationTime()
+        }
+    }
     
     //MARK: Private props
     private let notificationManager: any NotificationManagerProtocol
