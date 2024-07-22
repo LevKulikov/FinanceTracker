@@ -157,12 +157,14 @@ final class NotificationManager: NotificationManagerProtocol {
     }
     
     func setNotificationTitle(_ title: String) {
+        guard !title.isEmpty else { return }
         notificationTitle = title
         UserDefaults.standard.set(title, forKey: notificationTitleKey)
         dispatchReminderNotification()
     }
     
     func setNotificationBody(_ body: String) {
+        guard !body.isEmpty else { return }
         notificationBody = body
         UserDefaults.standard.set(body, forKey: notificationBodyKey)
         dispatchReminderNotification()
