@@ -91,7 +91,7 @@ final class NotificationManager: NotificationManagerProtocol {
     
     //MARK: - Methods
     static func askForPermition() {
-        UNUserNotificationCenter.current().requestAuthorization(options: .alert) { didAllow, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound, .providesAppNotificationSettings]) { didAllow, error in
             if didAllow {
                 shared.dispatchReminderNotification()
             } else {
@@ -106,7 +106,7 @@ final class NotificationManager: NotificationManagerProtocol {
             case .authorized, .provisional:
                 self?.systemNotificationPermition = true
             case .notDetermined:
-                self?.notificationCenter.requestAuthorization(options: .alert) { didAllow, _ in
+                self?.notificationCenter.requestAuthorization(options: [.alert, .badge, .sound, .providesAppNotificationSettings]) { didAllow, _ in
                     self?.systemNotificationPermition = didAllow
                 }
             default:
@@ -127,7 +127,7 @@ final class NotificationManager: NotificationManagerProtocol {
                 self?.isNotificationsAllowedByUser = false
                 completionHandler?(false, .denied)
             default:
-                self?.notificationCenter.requestAuthorization(options: .alert) { didAllow, error in
+                self?.notificationCenter.requestAuthorization(options: [.alert, .badge, .sound, .providesAppNotificationSettings]) { didAllow, error in
                     self?.systemNotificationPermition = didAllow
                     self?.isNotificationsAllowedByUser = didAllow
                     completionHandler?(didAllow, .notDetermined)
@@ -145,8 +145,8 @@ final class NotificationManager: NotificationManagerProtocol {
         
         let content = UNMutableNotificationContent()
         content.title = notificationTitle
-        content.title = notificationBody
-        content.sound = .defaultRingtone
+        content.body = notificationBody
+        content.sound = .default
         
         let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: notificationTime)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
@@ -157,12 +157,14 @@ final class NotificationManager: NotificationManagerProtocol {
     }
     
     func setNotificationTitle(_ title: String) {
+        guard !title.isEmpty else { return }
         notificationTitle = title
         UserDefaults.standard.set(title, forKey: notificationTitleKey)
         dispatchReminderNotification()
     }
     
     func setNotificationBody(_ body: String) {
+        guard !body.isEmpty else { return }
         notificationBody = body
         UserDefaults.standard.set(body, forKey: notificationBodyKey)
         dispatchReminderNotification()
