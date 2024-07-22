@@ -771,6 +771,8 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
         case .budgets:
             return
+        case .notifications:
+            break
         }
     }
 }

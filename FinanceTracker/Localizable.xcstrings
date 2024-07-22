@@ -683,6 +683,9 @@
         }
       }
     },
+    "Daily reminder" : {
+
+    },
     "Dark mode" : {
       "localizations" : {
         "ru" : {
@@ -1436,6 +1439,9 @@
         }
       }
     },
+    "Notifications" : {
+
+    },
     "Of type" : {
       "localizations" : {
         "ru" : {
@@ -1666,6 +1672,15 @@
           }
         }
       }
+    },
+    "Reminder body" : {
+
+    },
+    "Reminder time" : {
+
+    },
+    "Reminder title" : {
+
     },
     "Reorder" : {
       "localizations" : {
@@ -2123,6 +2138,9 @@
         }
       }
     },
+    "Time, Title and Body" : {
+
+    },
     "To" : {
       "localizations" : {
         "ru" : {
@@ -2392,6 +2410,9 @@
           }
         }
       }
+    },
+    "You have prevented the application from sending notifications. [Click here](%@) to go to Settings and allow notifications to be sent." : {
+
     },
     "Сafes" : {
       "localizations" : {
