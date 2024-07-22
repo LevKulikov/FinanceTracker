@@ -923,6 +923,9 @@
         }
       }
     },
+    "Don't forget to add your spendings" : {
+
+    },
     "Drag and drop to reorder" : {
       "localizations" : {
         "ru" : {
@@ -1079,6 +1082,9 @@
           }
         }
       }
+    },
+    "Finances are important" : {
+
     },
     "First step" : {
       "localizations" : {
