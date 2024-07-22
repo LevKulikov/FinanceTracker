@@ -544,7 +544,14 @@
       }
     },
     "Click here" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите здесь"
+          }
+        }
+      }
     },
     "Close" : {
       "localizations" : {
@@ -687,7 +694,14 @@
       }
     },
     "Daily reminder" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ежедневное напоминание"
+          }
+        }
+      }
     },
     "Dark mode" : {
       "localizations" : {
@@ -930,10 +944,24 @@
       }
     },
     "Don't forget to add your spendings" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не забудьте добавить свои расходы"
+          }
+        }
+      }
     },
     "Done" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
     },
     "Drag and drop to reorder" : {
       "localizations" : {
@@ -1093,7 +1121,14 @@
       }
     },
     "Finances are important" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Финансы это важно"
+          }
+        }
+      }
     },
     "First step" : {
       "localizations" : {
@@ -1446,7 +1481,14 @@
       }
     },
     "Notifications" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления"
+          }
+        }
+      }
     },
     "Of type" : {
       "localizations" : {
@@ -1680,13 +1722,34 @@
       }
     },
     "Reminder body" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст напоминания"
+          }
+        }
+      }
     },
     "Reminder time" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок напоминания"
+          }
+        }
+      }
     },
     "Reminder title" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время напоминания"
+          }
+        }
+      }
     },
     "Reorder" : {
       "localizations" : {
@@ -2145,7 +2208,14 @@
       }
     },
     "Time, Title and Body" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время, Заголовок и Текст"
+          }
+        }
+      }
     },
     "To" : {
       "localizations" : {
@@ -2418,7 +2488,14 @@
       }
     },
     "You have prevented the application from sending notifications. %@ to go to Settings and allow notifications to be sent." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы запретили приложению отправлять уведомления. %@ чтобы перейти в Настройки и разрешить отправку уведомлений"
+          }
+        }
+      }
     },
     "Сafes" : {
       "localizations" : {
