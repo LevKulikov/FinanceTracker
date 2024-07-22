@@ -22,6 +22,7 @@ enum SettingsSectionAndDataType {
     case appearance
     case data
     case budgets
+    case notifications
 }
 
 final class SettingsViewModel: ObservableObject {
@@ -72,6 +73,11 @@ final class SettingsViewModel: ObservableObject {
     
     func getBudgetsView() -> some View {
         return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
+    }
+    
+    func getNotificationsView() -> some View {
+        let notificationManager = NotificationManager()
+        return FTFactory.shared.createNotificationsView(notificationManager: notificationManager)
     }
 }
 

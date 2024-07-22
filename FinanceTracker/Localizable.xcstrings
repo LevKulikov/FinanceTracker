@@ -543,6 +543,9 @@
         }
       }
     },
+    "Click here" : {
+
+    },
     "Close" : {
       "localizations" : {
         "ru" : {
@@ -682,6 +685,9 @@
           }
         }
       }
+    },
+    "Daily reminder" : {
+
     },
     "Dark mode" : {
       "localizations" : {
@@ -923,6 +929,12 @@
         }
       }
     },
+    "Don't forget to add your spendings" : {
+
+    },
+    "Done" : {
+
+    },
     "Drag and drop to reorder" : {
       "localizations" : {
         "ru" : {
@@ -1079,6 +1091,9 @@
           }
         }
       }
+    },
+    "Finances are important" : {
+
     },
     "First step" : {
       "localizations" : {
@@ -1430,6 +1445,9 @@
         }
       }
     },
+    "Notifications" : {
+
+    },
     "Of type" : {
       "localizations" : {
         "ru" : {
@@ -1660,6 +1678,15 @@
           }
         }
       }
+    },
+    "Reminder body" : {
+
+    },
+    "Reminder time" : {
+
+    },
+    "Reminder title" : {
+
     },
     "Reorder" : {
       "localizations" : {
@@ -2117,6 +2144,9 @@
         }
       }
     },
+    "Time, Title and Body" : {
+
+    },
     "To" : {
       "localizations" : {
         "ru" : {
@@ -2386,6 +2416,9 @@
           }
         }
       }
+    },
+    "You have prevented the application from sending notifications. %@ to go to Settings and allow notifications to be sent." : {
+
     },
     "Сafes" : {
       "localizations" : {

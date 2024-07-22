@@ -60,6 +60,8 @@ final class WelcomeViewModel: ObservableObject {
     
     func welcomeIsPassed() {
         dataManager.isFirstLaunch = false
+        // NotificationManager ask for notifications permition during init
+        NotificationManager.askForPermition()
         Task {
             await dataManager.saveDefaultCategories()
         }

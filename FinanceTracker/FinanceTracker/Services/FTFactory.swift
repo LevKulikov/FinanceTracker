@@ -153,4 +153,9 @@ final class FTFactory {
         viewModel.delegate = delegate
         return AnyView(AddingBudgetView(viewModel: viewModel))
     }
+    
+    func createNotificationsView(notificationManager: some NotificationManagerProtocol) -> AnyView {
+        let viewModel = NotificationsViewModel(notificationManager: notificationManager)
+        return AnyView(NotificationsView(viewModel: viewModel))
+    }
 }
