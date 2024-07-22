@@ -52,6 +52,8 @@ protocol NotificationManagerProtocol: AnyObject {
 
 final class NotificationManager: NotificationManagerProtocol {
     //MARK: - Properties
+    private static let shared = NotificationManager()
+    
     var isSystemAllowsNotifications: Bool {
         return systemNotificationPermition ?? false
     }
@@ -88,6 +90,16 @@ final class NotificationManager: NotificationManagerProtocol {
     }
     
     //MARK: - Methods
+    static func askForPermition() {
+        UNUserNotificationCenter.current().requestAuthorization(options: .alert) { didAllow, error in
+            if didAllow {
+                shared.dispatchReminderNotification()
+            } else {
+                shared.disableNotifications()
+            }
+        }
+    }
+    
     func checkForSystemNotificationPermition() {
         notificationCenter.getNotificationSettings { [weak self] notificationSettings in
             switch notificationSettings.authorizationStatus {
