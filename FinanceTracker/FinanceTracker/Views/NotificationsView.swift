@@ -29,6 +29,17 @@ struct NotificationsView: View {
                 notificationDetailsSection
             }
             .navigationTitle("Notifications")
+            .toolbar {
+                if bodyFocus {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        
+                        Button("Done") {
+                            bodyFocus = false
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -39,9 +50,16 @@ struct NotificationsView: View {
                 .disabled(!viewModel.isSystemAllowsNotifications)
             
             if !viewModel.isSystemAllowsNotifications {
-                Text("You have prevented the application from sending notifications. [Click here](\(UIApplication.openNotificationSettingsURLString)) to go to Settings and allow notifications to be sent.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                VStack {
+                    Text("You have prevented the application from sending notifications. \(Text("Click here").foregroundStyle(.blue)) to go to Settings and allow notifications to be sent.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .onTapGesture {
+                            if let notificationsURL = UIApplication.appNotificationSettingsURL {
+                                openURL(notificationsURL)
+                            }
+                        }
+                }
             }
         }
     }
@@ -62,7 +80,6 @@ struct NotificationsView: View {
             TextField("Reminder body", text: $viewModel.notificationBody, axis: .vertical)
                 .lineLimit(1...3)
                 .focused($bodyFocus)
-                .submitLabel(.done)
                 .onChange(of: bodyFocus) {
                     if !bodyFocus {
                         viewModel.saveNotificationBody()

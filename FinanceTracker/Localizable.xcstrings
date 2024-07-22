@@ -543,6 +543,9 @@
         }
       }
     },
+    "Click here" : {
+
+    },
     "Close" : {
       "localizations" : {
         "ru" : {
@@ -927,6 +930,9 @@
       }
     },
     "Don't forget to add your spendings" : {
+
+    },
+    "Done" : {
 
     },
     "Drag and drop to reorder" : {
@@ -2411,7 +2417,7 @@
         }
       }
     },
-    "You have prevented the application from sending notifications. [Click here](%@) to go to Settings and allow notifications to be sent." : {
+    "You have prevented the application from sending notifications. %@ to go to Settings and allow notifications to be sent." : {
 
     },
     "Сafes" : {
