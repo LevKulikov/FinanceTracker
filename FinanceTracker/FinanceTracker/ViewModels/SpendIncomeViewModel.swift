@@ -27,13 +27,12 @@ enum DateSettingDestination: Equatable {
     case forward
 }
 
-final class SpendIncomeViewModel: ObservableObject {
+final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
     private var transactions: [Transaction] = []
     private let calendar = Calendar.current
-    private var cancelables = Set<AnyCancellable>()
     
     //MARK: Internal props
     weak var delegate: (any SpendIncomeViewModelDelegate)?
@@ -98,7 +97,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func save(errorHandler: ((Error) -> Void)? = nil) {
+    func save(errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
             do {
                 try await dataManager.save()
@@ -109,14 +108,14 @@ final class SpendIncomeViewModel: ObservableObject {
         }
     }
     
-    func delete(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
+    func delete(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
             await dataManager.deleteTransaction(transaction)
             await fetchTransactions(errorHandler: errorHandler)
         }
     }
     
-    func insert(_ transaction: Transaction, errorHandler: ((Error) -> Void)? = nil) {
+    func insert(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
             await dataManager.insert(transaction)
             await fetchTransactions(errorHandler: errorHandler)
@@ -212,7 +211,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchTransactions(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         let startOfSelectedDate = calendar.startOfDay(for: dateSelected)
         let endOfSelectedDate = dateSelected.endOfDay() ?? dateSelected
         
@@ -235,7 +234,7 @@ final class SpendIncomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) {
         let descriptor = FetchDescriptor<BalanceAccount>()
         
         do {
@@ -331,55 +330,5 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         case .notifications:
             break
         }
-    }
-}
-
-//MARK: - Sink extension
-extension SpendIncomeViewModel {
-    private func sinkOnPublishers() {
-        sinkOnDate()
-        sinkOnAction()
-        sinkOnBalanceAccount()
-        sinkOnTransactionType()
-    }
-    
-    private func sinkOnTransactionType() {
-        $transactionsTypeSelected
-            .sink { [weak self] newTransactionType in
-                self?.fetchAllData {
-                    self?.filterGroupSortTransactions()
-                }
-            }
-            .store(in: &cancelables)
-    }
-    
-    private func sinkOnAction() {
-        $actionSelected
-            .sink { [weak self] newAction in
-                self?.didSelectAction(action: newAction)
-                if case .none = newAction {
-                    self?.fetchAllData {
-                        self?.filterGroupSortTransactions()
-                    }
-                    self?.enableTapsWithDeadline()
-                }
-            }
-            .store(in: &cancelables)
-    }
-    
-    private func sinkOnDate() {
-        $dateSelected
-            .sink { [weak self] newDate in
-                self?.filterGroupSortTransactions()
-            }
-            .store(in: &cancelables)
-    }
-    
-    private func sinkOnBalanceAccount() {
-        $balanceAccountToFilter
-            .sink { [weak self] newBalanceAccount in
-                self?.filterGroupSortTransactions()
-            }
-            .store(in: &cancelables)
     }
 }
