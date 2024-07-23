@@ -243,6 +243,7 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
     }
     
+    @MainActor
     func getAddingBalanceAccountView() -> some View {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }

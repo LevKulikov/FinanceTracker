@@ -200,6 +200,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         delegate?.hideTabBar(hide)
     }
     
+    @MainActor
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }

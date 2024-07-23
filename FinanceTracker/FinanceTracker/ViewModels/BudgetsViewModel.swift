@@ -73,19 +73,23 @@ final class BudgetsViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func getBudgetCard<MenuItems: View>(for budget: Budget, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) -> some View {
         let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: budget)
         return BudgetCard(viewModel: viewModel, namespace: namespace,  menuItems: menuItems)
     }
     
+    @MainActor
     func getAddingBudgetView() -> some View {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .add(selectedBalanceAccount), delegate: self)
     }
     
+    @MainActor
     func getUpdaingBudgetView(for budget: Budget) -> some View {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .update(budget: budget), delegate: self)
     }
     
+    @MainActor
     func getTransactionsListView(for budgetData: BudgetCardViewData) -> some View {
         let budget = budgetData.budget
         let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name

@@ -264,6 +264,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     /// Provides View for Tags settings
     /// - Returns: View for tags settings
+    @MainActor
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
@@ -273,6 +274,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     ///   - transactions: transactions to be displayed in list
     ///   - title: title to be set in the returned view
     /// - Returns: TransactionListView with view model
+    @MainActor
     func getTransactionListView(transactions: [Transaction], title: String) -> some View {
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: transactions, title: title, threadToUse: .global, delegate: self)
     }

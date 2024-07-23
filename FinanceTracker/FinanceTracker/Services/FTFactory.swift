@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
+@MainActor
 final class FTFactory {
     static let shared = FTFactory()
     
@@ -58,7 +59,6 @@ final class FTFactory {
         return AnyView(AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel))
     }
     
-    @MainActor
     func createAddingCategoryView(dataManager: some DataManagerProtocol, transactionType: TransactionsType, action: ActionWithCategory, delegate: (some AddingCategoryViewModelDelegate)? = nil) -> AnyView {
         let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionType, action: action)
         viewModel.delegate = delegate

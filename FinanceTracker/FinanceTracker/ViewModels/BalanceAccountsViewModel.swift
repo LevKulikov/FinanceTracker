@@ -64,6 +64,7 @@ final class BalanceAccountsViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func getAddingBalanceAccountView(for action: ActionWithBalanceAccaunt) -> some View {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
     }

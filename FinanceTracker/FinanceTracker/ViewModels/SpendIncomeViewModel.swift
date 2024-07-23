@@ -134,7 +134,8 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {        
+    @MainActor
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(
             dataManager: dataManager,
             threadToUse: .main,

@@ -54,28 +54,33 @@ final class CustomTabViewModel: ObservableObject {
         delegates.forEach { $0.object?.addButtonPressed() }
     }
     
+    @MainActor
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getStatisticsView() -> some View {
         return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getSearchView() -> some View {
         return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getSettingsView() -> some View {
         return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getWelcomeView() -> some View {
         return FTFactory.shared.createWelcomeView(dataManager: dataManager, delegate: self)
     }

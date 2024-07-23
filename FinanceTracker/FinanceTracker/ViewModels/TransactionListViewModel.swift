@@ -43,6 +43,7 @@ final class TransactionListViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    @MainActor
     func getAddingSpendIcomeView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: threadToUse, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
