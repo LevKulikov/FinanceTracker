@@ -25,7 +25,7 @@ enum TabViewType: Equatable {
     case welcomeView
 }
 
-final class CustomTabViewModel: ObservableObject {
+final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     private struct WeakReferenceDelegate {
         weak var object: (any CustomTabViewModelDelegate)?
         
@@ -134,14 +134,14 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
     func didSelectSetting(_ setting: SettingsSectionAndDataType?) {
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             if setting == nil {
                 withAnimation {
-                    self?.showTabBar = true
+                    showTabBar = true
                 }
             } else {
                 withAnimation {
-                    self?.showTabBar = false
+                    showTabBar = false
                 }
             }
         }
