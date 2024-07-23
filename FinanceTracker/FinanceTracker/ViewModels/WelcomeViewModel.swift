@@ -63,7 +63,7 @@ final class WelcomeViewModel: ObservableObject {
         dataManager.isFirstLaunch = false
         // NotificationManager ask for notifications permition during init
         NotificationManager.askForPermition()
-        Task {
+        Task { [dataManager] in
             await dataManager.saveDefaultCategories()
         }
     }
