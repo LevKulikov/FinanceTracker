@@ -9,13 +9,13 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-final class BudgetCardViewModel: ObservableObject {
+final class BudgetCardViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     let budget: Budget
     
     //MARK: Published properties
-    @Published private(set) var isProcessing = false
-    @Published private(set) var totalValue: Float = 0
+    @MainActor @Published private(set) var isProcessing = false
+    @MainActor @Published private(set) var totalValue: Float = 0
     
     //MARK: Private properties
     private let dataManager: any DataManagerProtocol
@@ -44,14 +44,18 @@ final class BudgetCardViewModel: ObservableObject {
         BudgetCardViewData(budget: budget, transactions: transactions)
     }
     
-    func fetchAndCalculate(compeletionHandler: (() -> Void)? = nil) {
-        isProcessing = true
+    func fetchAndCalculate(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         Task {
+            await MainActor.run {
+                isProcessing = true
+            }
+            
             await fetchTransactions()
             await calculateTotalValue()
-            compeletionHandler?()
-            DispatchQueue.main.async { [weak self] in
-                self?.isProcessing = false
+            await compeletionHandler?()
+                
+            await MainActor.run {
+                isProcessing = false
             }
         }
     }
