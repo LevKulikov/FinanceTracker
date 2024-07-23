@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 import SwiftUI
 
 protocol SearchViewModelDelegate: AnyObject {
@@ -33,7 +33,7 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-final class SearchViewModel: ObservableObject {
+final class SearchViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
     
@@ -346,7 +346,7 @@ final class SearchViewModel: ObservableObject {
             .sorted { $0.date > $1.date }
     }
     
-    private func fetchAllData(errorHandler: ((Error) -> Void)? = nil, competionHandler: (() -> Void)? = nil) {
+    private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil, competionHandler: (@Sendable () -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
@@ -374,46 +374,46 @@ final class SearchViewModel: ObservableObject {
         }
     }
     
-    private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedCategories: [Category] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allCategories = fetchedCategories
+                self.allCategories = fetchedCategories
             }
         }
     }
     
-    private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchTags(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedTags: [Tag] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allTags = fetchedTags
+                self.allTags = fetchedTags
             }
         }
     }
     
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allBalanceAccounts = fetchedBalanceAccounts
+                self.allBalanceAccounts = fetchedBalanceAccounts
             }
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
             sortBy: []
