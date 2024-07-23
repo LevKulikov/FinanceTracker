@@ -199,7 +199,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData(compeletionHandler: (() -> Void)? = nil) {
+    func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         print("refreshData, started")
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
@@ -207,13 +207,15 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             self?.calculateDataForPieChart(animated: true)
             self?.calculateDataForBarChart()
             print("refreshData, ended")
-            compeletionHandler?()
+            Task { @MainActor in
+                compeletionHandler?()
+            }
         }
     }
     
     /// Refreshes data if some changes occured, otherwise do nothing
     /// - Parameter compeletionHandler: closure that is called at the end of refreshing
-    func refreshDataIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+    func refreshDataIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard isTransactionUpdatedFromAnotherView else { return }
         isTransactionUpdatedFromAnotherView = false
         refreshData(compeletionHandler: compeletionHandler)
@@ -435,7 +437,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [returnData] in
                 print("calculateDataForPieChart, started to provide data for pie chart")
                 self.pieDataIsCalculating = false
                 if animated {
@@ -606,7 +608,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     /// Sets available dates arrays for only years and years with months (useless)
-    private func setDateArrays(completionHandler: @escaping () -> Void) {
+    private func setDateArrays(completionHandler: @Sendable @escaping () -> Void) {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             
@@ -658,7 +660,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     /// Fetches all data and executes completion handler
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
-    private func fetchAllData(completionHandler: @escaping () -> Void) {
+    private func fetchAllData(completionHandler: @Sendable @escaping () -> Void) {
         isFetchingData = true
         print("fetchAllData, started")
         let localCompletion: @Sendable () -> Void = {
