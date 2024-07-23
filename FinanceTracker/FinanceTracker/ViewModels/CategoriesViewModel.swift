@@ -78,7 +78,7 @@ final class CategoriesViewModel: ObservableObject {
     func saveReordering(refetchAfter: Bool) {
         defer { categoreisToReorder = [] }
         categoreisToReorder.forEach { category in
-            guard let newIndex = categoreisToReorder.firstIndex(of: category) else { return }
+            guard let newIndex = categoreisToReorder.firstIndex(where: { $0.id == category.id }) else { return }
             category.placement = newIndex
         }
         Task {

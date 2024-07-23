@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 import SwiftUI
 
 protocol DataManagerProtocol: AnyObject {
@@ -82,7 +82,7 @@ protocol DataManagerProtocol: AnyObject {
     func saveDefaultCategories()
 }
 
-final class DataManager: DataManagerProtocol, ObservableObject {
+final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
     enum DataThread: Equatable {
         case main
         case global
@@ -334,7 +334,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         }
     }
     
-    func insertFromBackground<T>(_ model: T) async where T : PersistentModel {
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel, T: Sendable {
         do {
             if let backgroundActor {
                 await backgroundActor.insert(model)
@@ -359,7 +359,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     }
     
     /// Should be firstly used from background thread. Otherwise it will be execute from main thread
-    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel {
+    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel, T: Sendable {
         if let backgroundActor {
             return try await backgroundActor.fetch(descriptor)
         } else {
