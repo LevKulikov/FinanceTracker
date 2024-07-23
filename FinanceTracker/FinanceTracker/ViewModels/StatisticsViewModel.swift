@@ -60,7 +60,7 @@ enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Id
     }
 }
 
-final class StatisticsViewModel: ObservableObject {
+final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
         case totalValue
@@ -661,10 +661,10 @@ final class StatisticsViewModel: ObservableObject {
     private func fetchAllData(completionHandler: @escaping () -> Void) {
         isFetchingData = true
         print("fetchAllData, started")
-        let localCompletion = { [weak self] in
+        let localCompletion: @Sendable () -> Void = {
             print("fetchAllData, started to provide data on main thread")
-            DispatchQueue.main.async {
-                self?.isFetchingData = false
+            Task { @MainActor in
+                self.isFetchingData = false
             }
             print("fetchAllData, ended")
             completionHandler()
