@@ -34,12 +34,12 @@ final class SettingsViewModel: ObservableObject {
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
-    private let userIdiom = FTAppAssets.currentUserDevise
     
     //MARK: Published props
-    @Published var selectedSettings: SettingsSectionAndDataType? {
+    
+    @MainActor @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
-            if userIdiom == .phone {
+            if FTAppAssets.currentUserDevise == .phone {
                 delegate?.didSelectSetting(selectedSettings)
             }
         }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct SingleExampleView: View {
     let model: ExampleModel
     private let currentDevice = FTAppAssets.currentUserDevise
