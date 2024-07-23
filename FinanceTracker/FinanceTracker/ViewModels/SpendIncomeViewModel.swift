@@ -89,9 +89,9 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        fetchAllData { [weak self] in
-            DispatchQueue.main.async {
-                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+        fetchAllData {
+            Task { @MainActor in
+                self.balanceAccountToFilter = self.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
         }
     }
@@ -203,7 +203,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func fetchAllData(completionHandler: (()->Void)? = nil) {
+    private func fetchAllData(completionHandler: (@Sendable ()->Void)? = nil) {
         Task {
             await fetchTransactions()
             await fetchBalanceAccounts()
@@ -311,10 +311,10 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
                 filterGroupSortTransactions()
             }
         case .data:
-            fetchAllData { [weak self] in
-                self?.filterGroupSortTransactions()
-                DispatchQueue.main.async {
-                    self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            fetchAllData {
+                self.filterGroupSortTransactions()
+                Task { @MainActor in
+                    self.balanceAccountToFilter = self.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
                 }
             }
         case .transactions:
