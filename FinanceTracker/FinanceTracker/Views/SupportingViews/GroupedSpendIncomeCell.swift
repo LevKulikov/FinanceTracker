@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct GroupedSpendIncomeCell: View {
     var transactions: [Transaction]
     var namespace: Namespace.ID

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct SpendIncomeCell: View {
     @Bindable var transaction: Transaction
     var namespace: Namespace.ID

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct SearchTransactionRow: View {
     //MARK: - Properties
     let transaction: Transaction

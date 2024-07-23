@@ -8,17 +8,18 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct FTAppAssets {
     //MARK: Properteis
-    static var defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
-    static var maxCustomSheetWidth: CGFloat = 600
-    static var maxCustomSheetHeight: CGFloat = 900
+    nonisolated static let defaultIconNames: [String] = /*["testIcon", "dollarInCircle", "dollarThreeCash", "database", "wallet"]*/ getIconNames()
+    nonisolated static let maxCustomSheetWidth: CGFloat = 600
+    nonisolated static let maxCustomSheetHeight: CGFloat = 900
     
-    static var availableDateRange: ClosedRange<Date> {
+    nonisolated static var availableDateRange: ClosedRange<Date> {
         Date(timeIntervalSince1970: 0)...(Date.now.endOfDay() ?? .now)
     }
     
-    static let defaultColors: [Color] = [
+    nonisolated static let defaultColors: [Color] = [
         .red,
         .blue,
         .green,
@@ -27,7 +28,7 @@ struct FTAppAssets {
         .yellow,
     ]
     
-    static let appVersion: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    nonisolated static let appVersion: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     
     static let currentUserDevise: UIUserInterfaceIdiom = UIDevice.current.userInterfaceIdiom
     
@@ -73,7 +74,7 @@ struct FTAppAssets {
         return size
     }
     
-    private static func getIconNames() -> [String] {
+    nonisolated private static func getIconNames() -> [String] {
         let fileManager = FileManager.default
         let bundleURL = Bundle.main.bundleURL
         let assetURL = bundleURL.appendingPathComponent("IconImages.bundle")

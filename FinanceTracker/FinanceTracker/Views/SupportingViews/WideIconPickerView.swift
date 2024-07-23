@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct WideIconPickerView: View {
     @Binding var showPicker: Bool
     @Binding var selectIcon: String
