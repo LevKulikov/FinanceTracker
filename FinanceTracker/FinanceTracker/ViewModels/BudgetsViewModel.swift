@@ -27,7 +27,7 @@ struct BudgetCardViewData: Identifiable, Hashable {
 }
 
 //MARK: - ViewModel class
-final class BudgetsViewModel: ObservableObject {
+final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any BudgetsViewModelDelegate)?
     
@@ -36,19 +36,19 @@ final class BudgetsViewModel: ObservableObject {
     private var neededToBeRefreshed = false
     
     //MARK: Published props
-    @Published var action: ActionWithBudget?
-    @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
+    @MainActor @Published var action: ActionWithBudget?
+    @MainActor @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            Task.detached { @MainActor [weak self] in
-                self?.isFetching = true
-                await self?.fetchBudgets()
-                self?.isFetching = false
+            Task.detached { @MainActor in
+                self.isFetching = true
+                await self.fetchBudgets()
+                self.isFetching = false
             }
         }
     }
-    @Published private (set) var allBalanceAccounts: [BalanceAccount] = []
-    @Published private(set) var budgets: [Budget] = []
-    @Published private(set) var isFetching = false
+    @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
+    @MainActor @Published private(set) var budgets: [Budget] = []
+    @MainActor @Published private(set) var isFetching = false
     
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
@@ -57,13 +57,13 @@ final class BudgetsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func refreshIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+    func refreshIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard neededToBeRefreshed else { return }
         neededToBeRefreshed = false
         refreshData(compeletionHandler: compeletionHandler)
     }
     
-    func refreshData(compeletionHandler: (() -> Void)? = nil) {
+    func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         Task { @MainActor in
             isFetching = true
             await fetchBalanceAccounts()
@@ -96,11 +96,13 @@ final class BudgetsViewModel: ObservableObject {
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self)
     }
     
+    @MainActor
     func deleteBudget(_ budget: Budget) {
         Task {
             await dataManager.deleteBudget(budget)
             delegate?.didDeleteBudget(budget)
         }
+        
         withAnimation {
             budgets.removeAll { $0 == budget }
         }
