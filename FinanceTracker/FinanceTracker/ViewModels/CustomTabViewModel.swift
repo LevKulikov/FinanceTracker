@@ -39,6 +39,7 @@ final class CustomTabViewModel: ObservableObject {
     private var delegates: [WeakReferenceDelegate] = []
     
     //MARK: Published props
+    @Published var tabSelection = 1
     @Published var showTabBar = true
     @Published var isFirstLaunch = false
     

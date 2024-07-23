@@ -12,7 +12,6 @@ struct CustomTabView: View  {
     //MARK: - Propeties
     @Namespace private var namespace
     @StateObject private var viewModel: CustomTabViewModel
-    @State private var tabSelection = 1
     private var availableYOffset: CGFloat {
         if FTAppAssets.currnetUserDeviseName == "iPhone SE (3rd generation)" {
             return 5
@@ -29,7 +28,7 @@ struct CustomTabView: View  {
     
     //MARK: - Body
     var body: some View {
-        TabView(selection: $tabSelection) {
+        TabView(selection: $viewModel.tabSelection) {
             viewModel.getSpendIncomeView(namespace: namespace)
                 .tag(1)
             
@@ -60,7 +59,7 @@ struct CustomTabView: View  {
             let imageHeight: CGFloat = 20
             
             Button {
-                selectTab(1)
+                selectTab(1, animated: true)
             } label: {
                 VStack {
                     Image(systemName: "list.bullet.clipboard")
@@ -71,7 +70,7 @@ struct CustomTabView: View  {
                 }
             }
             .frame(width: buttonWidth)
-            .foregroundStyle(tabSelection == 1 ? .blue : .secondary)
+            .foregroundStyle(viewModel.tabSelection == 1 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
             Spacer()
@@ -88,10 +87,10 @@ struct CustomTabView: View  {
                 }
             }
             .frame(width: buttonWidth)
-            .foregroundStyle(tabSelection == 2 ? .blue : .secondary)
+            .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
-            if tabSelection == 1 {
+            if viewModel.tabSelection == 1 {
                 Spacer()
                 
                 Button {
@@ -126,7 +125,7 @@ struct CustomTabView: View  {
                 }
             }
             .frame(width: buttonWidth)
-            .foregroundStyle(tabSelection == 3 ? .blue : .secondary)
+            .foregroundStyle(viewModel.tabSelection == 3 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
             Spacer()
@@ -143,7 +142,7 @@ struct CustomTabView: View  {
                 }
             }
             .frame(width: buttonWidth)
-            .foregroundStyle(tabSelection == 4 ? .blue : .secondary)
+            .foregroundStyle(viewModel.tabSelection == 4 ? .blue : .secondary)
             .hoverEffect(.highlight)
         }
         .padding(.horizontal, 5)
@@ -157,9 +156,14 @@ struct CustomTabView: View  {
     }
     
     //MARK: - Methods
-    private func selectTab(_ tabId: Int) {
-        withAnimation(.snappy(duration: 0.5)) {
-            tabSelection = tabId
+    private func selectTab(_ tabId: Int, animated: Bool = false) {
+        guard viewModel.tabSelection != tabId else { return }
+        if animated {
+            withAnimation {
+                viewModel.tabSelection = tabId
+            }
+        } else {
+            viewModel.tabSelection = tabId
         }
     }
 }

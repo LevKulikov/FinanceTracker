@@ -44,7 +44,13 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.tertiary)
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 .multilineTextAlignment(.center)
+            
+            Rectangle()
+                .fill(.clear)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
     }
     
@@ -66,6 +72,8 @@ struct SettingsView: View {
                 EmptyView()
             case .budgets:
                 viewModel.getBudgetsView()
+            case .notifications:
+                viewModel.getNotificationsView()
             }
         } else {
             noSelectionView
@@ -115,6 +123,10 @@ struct SettingsView: View {
     
     private var appSettingsSection: some View {
         Section("App and Data") {
+            NavigationLink(value: SettingsSectionAndDataType.notifications) {
+                Label("Notifications", systemImage: "bell.badge")
+            }
+            
             NavigationLink(value: SettingsSectionAndDataType.appearance) {
                 Label("Appearance", systemImage: "circle.righthalf.filled")
             }

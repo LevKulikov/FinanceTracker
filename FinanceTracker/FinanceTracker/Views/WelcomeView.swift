@@ -45,8 +45,10 @@ struct WelcomeView: View {
         .padding(.bottom, 15)
         .ignoresSafeArea(edges: .bottom)
         .overlay(alignment: .topTrailing) {
-            skipButton
-                .padding(.trailing)
+            if selection < viewModel.models.count - 1 {
+                skipButton
+                    .padding(.trailing)
+            }
         }
         .overlay(alignment: .bottom) {
             bottomButton

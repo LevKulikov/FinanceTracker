@@ -219,6 +219,13 @@ final class Transaction {
     func removeTag(_ tag: Tag) {
         tags.removeAll { $0 == tag }
     }
+    
+    /// For iOS 18 Deletion fixing
+    func prepareForDeletion() {
+        self.category = nil
+        self.balanceAccount = nil
+        tags = []
+    }
 }
 
 @Model
