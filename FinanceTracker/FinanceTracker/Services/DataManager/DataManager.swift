@@ -9,7 +9,7 @@ import Foundation
 @preconcurrency import SwiftData
 import SwiftUI
 
-protocol DataManagerProtocol: AnyObject {
+protocol DataManagerProtocol: AnyObject, Sendable {
     var tagDefaultColor: Color? { get set }
     var isFirstLaunch: Bool { get set }
     
