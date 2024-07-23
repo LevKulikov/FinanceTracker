@@ -19,6 +19,7 @@ enum ActionWithCategory: Equatable, Hashable {
     case update(Category)
 }
 
+@MainActor
 final class AddingCategoryViewModel: ObservableObject {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
@@ -130,7 +131,7 @@ final class AddingCategoryViewModel: ObservableObject {
     
     /// This method is needed to check if such category exists
     @MainActor
-    private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
         let rawValue = transactionType.rawValue
         
@@ -148,7 +149,7 @@ final class AddingCategoryViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
             sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]

@@ -51,6 +51,7 @@ final class CategoriesViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func getAddingBalanceAccountView(for action: ActionWithCategory) -> some View {
         return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: caterotyType, action: action, delegate: self)
     }

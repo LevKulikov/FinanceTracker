@@ -58,6 +58,7 @@ final class FTFactory {
         return AnyView(AddingSpendIcomeView(action: forAction, namespace: namespace, viewModel: viewModel))
     }
     
+    @MainActor
     func createAddingCategoryView(dataManager: some DataManagerProtocol, transactionType: TransactionsType, action: ActionWithCategory, delegate: (some AddingCategoryViewModelDelegate)? = nil) -> AnyView {
         let viewModel = AddingCategoryViewModel(dataManager: dataManager, transactionType: transactionType, action: action)
         viewModel.delegate = delegate
