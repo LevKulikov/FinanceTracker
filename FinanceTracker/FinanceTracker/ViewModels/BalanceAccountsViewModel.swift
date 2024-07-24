@@ -9,12 +9,12 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol BalanceAccountsViewModelDelegate: AnyObject {
+protocol BalanceAccountsViewModelDelegate: AnyObject, Sendable {
     func didUpdatedBalanceAccountsList()
     func didDeleteBalanceAccount()
 }
 
-final class BalanceAccountsViewModel: ObservableObject {
+final class BalanceAccountsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any BalanceAccountsViewModelDelegate)?
     
@@ -45,7 +45,7 @@ final class BalanceAccountsViewModel: ObservableObject {
     }
     
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
-        Task { @MainActor in
+        Task { @MainActor [dataManager, delegate] in
             dataManager.deleteBalanceAccount(balanceAccount)
             delegate?.didDeleteBalanceAccount()
             await fetchBalanceAccounts()
@@ -57,7 +57,7 @@ final class BalanceAccountsViewModel: ObservableObject {
     }
     
     func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
-        Task { @MainActor in
+        Task { @MainActor [dataManager, delegate] in
             dataManager.deleteBalanceAccountWithTransactions(balanceAccount)
             delegate?.didDeleteBalanceAccount()
             await fetchBalanceAccounts()
@@ -69,16 +69,9 @@ final class BalanceAccountsViewModel: ObservableObject {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
     }
     
-    //TODO: Implement balance account deletion
-    func delete(balanceAccount: BalanceAccount?, competionHandler: (() -> Void)? = nil) {
-        Task { @MainActor in
-            competionHandler?()
-        }
-    }
-    
     //MARK: Private methods
     @MainActor
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         let descriptor = FetchDescriptor<BalanceAccount>(sortBy: [SortDescriptor(\.name)])
         
         do {
