@@ -19,6 +19,7 @@ enum ActionWithCategory: Equatable, Hashable {
     case update(Category)
 }
 
+@MainActor
 final class AddingCategoryViewModel: ObservableObject {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
@@ -84,7 +85,7 @@ final class AddingCategoryViewModel: ObservableObject {
                 placement: availableCategories.count + 1
             )
             Task {
-                await dataManager.insert(newCategory)
+                dataManager.insert(newCategory)
                 delegate?.didUpdateCategory()
                 completionHandler()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
@@ -103,7 +104,7 @@ final class AddingCategoryViewModel: ObservableObject {
             
             Task {
                 do {
-                    try await dataManager.save()
+                    try dataManager.save()
                     delegate?.didUpdateCategory()
                     completionHandler()
                 } catch {
@@ -130,7 +131,7 @@ final class AddingCategoryViewModel: ObservableObject {
     
     /// This method is needed to check if such category exists
     @MainActor
-    private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
         let rawValue = transactionType.rawValue
         
@@ -148,14 +149,14 @@ final class AddingCategoryViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
             sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
+            var fetchedItems = try dataManager.fetch(descriptor)
             if keyPath == nil {
                 fetchedItems.reverse()
             }

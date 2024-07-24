@@ -35,6 +35,7 @@ struct TransactionBarChartData: Identifiable, Hashable {
     let date: Date
 }
 
+@MainActor
 struct TransactionBarChart: View {
     //MARK: Properties
     private let transactionsData: [[TransactionBarChartData]]

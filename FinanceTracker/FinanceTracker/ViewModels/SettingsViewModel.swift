@@ -25,7 +25,7 @@ enum SettingsSectionAndDataType {
     case notifications
 }
 
-final class SettingsViewModel: ObservableObject {
+final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SettingsViewModelDelegate)?
     let developerTelegramUsername = "k_lev_s"
@@ -34,12 +34,12 @@ final class SettingsViewModel: ObservableObject {
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
-    private let userIdiom = FTAppAssets.currentUserDevise
     
     //MARK: Published props
-    @Published var selectedSettings: SettingsSectionAndDataType? {
+    
+    @MainActor @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
-            if userIdiom == .phone {
+            if FTAppAssets.currentUserDevise == .phone {
                 delegate?.didSelectSetting(selectedSettings)
             }
         }
@@ -51,30 +51,37 @@ final class SettingsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    @MainActor
     func getBalanceAccountsView() -> some View {
         return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getCategoriesView() -> some View {
         return FTFactory.shared.createCategoriesView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getAppearanceView() -> some View {
         return FTFactory.shared.createAppearanceView(dataManager: dataManager)
     }
     
+    @MainActor
     func getManageDataView() -> some View {
         return FTFactory.shared.createManageDataView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getBudgetsView() -> some View {
         return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getNotificationsView() -> some View {
         let notificationManager = NotificationManager()
         return FTFactory.shared.createNotificationsView(notificationManager: notificationManager)

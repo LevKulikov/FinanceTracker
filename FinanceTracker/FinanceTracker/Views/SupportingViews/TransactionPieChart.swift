@@ -15,6 +15,7 @@ struct TransactionPieChartData: Identifiable {
     let transactions: [Transaction]
 }
 
+@MainActor
 struct TransactionPieChart: View {
     //MARK: - Properties
     private let transactionsChartData: [TransactionPieChartData]

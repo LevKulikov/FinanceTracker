@@ -25,7 +25,7 @@ enum TabViewType: Equatable {
     case welcomeView
 }
 
-final class CustomTabViewModel: ObservableObject {
+final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     private struct WeakReferenceDelegate {
         weak var object: (any CustomTabViewModelDelegate)?
         
@@ -54,28 +54,33 @@ final class CustomTabViewModel: ObservableObject {
         delegates.forEach { $0.object?.addButtonPressed() }
     }
     
+    @MainActor
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getStatisticsView() -> some View {
         return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getSearchView() -> some View {
         return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
+    @MainActor
     func getSettingsView() -> some View {
         return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getWelcomeView() -> some View {
         return FTFactory.shared.createWelcomeView(dataManager: dataManager, delegate: self)
     }
@@ -129,14 +134,14 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
     func didSelectSetting(_ setting: SettingsSectionAndDataType?) {
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             if setting == nil {
                 withAnimation {
-                    self?.showTabBar = true
+                    showTabBar = true
                 }
             } else {
                 withAnimation {
-                    self?.showTabBar = false
+                    showTabBar = false
                 }
             }
         }

@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
+@MainActor
 final class FTFactory {
     static let shared = FTFactory()
     
