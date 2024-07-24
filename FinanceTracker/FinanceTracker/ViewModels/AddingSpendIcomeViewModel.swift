@@ -109,7 +109,7 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Methods
     /// Updates or saves new transaction
-    func saveTransaction(completionHanler: (@MainActor (SaveErrors?) -> Void)? = nil) {
+    func saveTransaction(completionHanler: (@MainActor @Sendable (SaveErrors?) -> Void)? = nil) {
         // Field checking
         guard value > 0 else {
             Task { @MainActor in
