@@ -85,7 +85,7 @@ final class AddingCategoryViewModel: ObservableObject {
                 placement: availableCategories.count + 1
             )
             Task {
-                await dataManager.insert(newCategory)
+                dataManager.insert(newCategory)
                 delegate?.didUpdateCategory()
                 completionHandler()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
@@ -104,7 +104,7 @@ final class AddingCategoryViewModel: ObservableObject {
             
             Task {
                 do {
-                    try await dataManager.save()
+                    try dataManager.save()
                     delegate?.didUpdateCategory()
                     completionHandler()
                 } catch {
@@ -156,7 +156,7 @@ final class AddingCategoryViewModel: ObservableObject {
         )
         
         do {
-            var fetchedItems = try await dataManager.fetch(descriptor)
+            var fetchedItems = try dataManager.fetch(descriptor)
             if keyPath == nil {
                 fetchedItems.reverse()
             }
