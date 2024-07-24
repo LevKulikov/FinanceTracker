@@ -25,7 +25,7 @@ enum SettingsSectionAndDataType {
     case notifications
 }
 
-final class SettingsViewModel: ObservableObject {
+final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SettingsViewModelDelegate)?
     let developerTelegramUsername = "k_lev_s"
