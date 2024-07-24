@@ -9,13 +9,13 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol CategoriesViewModelDelegate: AnyObject {
+protocol CategoriesViewModelDelegate: AnyObject, Sendable {
     func didUpdateCategoryList()
     
     func didDeleteCategory()
 }
 
-final class CategoriesViewModel: ObservableObject {
+final class CategoriesViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any CategoriesViewModelDelegate)?
     var filteredCategories: [Category] {
@@ -44,7 +44,7 @@ final class CategoriesViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func fetchData(withAnimation: Bool = false, completionHandler: (() -> Void)? = nil) {
+    func fetchData(withAnimation: Bool = false, completionHandler: (@Sendable () -> Void)? = nil) {
         Task {
             await fetchCategories(withAnimation: withAnimation)
             completionHandler?()
@@ -57,7 +57,7 @@ final class CategoriesViewModel: ObservableObject {
     }
     
     func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) {
-        Task { @MainActor in
+        Task { @MainActor [dataManager, delegate] in
             await dataManager.deleteCategory(category, moveTransactionsTo: replacingCategory)
             delegate?.didDeleteCategory()
             await fetchCategories()
@@ -65,7 +65,7 @@ final class CategoriesViewModel: ObservableObject {
     }
     
     func deleteCategoryWithTransactions(_ category: Category) {
-        Task { @MainActor in
+        Task { @MainActor [dataManager, delegate] in
             await dataManager.deleteCategoryWithTransactions(category)
             delegate?.didDeleteCategory()
             await fetchCategories()
@@ -82,7 +82,7 @@ final class CategoriesViewModel: ObservableObject {
             guard let newIndex = categoreisToReorder.firstIndex(where: { $0.id == category.id }) else { return }
             category.placement = newIndex
         }
-        Task {
+        Task { [dataManager] in
             try await dataManager.save()
             if refetchAfter {
                 await fetchCategories()
@@ -92,7 +92,7 @@ final class CategoriesViewModel: ObservableObject {
     
     //MARK: Private methods
     @MainActor
-    private func fetchCategories(withAnimation animated: Bool = false, errorHandler: (() -> Void)? = nil) async {
+    private func fetchCategories(withAnimation animated: Bool = false, errorHandler: (@Sendable () -> Void)? = nil) async {
         let descriptor = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.placement)])
         
         do {
