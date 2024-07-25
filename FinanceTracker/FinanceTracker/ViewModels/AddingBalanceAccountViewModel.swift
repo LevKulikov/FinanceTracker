@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol AddingBalanceAccountViewModelDelegate: AnyObject {
+protocol AddingBalanceAccountViewModelDelegate: AnyObject, Sendable {
     func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount)
 }
 
@@ -19,7 +19,7 @@ enum ActionWithBalanceAccaunt: Equatable, Hashable {
     case update(BalanceAccount)
 }
 
-final class AddingBalanceAccountViewModel: ObservableObject {
+final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
     private var balanceAccountToUpdate: BalanceAccount?
@@ -49,7 +49,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func save(completionHandler: @escaping () -> Void) {
+    func save(completionHandler: @MainActor @Sendable @escaping () -> Void) {
         switch action {
         case .none, .add:
             let newBalanceAccount = BalanceAccount(
@@ -60,7 +60,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
                 color: color
             )
             
-            Task { @MainActor in
+            Task { @MainActor [dataManager, delegate] in
                 dataManager.insert(newBalanceAccount)
                 delegate?.didUpdateBalanceAccount(newBalanceAccount)
                 completionHandler()
@@ -79,7 +79,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             balanceAccountToUpdate.iconName = iconName
             balanceAccountToUpdate.color = color
             
-            Task { @MainActor in
+            Task { @MainActor [dataManager, delegate] in
                 do {
                     try dataManager.save()
                     delegate?.didUpdateBalanceAccount(balanceAccountToUpdate)
@@ -105,26 +105,24 @@ final class AddingBalanceAccountViewModel: ObservableObject {
             iconName = balanceAccount.iconName
             color = balanceAccount.color
             
-            isFetching = true
-            
-            let settingBalanceStringClosure = {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    let totalBalance = balance + transactionsChanges
-                    balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
-                    isFetching = false
-                }
+            Task { @MainActor in
+                isFetching = true
             }
             
-            Task.detached(priority: .high) { [weak self] in
-                await self?.setTransactionsChanges()
-                settingBalanceStringClosure()
+            Task.detached(priority: .high) {
+                await self.setTransactionsChanges()
+                
+                await MainActor.run {
+                    let totalBalance = self.balance + self.transactionsChanges
+                    self.balanceString = FTFormatters.numberFormatterWithDecimals.string(for: totalBalance) ?? ""
+                    self.isFetching = false
+                }
             }
         }
     }
     
     @MainActor
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)?) {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)?) {
         let descriptor = FetchDescriptor<BalanceAccount>()
         
         do {
@@ -141,7 +139,7 @@ final class AddingBalanceAccountViewModel: ObservableObject {
         transactionsChanges = changes
     }
     
-    private func fetchTransactionsWithBalanceAccount(errorHandler: ((Error) -> Void)?) async {
+    private func fetchTransactionsWithBalanceAccount(errorHandler: (@Sendable (Error) -> Void)?) async {
         guard let balanceAccountToUpdate else { return }
         
         let copyBalanceAccountId = balanceAccountToUpdate.persistentModelID
