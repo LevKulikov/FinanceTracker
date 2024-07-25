@@ -200,9 +200,11 @@ struct StatisticsView: View {
         VStack {
             Text("You do not have any saved tag.")
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
             
             Text("It is good opportunity to try!")
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
             
             Button("Create tag") {
                 showTagsView.toggle()
@@ -216,6 +218,7 @@ struct StatisticsView: View {
     private var noOneTagIsUsedView: some View {
         VStack {
             Text("You do not have \(viewModel.transactionTypeForTags.localizedString) with tags")
+                .multilineTextAlignment(.center)
         }
         .foregroundStyle(.secondary)
     }

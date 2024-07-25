@@ -1968,6 +1968,7 @@
       }
     },
     "Skip" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

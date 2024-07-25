@@ -63,9 +63,11 @@ struct TagsView: View {
                     VStack {
                         Text("You do not have any saved tag.")
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                         
                         Text("It is good opportunity to try!")
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                         
                         Button("Create tag") {
                             tagAddingTextFieldFocused = !showAddingRow
