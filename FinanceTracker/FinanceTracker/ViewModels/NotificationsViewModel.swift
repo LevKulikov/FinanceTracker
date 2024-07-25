@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-final class NotificationsViewModel: ObservableObject {
+final class NotificationsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     var isSystemAllowsNotifications: Bool {
         notificationManager.isSystemAllowsNotifications
