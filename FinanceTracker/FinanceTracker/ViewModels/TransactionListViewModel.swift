@@ -54,8 +54,8 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
             isGroupingAndSortingProceeds = true
         }
         
-        Task.detached(priority: .medium) {
-            let groupedTransactions = self.transactions
+        Task.detached(priority: .medium) { [transactions] in
+            let groupedTransactions = transactions
                 .grouped { trans in
                     let year = self.calendar.component(.year, from: trans.date)
                     let month = self.calendar.component(.month, from: trans.date)
