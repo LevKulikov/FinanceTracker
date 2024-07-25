@@ -10,6 +10,7 @@ import Charts
 
 struct StatisticsView: View {
     //MARK: - Properties
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: StatisticsViewModel
     @State private var showTagsView = false
     @State private var showTransactionListWithData: TransactionListUIData?
@@ -18,6 +19,12 @@ struct StatisticsView: View {
     }
     private var pieChartHeight: CGFloat {
         return 350
+    }
+    private var backgroundColor: Color {
+        colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
+    }
+    private var cellColor: Color {
+        colorScheme == .light ? Color(.systemBackground) : Color(.secondarySystemBackground)
     }
     
     //MARK: - Init
@@ -77,6 +84,7 @@ struct StatisticsView: View {
             .onAppear {
                 viewModel.refreshDataIfNeeded()
             }
+            .background(content: { backgroundColor.ignoresSafeArea() })
         }
     }
     
@@ -139,7 +147,7 @@ struct StatisticsView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color(.secondarySystemBackground))
+                .fill(cellColor)
         }
         .frame(maxHeight: pieChartHeight)
     }
@@ -250,7 +258,7 @@ struct StatisticsView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color(.secondarySystemBackground))
+                .fill(cellColor)
         }
         .frame(height: pieChartHeight)
     }
@@ -379,7 +387,7 @@ struct StatisticsView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color(.secondarySystemBackground))
+                .fill(cellColor)
         }
     }
     
