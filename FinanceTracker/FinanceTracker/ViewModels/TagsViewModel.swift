@@ -16,6 +16,7 @@ protocol TagsViewModelDelegate: AnyObject {
     func didUpdatedTag()
 }
 
+@MainActor
 final class TagsViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any TagsViewModelDelegate)?
@@ -54,8 +55,8 @@ final class TagsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func fetchData(withAnimation: Bool = false, completionHandler: (() -> Void)? = nil) {
-        Task {
+    func fetchData(withAnimation: Bool = false, completionHandler: (@Sendable @MainActor () -> Void)? = nil) {
+        Task { @MainActor in
             await fetchTags(withAnimation: withAnimation)
             completionHandler?()
         }
@@ -88,7 +89,7 @@ final class TagsViewModel: ObservableObject {
         }
         
         Task {
-            await dataManager.insert(newTag)
+            dataManager.insert(newTag)
             delegate?.didAddTag()
             await fetchTags()
         }
@@ -100,7 +101,7 @@ final class TagsViewModel: ObservableObject {
         tagSelected.color = tagColor
         Task {
             do {
-                try await dataManager.save()
+                try dataManager.save()
                 delegate?.didUpdatedTag()
                 await fetchTags()
             } catch {
