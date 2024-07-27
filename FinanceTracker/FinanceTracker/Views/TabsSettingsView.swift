@@ -8,11 +8,52 @@
 import SwiftUI
 
 struct TabsSettingsView: View {
+    //MARK: - Properties
+    @StateObject private var viewModel: TabsSettingsViewModel
+    
+    //MARK: - Initializer
+    init(viewModel: TabsSettingsViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
+    //MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            List {
+                ForEach(viewModel.changableTabs) { tab in
+                    rowForTab(tab)
+                }
+                .onMove(perform: { indices, newOffset in
+                    viewModel.moveTabs(indices: indices, newOffset: newOffset)
+                })
+            }
+            .navigationTitle("Tabs placements")
+        }
+    }
+    
+    //MARK: - Methods
+    @ViewBuilder
+    private func rowForTab(_ tab: TabViewType) -> some View {
+        let isHidden = (viewModel.changableTabs.firstIndex(of: tab) ?? 0) > (viewModel.numberOfTabsThatCanBeSet - 1)
+        
+        HStack {
+            tab.tabImage
+                .foregroundStyle(isHidden ? Color.secondary : Color.blue)
+            
+            Text(tab.tabTitle)
+            
+            Spacer()
+            
+            Image(systemName: "line.3.horizontal")
+                .foregroundStyle(.tertiary)
+        }
+        .foregroundStyle(isHidden ? Color.secondary : Color.primary)
     }
 }
 
 #Preview {
-    TabsSettingsView()
+    let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
+    let viewModel = TabsSettingsViewModel(dataManager: dataManager)
+    
+    return TabsSettingsView(viewModel: viewModel)
 }

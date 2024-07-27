@@ -99,7 +99,7 @@ final class SettingsManager: SettingsManagerProtocol {
     
     func getSecondThirdTabsArray() -> [TabViewType] {
         guard let stringArray = UserDefaults.standard.stringArray(forKey: tabsArrayKey) else {
-            return [.settingsView, .searchView]
+            return [.statisticsView, .searchView]
         }
         let tabsArray = stringArray.compactMap { TabViewType(rawValue: $0) }
         guard tabsArray.count > 1 else {
