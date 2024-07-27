@@ -17,12 +17,54 @@ protocol CustomTabViewModelDelegate: AnyObject {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
 }
 
-enum TabViewType: Equatable {
+enum TabViewType: String, Equatable, Hashable {
     case spendIncomeView
     case searchView
     case statisticsView
     case settingsView
     case welcomeView
+    
+    @ViewBuilder
+    var tabLabel: some View {
+        switch self {
+        case .spendIncomeView:
+            VStack {
+                Image(systemName: "list.bullet.clipboard")
+                    .frame(height: imageHeight)
+                
+                Text("List")
+                    .font(.caption)
+            }
+        case .searchView:
+            VStack {
+                Image(systemName: "magnifyingglass")
+                    .frame(height: imageHeight)
+                
+                Text("Search")
+                    .font(.caption)
+            }
+        case .statisticsView:
+            VStack {
+                Image(systemName: "chart.bar")
+                    .frame(height: imageHeight)
+                
+                Text("Charts")
+                    .font(.caption)
+            }
+        case .settingsView:
+            VStack {
+                Image(systemName: "gear")
+                    .frame(height: imageHeight)
+                
+                Text("Setting")
+                    .font(.caption)
+            }
+        case .welcomeView:
+            EmptyView()
+        }
+    }
+    
+    var imageHeight: CGFloat { 20 }
 }
 
 final class CustomTabViewModel: ObservableObject, @unchecked Sendable {

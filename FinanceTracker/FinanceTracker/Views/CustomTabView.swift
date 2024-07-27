@@ -56,18 +56,11 @@ struct CustomTabView: View  {
     private var customTabView: some View {
         HStack {
             let buttonWidth: CGFloat = 70
-            let imageHeight: CGFloat = 20
             
             Button {
                 selectTab(1, animated: true)
             } label: {
-                VStack {
-                    Image(systemName: "list.bullet.clipboard")
-                        .frame(height: imageHeight)
-                    
-                    Text("List")
-                        .font(.caption)
-                }
+                TabViewType.spendIncomeView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 1 ? .blue : .secondary)
@@ -78,13 +71,7 @@ struct CustomTabView: View  {
             Button {
                 selectTab(2)
             } label: {
-                VStack {
-                    Image(systemName: "chart.bar")
-                        .frame(height: imageHeight)
-                    
-                    Text("Charts")
-                        .font(.caption)
-                }
+                TabViewType.statisticsView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
@@ -116,13 +103,7 @@ struct CustomTabView: View  {
             Button {
                 selectTab(3)
             } label: {
-                VStack {
-                    Image(systemName: "magnifyingglass")
-                        .frame(height: imageHeight)
-                    
-                    Text("Search")
-                        .font(.caption)
-                }
+                TabViewType.searchView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 3 ? .blue : .secondary)
@@ -133,13 +114,7 @@ struct CustomTabView: View  {
             Button {
                 selectTab(4)
             } label: {
-                VStack {
-                    Image(systemName: "gear")
-                        .frame(height: imageHeight)
-                    
-                    Text("Setting")
-                        .font(.caption)
-                }
+                TabViewType.settingsView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 4 ? .blue : .secondary)
