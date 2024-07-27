@@ -159,4 +159,10 @@ final class FTFactory {
         let viewModel = NotificationsViewModel(notificationManager: notificationManager)
         return AnyView(NotificationsView(viewModel: viewModel))
     }
+    
+    func createTabsSettingsView(dataManager: some DataManagerProtocol, delegate: (any TabsSettingsViewModelDelegate)? = nil) -> AnyView {
+        let viewModel = TabsSettingsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(TabsSettingsView(viewModel: viewModel))
+    }
 }

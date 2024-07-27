@@ -86,6 +86,11 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
         let notificationManager = NotificationManager()
         return FTFactory.shared.createNotificationsView(notificationManager: notificationManager)
     }
+    
+    @MainActor
+    func getTabsSettingsView() -> some View {
+        return FTFactory.shared.createTabsSettingsView(dataManager: dataManager, delegate: nil)
+    }
 }
 
 //MARK: - Extensions

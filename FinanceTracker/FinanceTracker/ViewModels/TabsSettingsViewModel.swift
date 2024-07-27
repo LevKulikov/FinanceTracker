@@ -27,7 +27,7 @@ final class TabsSettingsViewModel: ObservableObject {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         let savedTabs = dataManager.getSecondThirdTabsArray()
-        let canBeSet = Array(TabViewType.changableTabs.drop { savedTabs.contains($0) })
+        let canBeSet = Array(TabViewType.changableTabs.filter { !savedTabs.contains($0) })
         self._changableTabs = Published(wrappedValue: savedTabs + canBeSet)
     }
     

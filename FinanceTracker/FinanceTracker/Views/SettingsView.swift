@@ -11,6 +11,7 @@ struct SettingsView: View {
     //MARK: - Properties
     @Environment(\.openURL) var openURL
     @StateObject private var viewModel: SettingsViewModel
+    @State private var showTabsSettingsView = false
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
     
@@ -51,6 +52,9 @@ struct SettingsView: View {
                 .fill(.clear)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
+        }
+        .sheet(isPresented: $showTabsSettingsView) {
+            viewModel.getTabsSettingsView()
         }
     }
     
@@ -117,6 +121,10 @@ struct SettingsView: View {
         Section("Additional tabs") {
             NavigationLink(value: SettingsSectionAndDataType.budgets) {
                 Label("Budgets", systemImage: "dollarsign.square")
+            }
+            
+            Button("Reorder tabs", systemImage: "ellipsis.rectangle") {
+                showTabsSettingsView = true
             }
         }
     }

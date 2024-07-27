@@ -1761,6 +1761,9 @@
         }
       }
     },
+    "Reorder tabs" : {
+
+    },
     "Replace and delete" : {
       "localizations" : {
         "ru" : {
@@ -2078,6 +2081,9 @@
           }
         }
       }
+    },
+    "Tabs placements" : {
+
     },
     "Tag name" : {
       "localizations" : {
