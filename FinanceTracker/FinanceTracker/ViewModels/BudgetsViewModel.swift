@@ -185,3 +185,51 @@ extension BudgetsViewModel: TransactionListViewModelDelegate {
         }
     }
 }
+
+extension BudgetsViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        return "BudgetsViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .budgetsView else { return }
+        
+        switch dataType {
+        case .categories:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .balanceAccounts:
+            Task {@MainActor in
+                await fetchBalanceAccounts()
+            }
+        case .tags:
+            return
+        case .transactions:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .appearance:
+            return
+        case .data:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+                await fetchBalanceAccounts()
+            }
+        case .budgets:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .notifications:
+            return
+        }
+    }
+}

@@ -133,6 +133,16 @@
         }
       }
     },
+    "404" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "404"
+          }
+        }
+      }
+    },
     "Add" : {
       "localizations" : {
         "ru" : {
@@ -973,6 +983,16 @@
         }
       }
     },
+    "Drag to reorder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удерживайте чтобы упорядочить"
+          }
+        }
+      }
+    },
     "Easily add your expenses and income" : {
       "localizations" : {
         "ru" : {
@@ -1761,6 +1781,16 @@
         }
       }
     },
+    "Reorder tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упорядочить вкладки"
+          }
+        }
+      }
+    },
     "Replace and delete" : {
       "localizations" : {
         "ru" : {
@@ -1898,6 +1928,7 @@
       }
     },
     "Setting" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2008,6 +2039,16 @@
         }
       }
     },
+    "Sorry, some error occured. This page doesn't exist" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, произошла неизвестная ошибка. Данная страница не существует"
+          }
+        }
+      }
+    },
     "Spending" : {
       "localizations" : {
         "ru" : {
@@ -2074,6 +2115,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Режим системы"
+          }
+        }
+      }
+    },
+    "Tabs placements" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разположение вкладок"
           }
         }
       }
@@ -2414,6 +2465,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пикер недели"
+          }
+        }
+      }
+    },
+    "Welcome" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать"
           }
         }
       }

@@ -112,7 +112,9 @@ struct BudgetsView: View {
             } content: { budgetData in
                 viewModel.getTransactionsListView(for: budgetData)
             }
-
+            .onAppear {
+                viewModel.refreshIfNeeded()
+            }
         }
     }
     
