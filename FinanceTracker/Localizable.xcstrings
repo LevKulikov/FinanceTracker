@@ -133,6 +133,9 @@
         }
       }
     },
+    "404" : {
+
+    },
     "Add" : {
       "localizations" : {
         "ru" : {
@@ -2014,6 +2017,9 @@
           }
         }
       }
+    },
+    "Sorry, some error occured. This page doesn't exist" : {
+
     },
     "Spending" : {
       "localizations" : {

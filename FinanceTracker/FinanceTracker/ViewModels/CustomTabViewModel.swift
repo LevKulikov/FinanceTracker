@@ -103,11 +103,38 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     @Published var tabSelection = 1
     @Published var showTabBar = true
     @Published var isFirstLaunch = false
+    @MainActor @Published private(set) var secondAndThirdTabs: [TabViewType]
+    
+    @ViewBuilder
+    var page404: some View {
+        VStack {
+            Text("404")
+                .bold()
+                .monospaced()
+                .font(.largeTitle)
+            
+            Text("Sorry, some error occured. This page doesn't exist")
+                .multilineTextAlignment(.center)
+        }
+    }
+    
+    @MainActor
+    var isSecondTabCanBeShown: Bool {
+        guard secondAndThirdTabs.count > 0 else { return false }
+        return true
+    }
+    
+    @MainActor
+    var isThirdTabCanBeShown: Bool {
+        guard secondAndThirdTabs.count > 1 else { return false }
+        return true
+    }
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
+        self._secondAndThirdTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
     }
     
     //MARK: - Methods
@@ -137,6 +164,13 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
+    func getBudgetsView() -> some View {
+        return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self, strongReference: true) { [weak self] viewModel in
+            self?.addDelegate(object: viewModel)
+        }
+    }
+    
+    @MainActor
     func getSettingsView() -> some View {
         return FTFactory.shared.createSettingsView(dataManager: dataManager, delegate: self)
     }
@@ -146,15 +180,43 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createWelcomeView(dataManager: dataManager, delegate: self)
     }
     
-//    @MainActor
-//    func getSecondTab() -> some View {
-//        
-//    }
+    @MainActor
+    func getSecondTab() -> AnyView {
+        guard let first = secondAndThirdTabs.first else { return AnyView(page404) }
+        switch first {
+        case .spendIncomeView:
+            return AnyView(page404)
+        case .searchView:
+            return AnyView(getSearchView())
+        case .statisticsView:
+            return AnyView(getStatisticsView())
+        case .settingsView:
+            return AnyView(getSettingsView())
+        case .welcomeView:
+            return AnyView(page404)
+        case .budgetsView:
+            return AnyView(getBudgetsView())
+        }
+    }
     
-//    @MainActor
-//    func getThirdTab() -> some View {
-//        
-//    }
+    @MainActor
+    func getThirdTab() -> some View {
+        guard secondAndThirdTabs.count > 1 else { return AnyView(page404) }
+        switch secondAndThirdTabs[1] {
+        case .spendIncomeView:
+            return AnyView(page404)
+        case .searchView:
+            return AnyView(getSearchView())
+        case .statisticsView:
+            return AnyView(getStatisticsView())
+        case .settingsView:
+            return AnyView(getSettingsView())
+        case .welcomeView:
+            return AnyView(page404)
+        case .budgetsView:
+            return AnyView(getBudgetsView())
+        }
+    }
     
     //MARK: Private methods
     private func addDelegate(object: some CustomTabViewModelDelegate) {
@@ -204,6 +266,12 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
 
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
+    func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
+        Task { @MainActor in
+            secondAndThirdTabs = tabsPositions
+        }
+    }
+    
     func didSelectSetting(_ setting: SettingsSectionAndDataType?) {
         Task { @MainActor in
             if setting == nil {
@@ -243,6 +311,27 @@ extension CustomTabViewModel: WelcomeViewModelDelegate {
     func didCreateBalanceAccount() {
         delegates.forEach {
             $0.object?.didUpdateData(for: .balanceAccounts, from: .welcomeView)
+        }
+    }
+}
+
+//MARK: Extension for BudgetsViewModelDelegate
+extension CustomTabViewModel: BudgetsViewModelDelegate {
+    func didAddBudget(_ budget: Budget) {
+        return
+    }
+    
+    func didUpdateBudget(_ budget: Budget) {
+        return
+    }
+    
+    func didDeleteBudget(_ budget: Budget) {
+        return
+    }
+    
+    func didUpdateTransaction() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .budgetsView)
         }
     }
 }

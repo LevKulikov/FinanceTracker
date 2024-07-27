@@ -32,11 +32,21 @@ struct CustomTabView: View  {
             viewModel.getSpendIncomeView(namespace: namespace)
                 .tag(1)
             
-            viewModel.getStatisticsView()
-                .tag(2)
+            if viewModel.isSecondTabCanBeShown {
+                viewModel.getSecondTab()
+                    .tag(2)
+            } else {
+                viewModel.getStatisticsView()
+                    .tag(2)
+            }
             
-            viewModel.getSearchView()
-                .tag(3)
+            if viewModel.isThirdTabCanBeShown {
+                viewModel.getThirdTab()
+                    .tag(3)
+            } else {
+                viewModel.getSearchView()
+                    .tag(3)
+            }
             
             viewModel.getSettingsView()
                 .tag(4)
@@ -71,7 +81,11 @@ struct CustomTabView: View  {
             Button {
                 selectTab(2)
             } label: {
-                TabViewType.statisticsView.tabLabel
+                if viewModel.isSecondTabCanBeShown {
+                    viewModel.secondAndThirdTabs.first!.tabLabel
+                } else {
+                    TabViewType.statisticsView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
@@ -103,7 +117,11 @@ struct CustomTabView: View  {
             Button {
                 selectTab(3)
             } label: {
-                TabViewType.searchView.tabLabel
+                if viewModel.isThirdTabCanBeShown {
+                    viewModel.secondAndThirdTabs[1].tabLabel
+                } else {
+                    TabViewType.searchView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 3 ? .blue : .secondary)

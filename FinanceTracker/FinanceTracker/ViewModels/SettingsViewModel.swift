@@ -12,6 +12,8 @@ protocol SettingsViewModelDelegate: AnyObject {
     func didSelectSetting(_ setting: SettingsSectionAndDataType?)
     
     func didUpdateSettingsSection(_ section: SettingsSectionAndDataType)
+    
+    func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType])
 }
 
 enum SettingsSectionAndDataType {
@@ -209,6 +211,7 @@ extension SettingsViewModel: SearchViewModelDelegate {
 //MARK: Extensions for TabsSettingsViewModelDelegate
 extension SettingsViewModel: TabsSettingsViewModelDelegate {
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
+        delegate?.didSetSecondThirdTabsPosition(for: tabsPositions)
         Task { @MainActor in
             let notSaved = TabViewType.changableTabs.filter { !tabsPositions.contains($0) }
             additionalTab = notSaved.first
