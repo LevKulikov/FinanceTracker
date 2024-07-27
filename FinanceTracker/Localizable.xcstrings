@@ -134,7 +134,14 @@
       }
     },
     "404" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "404"
+          }
+        }
+      }
     },
     "Add" : {
       "localizations" : {
@@ -977,7 +984,14 @@
       }
     },
     "Drag to reorder" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удерживайте чтобы упорядочить"
+          }
+        }
+      }
     },
     "Easily add your expenses and income" : {
       "localizations" : {
@@ -1768,7 +1782,14 @@
       }
     },
     "Reorder tabs" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упорядочить вкладки"
+          }
+        }
+      }
     },
     "Replace and delete" : {
       "localizations" : {
@@ -2019,7 +2040,14 @@
       }
     },
     "Sorry, some error occured. This page doesn't exist" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, произошла неизвестная ошибка. Данная страница не существует"
+          }
+        }
+      }
     },
     "Spending" : {
       "localizations" : {
@@ -2092,7 +2120,14 @@
       }
     },
     "Tabs placements" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разположение вкладок"
+          }
+        }
+      }
     },
     "Tag name" : {
       "localizations" : {

@@ -30,6 +30,7 @@ struct TabsSettingsView: View {
                 }
             }
             .navigationTitle("Tabs placements")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
@@ -41,6 +42,7 @@ struct TabsSettingsView: View {
         HStack {
             tab.tabImage
                 .foregroundStyle(isHidden ? Color.secondary : Color.blue)
+                .frame(width: 25)
             
             Text(tab.tabTitle)
             
