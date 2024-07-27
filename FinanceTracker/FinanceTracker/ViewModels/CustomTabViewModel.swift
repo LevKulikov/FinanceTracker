@@ -17,13 +17,15 @@ protocol CustomTabViewModelDelegate: AnyObject {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
 }
 
-enum TabViewType: String, Equatable, Hashable {
+enum TabViewType: String, Equatable, Hashable, Identifiable {
     case spendIncomeView
     case searchView
     case statisticsView
     case settingsView
     case welcomeView
     case budgetsView
+    
+    var id: Self { return self }
     
     @ViewBuilder
     var tabLabel: some View {
@@ -71,6 +73,8 @@ enum TabViewType: String, Equatable, Hashable {
     }
     
     var imageHeight: CGFloat { 20 }
+    
+    var changableTabs: [Self] { [.statisticsView, .searchView, .budgetsView] }
 }
 
 final class CustomTabViewModel: ObservableObject, @unchecked Sendable {

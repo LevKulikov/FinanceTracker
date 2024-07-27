@@ -78,6 +78,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func getPreferredColorScheme() -> ColorScheme?
     
+    func setSecondThirdTabsArray(_ tabsArray: [TabViewType])
+    
+    func getSecondThirdTabsArray() -> [TabViewType]
+    
     @MainActor
     func saveDefaultCategories()
 }
@@ -394,6 +398,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         for category in defaultIncomeCategories {
             insert(category)
         }
+    }
+    
+    func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
+        settingsManager.setSecondThirdTabsArray(tabsArray)
+    }
+    
+    func getSecondThirdTabsArray() -> [TabViewType] {
+        settingsManager.getSecondThirdTabsArray()
     }
     
     //MARK: Private methods
