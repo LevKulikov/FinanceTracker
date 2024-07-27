@@ -1898,6 +1898,7 @@
       }
     },
     "Setting" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2414,6 +2415,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пикер недели"
+          }
+        }
+      }
+    },
+    "Welcome" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать"
           }
         }
       }

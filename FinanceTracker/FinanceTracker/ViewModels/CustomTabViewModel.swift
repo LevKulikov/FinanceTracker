@@ -23,44 +23,50 @@ enum TabViewType: String, Equatable, Hashable {
     case statisticsView
     case settingsView
     case welcomeView
+    case budgetsView
     
     @ViewBuilder
     var tabLabel: some View {
+        VStack {
+            tabImage
+                .frame(height: imageHeight)
+            
+            Text(tabTitle)
+                .font(.caption)
+        }
+    }
+    
+    var tabImage: Image {
         switch self {
         case .spendIncomeView:
-            VStack {
-                Image(systemName: "list.bullet.clipboard")
-                    .frame(height: imageHeight)
-                
-                Text("List")
-                    .font(.caption)
-            }
+            return Image(systemName: "list.bullet.clipboard")
         case .searchView:
-            VStack {
-                Image(systemName: "magnifyingglass")
-                    .frame(height: imageHeight)
-                
-                Text("Search")
-                    .font(.caption)
-            }
+            return Image(systemName: "magnifyingglass")
         case .statisticsView:
-            VStack {
-                Image(systemName: "chart.bar")
-                    .frame(height: imageHeight)
-                
-                Text("Charts")
-                    .font(.caption)
-            }
+            return Image(systemName: "chart.bar")
         case .settingsView:
-            VStack {
-                Image(systemName: "gear")
-                    .frame(height: imageHeight)
-                
-                Text("Setting")
-                    .font(.caption)
-            }
+            return Image(systemName: "gear")
         case .welcomeView:
-            EmptyView()
+            return Image(systemName: "star")
+        case .budgetsView:
+            return Image(systemName: "dollarsign.square")
+        }
+    }
+    
+    var tabTitle: LocalizedStringResource {
+        switch self {
+        case .spendIncomeView:
+            return "List"
+        case .searchView:
+            return "Search"
+        case .statisticsView:
+            return "Charts"
+        case .settingsView:
+            return "Settings"
+        case .welcomeView:
+            return "Welcome"
+        case .budgetsView:
+            return "Budgets"
         }
     }
     
@@ -126,6 +132,16 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     func getWelcomeView() -> some View {
         return FTFactory.shared.createWelcomeView(dataManager: dataManager, delegate: self)
     }
+    
+//    @MainActor
+//    func getSecondTab() -> some View {
+//        
+//    }
+    
+//    @MainActor
+//    func getThirdTab() -> some View {
+//        
+//    }
     
     //MARK: Private methods
     private func addDelegate(object: some CustomTabViewModelDelegate) {
