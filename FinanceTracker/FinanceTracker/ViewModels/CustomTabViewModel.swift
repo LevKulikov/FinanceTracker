@@ -38,20 +38,29 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
         }
     }
     
+    @ViewBuilder
+    var label: some View {
+        Label(LocalizedStringKey(tabTitle.key), systemImage: imageSystemName)
+    }
+    
     var tabImage: Image {
+        return Image(systemName: imageSystemName)
+    }
+    
+    var imageSystemName: String {
         switch self {
         case .spendIncomeView:
-            return Image(systemName: "list.bullet.clipboard")
+            return "list.bullet.clipboard"
         case .searchView:
-            return Image(systemName: "magnifyingglass")
+            return "magnifyingglass"
         case .statisticsView:
-            return Image(systemName: "chart.bar")
+            return "chart.bar"
         case .settingsView:
-            return Image(systemName: "gear")
+            return "gear"
         case .welcomeView:
-            return Image(systemName: "star")
+            return "star"
         case .budgetsView:
-            return Image(systemName: "dollarsign.square")
+            return "dollarsign.square"
         }
     }
     
@@ -115,14 +124,14 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getStatisticsView() -> some View {
-        return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
+        return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self, strongReference: true) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
     
     @MainActor
     func getSearchView() -> some View {
-        return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self) { [weak self] viewModel in
+        return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self, strongReference: true) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }

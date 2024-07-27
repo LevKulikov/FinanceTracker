@@ -74,8 +74,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
-            case .budgets:
-                viewModel.getBudgetsView()
+            case .budgets: // .budgets is used to identify additional tab to show
+                viewModel.getAdditionalTabView()
             case .notifications:
                 viewModel.getNotificationsView()
             }
@@ -119,8 +119,10 @@ struct SettingsView: View {
     
     private var tabsSection: some View {
         Section("Additional tabs") {
-            NavigationLink(value: SettingsSectionAndDataType.budgets) {
-                Label("Budgets", systemImage: "dollarsign.square")
+            if let additionalTab = viewModel.additionalTab {
+                NavigationLink(value: SettingsSectionAndDataType.budgets) {
+                    additionalTab.label
+                }
             }
             
             Button("Reorder tabs", systemImage: "ellipsis.rectangle") {

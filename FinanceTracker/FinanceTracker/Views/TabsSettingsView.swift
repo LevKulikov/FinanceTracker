@@ -20,12 +20,14 @@ struct TabsSettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.changableTabs) { tab in
-                    rowForTab(tab)
+                Section("Drag to reorder") {
+                    ForEach(viewModel.changableTabs) { tab in
+                        rowForTab(tab)
+                    }
+                    .onMove(perform: { indices, newOffset in
+                        viewModel.moveTabs(indices: indices, newOffset: newOffset)
+                    })
                 }
-                .onMove(perform: { indices, newOffset in
-                    viewModel.moveTabs(indices: indices, newOffset: newOffset)
-                })
             }
             .navigationTitle("Tabs placements")
         }
