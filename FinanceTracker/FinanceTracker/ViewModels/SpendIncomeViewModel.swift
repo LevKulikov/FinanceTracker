@@ -97,28 +97,23 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Methods
-    func save(errorHandler: (@Sendable (Error) -> Void)? = nil) {
-        Task {
-            do {
-                try await dataManager.save()
-                await fetchTransactions(errorHandler: errorHandler)
-            } catch {
-                errorHandler?(error)
-            }
-        }
-    }
-    
-    func delete(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
+    func deleteTransaction(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
             await dataManager.deleteTransaction(transaction)
             await fetchTransactions(errorHandler: errorHandler)
+            delegate?.didUpdateTransactionList()
+            filterGroupSortTransactions(animated: true)
         }
     }
     
-    func insert(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
+    func deleteTransactions(_ transactions: [Transaction], errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
-            await dataManager.insert(transaction)
+            for transaction in transactions {
+                await dataManager.deleteTransaction(transaction)
+            }
             await fetchTransactions(errorHandler: errorHandler)
+            delegate?.didUpdateTransactionList()
+            filterGroupSortTransactions(animated: true)
         }
     }
     

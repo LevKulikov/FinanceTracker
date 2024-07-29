@@ -923,6 +923,26 @@
         }
       }
     },
+    "Delete transactions in the group" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции в группе"
+          }
+        }
+      }
+    },
+    "Delete transactions?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции?"
+          }
+        }
+      }
+    },
     "Delete with transactions" : {
       "localizations" : {
         "ru" : {

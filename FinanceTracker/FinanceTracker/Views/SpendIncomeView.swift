@@ -17,6 +17,7 @@ struct SpendIncomeView: View {
     @State private var isSomeGroupOpened = false
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
+    @State private var transactionsToDelete: [Transaction]?
     
     //MARK: Init
     init(viewModel: SpendIncomeViewModel, namespace: Namespace.ID) {
@@ -56,6 +57,11 @@ struct SpendIncomeView: View {
                                 isSomeGroupOpened = isOpen
                             }
                         }
+                        .contextMenu {
+                            Button("Delete transactions in the group", systemImage: "trash", role: .destructive) {
+                                transactionsToDelete = transactionArray
+                            }
+                        }
                     }
                     
                     Rectangle()
@@ -67,6 +73,20 @@ struct SpendIncomeView: View {
                 }
             }
             .scrollIndicators(.hidden)
+            .confirmationDialog(
+                "Delete transactions?",
+                isPresented: .init(get: { transactionsToDelete != nil }, set: { _ in transactionsToDelete = nil }),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionsToDelete {
+                            viewModel.deleteTransactions(transactionsToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
             .gesture(
                 DragGesture()
                     .onChanged { value in
@@ -214,10 +234,6 @@ struct SpendIncomeView: View {
     }
     
     //MARK: Methods
-    private func deleteTransaction(_ transaction: Transaction) {
-        viewModel.delete(transaction)
-    }
-    
     private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
         let xTrans = value.translation.width
         let screenWidth = FTAppAssets.getWindowSize().width

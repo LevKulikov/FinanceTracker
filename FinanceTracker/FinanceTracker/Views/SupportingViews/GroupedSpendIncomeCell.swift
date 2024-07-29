@@ -43,13 +43,6 @@ struct GroupedSpendIncomeCell: View {
         return categoryColor.opacity(opacity > minLimit ? (opacity < maxLimit ? opacity : maxLimit) : minLimit)
     }
     private var gradientStopLocations: (colorStop: CGFloat, grayStop: CGFloat) {
-//        guard transactions.count > 0 else { return (0, 1)}
-//        let count = transactions.count
-//        guard count < colorLimit else { return (0.6, 1) }
-//        let first: CGFloat = 0.05 + CGFloat(count)/10
-//        let second: CGFloat = 0.9 - CGFloat(colorLimit - count)/10
-//        return (first, second)
-        
         let first: CGFloat = 0 + CGFloat(percentageInt)/100
         let second: CGFloat = 1.25 - CGFloat(100 - percentageInt)/100
         return (first, second)
@@ -147,6 +140,7 @@ struct GroupedSpendIncomeCell: View {
                     )
                 )
         }
+        .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 23))
         .padding(.horizontal)
         .hoverEffect(.lift)
     }
