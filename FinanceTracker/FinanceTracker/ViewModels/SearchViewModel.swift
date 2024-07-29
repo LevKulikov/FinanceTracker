@@ -211,13 +211,22 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         })
     }
     
+    func deleteTransaction(_ transaction: Transaction) {
+        Task {
+            try await dataManager.deleteTransactionFromBackground(transaction)
+            await fetchTransactions()
+            delegate?.didUpdatedTransactionsList()
+            filterAndSetTransactions()
+        }
+    }
+    
     //MARK: Private props
     private func filterAndSetTransactions() {
-        DispatchQueue.main.async { [weak self] in
-            self?.isListCalculating = true
+        Task { @MainActor in
+            isListCalculating = true
         }
         
-        DispatchQueue.global().async { [weak self] in
+        Task.detached(priority: .high) { [weak self] in
             guard let self else { return }
             
             let filteredData = allTransactions
@@ -261,7 +270,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             
             let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.isListCalculating = false
                 withAnimation {
                     self.filteredTransactionGroups = sortedGroupedData
@@ -271,11 +280,11 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     }
     
     private func filterTransactionsWithSearch() {
-        DispatchQueue.main.async { [weak self] in
-            self?.isListCalculating = true
+        Task { @MainActor in
+            isListCalculating = true
         }
         
-        DispatchQueue.global().async { [weak self] in
+        Task.detached(priority: .high) { [weak self] in
             guard let self else { return }
             
             if !self.searchText.isEmpty {
@@ -291,7 +300,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             } else {
                 let groups = self.groupAndSortTransactionArray(filteredTransaction)
                 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isListCalculating = false
                     withAnimation {
                         self.filteredTransactionGroups = groups

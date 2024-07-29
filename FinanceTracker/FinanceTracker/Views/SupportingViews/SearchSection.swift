@@ -11,6 +11,7 @@ struct SearchSection: View, @unchecked Sendable {
     //MARK: Props
     let transactionGroupData: TransactionGroupedData
     let onTapAction: @MainActor @Sendable (Transaction) -> Void
+    let onDeleteSwipe: @MainActor @Sendable (Transaction) -> Void
     
     private let calendar = Calendar.current
     @State private var haveSameCurrency: Bool = true
@@ -18,9 +19,10 @@ struct SearchSection: View, @unchecked Sendable {
     @State private var totalIncome: Float?
     
     //MARK: Init
-    init(transactionGroupData: TransactionGroupedData, onTapAction: @MainActor @Sendable @escaping (Transaction) -> Void) {
+    init(transactionGroupData: TransactionGroupedData, onTapAction: @MainActor @Sendable @escaping (Transaction) -> Void, onDeleteSwipe: @MainActor @Sendable @escaping (Transaction) -> Void) {
         self.transactionGroupData = transactionGroupData
         self.onTapAction = onTapAction
+        self.onDeleteSwipe = onDeleteSwipe
     }
     
     //MARK: Body
@@ -30,6 +32,14 @@ struct SearchSection: View, @unchecked Sendable {
                 SearchTransactionRow(transaction: transaction)
                     .onTapGesture {
                         onTapAction(transaction)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            onDeleteSwipe(transaction)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
                     }
             }
         } header: {
@@ -112,5 +122,7 @@ struct SearchSection: View, @unchecked Sendable {
 #Preview {
     SearchSection(transactionGroupData: TransactionGroupedData(date: .now, transactions: [])) { trans in
         print(trans.value)
+    } onDeleteSwipe: { _ in
+        
     }
 }

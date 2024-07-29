@@ -48,6 +48,20 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: threadToUse, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
+    func deleteTransaction(_ transaction: Transaction) {
+        Task {
+            transactions.removeAll { $0.id == transaction.id }
+            setTransactionGroups()
+            switch threadToUse {
+            case .main:
+                await dataManager.deleteTransaction(transaction)
+            case .global:
+                try await dataManager.deleteTransactionFromBackground(transaction)
+            }
+            delegate?.didUpdatedTransaction()
+        }
+    }
+    
     //MARK: Private methods
     private func setTransactionGroups() {
         Task { @MainActor in

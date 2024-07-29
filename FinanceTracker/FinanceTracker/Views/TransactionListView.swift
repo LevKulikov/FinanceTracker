@@ -11,6 +11,7 @@ struct TransactionListView: View {
     //MARK: - Properties
     @StateObject private var viewModel: TransactionListViewModel
     @State private var showTransaction: Transaction?
+    @State private var transactionToDelete: Transaction?
     @Namespace private var namespace
     
     //MARK: - Initializer
@@ -31,6 +32,8 @@ struct TransactionListView: View {
                 ForEach(viewModel.filteredTransactionGroups) { transGroup in
                     SearchSection(transactionGroupData: transGroup) { transaction in
                         showTransaction = transaction
+                    } onDeleteSwipe: { transaction in
+                        transactionToDelete = transaction
                     }
                 }
                 
@@ -50,6 +53,20 @@ struct TransactionListView: View {
                         .controlSize(.large)
                 }
             }
+            .confirmationDialog(
+                "Delete transaction?",
+                isPresented: .init(get: { transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionToDelete {
+                            viewModel.deleteTransaction(transactionToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
             .fullScreenCover(item: $showTransaction) { transaction in
                 viewModel.getAddingSpendIcomeView(for: transaction, namespace: namespace)
             }
