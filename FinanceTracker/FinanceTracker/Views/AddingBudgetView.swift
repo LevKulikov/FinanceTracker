@@ -9,7 +9,8 @@ import SwiftUI
 
 struct AddingBudgetView: View {
     //MARK: - Properties
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: AddingBudgetViewModel
     @State private var showCategoryPicker = false
     @State private var saveAlert = false
@@ -24,6 +25,12 @@ struct AddingBudgetView: View {
     }
     private var canBeAddedOrUpdated: Bool {
         viewModel.value > 0
+    }
+    private var backgroundColor: Color {
+        colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
+    }
+    private var sectionColor: Color {
+        colorScheme == .light ? Color(.systemBackground) : Color(.secondarySystemBackground)
     }
     
     //MARK: - Initializer
@@ -86,20 +93,12 @@ struct AddingBudgetView: View {
             addButton
                 .offset(y: userDevice == .phone ? 0 : -60)
         }
+        .background { backgroundColor.ignoresSafeArea() }
     }
     
     //MARK: - Computed view props
     private var nameSection: some View {
         VStack {
-            HStack {
-                Text("Name")
-                    .font(.title3)
-                    .fontWeight(.medium)
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-            
             TextField("Budget name", text: $viewModel.name, prompt: Text("Budget name (Optional)"))
                 .focused($nameTextFieldFocus)
                 .font(.title2)
@@ -128,7 +127,7 @@ struct AddingBudgetView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15.0)
-                .fill(.ultraThinMaterial)
+                .fill(sectionColor)
                 .onTapGesture {
                     valueTextFieldFocus = true
                 }
@@ -172,7 +171,7 @@ struct AddingBudgetView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15.0)
-                .fill(.ultraThinMaterial)
+                .fill(sectionColor)
         }
         .padding(.horizontal, 10)
     }
@@ -206,7 +205,7 @@ struct AddingBudgetView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 15.0)
-                .fill(.ultraThinMaterial)
+                .fill(sectionColor)
         }
         .padding(.horizontal, 10)
     }
@@ -268,7 +267,7 @@ struct AddingBudgetView: View {
 
 #Preview {
     let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
-    let viewModel = AddingBudgetViewModel(action: .update(budget: .empty), dataManager: dataManager)
+    let viewModel = AddingBudgetViewModel(action: .add(.emptyBalanceAccount), dataManager: dataManager)
     
-    return AddingBudgetView(viewModel: viewModel)
+    return NavigationStack { AddingBudgetView(viewModel: viewModel) }
 }

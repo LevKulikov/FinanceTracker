@@ -9,10 +9,14 @@ import SwiftUI
 
 struct BudgetsView: View {    
     //MARK: - Properties
+    @Environment(\.colorScheme) private var colorScheme
     @Namespace private var namespace
     @StateObject private var viewModel: BudgetsViewModel
     @State private var deletionAlertItem: Budget?
     @State private var budgetDataForDetails: BudgetCardViewData?
+    private var backgroundColor: Color {
+        colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
+    }
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -114,6 +118,7 @@ struct BudgetsView: View {
             .onAppear {
                 viewModel.refreshIfNeeded()
             }
+            .background { backgroundColor.ignoresSafeArea() }
         }
     }
     
@@ -121,7 +126,6 @@ struct BudgetsView: View {
     private var headerView: some View {
         HStack {
             Text("Balance Account")
-                .bold()
                 .font(.title3)
                 .layoutPriority(1)
             

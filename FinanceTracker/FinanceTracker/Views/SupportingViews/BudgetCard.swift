@@ -10,6 +10,7 @@ import Charts
 
 struct BudgetCard<MenuItems: View>: View {
     //MARK: - Properties
+    @Environment(\.colorScheme) var colorScheme
     private var namespace: Namespace.ID
     private let menuItems: (BudgetCardViewData) -> MenuItems
     @StateObject private var viewModel: BudgetCardViewModel
@@ -27,6 +28,9 @@ struct BudgetCard<MenuItems: View>: View {
     }
     private var isBudgetOver: Bool {
         viewModel.totalValue > viewModel.budget.value
+    }
+    private var backgroundColor: Color {
+        colorScheme == .light ? Color(.systemBackground) : Color(.secondarySystemBackground)
     }
     
     //MARK: - Initializer
@@ -96,7 +100,7 @@ struct BudgetCard<MenuItems: View>: View {
             .padding()
             .background {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(.secondarySystemBackground))
+                    .fill(backgroundColor)
                     .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
             }
         }
