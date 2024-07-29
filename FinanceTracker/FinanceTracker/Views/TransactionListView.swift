@@ -22,6 +22,12 @@ struct TransactionListView: View {
     var body: some View {
         NavigationStack {
             List {
+                if viewModel.filteredTransactionGroups.isEmpty {
+                    ContentUnavailableView("No transactions", systemImage: "tray.fill", description: Text("Nothing here yet"))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
+                
                 ForEach(viewModel.filteredTransactionGroups) { transGroup in
                     SearchSection(transactionGroupData: transGroup) { transaction in
                         showTransaction = transaction
