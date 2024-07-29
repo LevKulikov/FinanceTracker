@@ -15,6 +15,7 @@ struct AddingBudgetView: View {
     @State private var saveAlert = false
     @FocusState private var nameTextFieldFocus
     @FocusState private var valueTextFieldFocus
+    private let userDevice = FTAppAssets.currentUserDevise
     private var isAdding: Bool {
         if case .add = viewModel.action {
             return true
@@ -83,6 +84,7 @@ struct AddingBudgetView: View {
         }
         .overlay(alignment: .bottom) {
             addButton
+                .offset(y: userDevice == .phone ? 0 : -60)
         }
     }
     

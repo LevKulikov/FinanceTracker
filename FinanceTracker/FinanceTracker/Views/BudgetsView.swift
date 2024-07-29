@@ -11,7 +11,6 @@ struct BudgetsView: View {
     //MARK: - Properties
     @Namespace private var namespace
     @StateObject private var viewModel: BudgetsViewModel
-    @State private var navigationPath = NavigationPath()
     @State private var deletionAlertItem: Budget?
     @State private var budgetDataForDetails: BudgetCardViewData?
     
@@ -22,7 +21,7 @@ struct BudgetsView: View {
     
     //MARK: - Body
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $viewModel.navigationPath) {
             ScrollView {
                 VStack {
                     headerView
@@ -38,7 +37,7 @@ struct BudgetsView: View {
                             Text("You don't have any saved budgets yet. Good opportunity to give it a try!")
                         } actions: {
                             Button("Add budget") {
-                                navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                                viewModel.navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                             }
                             .buttonStyle(.bordered)
                             .buttonBorderShape(.capsule)
@@ -52,7 +51,7 @@ struct BudgetsView: View {
                             }
                             
                             Button("Update", systemImage: "pencil.and.outline") {
-                                navigationPath.append(ActionWithBudget.update(budget: budget))
+                                viewModel.navigationPath.append(ActionWithBudget.update(budget: budget))
                             }
                             
                             Button("Delete", systemImage: "trash", role: .destructive) {
@@ -87,7 +86,7 @@ struct BudgetsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {
-                        navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                        viewModel.navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                     }
                 }
             }

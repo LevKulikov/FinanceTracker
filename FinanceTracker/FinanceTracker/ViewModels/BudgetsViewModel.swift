@@ -18,6 +18,8 @@ protocol BudgetsViewModelDelegate: AnyObject {
     func didDeleteBudget(_ budget: Budget)
     
     func didUpdateTransaction()
+    
+    func showTabBar(_ show: Bool)
 }
 
 struct BudgetCardViewData: Identifiable, Hashable {
@@ -49,6 +51,15 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
     @MainActor @Published private(set) var budgets: [Budget] = []
     @MainActor @Published private(set) var isFetching = false
+    @MainActor @Published var navigationPath = NavigationPath() {
+        didSet {
+            if navigationPath.isEmpty {
+                delegate?.showTabBar(true)
+            } else {
+                delegate?.showTabBar(false)
+            }
+        }
+    }
     
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
