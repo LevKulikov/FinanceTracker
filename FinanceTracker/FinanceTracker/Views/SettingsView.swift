@@ -41,12 +41,7 @@ struct SettingsView: View {
             
             contactsSection
             
-            Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
-                .frame(maxWidth: .infinity)
-                .foregroundStyle(.tertiary)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                .multilineTextAlignment(.center)
+            bottomAppVersionView
             
             Rectangle()
                 .fill(.clear)
@@ -181,6 +176,15 @@ struct SettingsView: View {
                 Label("Code source", systemImage: "chevron.left.forwardslash.chevron.right")
             }
         }
+    }
+    
+    private var bottomAppVersionView: some View {
+        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.tertiary)
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .multilineTextAlignment(.center)
     }
     
     //MARK: - Methods
