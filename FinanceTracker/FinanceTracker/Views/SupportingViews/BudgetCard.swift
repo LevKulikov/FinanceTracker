@@ -113,21 +113,24 @@ struct BudgetCard<MenuItems: View>: View {
                     
                     Spacer()
                 }
+                .lineLimit(1)
                 
                 HStack {
                     Text("Spent")
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
                     
                     Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
                         .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                        .layoutPriority(1)
                         .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
                     Text(budgetCurrency)
                         .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                        .layoutPriority(1)
                         .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
                     
                     Spacer()
                 }
+                .lineLimit(1)
             }
             
             pieChart
