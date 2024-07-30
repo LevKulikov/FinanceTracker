@@ -90,6 +90,14 @@ struct BudgetsView: View {
                 })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    Button("Card type", systemImage: viewModel.cardTypeIsLine ? "chart.pie" : "chart.line.flattrend.xyaxis") {
+                        withAnimation {
+                            viewModel.cardTypeIsLine.toggle()
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {
                         viewModel.navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                     }

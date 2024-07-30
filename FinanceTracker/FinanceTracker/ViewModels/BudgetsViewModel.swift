@@ -48,6 +48,8 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
             }
         }
     }
+    /// true = line card, false = pie card (because only two type exists)
+    @MainActor @Published var cardTypeIsLine: Bool = true
     @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
     @MainActor @Published private(set) var budgets: [Budget] = []
     @MainActor @Published private(set) var isFetching = false
@@ -87,7 +89,8 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     func getBudgetCard<MenuItems: View>(for budget: Budget, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) -> some View {
         let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: budget)
-        return BudgetCard(viewModel: viewModel, namespace: namespace,  menuItems: menuItems)
+        let cardType: BudgetCardType = cardTypeIsLine ? .line : .pie
+        return BudgetCard(viewModel: viewModel, namespace: namespace, type: cardType, menuItems: menuItems)
     }
     
     @MainActor
@@ -111,11 +114,11 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     func getTransactionsListView(for budgetData: BudgetCardViewData, namespace: Namespace.ID) -> some View {
         let budget = budgetData.budget
         let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name
-        
+        let cardType: BudgetCardType = cardTypeIsLine ? .line : .pie
         let dataManagerCopy = dataManager
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self) { transes in
             let newBudgetData = BudgetCardViewData(budget: budgetData.budget, transactions: transes)
-            return BudgetCard(dataManager: dataManagerCopy, namespace: namespace, budgetData: newBudgetData)
+            return BudgetCard(dataManager: dataManagerCopy, namespace: namespace, type: cardType, budgetData: newBudgetData)
         }
     }
     

@@ -8,10 +8,16 @@
 import SwiftUI
 import Charts
 
+enum BudgetCardType: Equatable {
+    case line
+    case pie
+}
+
 struct BudgetCard<MenuItems: View>: View {
     //MARK: - Properties
     @Environment(\.colorScheme) var colorScheme
     private var namespace: Namespace.ID
+    private let type: BudgetCardType
     private let menuItems: (BudgetCardViewData) -> MenuItems
     @StateObject private var viewModel: BudgetCardViewModel
     private var categoryColor: Color {
@@ -34,15 +40,17 @@ struct BudgetCard<MenuItems: View>: View {
     }
     
     //MARK: - Initializer
-    init(viewModel: BudgetCardViewModel, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) {
+    init(viewModel: BudgetCardViewModel, namespace: Namespace.ID, type: BudgetCardType, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self.namespace = namespace
+        self.type = type
         self.menuItems = menuItems
     }
     
-    init(dataManager: some DataManagerProtocol, namespace: Namespace.ID, budgetData: BudgetCardViewData) where MenuItems == EmptyView {
+    init(dataManager: some DataManagerProtocol, namespace: Namespace.ID, type: BudgetCardType, budgetData: BudgetCardViewData) where MenuItems == EmptyView {
         self._viewModel = StateObject(wrappedValue: BudgetCardViewModel(dataManager: dataManager, budget: budgetData.budget, transactions: budgetData.transactions))
         self.namespace = namespace
+        self.type = type
         self.menuItems = { _ in EmptyView() }
     }
     
@@ -51,6 +59,22 @@ struct BudgetCard<MenuItems: View>: View {
         Menu {
             menuItems(viewModel.getBudgetCardData())
         } label: {
+            switch type {
+            case .line:
+                cardWithLine
+            case .pie:
+                cardWithPie
+            }
+        }
+        .foregroundStyle(.primary)
+        .onChange(of: viewModel.budget.category) {
+            viewModel.fetchAndCalculate()
+        }
+    }
+    
+    //MARK: - Computed View Properties
+    private var cardWithPie: some View {
+        HStack {
             VStack {
                 HStack {
                     if viewModel.budget.category != nil {
@@ -72,19 +96,29 @@ struct BudgetCard<MenuItems: View>: View {
                     }
                     
                     Spacer()
+                }
+                
+                Spacer()
+                
+                HStack {
+                    Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
+                        .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
+                    Text(budgetCurrency)
+                        .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
                     
                     Text(viewModel.budget.period.localizedString)
                         .foregroundStyle(.secondary)
                         .layoutPriority(1)
                         .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
+                    
+                    Spacer()
                 }
-                .frame(minHeight: 30)
-                
-                lineChart
-                    .padding(.vertical, 7)
-                    .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
                 
                 HStack {
+                    Text("Spent")
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    
                     Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
                         .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
                         .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
@@ -93,30 +127,82 @@ struct BudgetCard<MenuItems: View>: View {
                         .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
                     
                     Spacer()
-                    
-                    Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
-                        .layoutPriority(1)
-                        .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
-                    Text(budgetCurrency)
-                        .layoutPriority(1)
-                        .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
                 }
-                .font(.subheadline)
             }
-            .padding()
-            .background {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(backgroundColor)
-                    .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
-            }
+            
+            pieChart
+                .padding(.leading)
+                .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
         }
-        .foregroundStyle(.primary)
-        .onChange(of: viewModel.budget.category) {
-            viewModel.fetchAndCalculate()
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(backgroundColor)
+                .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
         }
     }
     
-    //MARK: - Computed View Properties
+    private var cardWithLine: some View {
+        VStack {
+            HStack {
+                if viewModel.budget.category != nil {
+                    FTAppAssets.iconImageOrEpty(name: budgetIconName)
+                        .scaledToFit()
+                        .foregroundStyle(categoryColor)
+                        .matchedGeometryEffect(id: "budgetIcon" + viewModel.budget.id, in: namespace)
+                        .frame(width: 30, height: 30)
+                }
+                
+                Text(budgetName)
+                    .matchedGeometryEffect(id: "budgetName" + viewModel.budget.id, in: namespace)
+                    .bold()
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                
+                if viewModel.isProcessing {
+                    ProgressView()
+                }
+                
+                Spacer()
+                
+                Text(viewModel.budget.period.localizedString)
+                    .foregroundStyle(.secondary)
+                    .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
+            }
+            .frame(minHeight: 30)
+            
+            lineChart
+                .padding(.vertical, 7)
+                .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
+            
+            HStack {
+                Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.totalValue) ?? "Err")
+                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                    .matchedGeometryEffect(id: "budgetTotal" + viewModel.budget.id, in: namespace)
+                Text(budgetCurrency)
+                    .foregroundStyle(isBudgetOver ? Color.red : Color.primary)
+                    .matchedGeometryEffect(id: "budgetCurrecyTotal" + viewModel.budget.id, in: namespace)
+                
+                Spacer()
+                
+                Text(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.budget.value) ?? "Err")
+                    .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetValue" + viewModel.budget.id, in: namespace)
+                Text(budgetCurrency)
+                    .layoutPriority(1)
+                    .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
+            }
+            .font(.subheadline)
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(backgroundColor)
+                .matchedGeometryEffect(id: "budgetBachround" + viewModel.budget.id, in: namespace)
+        }
+    }
+    
     private var lineChart: some View {
         Chart {
             BarMark(
@@ -142,6 +228,28 @@ struct BudgetCard<MenuItems: View>: View {
         }
     }
     
+    private var pieChart: some View {
+        Chart {
+            SectorMark(
+                angle: .value("Budget total", viewModel.totalValue),
+                innerRadius: .ratio(0.7)
+            )
+            .foregroundStyle(categoryColor)
+            
+            if (viewModel.budget.value - viewModel.totalValue) > 0 {
+                SectorMark(
+                    angle: .value("Budget", (viewModel.budget.value - viewModel.totalValue)),
+                    innerRadius: .ratio(0.7)
+                )
+                .foregroundStyle(Color(.systemGray4))
+            }
+        }
+        .chartLegend(.hidden)
+        .chartXAxis(.hidden)
+        .chartYAxis(.hidden)
+        .frame(width: 100, height: 100)
+    }
+    
     //MARK: - Methods
     
 }
@@ -152,7 +260,7 @@ struct BudgetCard<MenuItems: View>: View {
     @Namespace var namespace
     @State var flag = false
     
-    return BudgetCard(viewModel: viewModel, namespace: namespace) { _ in
+    return BudgetCard(viewModel: viewModel, namespace: namespace, type: .line) { _ in
         EmptyView()
     }
 }
