@@ -40,6 +40,12 @@ struct BudgetCard<MenuItems: View>: View {
         self.menuItems = menuItems
     }
     
+    init(dataManager: some DataManagerProtocol, namespace: Namespace.ID, budgetData: BudgetCardViewData) where MenuItems == EmptyView {
+        self._viewModel = StateObject(wrappedValue: BudgetCardViewModel(dataManager: dataManager, budget: budgetData.budget, transactions: budgetData.transactions))
+        self.namespace = namespace
+        self.menuItems = { _ in EmptyView() }
+    }
+    
     //MARK: - Body
     var body: some View {
         Menu {

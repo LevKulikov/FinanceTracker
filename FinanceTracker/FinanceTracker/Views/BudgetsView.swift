@@ -11,6 +11,7 @@ struct BudgetsView: View {
     //MARK: - Properties
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var namespace
+    @Namespace private var emptyNamespace
     @StateObject private var viewModel: BudgetsViewModel
     @State private var deletionAlertItem: Budget?
     @State private var budgetDataForDetails: BudgetCardViewData?

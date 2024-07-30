@@ -26,6 +26,10 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
     let title: String
     @MainActor @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
     @MainActor @Published private(set) var isGroupingAndSortingProceeds = false
+    @MainActor
+    var getTransactions: [Transaction] {
+        transactions
+    }
     
     //MARK: Private properties
     private let dataManager: any DataManagerProtocol
@@ -46,11 +50,6 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     func getAddingSpendIcomeView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: threadToUse, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
-    }
-    
-    @MainActor
-    func getTransactions() -> [Transaction] {
-        return transactions
     }
     
     func deleteTransaction(_ transaction: Transaction) {

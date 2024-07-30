@@ -30,15 +30,17 @@ struct TransactionListView<Content: View>: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    topContent(viewModel.getTransactions())
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                        .listRowSeparator(.hidden)
-                        .listSectionSeparator(.hidden)
-                        .listSectionSpacing(0)
+                if !viewModel.isGroupingAndSortingProceeds {
+                    Section {
+                        topContent(viewModel.getTransactions)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .listRowSeparator(.hidden)
+                            .listSectionSeparator(.hidden)
+                            .listSectionSpacing(0)
+                    }
                 }
-                
+                    
                 if !viewModel.isGroupingAndSortingProceeds, viewModel.filteredTransactionGroups.isEmpty {
                     ContentUnavailableView("No transactions", systemImage: "tray.fill", description: Text("Nothing here yet"))
                         .listRowBackground(Color.clear)

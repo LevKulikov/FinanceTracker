@@ -108,6 +108,19 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
+    func getTransactionsListView(for budgetData: BudgetCardViewData, namespace: Namespace.ID) -> some View {
+        let budget = budgetData.budget
+        let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name
+        
+        let dataManagerCopy = dataManager
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self) { transes in
+            let newBudgetData = BudgetCardViewData(budget: budgetData.budget, transactions: transes)
+            return BudgetCard(dataManager: dataManagerCopy, namespace: namespace, budgetData: newBudgetData)
+        }
+    }
+    
+    
+    @MainActor
     func deleteBudget(_ budget: Budget) {
         Task {
             await dataManager.deleteBudget(budget)
