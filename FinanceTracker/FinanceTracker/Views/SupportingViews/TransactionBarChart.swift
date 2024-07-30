@@ -306,9 +306,10 @@ struct TransactionBarChart: View {
         }
         .padding(5)
         .background {
+            let color = colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
             RoundedRectangle(cornerRadius: 7)
-                .stroke(Color(.secondarySystemBackground))
-                .fill(Color(.systemBackground))
+                .stroke(color)
+                .fill(color)
         }
     }
     
