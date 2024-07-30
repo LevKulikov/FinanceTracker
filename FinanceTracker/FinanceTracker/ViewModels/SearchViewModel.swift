@@ -385,7 +385,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     }
     
     private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
-        guard let fetchedCategories: [Category] = await fetch() else {
+        guard let fetchedCategories: [Category] = await fetch(sortBy: [SortDescriptor<Category>(\.placement)]) else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
@@ -423,10 +423,10 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortBy: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
-            sortBy: []
+            sortBy: sortBy
         )
         
         do {

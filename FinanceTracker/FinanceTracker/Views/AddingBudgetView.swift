@@ -144,7 +144,7 @@ struct AddingBudgetView: View {
                 
                 Spacer()
                 
-                Menu(viewModel.category == nil ? "All" : viewModel.category!.name) {
+                Menu(viewModel.category == nil ? String(localized: "All") : viewModel.category!.name) {
                     Button("Select") {
                         showCategoryPicker = true
                     }
