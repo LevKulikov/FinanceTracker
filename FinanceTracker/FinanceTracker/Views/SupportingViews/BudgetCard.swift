@@ -106,14 +106,10 @@ struct BudgetCard<MenuItems: View>: View {
                     Text(budgetCurrency)
                         .matchedGeometryEffect(id: "budgetCurrecyValue" + viewModel.budget.id, in: namespace)
                     
-                    Text(viewModel.budget.period.localizedString)
-                        .foregroundStyle(.secondary)
-                        .layoutPriority(1)
-                        .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
-                    
                     Spacer()
                 }
                 .lineLimit(1)
+                .font(.subheadline)
                 
                 HStack {
                     Text("Spent")
@@ -131,11 +127,17 @@ struct BudgetCard<MenuItems: View>: View {
                     Spacer()
                 }
                 .lineLimit(1)
+                .font(.subheadline)
             }
             
             pieChart
-                .padding(.leading)
                 .matchedGeometryEffect(id: "budgetChart" + viewModel.budget.id, in: namespace)
+                .overlay {
+                    Text(viewModel.budget.period.localizedString)
+                        .foregroundStyle(.secondary)
+                        .matchedGeometryEffect(id: "budgetPeriod" + viewModel.budget.id, in: namespace)
+                }
+                .padding(.leading)
         }
         .padding()
         .background {
