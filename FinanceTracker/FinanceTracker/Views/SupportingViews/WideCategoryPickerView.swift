@@ -122,8 +122,6 @@ struct WideCategoryPickerView<Content: View, MenuItems: View>: View {
 }
 
 #Preview {
-    
-    
     WideCategoryPickerView(categories: [], selecetedCategory: .constant(nil), show: .constant(true)) { category in
         print(category.name)
     } contextMenuContent: { category in
