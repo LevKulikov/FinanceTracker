@@ -145,6 +145,12 @@ final class FTFactory {
         return AnyView(TransactionListView(viewModel: viewModel))
     }
     
+    func createTransactionListView<Content: View>(dataManager: some DataManagerProtocol, transactions: [Transaction], title: String, threadToUse: DataManager.DataThread, delegate: (some TransactionListViewModelDelegate)? = nil, topContent: @escaping ([Transaction]) -> Content) -> AnyView {
+        let viewModel = TransactionListViewModel(dataManager: dataManager, transactions: transactions, title: title, threadToUse: threadToUse)
+        viewModel.delegate = delegate
+        return AnyView(TransactionListView(viewModel: viewModel, topContent: topContent))
+    }
+    
     func createBudgetsView(dataManager: some DataManagerProtocol,
                            delegate: (some BudgetsViewModelDelegate)? = nil,
                            strongReference: Bool = false,
