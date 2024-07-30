@@ -321,6 +321,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
             try container.mainContext.delete(model: Tag.self)
+            try container.mainContext.delete(model: Budget.self)
             try save()
         } catch {
             print(error)

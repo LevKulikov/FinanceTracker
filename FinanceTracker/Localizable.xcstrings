@@ -303,7 +303,18 @@
         }
       }
     },
+    "Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены? Все данные (транзакции, счета, категории и т.д.) будут безвозвратно удалены \n\nВы можете удалить только транзакции, если желаете "
+          }
+        }
+      }
+    },
     "Are you sure? All stored data (transactions, balance accounts, categories, tags) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -494,7 +505,14 @@
       }
     },
     "Card type" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип карточки"
+          }
+        }
+      }
     },
     "Categories" : {
       "localizations" : {

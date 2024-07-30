@@ -56,7 +56,7 @@ struct ManageDataView: View {
                     deleteAllDataSecondAlert.toggle()
                 }
             } message: {
-                Text("Are you sure? All stored data (transactions, balance accounts, categories, tags) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
+                Text("Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
             }
             .alert("Final alert!", isPresented: $deleteAllDataSecondAlert) {
                 Button("Yes, delete anyway", role: .destructive) {
