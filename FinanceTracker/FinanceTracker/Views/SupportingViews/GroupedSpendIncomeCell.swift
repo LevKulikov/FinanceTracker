@@ -17,6 +17,7 @@ struct GroupedSpendIncomeCell: View {
     var closeOpenHandler: ((Bool) -> Void)?
     
     @State private var openGroup = false
+    @State private var currency: Currency?
     private let colorLimit = 5
     private var mutualCategory: Category? {
         return transactions.first?.category
@@ -80,7 +81,7 @@ struct GroupedSpendIncomeCell: View {
             
             if openGroup {
                 ForEach(transactions) { transaction in
-                    SpendIncomeCell(transaction: transaction, namespace: namespace)
+                    SpendIncomeCell(transaction: transaction, namespace: namespace, currency: currency)
                         .transition(.blurReplace)
                         .onTapGesture {
                             onTapTransaction(transaction)
@@ -94,6 +95,11 @@ struct GroupedSpendIncomeCell: View {
                 withAnimation(.snappy(duration: 0.5)) {
                     openGroup = false
                 }
+            }
+        }
+        .task {
+            if let codeString = mutualBalanceAccount?.currency {
+                currency = await FTAppAssets.getCurrency(for: codeString)
             }
         }
     }
@@ -114,9 +120,8 @@ struct GroupedSpendIncomeCell: View {
                     .bold()
                     .lineLimit(1)
                 
-                Text(mutualBalanceAccount?.currency ?? "Err")
-                    .font(.footnote)
-                    .padding(.bottom, 2.6)
+                Text(currency?.symbol ?? (mutualBalanceAccount?.currency ?? "Err"))
+                    .font(.title3)
                     .lineLimit(1)
                 
                 Text("\(percentageInt)%")
