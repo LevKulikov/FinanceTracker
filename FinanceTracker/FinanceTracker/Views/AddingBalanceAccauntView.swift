@@ -15,6 +15,7 @@ struct AddingBalanceAccauntView: View {
     @FocusState private var balanceTextFieldFocus
     @FocusState private var currencyTextFieldFocus
     @State private var showMoreIcons = false
+    @State private var showCurrencies = false
     private let userDevice = FTAppAssets.currentUserDevise
     private var canBeAddedOrUpdated: Bool {
         guard !viewModel.name.isEmpty else { return false }
@@ -76,6 +77,9 @@ struct AddingBalanceAccauntView: View {
         .sheet(isPresented: $showMoreIcons) {
             iconsListView
         }
+        .sheet(isPresented: $showCurrencies) {
+            CurrencyWidePickerView(currency: $viewModel.currencyPrecised, show: $showCurrencies)
+        }
         .overlay(alignment: .bottom) {
             if !isKeyboardActive {
                 addButton
@@ -116,12 +120,15 @@ struct AddingBalanceAccauntView: View {
                 .fontWeight(.medium)
             
             HStack {
+                let windowWidth = FTAppAssets.getWindowSize().width
+                
                 TextField(viewModel.isFetching ? "Please wait" : "0", text: $viewModel.balanceString)
                     .onChange(of: viewModel.balanceString, onChangeOfBalanceString)
                     .focused($balanceTextFieldFocus)
                     .keyboardType(.decimalPad)
                     .autocorrectionDisabled()
                     .font(.title2)
+                    .layoutPriority(1)
                     .textFieldStyle(.roundedBorder)
                     .disabled(viewModel.isFetching)
                     .overlay(alignment: .trailing) {
@@ -136,7 +143,13 @@ struct AddingBalanceAccauntView: View {
                     .autocorrectionDisabled()
                     .font(.title2)
                     .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: FTAppAssets.getScreenSize().width / 3)
+                    .frame(minWidth: windowWidth * 1/5.5)
+                
+                Button(viewModel.currencyPrecised == nil ? "Select" : viewModel.currencyPrecised!.symbol) {
+                    showCurrencies = true
+                }
+                .buttonStyle(.bordered)
+                .layoutPriority(1)
             }
         }
         .padding(.horizontal)

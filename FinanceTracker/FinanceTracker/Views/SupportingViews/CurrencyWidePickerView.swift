@@ -13,7 +13,7 @@ struct CurrencyWidePickerView: View {
     
     @State private var searchCurrencyText: String = ""
     @State private var isSearching = false
-    private let allCurrencies = FTAppAssets.currencies
+    private let allCurrencies = FTAppAssets.currencies.sorted { $0.name < $1.name }
     private var searchCurrencies: [Currency] {
         guard !searchCurrencyText.isEmpty else { return allCurrencies }
         

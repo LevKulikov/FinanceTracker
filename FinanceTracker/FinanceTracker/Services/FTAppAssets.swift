@@ -451,7 +451,7 @@ struct FTAppAssets {
             code: "VND"
         ),
         Currency(
-            symbol: "AED",
+            symbol: "د.إ",
             name: "United Arab Emirates Dirham",
             code: "AED"
         ),

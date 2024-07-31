@@ -564,6 +564,9 @@
         }
       }
     },
+    "Check the spelling and enter the query in English" : {
+
+    },
     "Clear selection" : {
       "localizations" : {
         "ru" : {
@@ -703,6 +706,12 @@
           }
         }
       }
+    },
+    "Currencies" : {
+
+    },
+    "Currency name or code" : {
+
     },
     "Current balance" : {
       "localizations" : {
@@ -1510,6 +1519,9 @@
           }
         }
       }
+    },
+    "No currencies with \"%@\"" : {
+
     },
     "No results for \"%@\"" : {
       "localizations" : {
