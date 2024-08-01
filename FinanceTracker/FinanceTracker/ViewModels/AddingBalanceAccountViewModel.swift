@@ -120,6 +120,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             
             Task { @MainActor in
                 isFetching = true
+                currencyPrecised = await FTAppAssets.getCurrency(for: currency)
             }
             
             Task.detached(priority: .high) {
