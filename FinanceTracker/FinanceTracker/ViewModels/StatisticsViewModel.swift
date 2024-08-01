@@ -249,17 +249,19 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             newEndDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
         }
         
-        pieChartDateStart = newStartDate
-        pieChartDateEnd = newEndDate
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
+            pieChartDateStart = newStartDate
+            pieChartDateEnd = newEndDate
+        }
     }
     
     /// Sets pie chart date filter to default values
     func setPieChartDateFiltersToDefault() {
-        doNotCalculateDataUntilBlockIsFinished({
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
             pieChartDate = .now
             pieChartDateStart = .now
             pieChartDateEnd = .now
-        }, for: .pieChart)
+        }
     }
     
     /// Provides View for Tags settings
@@ -284,7 +286,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// - Parameters:
     ///   - block: code to execute before data recalculation
     ///   - calculationData: which data should be calculated after block will be executed. Provide nil if calculation is need for all data types
-    private func doNotCalculateDataUntilBlockIsFinished(_ block: () -> Void, for calculationData: CalculatingDataType?) {
+    private func doNotCalculateDataUntilBlockIsFinished(for calculationData: CalculatingDataType?, _ block: () -> Void) {
         isCalculationAllowed = false
         block()
         isCalculationAllowed = true

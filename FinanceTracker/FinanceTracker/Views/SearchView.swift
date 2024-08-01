@@ -190,7 +190,7 @@ struct SearchView: View {
                                 showMoreFilters = false
                             }
                         }
-                        .font(.caption)
+                        .font(.subheadline)
                         .buttonBorderShape(.capsule)
                         .buttonStyle(.bordered)
                         .foregroundStyle(.secondary)

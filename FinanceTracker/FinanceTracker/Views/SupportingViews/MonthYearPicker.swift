@@ -71,9 +71,9 @@ struct MonthYearPicker: View {
             }
             
             let yearNumber = calendar.component(.year, from: date)
-            Menu("\(yearNumber)") {
+            Menu(String(yearNumber)) {
                 ForEach(yearRange.reversed(), id: \.self) { yearIndex in
-                    Button("\(yearIndex)") {
+                    Button(String(yearIndex)) {
                         selectYear(yearIndex)
                     }
                 }
