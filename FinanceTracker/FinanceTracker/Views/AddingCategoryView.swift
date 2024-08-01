@@ -71,7 +71,7 @@ struct AddingCategoryView: View {
                     .frame(height: 50)
             }
         }
-        .navigationTitle(isUpdating ? "Сategory" : "New category")
+        .navigationTitle(isUpdating ? "Category" : "New category")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(showPreview ? "Hide" : "Preview") {

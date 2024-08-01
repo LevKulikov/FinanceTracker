@@ -321,7 +321,7 @@ struct TransactionBarChart: View {
         case .perDay:
             return date.formatted(date: .abbreviated, time: .omitted)
         case .perWeek:
-            return "Week \(dateComponents.weekOfMonth ?? 0), \(date.month) \(dateComponents.year ?? 0)"
+            return "\(String(localized: "Week")) \(dateComponents.weekOfMonth ?? 0), \(date.month) \(dateComponents.year ?? 0)"
         case .perMonth:
             return "\(date.month) \(dateComponents.year ?? 0)"
         case .perYear:

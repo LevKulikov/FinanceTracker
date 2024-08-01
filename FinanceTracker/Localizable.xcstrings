@@ -2573,6 +2573,16 @@
         }
       }
     },
+    "Week" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя"
+          }
+        }
+      }
+    },
     "Week picker" : {
       "localizations" : {
         "ru" : {
