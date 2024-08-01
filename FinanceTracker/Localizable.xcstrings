@@ -154,6 +154,7 @@
       }
     },
     "Add %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1461,6 +1462,16 @@
         }
       }
     },
+    "Move and delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить и удалить"
+          }
+        }
+      }
+    },
     "Move transactions" : {
       "localizations" : {
         "ru" : {
@@ -1883,6 +1894,7 @@
       }
     },
     "Replace and delete" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
