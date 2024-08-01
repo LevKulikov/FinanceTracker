@@ -564,6 +564,16 @@
         }
       }
     },
+    "Check the spelling and enter the query in English" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте написание и вводите запрос на английском"
+          }
+        }
+      }
+    },
     "Clear selection" : {
       "localizations" : {
         "ru" : {
@@ -700,6 +710,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Создайте ваш счет чтобы начать пользоваться приложением"
+          }
+        }
+      }
+    },
+    "Currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюты"
+          }
+        }
+      }
+    },
+    "Currency name or code" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя или код валюты"
           }
         }
       }
@@ -1507,6 +1537,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет бюджетов"
+          }
+        }
+      }
+    },
+    "No currencies with \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет валют, содержащих \"%@\""
           }
         }
       }

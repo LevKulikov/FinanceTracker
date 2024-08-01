@@ -20,6 +20,7 @@ struct BudgetCard<MenuItems: View>: View {
     private let type: BudgetCardType
     private let menuItems: (BudgetCardViewData) -> MenuItems
     @StateObject private var viewModel: BudgetCardViewModel
+    @State private var currency: Currency?
     private var categoryColor: Color {
         viewModel.budget.category?.color ?? .blue
     }
@@ -30,7 +31,7 @@ struct BudgetCard<MenuItems: View>: View {
         viewModel.budget.category?.iconName ?? ""
     }
     private var budgetCurrency: String {
-        viewModel.budget.balanceAccount?.currency ?? ""
+        currency?.symbol ?? (viewModel.budget.balanceAccount?.currency ?? "")
     }
     private var isBudgetOver: Bool {
         viewModel.totalValue > viewModel.budget.value
@@ -69,6 +70,12 @@ struct BudgetCard<MenuItems: View>: View {
         .foregroundStyle(.primary)
         .onChange(of: viewModel.budget.category) {
             viewModel.fetchAndCalculate()
+        }
+        .task {
+            guard currency == nil else { return }
+            if let codeString = viewModel.budget.balanceAccount?.currency {
+                currency = await FTAppAssets.getCurrency(for: codeString)
+            }
         }
     }
     

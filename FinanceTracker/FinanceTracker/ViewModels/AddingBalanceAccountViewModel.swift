@@ -35,11 +35,24 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
     
     //MARK: Category props to set
     @Published var name: String = ""
-    @Published var currency: String = ""
+    @Published var currency: String = "" {
+        didSet {
+            guard currencyPrecised != nil, currency != currencyPrecised?.code else { return }
+            withAnimation {
+                currencyPrecised = nil
+            }
+        }
+    }
     /// Converted from balanceString to float from View
     var balance: Float = 0
     @Published var iconName: String = ""
     @Published var color: Color = .cyan
+    @Published var currencyPrecised: Currency? {
+        didSet {
+            guard let currencyPrecised, currencyPrecised.id != oldValue?.id else { return }
+            currency = currencyPrecised.code
+        }
+    }
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol, action: ActionWithBalanceAccaunt) {
@@ -107,6 +120,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             
             Task { @MainActor in
                 isFetching = true
+                currencyPrecised = await FTAppAssets.getCurrency(for: currency)
             }
             
             Task.detached(priority: .high) {
