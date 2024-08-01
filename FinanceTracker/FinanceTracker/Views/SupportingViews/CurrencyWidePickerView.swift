@@ -26,30 +26,38 @@ struct CurrencyWidePickerView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(isSearching ? searchCurrencies : allCurrencies) { currency in
-                    rowForCurrency(currency)
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(isSearching ? searchCurrencies : allCurrencies) { currency in
+                        rowForCurrency(currency)
+                            .id(currency)
+                    }
+                    
+                    if isSearching, searchCurrencies.isEmpty {
+                        ContentUnavailableView(
+                            "No currencies with \"\(searchCurrencyText)\"",
+                            systemImage: "magnifyingglass",
+                            description: Text("Check the spelling and enter the query in English")
+                        )
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listSectionSeparator(.hidden)
+                    }
                 }
-                
-                if isSearching, searchCurrencies.isEmpty {
-                    ContentUnavailableView(
-                        "No currencies with \"\(searchCurrencyText)\"",
-                        systemImage: "magnifyingglass",
-                        description: Text("Check the spelling and enter the query in English")
-                    )
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .listSectionSeparator(.hidden)
+                .navigationTitle("Currencies")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    Button("Done") {
+                        show = false
+                    }
+                }
+                .searchable(text: $searchCurrencyText, isPresented: $isSearching, prompt: "Currency name or code")
+                .onAppear {
+                    if let currency {
+                        proxy.scrollTo(currency, anchor: .center)
+                    }
                 }
             }
-            .navigationTitle("Currencies")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                Button("Done") {
-                    show = false
-                }
-            }
-            .searchable(text: $searchCurrencyText, isPresented: $isSearching, prompt: "Currency name or code")
         }
     }
     
@@ -81,6 +89,7 @@ struct CurrencyWidePickerView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             self.currency = currency
+            show = false
         }
     }
 }

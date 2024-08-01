@@ -145,7 +145,7 @@ struct AddingBalanceAccauntView: View {
                     .textFieldStyle(.roundedBorder)
                     .frame(minWidth: windowWidth * 1/5.5)
                 
-                Button(viewModel.currencyPrecised == nil ? "Select" : viewModel.currencyPrecised!.symbol) {
+                Button(viewModel.currencyPrecised == nil ? String(localized: "Select") : viewModel.currencyPrecised!.symbol) {
                     showCurrencies = true
                 }
                 .buttonStyle(.bordered)

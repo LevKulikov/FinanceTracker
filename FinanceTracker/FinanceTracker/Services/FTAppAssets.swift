@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct Currency: Codable, Identifiable {
+struct Currency: Codable, Identifiable, Hashable {
     var id: String {
         return code
     }

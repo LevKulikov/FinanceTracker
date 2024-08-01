@@ -565,7 +565,14 @@
       }
     },
     "Check the spelling and enter the query in English" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте написание и вводите запрос на английском"
+          }
+        }
+      }
     },
     "Clear selection" : {
       "localizations" : {
@@ -708,10 +715,24 @@
       }
     },
     "Currencies" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюты"
+          }
+        }
+      }
     },
     "Currency name or code" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя или код валюты"
+          }
+        }
+      }
     },
     "Current balance" : {
       "localizations" : {
@@ -1521,7 +1542,14 @@
       }
     },
     "No currencies with \"%@\"" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет валют, содержащих \"%@\""
+          }
+        }
+      }
     },
     "No results for \"%@\"" : {
       "localizations" : {
