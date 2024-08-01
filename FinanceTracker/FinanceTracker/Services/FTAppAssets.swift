@@ -682,8 +682,13 @@ struct FTAppAssets {
         return size
     }
     
+    /// Used in getCurrency to prevent multiple search in array
+    static private var lastFoundCurrency: Currency?
     static func getCurrency(for code: String) async -> Currency? {
-        return currencies.first { $0.code == code }
+        guard lastFoundCurrency?.code != code else { return lastFoundCurrency }
+        let currency = currencies.first { $0.code == code }
+        lastFoundCurrency = currency
+        return currency
     }
     
     nonisolated private static func getIconNames() -> [String] {
