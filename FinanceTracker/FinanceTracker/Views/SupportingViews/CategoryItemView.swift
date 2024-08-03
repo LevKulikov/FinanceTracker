@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct CategoryItemView: View {
     let category: Category
     @Binding var selectedCategory: Category?

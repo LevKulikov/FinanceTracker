@@ -23,7 +23,7 @@ enum ActionWithBudget: Equatable, Hashable {
     case update(budget: Budget)
 }
 
-final class AddingBudgetViewModel: ObservableObject {
+final class AddingBudgetViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any AddingBudgetViewModelDelegate)?
     
@@ -46,11 +46,14 @@ final class AddingBudgetViewModel: ObservableObject {
     init(action: ActionWithBudget, dataManager: any DataManagerProtocol) {
         self._action = Published(wrappedValue: action)
         self.dataManager = dataManager
-        setBudgetData()
+        Task { @MainActor in
+            setBudgetData()
+        }
     }
     
     //MARK: - Methods
-    func saveBudget(completionHandler: (() -> Void)? = nil) throws {
+    @MainActor
+    func saveBudget(completionHandler: (@MainActor @Sendable () -> Void)? = nil) throws {
         switch action {
         case .none:
             completionHandler?()
@@ -62,11 +65,10 @@ final class AddingBudgetViewModel: ObservableObject {
                 category: category,
                 balanceAccount: balanceAccount
             )
-            Task { @MainActor in
-                dataManager.insert(newBudget)
-                delegate?.didAddBudget(newBudget)
-                completionHandler?()
-            }
+            
+            dataManager.insert(newBudget)
+            delegate?.didAddBudget(newBudget)
+            completionHandler?()
         case .update:
             guard let budgetToUpdate else {
                 print("budgetToUpdate is nil, though action is .update")
@@ -79,17 +81,16 @@ final class AddingBudgetViewModel: ObservableObject {
             budgetToUpdate.setCategory(category)
             budgetToUpdate.setBalanceAccount(balanceAccount)
             
-            Task { @MainActor in
-                try dataManager.save()
-                delegate?.didUpdateBudget(budgetToUpdate)
-                completionHandler?()
-            }
+            try dataManager.save()
+            delegate?.didUpdateBudget(budgetToUpdate)
+            completionHandler?()
         }
     }
     
     //MARK: Private methods
+    @MainActor
     private func setBudgetData() {
-        Task { @MainActor in
+        Task {
             await fetchCategories()
             await fetchBalanceAccounts()
         }
@@ -111,7 +112,7 @@ final class AddingBudgetViewModel: ObservableObject {
     }
     
     @MainActor
-    func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+    func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         let typeRawValue = TransactionsType.spending.rawValue
         let predicate = #Predicate<Category> {
             $0.typeRawValue == typeRawValue
@@ -128,7 +129,7 @@ final class AddingBudgetViewModel: ObservableObject {
     }
     
     @MainActor
-    func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+    func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         let descriptor = FetchDescriptor<BalanceAccount>()
         do {
             let fetchedBAs = try dataManager.fetch(descriptor)

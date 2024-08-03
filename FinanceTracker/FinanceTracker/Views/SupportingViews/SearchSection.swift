@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-struct SearchSection: View {
+struct SearchSection: View, @unchecked Sendable {
     //MARK: Props
     let transactionGroupData: TransactionGroupedData
-    let onTapAction: (Transaction) -> Void
+    let onTapAction: @MainActor @Sendable (Transaction) -> Void
+    let onDeleteSwipe: @MainActor @Sendable (Transaction) -> Void
     
     private let calendar = Calendar.current
     @State private var haveSameCurrency: Bool = true
@@ -18,9 +19,10 @@ struct SearchSection: View {
     @State private var totalIncome: Float?
     
     //MARK: Init
-    init(transactionGroupData: TransactionGroupedData, onTapAction: @escaping (Transaction) -> Void) {
+    init(transactionGroupData: TransactionGroupedData, onTapAction: @MainActor @Sendable @escaping (Transaction) -> Void, onDeleteSwipe: @MainActor @Sendable @escaping (Transaction) -> Void) {
         self.transactionGroupData = transactionGroupData
         self.onTapAction = onTapAction
+        self.onDeleteSwipe = onDeleteSwipe
     }
     
     //MARK: Body
@@ -30,6 +32,14 @@ struct SearchSection: View {
                 SearchTransactionRow(transaction: transaction)
                     .onTapGesture {
                         onTapAction(transaction)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            onDeleteSwipe(transaction)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
                     }
             }
         } header: {
@@ -84,12 +94,12 @@ struct SearchSection: View {
     
     private func calculateTotalIncome() {
         guard haveSameCurrency else { return }
-        DispatchQueue.global().async {
+        Task(priority: .high) {
             let incomeTransactions = transactionGroupData.transactions.filter { $0.type == .income }
             guard !incomeTransactions.isEmpty else { return }
             let sumValue = incomeTransactions.map { $0.value }.reduce(0, +)
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 totalIncome = sumValue
             }
         }
@@ -97,12 +107,12 @@ struct SearchSection: View {
     
     private func calculateTotalSpending() {
         guard haveSameCurrency else { return }
-        DispatchQueue.global().async {
+        Task(priority: .high) {
             let spendingTransactions = transactionGroupData.transactions.filter { $0.type == .spending }
             guard !spendingTransactions.isEmpty else { return }
             let sumValue = spendingTransactions.map { $0.value }.reduce(0, +)
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 totalSpending = sumValue
             }
         }
@@ -112,5 +122,7 @@ struct SearchSection: View {
 #Preview {
     SearchSection(transactionGroupData: TransactionGroupedData(date: .now, transactions: [])) { trans in
         print(trans.value)
+    } onDeleteSwipe: { _ in
+        
     }
 }

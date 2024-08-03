@@ -78,6 +78,7 @@
       }
     },
     "%lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -133,6 +134,16 @@
         }
       }
     },
+    "404" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "404"
+          }
+        }
+      }
+    },
     "Add" : {
       "localizations" : {
         "ru" : {
@@ -144,6 +155,7 @@
       }
     },
     "Add %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -293,7 +305,18 @@
         }
       }
     },
+    "Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены? Все данные (транзакции, счета, категории и т.д.) будут безвозвратно удалены \n\nВы можете удалить только транзакции, если желаете "
+          }
+        }
+      }
+    },
     "Are you sure? All stored data (transactions, balance accounts, categories, tags) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -483,6 +506,16 @@
         }
       }
     },
+    "Card type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип карточки"
+          }
+        }
+      }
+    },
     "Categories" : {
       "localizations" : {
         "ru" : {
@@ -529,6 +562,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Графики"
+          }
+        }
+      }
+    },
+    "Check the spelling and enter the query in English" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте написание и вводите запрос на английском"
           }
         }
       }
@@ -669,6 +712,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Создайте ваш счет чтобы начать пользоваться приложением"
+          }
+        }
+      }
+    },
+    "Currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюты"
+          }
+        }
+      }
+    },
+    "Currency name or code" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя или код валюты"
           }
         }
       }
@@ -913,6 +976,26 @@
         }
       }
     },
+    "Delete transactions in the group" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции в группе"
+          }
+        }
+      }
+    },
+    "Delete transactions?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции?"
+          }
+        }
+      }
+    },
     "Delete with transactions" : {
       "localizations" : {
         "ru" : {
@@ -958,7 +1041,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Done"
+            "value" : "Готово"
           }
         }
       }
@@ -969,6 +1052,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перетащите чтобы переставить"
+          }
+        }
+      }
+    },
+    "Drag to reorder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удерживайте чтобы упорядочить"
           }
         }
       }
@@ -1370,6 +1463,16 @@
         }
       }
     },
+    "Move and delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить и удалить"
+          }
+        }
+      }
+    },
     "Move transactions" : {
       "localizations" : {
         "ru" : {
@@ -1450,6 +1553,16 @@
         }
       }
     },
+    "No currencies with \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет валют, содержащих \"%@\""
+          }
+        }
+      }
+    },
     "No results for \"%@\"" : {
       "localizations" : {
         "ru" : {
@@ -1476,6 +1589,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет, отменить"
+          }
+        }
+      }
+    },
+    "Nothing here yet" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь пока пусто"
           }
         }
       }
@@ -1761,7 +1884,18 @@
         }
       }
     },
+    "Reorder tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упорядочить вкладки"
+          }
+        }
+      }
+    },
     "Replace and delete" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1882,7 +2016,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Установить как дефолтный"
+            "value" : "Установить как базовый"
           }
         }
       }
@@ -1892,12 +2026,13 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сначала установить дефолтные счет"
+            "value" : "Сначала установите базовый счет"
           }
         }
       }
     },
     "Setting" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1968,6 +2103,7 @@
       }
     },
     "Skip" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2007,6 +2143,16 @@
         }
       }
     },
+    "Sorry, some error occured. This page doesn't exist" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, произошла неизвестная ошибка. Данная страница не существует"
+          }
+        }
+      }
+    },
     "Spending" : {
       "localizations" : {
         "ru" : {
@@ -2023,6 +2169,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Расходы"
+          }
+        }
+      }
+    },
+    "Spent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрачено"
           }
         }
       }
@@ -2073,6 +2229,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Режим системы"
+          }
+        }
+      }
+    },
+    "Tabs placements" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разположение вкладок"
           }
         }
       }
@@ -2332,7 +2498,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Невозможно удалить дефолтный счет. Установить другой счет в качестве дефолтного, если вам необходимо удалить выбранный счет"
+            "value" : "Невозможно удалить базовый счет. Установить другой счет в качестве базового, если вам необходимо удалить выбранный счет"
           }
         }
       }
@@ -2407,12 +2573,32 @@
         }
       }
     },
+    "Week" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя"
+          }
+        }
+      }
+    },
     "Week picker" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пикер недели"
+          }
+        }
+      }
+    },
+    "Welcome" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать"
           }
         }
       }

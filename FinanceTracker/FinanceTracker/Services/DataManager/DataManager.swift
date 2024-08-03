@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 import SwiftUI
 
-protocol DataManagerProtocol: AnyObject {
+protocol DataManagerProtocol: AnyObject, Sendable {
     var tagDefaultColor: Color? { get set }
     var isFirstLaunch: Bool { get set }
     
@@ -78,11 +78,15 @@ protocol DataManagerProtocol: AnyObject {
     
     func getPreferredColorScheme() -> ColorScheme?
     
+    func setSecondThirdTabsArray(_ tabsArray: [TabViewType])
+    
+    func getSecondThirdTabsArray() -> [TabViewType]
+    
     @MainActor
     func saveDefaultCategories()
 }
 
-final class DataManager: DataManagerProtocol, ObservableObject {
+final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
     enum DataThread: Equatable {
         case main
         case global
@@ -317,6 +321,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
             try container.mainContext.delete(model: Tag.self)
+            try container.mainContext.delete(model: Budget.self)
             try save()
         } catch {
             print(error)
@@ -334,7 +339,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         }
     }
     
-    func insertFromBackground<T>(_ model: T) async where T : PersistentModel {
+    func insertFromBackground<T>(_ model: T) async where T : PersistentModel, T: Sendable {
         do {
             if let backgroundActor {
                 await backgroundActor.insert(model)
@@ -359,7 +364,7 @@ final class DataManager: DataManagerProtocol, ObservableObject {
     }
     
     /// Should be firstly used from background thread. Otherwise it will be execute from main thread
-    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel {
+    func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel, T: Sendable {
         if let backgroundActor {
             return try await backgroundActor.fetch(descriptor)
         } else {
@@ -394,6 +399,14 @@ final class DataManager: DataManagerProtocol, ObservableObject {
         for category in defaultIncomeCategories {
             insert(category)
         }
+    }
+    
+    func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
+        settingsManager.setSecondThirdTabsArray(tabsArray)
+    }
+    
+    func getSecondThirdTabsArray() -> [TabViewType] {
+        settingsManager.getSecondThirdTabsArray()
     }
     
     //MARK: Private methods

@@ -9,11 +9,15 @@ import SwiftUI
 
 struct BudgetsView: View {    
     //MARK: - Properties
+    @Environment(\.colorScheme) private var colorScheme
     @Namespace private var namespace
+    @Namespace private var emptyNamespace
     @StateObject private var viewModel: BudgetsViewModel
-    @State private var navigationPath = NavigationPath()
     @State private var deletionAlertItem: Budget?
     @State private var budgetDataForDetails: BudgetCardViewData?
+    private var backgroundColor: Color {
+        colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
+    }
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -22,7 +26,7 @@ struct BudgetsView: View {
     
     //MARK: - Body
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $viewModel.navigationPath) {
             ScrollView {
                 VStack {
                     headerView
@@ -38,7 +42,7 @@ struct BudgetsView: View {
                             Text("You don't have any saved budgets yet. Good opportunity to give it a try!")
                         } actions: {
                             Button("Add budget") {
-                                navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                                viewModel.navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                             }
                             .buttonStyle(.bordered)
                             .buttonBorderShape(.capsule)
@@ -52,7 +56,7 @@ struct BudgetsView: View {
                             }
                             
                             Button("Update", systemImage: "pencil.and.outline") {
-                                navigationPath.append(ActionWithBudget.update(budget: budget))
+                                viewModel.navigationPath.append(ActionWithBudget.update(budget: budget))
                             }
                             
                             Button("Delete", systemImage: "trash", role: .destructive) {
@@ -86,8 +90,16 @@ struct BudgetsView: View {
                 })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    Button("Card type", systemImage: viewModel.cardTypeIsLine ? "chart.pie" : "chart.line.flattrend.xyaxis") {
+                        withAnimation {
+                            viewModel.cardTypeIsLine.toggle()
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Add", systemImage: "plus") {
-                        navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
+                        viewModel.navigationPath.append(ActionWithBudget.add(.emptyBalanceAccount))
                     }
                 }
             }
@@ -112,7 +124,10 @@ struct BudgetsView: View {
             } content: { budgetData in
                 viewModel.getTransactionsListView(for: budgetData)
             }
-
+            .onAppear {
+                viewModel.refreshIfNeeded()
+            }
+            .background { backgroundColor.ignoresSafeArea() }
         }
     }
     
@@ -120,7 +135,6 @@ struct BudgetsView: View {
     private var headerView: some View {
         HStack {
             Text("Balance Account")
-                .bold()
                 .font(.title3)
                 .layoutPriority(1)
             

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct GroupedSpendIncomeCell: View {
     var transactions: [Transaction]
     var namespace: Namespace.ID
@@ -16,6 +17,7 @@ struct GroupedSpendIncomeCell: View {
     var closeOpenHandler: ((Bool) -> Void)?
     
     @State private var openGroup = false
+    @State private var currency: Currency?
     private let colorLimit = 5
     private var mutualCategory: Category? {
         return transactions.first?.category
@@ -42,13 +44,6 @@ struct GroupedSpendIncomeCell: View {
         return categoryColor.opacity(opacity > minLimit ? (opacity < maxLimit ? opacity : maxLimit) : minLimit)
     }
     private var gradientStopLocations: (colorStop: CGFloat, grayStop: CGFloat) {
-//        guard transactions.count > 0 else { return (0, 1)}
-//        let count = transactions.count
-//        guard count < colorLimit else { return (0.6, 1) }
-//        let first: CGFloat = 0.05 + CGFloat(count)/10
-//        let second: CGFloat = 0.9 - CGFloat(colorLimit - count)/10
-//        return (first, second)
-        
         let first: CGFloat = 0 + CGFloat(percentageInt)/100
         let second: CGFloat = 1.25 - CGFloat(100 - percentageInt)/100
         return (first, second)
@@ -86,7 +81,7 @@ struct GroupedSpendIncomeCell: View {
             
             if openGroup {
                 ForEach(transactions) { transaction in
-                    SpendIncomeCell(transaction: transaction, namespace: namespace)
+                    SpendIncomeCell(transaction: transaction, namespace: namespace, currency: currency)
                         .transition(.blurReplace)
                         .onTapGesture {
                             onTapTransaction(transaction)
@@ -100,6 +95,11 @@ struct GroupedSpendIncomeCell: View {
                 withAnimation(.snappy(duration: 0.5)) {
                     openGroup = false
                 }
+            }
+        }
+        .task {
+            if let codeString = mutualBalanceAccount?.currency {
+                currency = await FTAppAssets.getCurrency(for: codeString)
             }
         }
     }
@@ -120,9 +120,8 @@ struct GroupedSpendIncomeCell: View {
                     .bold()
                     .lineLimit(1)
                 
-                Text(mutualBalanceAccount?.currency ?? "Err")
-                    .font(.footnote)
-                    .padding(.bottom, 2.6)
+                Text(currency?.symbol ?? (mutualBalanceAccount?.currency ?? "Err"))
+                    .font(.title3)
                     .lineLimit(1)
                 
                 Text("\(percentageInt)%")
@@ -146,6 +145,7 @@ struct GroupedSpendIncomeCell: View {
                     )
                 )
         }
+        .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 23))
         .padding(.horizontal)
         .hoverEffect(.lift)
     }

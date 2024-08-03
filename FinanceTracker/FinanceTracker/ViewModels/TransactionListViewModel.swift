@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol TransactionListViewModelDelegate: AnyObject {
+protocol TransactionListViewModelDelegate: AnyObject, Sendable {
     func didUpdatedTransaction()
 }
 
@@ -20,12 +20,16 @@ struct TransactionListUIData: Identifiable {
     let title: String
 }
 
-final class TransactionListViewModel: ObservableObject {
+final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any TransactionListViewModelDelegate)?
     let title: String
-    @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
-    @Published private(set) var isGroupingAndSortingProceeds = false
+    @MainActor @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
+    @MainActor @Published private(set) var isGroupingAndSortingProceeds = false
+    @MainActor
+    var getTransactions: [Transaction] {
+        transactions
+    }
     
     //MARK: Private properties
     private let dataManager: any DataManagerProtocol
@@ -43,41 +47,49 @@ final class TransactionListViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    @MainActor
     func getAddingSpendIcomeView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: threadToUse, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
+    func deleteTransaction(_ transaction: Transaction) {
+        Task {
+            transactions.removeAll { $0.id == transaction.id }
+            setTransactionGroups()
+            switch threadToUse {
+            case .main:
+                await dataManager.deleteTransaction(transaction)
+            case .global:
+                try await dataManager.deleteTransactionFromBackground(transaction)
+            }
+            delegate?.didUpdatedTransaction()
+        }
+    }
+    
     //MARK: Private methods
     private func setTransactionGroups() {
-        DispatchQueue.main.async { [weak self] in
-            self?.isGroupingAndSortingProceeds = true
+        Task { @MainActor in
+            isGroupingAndSortingProceeds = true
         }
         
-        DispatchQueue.global().async { [weak self] in
-            let groupedTransactions = self?.transactions
+        Task.detached(priority: .medium) { [transactions] in
+            let groupedTransactions = transactions
                 .grouped { trans in
-                    let year = self?.calendar.component(.year, from: trans.date)
-                    let month = self?.calendar.component(.month, from: trans.date)
-                    let day = self?.calendar.component(.day, from: trans.date)
+                    let year = self.calendar.component(.year, from: trans.date)
+                    let month = self.calendar.component(.month, from: trans.date)
+                    let day = self.calendar.component(.day, from: trans.date)
                     return DateComponents(year: year, month: month, day: day)
                 }
                 .map { dictTuple in
-                    let date = self?.calendar.date(from: dictTuple.key) ?? .now
+                    let date = self.calendar.date(from: dictTuple.key) ?? .now
                     return TransactionGroupedData(date: date, transactions: dictTuple.value)
                 }
                 .sorted { $0.date > $1.date }
             
-            guard let groupedTransactions else {
-                DispatchQueue.main.async {
-                    self?.isGroupingAndSortingProceeds = false
-                }
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self?.isGroupingAndSortingProceeds = false
+            await MainActor.run {
+                self.isGroupingAndSortingProceeds = false
                 withAnimation {
-                    self?.filteredTransactionGroups = groupedTransactions
+                    self.filteredTransactionGroups = groupedTransactions
                 }
             }
         }

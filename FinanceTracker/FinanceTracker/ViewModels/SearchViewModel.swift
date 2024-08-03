@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 import SwiftUI
 
 protocol SearchViewModelDelegate: AnyObject {
@@ -33,7 +33,18 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-final class SearchViewModel: ObservableObject {
+final class SearchViewModel: ObservableObject, @unchecked Sendable {
+    struct Configuration {
+        var filterTransactionType: TransactionFilterTypes = .both
+        var filterBalanceAccount: BalanceAccount?
+        var filterCategory: Category?
+        var filterTags: [Tag] = []
+        var dateFilterType: DateFilterType = .month
+        var filterDate: Date = .now
+        var filterDateStart: Date = .now
+        var filterDateEnd: Date = .now
+    }
+    
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
     
@@ -181,6 +192,21 @@ final class SearchViewModel: ObservableObject {
         })
     }
     
+    init(dataManager: some DataManagerProtocol, configuration: Configuration) {
+        self.dataManager = dataManager
+        self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
+        self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)
+        self._filterCategory = Published(wrappedValue: configuration.filterCategory)
+        self._filterTags = Published(wrappedValue: configuration.filterTags)
+        self._dateFilterType = Published(wrappedValue: configuration.dateFilterType)
+        self._filterDate = Published(wrappedValue: configuration.filterDate)
+        self._filterDateStart = Published(wrappedValue: configuration.filterDateStart)
+        self._filterDateEnd = Published(wrappedValue: configuration.filterDateEnd)
+        fetchAllData(competionHandler:  { [weak self] in
+            self?.filterAndSetTransactions()
+        })
+    }
+    
     //MARK: - Methods
     func addRemoveTag(_ tag: Tag) {
         if filterTags.contains(tag) {
@@ -200,6 +226,7 @@ final class SearchViewModel: ObservableObject {
         delegate?.hideTabBar(hide)
     }
     
+    @MainActor
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
@@ -210,13 +237,22 @@ final class SearchViewModel: ObservableObject {
         })
     }
     
+    func deleteTransaction(_ transaction: Transaction) {
+        Task {
+            try await dataManager.deleteTransactionFromBackground(transaction)
+            await fetchTransactions()
+            delegate?.didUpdatedTransactionsList()
+            filterAndSetTransactions()
+        }
+    }
+    
     //MARK: Private props
     private func filterAndSetTransactions() {
-        DispatchQueue.main.async { [weak self] in
-            self?.isListCalculating = true
+        Task { @MainActor in
+            isListCalculating = true
         }
         
-        DispatchQueue.global().async { [weak self] in
+        Task.detached(priority: .high) { [weak self] in
             guard let self else { return }
             
             let filteredData = allTransactions
@@ -260,7 +296,7 @@ final class SearchViewModel: ObservableObject {
             
             let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.isListCalculating = false
                 withAnimation {
                     self.filteredTransactionGroups = sortedGroupedData
@@ -270,11 +306,11 @@ final class SearchViewModel: ObservableObject {
     }
     
     private func filterTransactionsWithSearch() {
-        DispatchQueue.main.async { [weak self] in
-            self?.isListCalculating = true
+        Task { @MainActor in
+            isListCalculating = true
         }
         
-        DispatchQueue.global().async { [weak self] in
+        Task.detached(priority: .high) { [weak self] in
             guard let self else { return }
             
             if !self.searchText.isEmpty {
@@ -290,7 +326,7 @@ final class SearchViewModel: ObservableObject {
             } else {
                 let groups = self.groupAndSortTransactionArray(filteredTransaction)
                 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isListCalculating = false
                     withAnimation {
                         self.filteredTransactionGroups = groups
@@ -346,7 +382,7 @@ final class SearchViewModel: ObservableObject {
             .sorted { $0.date > $1.date }
     }
     
-    private func fetchAllData(errorHandler: ((Error) -> Void)? = nil, competionHandler: (() -> Void)? = nil) {
+    private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil, competionHandler: (@Sendable () -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
@@ -374,49 +410,49 @@ final class SearchViewModel: ObservableObject {
         }
     }
     
-    private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
-        guard let fetchedCategories: [Category] = await fetch() else {
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
+        guard let fetchedCategories: [Category] = await fetch(sortBy: [SortDescriptor<Category>(\.placement)]) else {
             errorHandler?(FetchErrors.unableToFetchCategories)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allCategories = fetchedCategories
+                self.allCategories = fetchedCategories
             }
         }
     }
     
-    private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchTags(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedTags: [Tag] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allTags = fetchedTags
+                self.allTags = fetchedTags
             }
         }
     }
     
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
         }
         
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor in
             withAnimation(.snappy) {
-                self?.allBalanceAccounts = fetchedBalanceAccounts
+                self.allBalanceAccounts = fetchedBalanceAccounts
             }
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortBy: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
-            sortBy: []
+            sortBy: sortBy
         )
         
         do {

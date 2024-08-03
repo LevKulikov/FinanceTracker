@@ -41,13 +41,33 @@ struct DateRangePicker: View {
     
     var body: some View {
         HStack {
-            DatePicker("Start date", selection: $startDate, in: startDateRange, displayedComponents: .date)
-                .datePickerStyle(.compact)
+            Text(startDate.formatted(date: .numeric, time: .omitted))
+                .padding(8)
+                .padding(.horizontal, 3)
+                .background {
+                    RoundedRectangle(cornerRadius: 9)
+                        .fill(Color(.secondarySystemFill))
+                }
+                .overlay {
+                    DatePicker("Start date", selection: $startDate, in: startDateRange, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .colorMultiply(.clear)
+                }
             
             Image(systemName: "arrow.left.and.right")
             
-            DatePicker("End date", selection: $endDate, in: endDateRange, displayedComponents: .date)
-                .datePickerStyle(.compact)
+            Text(endDate.formatted(date: .numeric, time: .omitted))
+                .padding(8)
+                .padding(.horizontal, 3)
+                .background {
+                    RoundedRectangle(cornerRadius: 9)
+                        .fill(Color(.secondarySystemFill))
+                }
+                .overlay {
+                    DatePicker("End date", selection: $endDate, in: endDateRange, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .colorMultiply(.clear)
+                }
         }
         .labelsHidden()
     }

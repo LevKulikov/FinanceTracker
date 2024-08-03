@@ -30,13 +30,12 @@ struct NotificationsView: View {
             }
             .navigationTitle("Notifications")
             .toolbar {
-                if bodyFocus {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Spacer()
-                        
-                        Button("Done") {
-                            bodyFocus = false
-                        }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    
+                    Button("Done") {
+                        titleFocus = false
+                        bodyFocus = false
                     }
                 }
             }

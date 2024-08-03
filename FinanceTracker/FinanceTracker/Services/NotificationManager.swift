@@ -52,8 +52,6 @@ protocol NotificationManagerProtocol: AnyObject {
 
 final class NotificationManager: NotificationManagerProtocol {
     //MARK: - Properties
-    private static let shared = NotificationManager()
-    
     var isSystemAllowsNotifications: Bool {
         return systemNotificationPermition ?? false
     }
@@ -89,9 +87,22 @@ final class NotificationManager: NotificationManagerProtocol {
         checkForSystemNotificationPermition()
     }
     
+    private init(checkPermition: Bool) {
+        notificationCenter = UNUserNotificationCenter.current()
+        isNotificationsAllowedByUser = UserDefaults.standard.value(forKey: isNotificationsAllowedKey) as? Bool ?? true
+        notificationTitle = UserDefaults.standard.string(forKey: notificationTitleKey) ?? String(localized: "Finances are important")
+        notificationBody = UserDefaults.standard.string(forKey: notificationBodyKey) ?? String(localized: "Don't forget to add your spendings")
+        notificationTime = UserDefaults.standard.object(forKey: notificationTimeKey) as? Date ?? Calendar.current.date(from: DateComponents(hour: 20, minute: 50))!
+        if checkPermition {
+            checkForSystemNotificationPermition()
+        }
+    }
+    
     //MARK: - Methods
     static func askForPermition() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound, .providesAppNotificationSettings]) { didAllow, error in
+            let shared = NotificationManager(checkPermition: false)
+            
             if didAllow {
                 shared.dispatchReminderNotification()
             } else {

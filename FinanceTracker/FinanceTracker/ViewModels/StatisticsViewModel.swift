@@ -60,7 +60,7 @@ enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Id
     }
 }
 
-final class StatisticsViewModel: ObservableObject {
+final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
         case totalValue
@@ -199,7 +199,7 @@ final class StatisticsViewModel: ObservableObject {
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData(compeletionHandler: (() -> Void)? = nil) {
+    func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         print("refreshData, started")
         fetchAllData { [weak self] in
             self?.calculateTotalForBalanceAccount()
@@ -207,13 +207,15 @@ final class StatisticsViewModel: ObservableObject {
             self?.calculateDataForPieChart(animated: true)
             self?.calculateDataForBarChart()
             print("refreshData, ended")
-            compeletionHandler?()
+            Task { @MainActor in
+                compeletionHandler?()
+            }
         }
     }
     
     /// Refreshes data if some changes occured, otherwise do nothing
     /// - Parameter compeletionHandler: closure that is called at the end of refreshing
-    func refreshDataIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+    func refreshDataIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard isTransactionUpdatedFromAnotherView else { return }
         isTransactionUpdatedFromAnotherView = false
         refreshData(compeletionHandler: compeletionHandler)
@@ -247,21 +249,24 @@ final class StatisticsViewModel: ObservableObject {
             newEndDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
         }
         
-        pieChartDateStart = newStartDate
-        pieChartDateEnd = newEndDate
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
+            pieChartDateStart = newStartDate
+            pieChartDateEnd = newEndDate
+        }
     }
     
     /// Sets pie chart date filter to default values
     func setPieChartDateFiltersToDefault() {
-        doNotCalculateDataUntilBlockIsFinished({
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
             pieChartDate = .now
             pieChartDateStart = .now
             pieChartDateEnd = .now
-        }, for: .pieChart)
+        }
     }
     
     /// Provides View for Tags settings
     /// - Returns: View for tags settings
+    @MainActor
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
@@ -271,6 +276,7 @@ final class StatisticsViewModel: ObservableObject {
     ///   - transactions: transactions to be displayed in list
     ///   - title: title to be set in the returned view
     /// - Returns: TransactionListView with view model
+    @MainActor
     func getTransactionListView(transactions: [Transaction], title: String) -> some View {
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: transactions, title: title, threadToUse: .global, delegate: self)
     }
@@ -280,7 +286,7 @@ final class StatisticsViewModel: ObservableObject {
     /// - Parameters:
     ///   - block: code to execute before data recalculation
     ///   - calculationData: which data should be calculated after block will be executed. Provide nil if calculation is need for all data types
-    private func doNotCalculateDataUntilBlockIsFinished(_ block: () -> Void, for calculationData: CalculatingDataType?) {
+    private func doNotCalculateDataUntilBlockIsFinished(for calculationData: CalculatingDataType?, _ block: () -> Void) {
         isCalculationAllowed = false
         block()
         isCalculationAllowed = true
@@ -435,7 +441,7 @@ final class StatisticsViewModel: ObservableObject {
             print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [returnData] in
                 print("calculateDataForPieChart, started to provide data for pie chart")
                 self.pieDataIsCalculating = false
                 if animated {
@@ -606,7 +612,7 @@ final class StatisticsViewModel: ObservableObject {
     }
     
     /// Sets available dates arrays for only years and years with months (useless)
-    private func setDateArrays(completionHandler: @escaping () -> Void) {
+    private func setDateArrays(completionHandler: @Sendable @escaping () -> Void) {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else { return }
             
@@ -658,13 +664,13 @@ final class StatisticsViewModel: ObservableObject {
     
     /// Fetches all data and executes completion handler
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
-    private func fetchAllData(completionHandler: @escaping () -> Void) {
+    private func fetchAllData(completionHandler: @Sendable @escaping () -> Void) {
         isFetchingData = true
         print("fetchAllData, started")
-        let localCompletion = { [weak self] in
+        let localCompletion: @Sendable () -> Void = {
             print("fetchAllData, started to provide data on main thread")
-            DispatchQueue.main.async {
-                self?.isFetchingData = false
+            Task { @MainActor in
+                self.isFetchingData = false
             }
             print("fetchAllData, ended")
             completionHandler()

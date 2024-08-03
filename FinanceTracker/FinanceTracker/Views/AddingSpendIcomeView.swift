@@ -373,8 +373,16 @@ struct AddingSpendIcomeView: View {
             Menu(viewModel.balanceAccount.name) {
                 Picker("", selection: $viewModel.balanceAccount) {
                     ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
-                        Text(balanceAcc.name)
-                            .tag(balanceAcc)
+                        HStack {
+                            Text(balanceAcc.name)
+                            
+                            if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
+                                Image(uiImage: uiImage)
+                            } else {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                        .tag(balanceAcc)
                     }
                 }
                 

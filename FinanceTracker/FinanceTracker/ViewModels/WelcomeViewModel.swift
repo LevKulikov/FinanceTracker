@@ -19,7 +19,7 @@ struct ExampleModel: Identifiable {
     let imageName: String
 }
 
-final class WelcomeViewModel: ObservableObject {
+final class WelcomeViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any WelcomeViewModelDelegate)?
     let models: [ExampleModel] = [
@@ -54,6 +54,7 @@ final class WelcomeViewModel: ObservableObject {
     }
     
     //MARK: - Methods
+    @MainActor
     func getAddingBalanceAccauntView() -> some View {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
@@ -62,7 +63,7 @@ final class WelcomeViewModel: ObservableObject {
         dataManager.isFirstLaunch = false
         // NotificationManager ask for notifications permition during init
         NotificationManager.askForPermition()
-        Task {
+        Task { [dataManager] in
             await dataManager.saveDefaultCategories()
         }
     }

@@ -230,7 +230,7 @@ struct CategoriesView: View {
             
             Spacer()
             
-            Button("Replace and delete", role: .destructive) {
+            Button("Move and delete", role: .destructive) {
                 if let categoryToDelete, let categoryToReplaceTo, categoryToDelete != categoryToReplaceTo {
                     viewModel.deleteCategory(categoryToDelete, moveTransactionsTo: categoryToReplaceTo)
                 }

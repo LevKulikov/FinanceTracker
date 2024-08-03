@@ -35,6 +35,7 @@ struct TransactionBarChartData: Identifiable, Hashable {
     let date: Date
 }
 
+@MainActor
 struct TransactionBarChart: View {
     //MARK: Properties
     private let transactionsData: [[TransactionBarChartData]]
@@ -305,9 +306,10 @@ struct TransactionBarChart: View {
         }
         .padding(5)
         .background {
+            let color = colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
             RoundedRectangle(cornerRadius: 7)
-                .stroke(Color(.secondarySystemBackground))
-                .fill(Color(.systemBackground))
+                .stroke(color)
+                .fill(color)
         }
     }
     
@@ -319,7 +321,7 @@ struct TransactionBarChart: View {
         case .perDay:
             return date.formatted(date: .abbreviated, time: .omitted)
         case .perWeek:
-            return "Week \(dateComponents.weekOfMonth ?? 0), \(date.month) \(dateComponents.year ?? 0)"
+            return "\(String(localized: "Week")) \(dateComponents.weekOfMonth ?? 0), \(date.month) \(dateComponents.year ?? 0)"
         case .perMonth:
             return "\(date.month) \(dateComponents.year ?? 0)"
         case .perYear:

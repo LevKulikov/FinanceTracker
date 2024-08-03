@@ -32,11 +32,21 @@ struct CustomTabView: View  {
             viewModel.getSpendIncomeView(namespace: namespace)
                 .tag(1)
             
-            viewModel.getStatisticsView()
-                .tag(2)
+            if viewModel.isSecondTabCanBeShown {
+                viewModel.getSecondTab()
+                    .tag(2)
+            } else {
+                viewModel.getStatisticsView()
+                    .tag(2)
+            }
             
-            viewModel.getSearchView()
-                .tag(3)
+            if viewModel.isThirdTabCanBeShown {
+                viewModel.getThirdTab()
+                    .tag(3)
+            } else {
+                viewModel.getSearchView()
+                    .tag(3)
+            }
             
             viewModel.getSettingsView()
                 .tag(4)
@@ -56,18 +66,11 @@ struct CustomTabView: View  {
     private var customTabView: some View {
         HStack {
             let buttonWidth: CGFloat = 70
-            let imageHeight: CGFloat = 20
             
             Button {
                 selectTab(1, animated: true)
             } label: {
-                VStack {
-                    Image(systemName: "list.bullet.clipboard")
-                        .frame(height: imageHeight)
-                    
-                    Text("List")
-                        .font(.caption)
-                }
+                TabViewType.spendIncomeView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 1 ? .blue : .secondary)
@@ -78,12 +81,10 @@ struct CustomTabView: View  {
             Button {
                 selectTab(2)
             } label: {
-                VStack {
-                    Image(systemName: "chart.bar")
-                        .frame(height: imageHeight)
-                    
-                    Text("Charts")
-                        .font(.caption)
+                if viewModel.isSecondTabCanBeShown {
+                    viewModel.secondAndThirdTabs.first!.tabLabel
+                } else {
+                    TabViewType.statisticsView.tabLabel
                 }
             }
             .frame(width: buttonWidth)
@@ -116,12 +117,10 @@ struct CustomTabView: View  {
             Button {
                 selectTab(3)
             } label: {
-                VStack {
-                    Image(systemName: "magnifyingglass")
-                        .frame(height: imageHeight)
-                    
-                    Text("Search")
-                        .font(.caption)
+                if viewModel.isThirdTabCanBeShown {
+                    viewModel.secondAndThirdTabs[1].tabLabel
+                } else {
+                    TabViewType.searchView.tabLabel
                 }
             }
             .frame(width: buttonWidth)
@@ -133,13 +132,7 @@ struct CustomTabView: View  {
             Button {
                 selectTab(4)
             } label: {
-                VStack {
-                    Image(systemName: "gear")
-                        .frame(height: imageHeight)
-                    
-                    Text("Setting")
-                        .font(.caption)
-                }
+                TabViewType.settingsView.tabLabel
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 4 ? .blue : .secondary)

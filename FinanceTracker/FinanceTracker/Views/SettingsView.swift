@@ -11,6 +11,7 @@ struct SettingsView: View {
     //MARK: - Properties
     @Environment(\.openURL) var openURL
     @StateObject private var viewModel: SettingsViewModel
+    @State private var showTabsSettingsView = false
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
     
@@ -40,17 +41,15 @@ struct SettingsView: View {
             
             contactsSection
             
-            Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
-                .frame(maxWidth: .infinity)
-                .foregroundStyle(.tertiary)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                .multilineTextAlignment(.center)
+            bottomAppVersionView
             
             Rectangle()
                 .fill(.clear)
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
+        }
+        .sheet(isPresented: $showTabsSettingsView) {
+            viewModel.getTabsSettingsView()
         }
     }
     
@@ -70,8 +69,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
-            case .budgets:
-                viewModel.getBudgetsView()
+            case .budgets: // .budgets is used to identify additional tab to show
+                viewModel.getAdditionalTabView()
             case .notifications:
                 viewModel.getNotificationsView()
             }
@@ -115,8 +114,14 @@ struct SettingsView: View {
     
     private var tabsSection: some View {
         Section("Additional tabs") {
-            NavigationLink(value: SettingsSectionAndDataType.budgets) {
-                Label("Budgets", systemImage: "dollarsign.square")
+            if let additionalTab = viewModel.additionalTab {
+                NavigationLink(value: SettingsSectionAndDataType.budgets) {
+                    additionalTab.label
+                }
+            }
+            
+            Button("Reorder tabs", systemImage: "ellipsis.rectangle") {
+                showTabsSettingsView = true
             }
         }
     }
@@ -171,6 +176,15 @@ struct SettingsView: View {
                 Label("Code source", systemImage: "chevron.left.forwardslash.chevron.right")
             }
         }
+    }
+    
+    private var bottomAppVersionView: some View {
+        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.tertiary)
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .multilineTextAlignment(.center)
     }
     
     //MARK: - Methods

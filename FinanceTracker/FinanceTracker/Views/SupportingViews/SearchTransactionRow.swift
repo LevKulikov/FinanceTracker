@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+@MainActor
 struct SearchTransactionRow: View {
     //MARK: - Properties
     let transaction: Transaction
     private let maxNumberOfTags = 3
+    @State private var currency: Currency?
     
     //MARK: - Body
     var body: some View {
@@ -35,9 +37,8 @@ struct SearchTransactionRow: View {
                                 .bold()
                                 .foregroundStyle(transaction.type == .spending ? .red : .green)
                             
-                            Text(transaction.balanceAccount?.currency ?? "Err")
+                            Text(currency?.symbol ?? (transaction.balanceAccount?.currency ?? "Err"))
                                 .foregroundStyle(.secondary)
-                                .font(.footnote)
                         }
                         .layoutPriority(1)
                         .lineLimit(1)
@@ -72,6 +73,11 @@ struct SearchTransactionRow: View {
             }
         }
         .contentShape(Rectangle())
+        .task {
+            if let codeString = transaction.balanceAccount?.currency {
+                currency = await FTAppAssets.getCurrency(for: codeString)
+            }
+        }
     }
     
     @ViewBuilder

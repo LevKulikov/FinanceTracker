@@ -12,6 +12,8 @@ protocol SettingsViewModelDelegate: AnyObject {
     func didSelectSetting(_ setting: SettingsSectionAndDataType?)
     
     func didUpdateSettingsSection(_ section: SettingsSectionAndDataType)
+    
+    func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType])
 }
 
 enum SettingsSectionAndDataType {
@@ -25,7 +27,7 @@ enum SettingsSectionAndDataType {
     case notifications
 }
 
-final class SettingsViewModel: ObservableObject {
+final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SettingsViewModelDelegate)?
     let developerTelegramUsername = "k_lev_s"
@@ -34,50 +36,83 @@ final class SettingsViewModel: ObservableObject {
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
-    private let userIdiom = FTAppAssets.currentUserDevise
     
     //MARK: Published props
-    @Published var selectedSettings: SettingsSectionAndDataType? {
+    
+    @MainActor @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
-            if userIdiom == .phone {
+            if FTAppAssets.currentUserDevise == .phone {
                 delegate?.didSelectSetting(selectedSettings)
             }
         }
     }
     
+    @MainActor @Published private(set) var additionalTab: TabViewType?
+    
     //MARK: - Initializer
+    
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        let savedTabs = dataManager.getSecondThirdTabsArray()
+        let notSaved = TabViewType.changableTabs.filter { !savedTabs.contains($0) }
+        self._additionalTab = Published(wrappedValue: notSaved.first)
     }
     
     //MARK: - Methods
+    @MainActor
     func getBalanceAccountsView() -> some View {
         return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getCategoriesView() -> some View {
         return FTFactory.shared.createCategoriesView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getTagsView() -> some View {
         return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getAppearanceView() -> some View {
         return FTFactory.shared.createAppearanceView(dataManager: dataManager)
     }
     
+    @MainActor
     func getManageDataView() -> some View {
         return FTFactory.shared.createManageDataView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
     func getBudgetsView() -> some View {
         return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
     }
     
+    @MainActor
+    func getAdditionalTabView() -> AnyView {
+        guard let additionalTab else { return AnyView(EmptyView()) }
+        switch additionalTab {
+        case .searchView:
+            return FTFactory.shared.createSearchView(dataManager: dataManager, delegate: self)
+        case .statisticsView:
+            return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self)
+        case .budgetsView:
+            return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
+    @MainActor
     func getNotificationsView() -> some View {
         let notificationManager = NotificationManager()
         return FTFactory.shared.createNotificationsView(notificationManager: notificationManager)
+    }
+    
+    @MainActor
+    func getTabsSettingsView() -> some View {
+        return FTFactory.shared.createTabsSettingsView(dataManager: dataManager, delegate: self)
     }
 }
 
@@ -134,7 +169,7 @@ extension SettingsViewModel: ManageDataViewModelDelegate {
     }
 }
 
-//MARK: Extensions for
+//MARK: Extensions for BudgetsViewModelDelegate
 extension SettingsViewModel: BudgetsViewModelDelegate {
     func didUpdateTransaction() {
         delegate?.didUpdateSettingsSection(.transactions)
@@ -150,5 +185,36 @@ extension SettingsViewModel: BudgetsViewModelDelegate {
     
     func didDeleteBudget(_ budget: Budget) {
         
+    }
+}
+
+extension SettingsViewModel: StatisticsViewModelDelegate {
+    func showTabBar(_ show: Bool) {
+        return
+    }
+    
+    func didUpdatedTransactionsListFromStatistics() {
+        delegate?.didUpdateSettingsSection(.transactions)
+    }
+}
+
+extension SettingsViewModel: SearchViewModelDelegate {
+    func didUpdatedTransactionsList() {
+        delegate?.didUpdateSettingsSection(.transactions)
+    }
+    
+    func hideTabBar(_ hide: Bool) {
+        return
+    }
+}
+
+//MARK: Extensions for TabsSettingsViewModelDelegate
+extension SettingsViewModel: TabsSettingsViewModelDelegate {
+    func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
+        delegate?.didSetSecondThirdTabsPosition(for: tabsPositions)
+        Task { @MainActor in
+            let notSaved = TabViewType.changableTabs.filter { !tabsPositions.contains($0) }
+            additionalTab = notSaved.first
+        }
     }
 }

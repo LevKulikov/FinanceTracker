@@ -15,8 +15,10 @@ struct SpendIncomeView: View {
     @State private var transactionIdSelected: String = ""
     @State private var closeAllOpenedGroup = false
     @State private var isSomeGroupOpened = false
+    @State private var transactionsToDelete: [Transaction]?
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
+    @State private var scrollDisabled = false
     
     //MARK: Init
     init(viewModel: SpendIncomeViewModel, namespace: Namespace.ID) {
@@ -56,6 +58,11 @@ struct SpendIncomeView: View {
                                 isSomeGroupOpened = isOpen
                             }
                         }
+                        .contextMenu {
+                            Button("Delete transactions in the group", systemImage: "trash", role: .destructive) {
+                                transactionsToDelete = transactionArray
+                            }
+                        }
                     }
                     
                     Rectangle()
@@ -67,14 +74,28 @@ struct SpendIncomeView: View {
                 }
             }
             .scrollIndicators(.hidden)
+            .scrollDisabled(scrollDisabled)
+            .confirmationDialog(
+                "Delete transactions?",
+                isPresented: .init(get: { transactionsToDelete != nil }, set: { _ in transactionsToDelete = nil }),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionsToDelete {
+                            viewModel.deleteTransactions(transactionsToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        let xTrans = value.translation.width
-                        dragXOffset = xTrans
+                        onDragChanged(value)
                     }
                     .onEnded { value in
-                        onDragEnded(value: value)
+                        onDragEnded(value)
                     }
             )
             
@@ -150,8 +171,12 @@ struct SpendIncomeView: View {
                         }
                     }
                 } label: {
-                    Label(viewModel.balanceAccountToFilter.name, systemImage: "chevron.down")
-                        .font(.title)
+                    HStack {
+                        FTAppAssets.iconImageOrEpty(name: viewModel.balanceAccountToFilter.iconName)
+                            .frame(width: 25, height: 25)
+                        Text(viewModel.balanceAccountToFilter.name)
+                    }
+                    .font(.title2)
                 }
                 .foregroundStyle(.primary)
                 .hoverEffect(.highlight)
@@ -194,31 +219,16 @@ struct SpendIncomeView: View {
         }
     }
     
-    private var addButton: some View {
-        Button {
-            guard viewModel.tapEnabled else { return }
-            viewModel.tapEnabled = false
-            withAnimation(.snappy(duration: 0.5)) {
-                viewModel.actionSelected = .add(viewModel.dateSelected)
-            }
-        } label: {
-            Label("Add \(viewModel.transactionsTypeSelected == .spending ? "spending" : "income")", systemImage: "plus")
-                .frame(width: 200, height: 55)
-                .background {
-                    Capsule()
-                        .fill(.thinMaterial)
-//                        .matchedGeometryEffect(id: "buttonBackground", in: namespace)
-                }
-        }
-        .offset(y: -5)
-    }
-    
     //MARK: Methods
-    private func deleteTransaction(_ transaction: Transaction) {
-        viewModel.delete(transaction)
+    private func onDragChanged(_ value: DragGesture.Value) {
+        guard abs(value.translation.height) < 10 || scrollDisabled else { return }
+        let xTrans = value.translation.width
+        dragXOffset = xTrans
+        scrollDisabled = true
     }
     
-    private func onDragEnded(value: _ChangedGesture<DragGesture>.Value) {
+    private func onDragEnded(_ value: _ChangedGesture<DragGesture>.Value) {
+        scrollDisabled = false
         let xTrans = value.translation.width
         let screenWidth = FTAppAssets.getWindowSize().width
         // plus is back, minus is forward

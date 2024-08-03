@@ -11,20 +11,7 @@ struct WelcomeView: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: WelcomeViewModel
-    @State private var selection: Int = 0
     @State private var showCreateBalanceAccount = false
-    private var buttonGradientStopLoaction: CGFloat {
-        let pageNumber = CGFloat(selection + 1)
-        let count = CGFloat(viewModel.models.count)
-        return (pageNumber/count)
-    }
-    private var buttonText: LocalizedStringResource {
-        if selection < viewModel.models.count - 1 {
-            return "Next"
-        } else {
-            return "Create"
-        }
-    }
     
     //MARK: - Initializer
     init(viewModel: WelcomeViewModel) {
@@ -33,84 +20,80 @@ struct WelcomeView: View {
     
     //MARK: - Body
     var body: some View {
-        TabView(selection: $selection.animation()) {
-            ForEach(0..<viewModel.models.count) { index in
-                SingleExampleView(model: viewModel.models[index])
-                    .tag(index)
-                    .padding(.vertical)
-            }
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .indexViewStyle(.page(backgroundDisplayMode: .never))
-        .padding(.bottom, 15)
-        .ignoresSafeArea(edges: .bottom)
-        .overlay(alignment: .topTrailing) {
-            if selection < viewModel.models.count - 1 {
-                skipButton
-                    .padding(.trailing)
-            }
-        }
-        .overlay(alignment: .bottom) {
-            bottomButton
-        }
-        .fullScreenCover(isPresented: $showCreateBalanceAccount, onDismiss: {
-            closeView()
-        }, content: {
-            NavigationStack {
-                viewModel.getAddingBalanceAccauntView()
-            }
-        })
+        welcomeScroll
     }
     
     //MARK: - Computed props
-    private var skipButton: some View {
-        Button("Skip", systemImage: "arrowshape.turn.up.forward.fill") {
-            withAnimation {
-                selection = viewModel.models.count - 1
+    private var welcomeScroll: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                HStack {
+                    ForEach(0..<viewModel.models.count) { index in
+                        SingleExampleView(model: viewModel.models[index])
+                            .tag(index)
+                            .containerRelativeFrame(.horizontal)
+                            .id(index)
+                            .overlay(alignment: .bottom) {
+                                nextCompeteButton(for: index, proxy: proxy)
+                                    .padding(.bottom, 25)
+                            }
+                            .scrollTransition(axis: .horizontal) { conent, phase in
+                                let maxDegree: Double = 25
+                                let rotDegrees: Double = phase == .topLeading ? maxDegree : (phase == .bottomTrailing ? -maxDegree : 0)
+                                
+                                return conent
+                                    .scaleEffect(phase == .identity ? 1 : 0.8)
+                                    .blur(radius: phase == .identity ? 0 : 2)
+                                    .rotation3DEffect(.degrees(rotDegrees), axis: (x: 0, y: 1, z: 0))
+                            }
+                    }
+                }
+                .scrollTargetLayout()
             }
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.viewAligned)
+            .ignoresSafeArea(edges: .bottom)
+            .fullScreenCover(isPresented: $showCreateBalanceAccount, onDismiss: {
+                closeView()
+            }, content: {
+                NavigationStack {
+                    viewModel.getAddingBalanceAccauntView()
+                }
+            })
         }
-        .foregroundStyle(.secondary)
     }
     
-    private var bottomButton: some View {
+    //MARK: - Methods
+    @ViewBuilder
+    private func nextCompeteButton(for index: Int, proxy: ScrollViewProxy) -> some View {
+        let text: LocalizedStringResource = (index < viewModel.models.count - 1) ? "Next" : "Create"
+        
         Button {
-            bottomButtonAction()
+            if index < viewModel.models.count - 1 {
+                withAnimation {
+                    proxy.scrollTo(index + 1)
+                }
+            } else {
+                showCreateBalanceAccount = true
+            }
         } label: {
-            Text(buttonText)
-                .blendMode(.difference)
+            Text(text)
+                .foregroundStyle(.white)
                 .font(.title2)
+                .fontWeight(.semibold)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 40)
                 .background {
                     Capsule()
-                        .fill(
-                            LinearGradient(
-                                stops: [.init(color: .blue.opacity(0.7), location: buttonGradientStopLoaction), .init(color: .clear, location: 01)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .stroke(Color.secondary)
-                        .shadow(color: .blue, radius: selection == viewModel.models.count - 1 ? 10 : 0)
+                        .fill(Color.blue)
+                        .shadow(color: .blue, radius: index < viewModel.models.count - 1 ? 0 : 7)
                 }
         }
-        .bold(selection == viewModel.models.count - 1)
     }
     
-    //MARK: - Methods
     private func closeView() {
         viewModel.welcomeIsPassed()
         dismiss()
-    }
-    
-    private func bottomButtonAction() {
-        if selection < viewModel.models.count - 1 {
-            withAnimation {
-                selection += 1
-            }
-        } else {
-            showCreateBalanceAccount = true
-        }
     }
 }
 

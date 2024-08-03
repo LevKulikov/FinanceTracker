@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 import SwiftUI
 
 protocol AddingSpendIcomeViewModelDelegate: AnyObject {
@@ -24,7 +24,7 @@ enum FetchErrors: Error {
     case unableToFetchBalanceAccounts
 }
 
-final class AddingSpendIcomeViewModel: ObservableObject {
+final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     enum SaveErrors: Error {
         case categoryIsNil
         case valueIsZero
@@ -109,15 +109,19 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     
     //MARK: Methods
     /// Updates or saves new transaction
-    func saveTransaction(completionHanler: ((SaveErrors?) -> Void)? = nil) {
+    func saveTransaction(completionHanler: (@MainActor @Sendable (SaveErrors?) -> Void)? = nil) {
         // Field checking
         guard value > 0 else {
-            completionHanler?(.valueIsZero)
+            Task { @MainActor in
+                completionHanler?(.valueIsZero)
+            }
             return
         }
         
         guard let category else {
-            completionHanler?(.categoryIsNil)
+            Task { @MainActor in
+                completionHanler?(.categoryIsNil)
+            }
             return
         }
         
@@ -130,11 +134,11 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             transactionToUpdate.date = date
             transactionToUpdate.setTags(tags)
             transactionToUpdate.comment = comment
-            Task {
+            Task { @MainActor in
                 do {
                     switch dataThread {
                     case .main:
-                        try await dataManager.save()
+                        try dataManager.save()
                     case .global:
                         try await dataManager.saveFromBackground()
                     }
@@ -164,7 +168,9 @@ final class AddingSpendIcomeViewModel: ObservableObject {
             }
         }
         
-        completionHanler?(nil)
+        Task { @MainActor in
+            completionHanler?(nil)
+        }
     }
     
     func addRemoveTag(_ tag: Tag) {
@@ -211,7 +217,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
-    func deleteUpdatedTransaction(completionHandler: (() -> Void)?) {
+    func deleteUpdatedTransaction(completionHandler: (@MainActor @Sendable () -> Void)?) {
         guard let transactionToUpdate else { return }
         Task {
             switch dataThread {
@@ -226,21 +232,23 @@ final class AddingSpendIcomeViewModel: ObservableObject {
                 }
             }
             delegate?.deletedTransaction(transactionToUpdate)
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 completionHandler?()
             }
         }
     }
     
+    @MainActor
     func getAddingCategoryView(action: ActionWithCategory) -> some View {
         return FTFactory.shared.createAddingCategoryView(dataManager: dataManager, transactionType: transactionsTypeSelected, action: action, delegate: self)
     }
     
+    @MainActor
     func getAddingBalanceAccountView() -> some View {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: .add, delegate: self)
     }
     
-    private func fetchAllData(errorHandler: ((Error) -> Void)? = nil) {
+    private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil) {
         Task {
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
@@ -249,7 +257,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchCategories(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         // It is needed to prevent Predicate type convertion error (cannot reference an object property inside of a Predicate)
         let rawValue = transactionsTypeSelected.rawValue
         
@@ -268,7 +276,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchTags(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchTags(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedTags: [Tag] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchTags)
             return
@@ -280,7 +288,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
     }
     
     @MainActor
-    private func fetchBalanceAccounts(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
             errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
             return
@@ -291,7 +299,7 @@ final class AddingSpendIcomeViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sort: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sort: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
             predicate: withPredicate,
             sortBy: sort

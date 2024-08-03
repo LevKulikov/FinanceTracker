@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
+@MainActor
 final class FTFactory {
     static let shared = FTFactory()
     
@@ -16,6 +17,7 @@ final class FTFactory {
     private var spendIncomeViewModel: SpendIncomeViewModel?
     private var searchViewModel: SearchViewModel?
     private var statisticsViewModel: StatisticsViewModel?
+    private var budgetsViewModel: BudgetsViewModel?
     
     private init() {}
     
@@ -70,8 +72,8 @@ final class FTFactory {
         return AnyView(AddingBalanceAccauntView(viewModel: viewModel))
     }
     
-    func createStatisticsView(dataManager: some DataManagerProtocol, delegate: (some StatisticsViewModelDelegate)? = nil, actionWithViewModel: ((StatisticsViewModel) -> Void)? = nil) -> AnyView {
-        if let statisticsViewModel {
+    func createStatisticsView(dataManager: some DataManagerProtocol, delegate: (some StatisticsViewModelDelegate)? = nil, strongReference: Bool = false, actionWithViewModel: ((StatisticsViewModel) -> Void)? = nil) -> AnyView {
+        if strongReference, let statisticsViewModel {
             actionWithViewModel?(statisticsViewModel)
             statisticsViewModel.delegate = delegate
             return AnyView(StatisticsView(viewModel: statisticsViewModel))
@@ -79,7 +81,9 @@ final class FTFactory {
         
         let viewModel = StatisticsViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
-        statisticsViewModel = viewModel
+        if strongReference {
+            statisticsViewModel = viewModel
+        }
         actionWithViewModel?(viewModel)
         return AnyView(StatisticsView(viewModel: viewModel))
     }
@@ -119,8 +123,8 @@ final class FTFactory {
         return AnyView(ManageDataView(viewModel: viewModel))
     }
     
-    func createSearchView(dataManager: some DataManagerProtocol, delegate: (some SearchViewModelDelegate)? = nil, actionWithViewModel: ((SearchViewModel) -> Void)? = nil) -> AnyView {
-        if let searchViewModel {
+    func createSearchView(dataManager: some DataManagerProtocol, delegate: (some SearchViewModelDelegate)? = nil, strongReference: Bool = false, actionWithViewModel: ((SearchViewModel) -> Void)? = nil) -> AnyView {
+        if strongReference, let searchViewModel {
             searchViewModel.delegate = delegate
             actionWithViewModel?(searchViewModel)
             return AnyView(SearchView(viewModel: searchViewModel))
@@ -128,7 +132,9 @@ final class FTFactory {
         
         let viewModel = SearchViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
-        searchViewModel = viewModel
+        if strongReference {
+            searchViewModel = viewModel
+        }
         actionWithViewModel?(viewModel)
         return AnyView(SearchView(viewModel: viewModel))
     }
@@ -139,11 +145,27 @@ final class FTFactory {
         return AnyView(TransactionListView(viewModel: viewModel))
     }
     
+    func createTransactionListView<Content: View>(dataManager: some DataManagerProtocol, transactions: [Transaction], title: String, threadToUse: DataManager.DataThread, delegate: (some TransactionListViewModelDelegate)? = nil, topContent: @escaping ([Transaction]) -> Content) -> AnyView {
+        let viewModel = TransactionListViewModel(dataManager: dataManager, transactions: transactions, title: title, threadToUse: threadToUse)
+        viewModel.delegate = delegate
+        return AnyView(TransactionListView(viewModel: viewModel, topContent: topContent))
+    }
+    
     func createBudgetsView(dataManager: some DataManagerProtocol,
                            delegate: (some BudgetsViewModelDelegate)? = nil,
+                           strongReference: Bool = false,
                            actionWithViewModel: ((BudgetsViewModel) -> Void)? = nil) -> AnyView {
+        if strongReference, let budgetsViewModel {
+            budgetsViewModel.delegate = delegate
+            actionWithViewModel?(budgetsViewModel)
+            return AnyView(BudgetsView(viewModel: budgetsViewModel))
+        }
+        
         let viewModel = BudgetsViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
+        if strongReference {
+            budgetsViewModel = viewModel
+        }
         actionWithViewModel?(viewModel)
         return AnyView(BudgetsView(viewModel: viewModel))
     }
@@ -157,5 +179,11 @@ final class FTFactory {
     func createNotificationsView(notificationManager: some NotificationManagerProtocol) -> AnyView {
         let viewModel = NotificationsViewModel(notificationManager: notificationManager)
         return AnyView(NotificationsView(viewModel: viewModel))
+    }
+    
+    func createTabsSettingsView(dataManager: some DataManagerProtocol, delegate: (any TabsSettingsViewModelDelegate)? = nil) -> AnyView {
+        let viewModel = TabsSettingsViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(TabsSettingsView(viewModel: viewModel))
     }
 }

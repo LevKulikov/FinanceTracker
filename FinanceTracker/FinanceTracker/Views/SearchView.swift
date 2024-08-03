@@ -16,6 +16,7 @@ struct SearchView: View {
     @State private var showMoreFilters = false
     @State private var searchIsPreseneted: Bool = false
     @State private var showTransaction: Transaction?
+    @State private var transactionToDelete: Transaction?
     @State private var showRefreshAlert = false
     private var maxFiltersWidth: CGFloat {
         if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
@@ -53,6 +54,8 @@ struct SearchView: View {
                 ForEach(viewModel.filteredTransactionGroups) { transGroup in
                     SearchSection(transactionGroupData: transGroup) { transaction in
                         showTransaction = transaction
+                    } onDeleteSwipe: { transaction in
+                        transactionToDelete = transaction
                     }
                 }
                 
@@ -88,8 +91,22 @@ struct SearchView: View {
             } message: {
                 Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")
             }
+            .confirmationDialog(
+                "Delete transaction?",
+                isPresented: .init(get: { transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionToDelete {
+                            viewModel.deleteTransaction(transactionToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
         }
-        .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
     }
     
     //MARK: - Computed View props
@@ -173,7 +190,7 @@ struct SearchView: View {
                                 showMoreFilters = false
                             }
                         }
-                        .font(.caption)
+                        .font(.subheadline)
                         .buttonBorderShape(.capsule)
                         .buttonStyle(.bordered)
                         .foregroundStyle(.secondary)

@@ -18,6 +18,8 @@ protocol BudgetsViewModelDelegate: AnyObject {
     func didDeleteBudget(_ budget: Budget)
     
     func didUpdateTransaction()
+    
+    func showTabBar(_ show: Bool)
 }
 
 struct BudgetCardViewData: Identifiable, Hashable {
@@ -27,7 +29,7 @@ struct BudgetCardViewData: Identifiable, Hashable {
 }
 
 //MARK: - ViewModel class
-final class BudgetsViewModel: ObservableObject {
+final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any BudgetsViewModelDelegate)?
     
@@ -36,19 +38,30 @@ final class BudgetsViewModel: ObservableObject {
     private var neededToBeRefreshed = false
     
     //MARK: Published props
-    @Published var action: ActionWithBudget?
-    @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
+    @MainActor @Published var action: ActionWithBudget?
+    @MainActor @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            Task.detached { @MainActor [weak self] in
-                self?.isFetching = true
-                await self?.fetchBudgets()
-                self?.isFetching = false
+            Task.detached { @MainActor in
+                self.isFetching = true
+                await self.fetchBudgets()
+                self.isFetching = false
             }
         }
     }
-    @Published private (set) var allBalanceAccounts: [BalanceAccount] = []
-    @Published private(set) var budgets: [Budget] = []
-    @Published private(set) var isFetching = false
+    /// true = line card, false = pie card (because only two type exists)
+    @MainActor @Published var cardTypeIsLine: Bool = true
+    @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
+    @MainActor @Published private(set) var budgets: [Budget] = []
+    @MainActor @Published private(set) var isFetching = false
+    @MainActor @Published var navigationPath = NavigationPath() {
+        didSet {
+            if navigationPath.isEmpty {
+                delegate?.showTabBar(true)
+            } else {
+                delegate?.showTabBar(false)
+            }
+        }
+    }
     
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
@@ -57,13 +70,13 @@ final class BudgetsViewModel: ObservableObject {
     }
     
     //MARK: - Methods
-    func refreshIfNeeded(compeletionHandler: (() -> Void)? = nil) {
+    func refreshIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard neededToBeRefreshed else { return }
         neededToBeRefreshed = false
         refreshData(compeletionHandler: compeletionHandler)
     }
     
-    func refreshData(compeletionHandler: (() -> Void)? = nil) {
+    func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         Task { @MainActor in
             isFetching = true
             await fetchBalanceAccounts()
@@ -73,30 +86,50 @@ final class BudgetsViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func getBudgetCard<MenuItems: View>(for budget: Budget, namespace: Namespace.ID, @ViewBuilder menuItems: @escaping (BudgetCardViewData) -> MenuItems) -> some View {
         let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: budget)
-        return BudgetCard(viewModel: viewModel, namespace: namespace,  menuItems: menuItems)
+        let cardType: BudgetCardType = cardTypeIsLine ? .line : .pie
+        return BudgetCard(viewModel: viewModel, namespace: namespace, type: cardType, menuItems: menuItems)
     }
     
+    @MainActor
     func getAddingBudgetView() -> some View {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .add(selectedBalanceAccount), delegate: self)
     }
     
+    @MainActor
     func getUpdaingBudgetView(for budget: Budget) -> some View {
         return FTFactory.shared.createAddingBudgetView(dataManager: dataManager, action: .update(budget: budget), delegate: self)
     }
     
+    @MainActor
     func getTransactionsListView(for budgetData: BudgetCardViewData) -> some View {
         let budget = budgetData.budget
         let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name
         return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self)
     }
     
+    @MainActor
+    func getTransactionsListView(for budgetData: BudgetCardViewData, namespace: Namespace.ID) -> some View {
+        let budget = budgetData.budget
+        let title = budget.name.isEmpty ? budget.category?.name ?? String(localized: "For all categories") : budget.name
+        let cardType: BudgetCardType = cardTypeIsLine ? .line : .pie
+        let dataManagerCopy = dataManager
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: budgetData.transactions, title: title, threadToUse: .global, delegate: self) { transes in
+            let newBudgetData = BudgetCardViewData(budget: budgetData.budget, transactions: transes)
+            return BudgetCard(dataManager: dataManagerCopy, namespace: namespace, type: cardType, budgetData: newBudgetData)
+        }
+    }
+    
+    
+    @MainActor
     func deleteBudget(_ budget: Budget) {
         Task {
             await dataManager.deleteBudget(budget)
             delegate?.didDeleteBudget(budget)
         }
+        
         withAnimation {
             budgets.removeAll { $0 == budget }
         }
@@ -176,6 +209,54 @@ extension BudgetsViewModel: TransactionListViewModelDelegate {
             withAnimation {
                 budgets = []
             }
+        }
+    }
+}
+
+extension BudgetsViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        return "BudgetsViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .budgetsView else { return }
+        
+        switch dataType {
+        case .categories:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .balanceAccounts:
+            Task {@MainActor in
+                await fetchBalanceAccounts()
+            }
+        case .tags:
+            return
+        case .transactions:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .appearance:
+            return
+        case .data:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+                await fetchBalanceAccounts()
+            }
+        case .budgets:
+            neededToBeRefreshed = true
+            Task { @MainActor in
+                budgets = []
+            }
+        case .notifications:
+            return
         }
     }
 }

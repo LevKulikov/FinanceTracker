@@ -7,9 +7,17 @@
 
 import SwiftUI
 
+@MainActor
 struct SpendIncomeCell: View {
     @Bindable var transaction: Transaction
     var namespace: Namespace.ID
+    @State private var currency: Currency?
+    
+    init(transaction: Transaction, namespace: Namespace.ID, currency: Currency? = nil) {
+        self.transaction = transaction
+        self.namespace = namespace
+        self._currency = State(wrappedValue: currency)
+    }
     
     var body: some View {
         HStack {
@@ -28,9 +36,8 @@ struct SpendIncomeCell: View {
                     .lineLimit(1)
 //                    .matchedGeometryEffect(id: "transactionValue" + transaction.id, in: namespace, isSource: false)
                 
-                Text(transaction.balanceAccount?.currency ?? "Err")
-                    .font(.footnote)
-                    .padding(.bottom, 2.6)
+                Text(currency?.symbol ?? (transaction.balanceAccount?.currency ?? "Err"))
+                    .font(.title3)
                     .lineLimit(1)
 //                    .matchedGeometryEffect(id: "currency" + transaction.id, in: namespace, isSource: false)
             }
@@ -42,6 +49,12 @@ struct SpendIncomeCell: View {
                 .fill(.ultraThinMaterial)
         }
         .padding(.horizontal)
+        .task {
+            guard currency == nil else { return }
+            if let codeString = transaction.balanceAccount?.currency {
+                currency = await FTAppAssets.getCurrency(for: codeString)
+            }
+        }
     }
     
     @ViewBuilder
