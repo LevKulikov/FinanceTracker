@@ -8,29 +8,29 @@
 import SwiftUI
 import Charts
 
-struct TransactionBarChartData: Identifiable, Hashable {
-    enum TransactionBarChartDataType: LocalizedStringResource {
-        case spending = "Spending"
-        case income = "Income"
-        case profit = "Profit"
-        case unknown = "Unknown"
-        
-        var color: Color {
-            switch self {
-            case .spending:
-                return .red
-            case .income:
-                return .green
-            case .profit:
-                return .blue
-            case .unknown:
-                return .yellow
-            }
+enum TransactionCalculationValueType: LocalizedStringResource {
+    case spending = "Spending"
+    case income = "Income"
+    case profit = "Profit"
+    case unknown = "Unknown"
+    
+    var color: Color {
+        switch self {
+        case .spending:
+            return .red
+        case .income:
+            return .green
+        case .profit:
+            return .blue
+        case .unknown:
+            return .yellow
         }
     }
-    
+}
+
+struct TransactionBarChartData: Identifiable, Hashable {
     let id: String = UUID().uuidString
-    let type: TransactionBarChartDataType
+    let type: TransactionCalculationValueType
     let value: Float
     let date: Date
 }
@@ -188,10 +188,10 @@ struct TransactionBarChart: View {
             }
         }
         .chartForegroundStyleScale([
-            String(localized:TransactionBarChartData.TransactionBarChartDataType.spending.rawValue) : .red,
-            String(localized:TransactionBarChartData.TransactionBarChartDataType.income.rawValue) : .green,
-            String(localized:TransactionBarChartData.TransactionBarChartDataType.profit.rawValue) : .blue,
-            String(localized:TransactionBarChartData.TransactionBarChartDataType.unknown.rawValue) : .yellow,
+            String(localized: TransactionCalculationValueType.spending.rawValue) : .red,
+            String(localized: TransactionCalculationValueType.income.rawValue) : .green,
+            String(localized: TransactionCalculationValueType.profit.rawValue) : .blue,
+            String(localized: TransactionCalculationValueType.unknown.rawValue) : .yellow,
         ])
         .chartScrollTargetBehavior(
             .valueAligned(
