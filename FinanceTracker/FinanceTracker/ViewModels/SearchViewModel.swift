@@ -34,6 +34,17 @@ struct TransactionGroupedData: Identifiable {
 }
 
 final class SearchViewModel: ObservableObject, @unchecked Sendable {
+    struct Configuration {
+        var filterTransactionType: TransactionFilterTypes = .both
+        var filterBalanceAccount: BalanceAccount?
+        var filterCategory: Category?
+        var filterTags: [Tag] = []
+        var dateFilterType: DateFilterType = .month
+        var filterDate: Date = .now
+        var filterDateStart: Date = .now
+        var filterDateEnd: Date = .now
+    }
+    
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
     
@@ -176,6 +187,21 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        fetchAllData(competionHandler:  { [weak self] in
+            self?.filterAndSetTransactions()
+        })
+    }
+    
+    init(dataManager: some DataManagerProtocol, configuration: Configuration) {
+        self.dataManager = dataManager
+        self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
+        self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)
+        self._filterCategory = Published(wrappedValue: configuration.filterCategory)
+        self._filterTags = Published(wrappedValue: configuration.filterTags)
+        self._dateFilterType = Published(wrappedValue: configuration.dateFilterType)
+        self._filterDate = Published(wrappedValue: configuration.filterDate)
+        self._filterDateStart = Published(wrappedValue: configuration.filterDateStart)
+        self._filterDateEnd = Published(wrappedValue: configuration.filterDateEnd)
         fetchAllData(competionHandler:  { [weak self] in
             self?.filterAndSetTransactions()
         })
