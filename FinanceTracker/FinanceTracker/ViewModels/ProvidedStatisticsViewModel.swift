@@ -27,20 +27,41 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor @Published private(set) var pieChartTransactionData: [TransactionPieChartData] = []
     @MainActor @Published private(set) var pieDataIsCalculating = false
-    @MainActor @Published var pieChartTransactionType: TransactionsType = .spending
+    @MainActor @Published var pieChartTransactionType: TransactionsType = .spending {
+        didSet {
+            guard pieChartTransactionType != oldValue else { return }
+            Task {
+                await calculateDataForPieChart(animated: true)
+            }
+        }
+    }
     
     @MainActor @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = []
     @MainActor @Published private(set) var barDataIsCalculating = false
-    @MainActor @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending
-    @MainActor @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay
+    @MainActor @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
+        didSet {
+            guard barChartTransactionTypeFilter != oldValue else { return }
+            Task {
+                await calculateDataForBarChart(animated: true)
+            }
+        }
+    }
+    @MainActor @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
+        didSet {
+            guard barChartPerDateFilter != oldValue else { return }
+            Task {
+                await calculateDataForBarChart(animated: true)
+            }
+        }
+    }
     
     //MARK: Private properties
     /// Transactions to calculate statistics for
     private let transactions: [Transaction]
     ///Currency code String
-    private let currency: String
+    let currency: String
     /// Currency struct with code, name, symbol and etc.
-    private let currencyPrecised: Currency?
+    let currencyPrecised: Currency?
     private let calendar = Calendar.current
     
     //MARK: - Initializer

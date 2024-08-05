@@ -52,21 +52,32 @@ struct ProvidedStatisticsView: View {
                     .font(.title2)
                     .bold()
                 
+                Text(viewModel.currency)
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                
                 Spacer()
             }
             
             ForEach(viewModel.totalValues) { totalValue in
                 HStack {
-                    Text(FTFormatters.numberFormatterWithDecimals.string(for: totalValue.value) ?? "Err")
+                    HStack {
+                        Text(FTFormatters.numberFormatterWithDecimals.string(for: totalValue.value) ?? "Err")
+                        if let currency = viewModel.currencyPrecised {
+                            Text(currency.symbol)
+                        }
+                        
+                        Text(totalValue.type.rawValue)
+                            .foregroundStyle(totalValue.type.color)
+                            .layoutPriority(1)
+                    }
+                    .padding()
+                    .background {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(backgroundColor)
+                    }
                     
-                    Text(totalValue.type.rawValue)
-                        .foregroundStyle(totalValue.type.color)
-                        .layoutPriority(1)
-                }
-                .padding()
-                .background {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(backgroundColor)
+                    Spacer()
                 }
             }
         }
