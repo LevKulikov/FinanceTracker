@@ -54,7 +54,9 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     private var searchDispatchWorkItem: DispatchWorkItem?
     private var allTransactions: [Transaction] = []
     /// Not grouped, only filtered, used for search filter
-    private var filteredTransaction: [Transaction] = []
+    private var filteredTransactions: [Transaction] = []
+    /// Not grouped, only filtered by search string
+    private var searchedTransactions: [Transaction] = []
     private var allCategories: [Category] = []
     /// For transactions predicate
     private var dateFilterRange: ClosedRange<Date> {
@@ -183,6 +185,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     //For UI
     @Published private(set) var isListCalculating: Bool = false
     @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
+    @MainActor @Published private(set) var filteredTransactionsCurrencies: [String] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -229,6 +232,18 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
+    }
+    
+    @MainActor
+    func getProvidedStatisticsView(for currency: String, fromSearch: Bool) -> some View {
+        let transactions: [Transaction]
+        if fromSearch {
+            transactions = filteredTransactionsCurrencies.count == 1 ? searchedTransactions : searchedTransactions.filter { $0.balanceAccount?.currency == currency }
+        } else {
+            transactions = filteredTransactionsCurrencies.count == 1 ? filteredTransactions : filteredTransactions.filter { $0.balanceAccount?.currency == currency }
+        }
+        
+        return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: currency)
     }
     
     func refetchData() {
@@ -288,10 +303,14 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                     return (sameBA && sameCategory && containsNeededTag)
                 }
             
-            self.filteredTransaction = filteredData
+            self.filteredTransactions = filteredData
+            
             var searchData = filteredData
             if !self.searchText.isEmpty {
                 searchData = self.getFilteredTransactionWithSearchText(arrayToFilter: searchData)
+            }
+            Task { [searchData] in
+                await self.setFilteredTransactionsCurrencies(for: searchData)
             }
             
             let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
@@ -314,17 +333,24 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             guard let self else { return }
             
             if !self.searchText.isEmpty {
-                let searchFiltered = self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransaction)
+                let searchFiltered = self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransactions)
+                self.searchedTransactions = searchFiltered
+                Task { await self.setFilteredTransactionsCurrencies(for: searchFiltered) }
+                
                 let groups = self.groupAndSortTransactionArray(searchFiltered)
                 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isListCalculating = false
                     withAnimation {
                         self.filteredTransactionGroups = groups
                     }
                 }
             } else {
-                let groups = self.groupAndSortTransactionArray(filteredTransaction)
+                let groups = self.groupAndSortTransactionArray(filteredTransactions)
+                self.searchedTransactions = filteredTransactions
+                Task { [filteredTransactions] in
+                    await self.setFilteredTransactionsCurrencies(for: filteredTransactions)
+                }
                 
                 await MainActor.run {
                     self.isListCalculating = false
@@ -333,6 +359,23 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                     }
                 }
             }
+        }
+    }
+    
+    private func setFilteredTransactionsCurrencies(for transactins: [Transaction]) async {
+        await MainActor.run {
+            filteredTransactionsCurrencies = []
+        }
+        var currencies: Set<String> = []
+        for transactin in transactins {
+            if let currency = transactin.balanceAccount?.currency {
+                currencies.insert(currency)
+            }
+        }
+        
+        let currenciesArray = Array(currencies)
+        await MainActor.run {
+            filteredTransactionsCurrencies = currenciesArray
         }
     }
     

@@ -117,6 +117,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Balance Account to filter all data
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
         didSet {
+            guard balanceAccountToFilter.id != oldValue.id else { return }
             refreshData()
         }
     }
@@ -129,6 +130,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Transaction type to select of which transactins should be shown as total for tags data
     @Published var transactionTypeForTags: TransactionsType = .spending {
         didSet {
+            guard transactionTypeForTags != oldValue else { return }
             calculateTagsTotal(animated: true)
         }
     }
@@ -141,30 +143,35 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
+            guard pieChartTransactionType != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// Which type of date filtering is selected for pie chart
     @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .month {
         didSet {
+            guard pieChartMenuDateFilterSelected != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart DatePicker (for a single day, month or year )
     @Published var pieChartDate: Date = .now {
         didSet {
+            guard pieChartDate != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, start date
     @Published var pieChartDateStart: Date = .now {
         didSet {
+            guard pieChartDateStart != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, end date
     @Published var pieChartDateEnd: Date = .now {
         didSet {
+            guard pieChartDateEnd != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
@@ -177,12 +184,14 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Filter by transactions type (adding both case) to display in bar chart
     @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
         didSet {
+            guard barChartTransactionTypeFilter != oldValue else { return }
             calculateDataForBarChart(animated: true)
         }
     }
     /// Filter to select per which type of date to be diplayed in bar chart
     @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
         didSet {
+            guard barChartPerDateFilter != oldValue else { return }
             calculateDataForBarChart(animated: true)
         }
     }

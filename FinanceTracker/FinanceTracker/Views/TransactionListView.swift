@@ -11,6 +11,7 @@ struct TransactionListView<Content: View>: View {
     //MARK: - Properties
     @StateObject private var viewModel: TransactionListViewModel
     @State private var showTransaction: Transaction?
+    @State private var currencyForStatistics: Currency?
     @State private var transactionToDelete: Transaction?
     @Namespace private var namespace
     @ViewBuilder private let topContent: ([Transaction]) -> Content
@@ -87,6 +88,37 @@ struct TransactionListView<Content: View>: View {
                 })
             .fullScreenCover(item: $showTransaction) { transaction in
                 viewModel.getAddingSpendIcomeView(for: transaction, namespace: namespace)
+            }
+            .toolbar {
+                if !viewModel.filteredTransactionsCurrencies.isEmpty {
+                    statisticsButton
+                }
+            }
+            .sheet(item: $currencyForStatistics) { currency in
+                return viewModel.getProvidedStatisticsView(for: currency.code)
+            }
+        }
+    }
+    
+    private var statisticsButton: some View {
+        HStack {
+            if viewModel.filteredTransactionsCurrencies.count > 1 {
+                Menu("Statistics", systemImage: "chart.bar") {
+                    ForEach(viewModel.filteredTransactionsCurrencies, id: \.self) { currency in
+                        Button(currency) {
+                            let currency = Currency(symbol: "", name: "", code: currency)
+                            currencyForStatistics = currency
+                        }
+                    }
+                }
+            } else {
+                Button("Statistics", systemImage: "chart.bar") {
+                    if let first = viewModel.filteredTransactionsCurrencies.first {
+                        let currency = Currency(symbol: "", name: "", code: first)
+                        currencyForStatistics = currency
+                    }
+                }
+                .labelStyle(.iconOnly)
             }
         }
     }
