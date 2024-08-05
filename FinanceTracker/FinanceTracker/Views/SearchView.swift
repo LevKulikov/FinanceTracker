@@ -113,7 +113,6 @@ struct SearchView: View {
                 }
             }
             .sheet(item: $currencyForStatistics) { currency in
-                print("Search is presented: \(searchIsPreseneted)")
                 return viewModel.getProvidedStatisticsView(for: currency.code, fromSearch: searchIsPreseneted)
             }
         }

@@ -26,6 +26,7 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
     let title: String
     @MainActor @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
     @MainActor @Published private(set) var isGroupingAndSortingProceeds = false
+    @MainActor @Published private(set) var filteredTransactionsCurrencies: [String] = []
     @MainActor
     var getTransactions: [Transaction] {
         transactions
@@ -52,6 +53,15 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: threadToUse, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
     }
     
+    @MainActor
+    func getProvidedStatisticsView(for currency: String) -> some View {
+        var filteredTransactions = transactions
+        if filteredTransactionsCurrencies.count > 1 {
+            filteredTransactions = filteredTransactions.filter { $0.balanceAccount?.currency == currency }
+        }
+        return FTFactory.shared.createProvidedStatisticsView(transactions: filteredTransactions, currency: currency)
+    }
+    
     func deleteTransaction(_ transaction: Transaction) {
         Task {
             transactions.removeAll { $0.id == transaction.id }
@@ -73,6 +83,8 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
         }
         
         Task.detached(priority: .medium) { [transactions] in
+            Task { await self.setFilteredTransactionsCurrencies(for: transactions) }
+            
             let groupedTransactions = transactions
                 .grouped { trans in
                     let year = self.calendar.component(.year, from: trans.date)
@@ -92,6 +104,23 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
                     self.filteredTransactionGroups = groupedTransactions
                 }
             }
+        }
+    }
+    
+    private func setFilteredTransactionsCurrencies(for transactins: [Transaction]) async {
+        await MainActor.run {
+            filteredTransactionsCurrencies = []
+        }
+        var currencies: Set<String> = []
+        for transactin in transactins {
+            if let currency = transactin.balanceAccount?.currency {
+                currencies.insert(currency)
+            }
+        }
+        
+        let currenciesArray = Array(currencies)
+        await MainActor.run {
+            filteredTransactionsCurrencies = currenciesArray
         }
     }
 }

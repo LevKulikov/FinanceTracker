@@ -238,9 +238,9 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     func getProvidedStatisticsView(for currency: String, fromSearch: Bool) -> some View {
         let transactions: [Transaction]
         if fromSearch {
-            transactions = searchedTransactions.filter { $0.balanceAccount?.currency == currency }
+            transactions = filteredTransactionsCurrencies.count == 1 ? searchedTransactions : searchedTransactions.filter { $0.balanceAccount?.currency == currency }
         } else {
-            transactions = filteredTransactions.filter { $0.balanceAccount?.currency == currency }
+            transactions = filteredTransactionsCurrencies.count == 1 ? filteredTransactions : filteredTransactions.filter { $0.balanceAccount?.currency == currency }
         }
         
         return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: currency)

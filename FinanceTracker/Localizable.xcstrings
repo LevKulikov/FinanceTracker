@@ -2393,6 +2393,16 @@
         }
       }
     },
+    "Total" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Итого"
+          }
+        }
+      }
+    },
     "Total balance" : {
       "localizations" : {
         "ru" : {
@@ -2403,8 +2413,16 @@
         }
       }
     },
-    "Total value%@" : {
-
+    "Total value" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Итого"
+          }
+        }
+      }
     },
     "Track your finances with customizable graphs" : {
       "localizations" : {

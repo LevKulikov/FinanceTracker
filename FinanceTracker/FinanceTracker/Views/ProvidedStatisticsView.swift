@@ -48,7 +48,7 @@ struct ProvidedStatisticsView: View {
     private var totalsSection: some View {
         VStack {
             HStack {
-                Text("Total value\(viewModel.providedTransactionType == .both ? "s" : "")")
+                Text("Total")
                     .font(.title2)
                     .bold()
                 
