@@ -85,6 +85,9 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Checkes if provided transactions have same  type or they are different
     private func checkTransactionsType() async {
         guard let firstTransactionType = transactions.first?.type else {
+            await MainActor.run {
+                providedTransactionType = .spending
+            }
             return
         }
         
@@ -169,7 +172,12 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
         
         let sortedData = groupedData.sorted(by: { $0.sumValue > $1.sumValue })
         
-        try? await Task.sleep(for: .seconds(0.1))
+        do {
+            try await Task.sleep(for: .seconds(0.1))
+        } catch {
+            print("Task.sleep(for: .seconds(0.1)) error: \(error)")
+        }
+        
         await MainActor.run {
             pieDataIsCalculating = false
             if animated {

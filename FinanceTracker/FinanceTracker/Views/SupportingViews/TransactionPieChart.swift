@@ -20,6 +20,7 @@ struct TransactionPieChart: View {
     //MARK: - Properties
     private let transactionsChartData: [TransactionPieChartData]
     private let onCategoryDataTap: (TransactionPieChartData) -> Void
+    private let showTransactions: Bool
     private var sumOfValue: Float = 0
     @State private var selectedValue: Int?
     @State private var selectedCategoryId: String?
@@ -39,6 +40,14 @@ struct TransactionPieChart: View {
     init(transactionGroups: [TransactionPieChartData], onTap: @escaping (TransactionPieChartData) -> Void) {
         self.transactionsChartData = transactionGroups
         self.onCategoryDataTap = onTap
+        self.showTransactions = true
+        sumOfValue = calculateTotalValue()
+    }
+    
+    init(transactionGroups: [TransactionPieChartData]) {
+        self.transactionsChartData = transactionGroups
+        self.onCategoryDataTap = {_ in }
+        self.showTransactions = false
         sumOfValue = calculateTotalValue()
     }
     
@@ -105,8 +114,10 @@ struct TransactionPieChart: View {
                             .contentShape([.contextMenuPreview, .hoverEffect], RoundedRectangle(cornerRadius: 3))
                             .hoverEffect(.highlight)
                             .contextMenu {
-                                Button("Show transactions", systemImage: "list.bullet") {
-                                    onCategoryDataTap(singleData)
+                                if showTransactions {
+                                    Button("Show transactions", systemImage: "list.bullet") {
+                                        onCategoryDataTap(singleData)
+                                    }
                                 }
                             }
                             .id(singleData.category.id)
