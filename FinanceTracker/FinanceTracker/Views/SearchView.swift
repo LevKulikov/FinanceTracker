@@ -18,6 +18,7 @@ struct SearchView: View {
     @State private var showTransaction: Transaction?
     @State private var transactionToDelete: Transaction?
     @State private var showRefreshAlert = false
+    @State private var currencyForStatistics: Currency?
     private var maxFiltersWidth: CGFloat {
         if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
             return 370
@@ -106,6 +107,14 @@ struct SearchView: View {
                     Text("This action is irretable")
                 })
             .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
+            .toolbar {
+                if !viewModel.filteredTransactionsCurrencies.isEmpty {
+                    statisticsButton
+                }
+            }
+            .sheet(item: $currencyForStatistics) { currency in
+                return viewModel.getProvidedStatisticsView(for: currency.code, fromSearch: searchIsPreseneted)
+            }
         }
     }
     
@@ -152,6 +161,29 @@ struct SearchView: View {
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowSeparator(.hidden)
+    }
+    
+    private var statisticsButton: some View {
+        HStack {
+            if viewModel.filteredTransactionsCurrencies.count > 1 {
+                Menu("Statistics", systemImage: "chart.bar") {
+                    ForEach(viewModel.filteredTransactionsCurrencies, id: \.self) { currency in
+                        Button(currency) {
+                            let currency = Currency(symbol: "", name: "", code: currency)
+                            currencyForStatistics = currency
+                        }
+                    }
+                }
+            } else {
+                Button("Statistics", systemImage: "chart.bar") {
+                    if let first = viewModel.filteredTransactionsCurrencies.first {
+                        let currency = Currency(symbol: "", name: "", code: first)
+                        currencyForStatistics = currency
+                    }
+                }
+                .labelStyle(.iconOnly)
+            }
+        }
     }
     
     private var showFilterButton: some View {

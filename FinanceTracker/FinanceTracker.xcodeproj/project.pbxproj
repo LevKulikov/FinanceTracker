@@ -66,6 +66,8 @@
 		73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D000E12C333E7000AACFCE /* SingleExampleView.swift */; };
 		73D0F05D2C45CF1200D50CFF /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */; };
 		73D0F05F2C45CF3F00D50CFF /* TransactionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */; };
+		73DFF0AB2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */; };
+		73DFF0AD2C60CB0100BFDBAF /* ProvidedStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
 		73EF650E2C5A883300E50221 /* CurrencyWidePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */; };
@@ -164,6 +166,8 @@
 		73D000E12C333E7000AACFCE /* SingleExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleExampleView.swift; sourceTree = "<group>"; };
 		73D0F05C2C45CF1200D50CFF /* TransactionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListView.swift; sourceTree = "<group>"; };
 		73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListViewModel.swift; sourceTree = "<group>"; };
+		73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidedStatisticsViewModel.swift; sourceTree = "<group>"; };
+		73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidedStatisticsView.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
 		73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyWidePickerView.swift; sourceTree = "<group>"; };
@@ -310,6 +314,7 @@
 				733397C12C4C05CA00BAE878 /* AddingBudgetView.swift */,
 				733397C92C4EF12E00BAE878 /* NotificationsView.swift */,
 				73633E532C556AE000E3B9CF /* TabsSettingsView.swift */,
+				73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -338,6 +343,7 @@
 				733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */,
 				733397C72C4EB6B600BAE878 /* NotificationsViewModel.swift */,
 				73633E512C55696800E3B9CF /* TabsSettingsViewModel.swift */,
+				73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -543,6 +549,7 @@
 				73D0F05D2C45CF1200D50CFF /* TransactionListView.swift in Sources */,
 				73D000D62C2DC2F400AACFCE /* SearchView.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
+				73DFF0AB2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
 				73AE90452C499092002267F4 /* BudgetsView.swift in Sources */,
 				73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */,
@@ -587,6 +594,7 @@
 				73D000DA2C2EED3500AACFCE /* SearchTransactionRow.swift in Sources */,
 				73EF650E2C5A883300E50221 /* CurrencyWidePickerView.swift in Sources */,
 				735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */,
+				73DFF0AD2C60CB0100BFDBAF /* ProvidedStatisticsView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				736389162C22EA5C00D6478E /* SettingsView.swift in Sources */,
 				73D000E02C31DCCF00AACFCE /* WelcomeView.swift in Sources */,
@@ -774,7 +782,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = finance.FinanceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -807,7 +815,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = finance.FinanceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

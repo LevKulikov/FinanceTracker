@@ -186,4 +186,14 @@ final class FTFactory {
         viewModel.delegate = delegate
         return AnyView(TabsSettingsView(viewModel: viewModel))
     }
+    
+    func createProvidedStatisticsView(transactions: [Transaction], currency: String) -> AnyView {
+        let viewModel = ProvidedStatisticsViewModel(transactions: transactions, currency: currency)
+        return AnyView(ProvidedStatisticsView(viewModel: viewModel))
+    }
+    
+    func createProvidedStatisticsView(transactions: [Transaction], currency: Currency) -> AnyView {
+        let viewModel = ProvidedStatisticsViewModel(transactions: transactions, currency: currency)
+        return AnyView(ProvidedStatisticsView(viewModel: viewModel))
+    }
 }

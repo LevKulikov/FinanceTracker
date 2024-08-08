@@ -117,6 +117,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Balance Account to filter all data
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
         didSet {
+            guard balanceAccountToFilter.id != oldValue.id else { return }
             refreshData()
         }
     }
@@ -129,6 +130,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Transaction type to select of which transactins should be shown as total for tags data
     @Published var transactionTypeForTags: TransactionsType = .spending {
         didSet {
+            guard transactionTypeForTags != oldValue else { return }
             calculateTagsTotal(animated: true)
         }
     }
@@ -141,30 +143,35 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Filter by type of transactions to display in pie chart
     @Published var pieChartTransactionType: TransactionsType = .spending {
         didSet {
+            guard pieChartTransactionType != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// Which type of date filtering is selected for pie chart
     @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .month {
         didSet {
+            guard pieChartMenuDateFilterSelected != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart DatePicker (for a single day, month or year )
     @Published var pieChartDate: Date = .now {
         didSet {
+            guard pieChartDate != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, start date
     @Published var pieChartDateStart: Date = .now {
         didSet {
+            guard pieChartDateStart != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
     /// For pie chart date range, end date
     @Published var pieChartDateEnd: Date = .now {
         didSet {
+            guard pieChartDateEnd != oldValue else { return }
             calculateDataForPieChart(animated: true)
         }
     }
@@ -177,12 +184,14 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Filter by transactions type (adding both case) to display in bar chart
     @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
         didSet {
+            guard barChartTransactionTypeFilter != oldValue else { return }
             calculateDataForBarChart(animated: true)
         }
     }
     /// Filter to select per which type of date to be diplayed in bar chart
     @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
         didSet {
+            guard barChartPerDateFilter != oldValue else { return }
             calculateDataForBarChart(animated: true)
         }
     }
@@ -549,116 +558,6 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 }
                 print("calculateDataForBarChart, ended")
             }
-        }
-    }
-    
-    /// Fills date gaps with empty TransactionBarChartData
-    /// - Parameter barChartData: existing TransactionBarChartData
-    /// - Returns: filled and sorted array of arrays of bar chart data
-    private func addEmptyDataTo(_ barChartData: [[TransactionBarChartData]]) -> [[TransactionBarChartData]] {
-        var usedDateArray: [Date]
-        var dateComponentsToUse: Set<Calendar.Component> = []
-        switch barChartPerDateFilter {
-        case .perDay:
-            usedDateArray = availableYearMonthDayDates
-            dateComponentsToUse.insert(.day)
-            dateComponentsToUse.insert(.month)
-            dateComponentsToUse.insert(.year)
-        case .perWeek:
-            usedDateArray = availableYearMonthWeekDates
-            dateComponentsToUse.insert(.calendar)
-            dateComponentsToUse.insert(.yearForWeekOfYear)
-            dateComponentsToUse.insert(.weekOfYear)
-        case .perMonth:
-            usedDateArray = availableYearMonthDates
-            dateComponentsToUse.insert(.month)
-            dateComponentsToUse.insert(.year)
-        case .perYear:
-            usedDateArray = availableYearDates
-            dateComponentsToUse.insert(.year)
-        }
-        
-        let returnArray = usedDateArray
-            .map { date in
-                let filterDateComponent = calendar.dateComponents(dateComponentsToUse, from: date)
-                if let equelTransaction = barChartData.first(where: { transDataArray in
-                    guard let firstTrans = transDataArray.first else { return false }
-                    let transDateComponents = calendar.dateComponents(dateComponentsToUse, from: firstTrans.date)
-                    return (filterDateComponent == transDateComponents)
-                }) {
-                    return equelTransaction
-                }
-                
-                var returnTransData: [TransactionBarChartData] = []
-                let emptySpendingTransData = TransactionBarChartData(type: .spending, value: 0, date: date)
-                let emptyIncomeTransData = TransactionBarChartData(type: .income, value: 0, date: date)
-                let emptyProfitTransData = TransactionBarChartData(type: .profit, value: 0, date: date)
-                
-                switch barChartTransactionTypeFilter {
-                case .both:
-                    returnTransData.append(emptySpendingTransData)
-                    returnTransData.append(emptyIncomeTransData)
-                    returnTransData.append(emptyProfitTransData)
-                case .spending:
-                    returnTransData.append(emptySpendingTransData)
-                case .income:
-                    returnTransData.append(emptyIncomeTransData)
-                }
-                
-                return returnTransData
-            }
-        
-        return returnArray
-    }
-    
-    /// Sets available dates arrays for only years and years with months (useless)
-    private func setDateArrays(completionHandler: @Sendable @escaping () -> Void) {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let self else { return }
-            
-            let availabelDateRange = FTAppAssets.availableDateRange
-            var yearDateArray: [Date?] = []
-            var yearMonthDateArray: [Date?] = []
-            var yearMonthDayDateArray: [Date?] = []
-            var yearMonthWeekDateArray: [Date?] = []
-            let standardMonthArray = Array(1...12)
-            let standardDayArray = Array(1...31)
-            let maxYear = calendar.component(.year, from: availabelDateRange.upperBound)
-            let maxMonth = calendar.component(.month, from: availabelDateRange.upperBound)
-            let maxDay = calendar.component(.day, from: availabelDateRange.upperBound)
-            
-            let yearRange = calendar.component(.year, from: availabelDateRange.lowerBound)...calendar.component(.year, from: availabelDateRange.upperBound)
-            yearLoop: for oneYear in yearRange {
-                let yearDate = calendar.date(from: DateComponents(year: oneYear))
-                yearDateArray.append(yearDate)
-                
-                monthLoop: for monthNumber in standardMonthArray {
-                    let monthDateComponent = DateComponents(year: oneYear, month: monthNumber)
-                    let monthDate = calendar.date(from: monthDateComponent)
-                    yearMonthDateArray.append(monthDate)
-                    
-                    dayLoop: for dayNumber in standardDayArray {
-                        let dayDateComponent = DateComponents(year: oneYear, month: monthNumber, day: dayNumber)
-                        let dayDate = calendar.date(from: dayDateComponent)
-                        
-                        let startOfWeekDate = dayDate?.startOfWeek()
-                        if !yearMonthWeekDateArray.contains(startOfWeekDate) {
-                            yearMonthWeekDateArray.append(startOfWeekDate)
-                        }
-                        
-                        if oneYear == maxYear, monthNumber == maxMonth, dayNumber == (maxDay + 1) {
-                            yearMonthDayDateArray.append(dayDate)
-                            break yearLoop
-                        }
-                        yearMonthDayDateArray.append(dayDate)
-                    }
-                }
-            }
-            self.availableYearDates = yearDateArray.compactMap { $0 }
-            self.availableYearMonthDates = yearMonthDateArray.compactMap { $0 }
-            self.availableYearMonthDayDates = yearMonthDayDateArray.compactMap { $0 }
-            self.availableYearMonthWeekDates = yearMonthWeekDateArray.compactMap { $0 }
-            completionHandler()
         }
     }
     
