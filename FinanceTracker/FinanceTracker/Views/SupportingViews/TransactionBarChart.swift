@@ -263,6 +263,7 @@ struct TransactionBarChart: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .clipped()
         .onChange(of: transactionsData, {
             setSelected(nil, date: nil)
             adaptYAxisScaleToVisibleData(isInitial: true) {
