@@ -68,6 +68,7 @@
 		73D0F05F2C45CF3F00D50CFF /* TransactionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */; };
 		73DFF0AB2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */; };
 		73DFF0AD2C60CB0100BFDBAF /* ProvidedStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */; };
+		73DFF0AF2C653E7B00BFDBAF /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0AE2C653E7B00BFDBAF /* Data+Extension.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
 		73EF650E2C5A883300E50221 /* CurrencyWidePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */; };
@@ -168,6 +169,7 @@
 		73D0F05E2C45CF3F00D50CFF /* TransactionListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionListViewModel.swift; sourceTree = "<group>"; };
 		73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidedStatisticsViewModel.swift; sourceTree = "<group>"; };
 		73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidedStatisticsView.swift; sourceTree = "<group>"; };
+		73DFF0AE2C653E7B00BFDBAF /* Data+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extension.swift"; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
 		73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyWidePickerView.swift; sourceTree = "<group>"; };
@@ -365,6 +367,7 @@
 				731EE8252C0B88E9006C7B0F /* Date+Extension.swift */,
 				736389172C22F5AF00D6478E /* GlobalMethods.swift */,
 				733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */,
+				73DFF0AE2C653E7B00BFDBAF /* Data+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -550,6 +553,7 @@
 				73D000D62C2DC2F400AACFCE /* SearchView.swift in Sources */,
 				73F9232A2C0DEA70001D96D4 /* CategoryItemView.swift in Sources */,
 				73DFF0AB2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift in Sources */,
+				73DFF0AF2C653E7B00BFDBAF /* Data+Extension.swift in Sources */,
 				736821CB2C076DEA00FFD5FD /* AddingSpendIcomeView.swift in Sources */,
 				73AE90452C499092002267F4 /* BudgetsView.swift in Sources */,
 				73D000E22C333E7000AACFCE /* SingleExampleView.swift in Sources */,
