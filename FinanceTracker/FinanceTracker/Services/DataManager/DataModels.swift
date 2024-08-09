@@ -33,7 +33,7 @@ enum TransactionsType: String, CaseIterable, Identifiable {
 
 //MARK: - BalanceAccount Model
 @Model
-final class BalanceAccount: @unchecked Sendable {
+final class BalanceAccount: @unchecked Sendable, Codable {
     static let emptyBalanceAccount = BalanceAccount(name: "empty", currency: "RUB", balance: 0, iconName: "", color: .clear)
     
     //MARK: Properties
@@ -68,6 +68,34 @@ final class BalanceAccount: @unchecked Sendable {
         let id = UUID().uuidString
         let uiColor = UIColor(color)
         self.init(id: id, name: name, currency: currency, balance: balance, iconName: iconName, uiColor: uiColor)
+    }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case name
+        case currency
+        case balance
+        case iconName
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        currency = try container.decode(String.self, forKey: .currency)
+        balance = try container.decode(Float.self, forKey: .balance)
+        iconName = try container.decode(String.self, forKey: .iconName)
+        uiColor = UIColor(.init(uiColor: .random))
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(currency, forKey: .currency)
+        try container.encode(balance, forKey: .balance)
+        try container.encode(iconName, forKey: .iconName)
     }
 }
 
