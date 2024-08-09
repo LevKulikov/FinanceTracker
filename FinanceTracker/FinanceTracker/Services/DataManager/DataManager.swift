@@ -70,6 +70,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel
     
+    /// Fetches all data from background and creates codable data container
+    /// - Returns: codable data container with all stored data
+    func createDataContainer() async throws -> FTDataContainer
+    
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
     func getDefaultBalanceAccount() -> BalanceAccount?
@@ -373,8 +377,6 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
-    /// Fetches all data from background and creates codable data container
-    /// - Returns: codable data container with all stored data
     func createDataContainer() async throws -> FTDataContainer {
         let nonNilBackgroundActor = backgroundActor ?? BackgroundDataActor(modelContainer: container)
         
