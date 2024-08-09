@@ -77,6 +77,7 @@ final class BalanceAccount: @unchecked Sendable, Codable {
         case currency
         case balance
         case iconName
+        case uiColor
     }
     
     init(from decoder: any Decoder) throws {
@@ -86,7 +87,13 @@ final class BalanceAccount: @unchecked Sendable, Codable {
         currency = try container.decode(String.self, forKey: .currency)
         balance = try container.decode(Float.self, forKey: .balance)
         iconName = try container.decode(String.self, forKey: .iconName)
-        uiColor = UIColor(.init(uiColor: .random))
+        
+        let colorData = try container.decode(Data.self, forKey: .uiColor)
+        if let uiColor = UIColorValueTransformer().reverseTransformedValue(colorData) as? UIColor {
+            self.uiColor = uiColor
+        } else {
+            self.uiColor = UIColor(.init(uiColor: .random))
+        }
     }
     
     func encode(to encoder: any Encoder) throws {
@@ -96,12 +103,15 @@ final class BalanceAccount: @unchecked Sendable, Codable {
         try container.encode(currency, forKey: .currency)
         try container.encode(balance, forKey: .balance)
         try container.encode(iconName, forKey: .iconName)
+        
+        let colorData = try NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false)
+        try container.encode(colorData, forKey: .uiColor)
     }
 }
 
 //MARK: - Category Model
 @Model
-final class Category: @unchecked Sendable {
+final class Category: @unchecked Sendable, Codable {
     static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear, placement: 0)
     
     //MARK: Properties
@@ -150,6 +160,44 @@ final class Category: @unchecked Sendable {
         let typeRawValue = type.rawValue
         let uiColor = UIColor(color)
         self.init(id: id, typeRawValue: typeRawValue, name: name, iconName: iconName, placement: placement, uiColor: uiColor)
+    }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case typeRawValue
+        case name
+        case iconName
+        case placement
+        case uiColor
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        typeRawValue = try container.decode(String.self, forKey: .typeRawValue)
+        name = try container.decode(String.self, forKey: .name)
+        iconName = try container.decode(String.self, forKey: .iconName)
+        placement = try container.decode(Int.self, forKey: .placement)
+        
+        let colorData = try container.decode(Data.self, forKey: .uiColor)
+        if let uiColor = UIColorValueTransformer().reverseTransformedValue(colorData) as? UIColor {
+            self.uiColor = uiColor
+        } else {
+            self.uiColor = UIColor(.init(uiColor: .random))
+        }
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(typeRawValue, forKey: .typeRawValue)
+        try container.encode(name, forKey: .name)
+        try container.encode(iconName, forKey: .iconName)
+        try container.encode(placement, forKey: .placement)
+        
+        let colorData = try NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false)
+        try container.encode(colorData, forKey: .uiColor)
     }
 }
 
