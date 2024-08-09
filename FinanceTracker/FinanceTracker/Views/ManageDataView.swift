@@ -101,15 +101,15 @@ struct ManageDataView: View {
     
     private var exportButton: some View {
         HStack {
-            Button("Export all data", systemImage: "square.and.arrow.up") {
+            Button("Export all data as JSON file", systemImage: "square.and.arrow.up") {
                 viewModel.getDataToExport()
             }
+            
+            Spacer()
             
             if viewModel.isDataFetchingForExport {
                 ProgressView()
             }
-            
-            Spacer()
         }
     }
     

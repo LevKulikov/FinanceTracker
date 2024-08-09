@@ -1184,7 +1184,25 @@
       }
     },
     "Export all data" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать все данные"
+          }
+        }
+      }
+    },
+    "Export all data as JSON file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать данные в виде JSON файла"
+          }
+        }
+      }
     },
     "Family" : {
       "localizations" : {
