@@ -373,6 +373,28 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
+    /// Fetches all data from background and creates codable data container
+    /// - Returns: codable data container with all stored data
+    func createDataContainer() async throws -> FTDataContainer {
+        let nonNilBackgroundActor = backgroundActor ?? BackgroundDataActor(modelContainer: container)
+        
+        async let allBalanceAccounts = nonNilBackgroundActor.fetch(FetchDescriptor<BalanceAccount>())
+        async let allCategories = nonNilBackgroundActor.fetch(FetchDescriptor<Category>())
+        async let allTags = nonNilBackgroundActor.fetch(FetchDescriptor<Tag>())
+        async let allTransactions = nonNilBackgroundActor.fetch(FetchDescriptor<Transaction>())
+        async let allBudgets = nonNilBackgroundActor.fetch(FetchDescriptor<Budget>())
+        
+        let dataContainer = FTDataContainer(
+            balanceAccounts: try await allBalanceAccounts,
+            categories: try await allCategories,
+            tags: try await allTags,
+            transactions: try await allTransactions,
+            budgets: try await allBudgets
+        )
+        
+        return dataContainer
+    }
+    
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {
         UserDefaults.standard.set(balanceAccount.id, forKey: defaultBalanceAccountIdKey)
     }

@@ -9,10 +9,6 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol Named {
-    var name: String { get set }
-}
-
 enum TransactionsType: String, CaseIterable, Identifiable {
     case spending = "Spendings"
     case income = "Income"
@@ -34,6 +30,14 @@ enum TransactionsType: String, CaseIterable, Identifiable {
 enum CodingError: Error {
     case balanceAccountIsNil
     case categoryIsNil
+}
+
+struct FTDataContainer: Codable {
+    let balanceAccounts: [BalanceAccount]
+    let categories: [Category]
+    let tags: [Tag]
+    let transactions: [Transaction]
+    let budgets: [Budget]
 }
 
 //MARK: - BalanceAccount Model
