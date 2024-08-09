@@ -31,6 +31,11 @@ enum TransactionsType: String, CaseIterable, Identifiable {
     }
 }
 
+enum CodingError: Error {
+    case balanceAccountIsNil
+    case categoryIsNil
+}
+
 //MARK: - BalanceAccount Model
 @Model
 final class BalanceAccount: @unchecked Sendable, Codable {
@@ -336,11 +341,6 @@ final class Transaction: @unchecked Sendable, Codable {
     }
     
     //MARK: Codable
-    enum CodingError: Error {
-        case balanceAccountIsNil
-        case categoryIsNil
-    }
-    
     enum CodingKeys: CodingKey {
         case id
         case typeRawValue
@@ -385,7 +385,7 @@ final class Transaction: @unchecked Sendable, Codable {
 }
 
 @Model
-final class Budget: @unchecked Sendable {
+final class Budget: @unchecked Sendable, Codable {
     static let empty = Budget(name: "empty", value: 1000, period: .week, category: nil, balanceAccount: .emptyBalanceAccount)
     
     enum Period: CaseIterable, Identifiable, Codable {
@@ -441,6 +441,43 @@ final class Budget: @unchecked Sendable {
     
     func setBalanceAccount(_ balanceAccount: BalanceAccount) {
         self.balanceAccount = balanceAccount
+    }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case name
+        case value
+        case period
+        case category
+        case balanceAccount
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        value = try container.decode(Float.self, forKey: .value)
+        period = try container.decode(Period.self, forKey: .period)
+        balanceAccount = try container.decode(BalanceAccount.self, forKey: .balanceAccount)
+        do {
+            category = try container.decode(Optional<Category>.self, forKey: .category)
+        } catch {
+            category = nil
+        }
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        guard let balanceAccount else {
+            throw CodingError.balanceAccountIsNil
+        }
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(value, forKey: .value)
+        try container.encode(period, forKey: .period)
+        try container.encode(category, forKey: .category)
+        try container.encode(balanceAccount, forKey: .balanceAccount)
     }
 }
 
