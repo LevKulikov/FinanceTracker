@@ -27,6 +27,10 @@ struct ManageDataView: View {
         NavigationStack {
             List {
                 Section {
+                    exportButton
+                }
+                
+                Section {
                     deleteAllTransactionsRow
                 }
                 
@@ -67,6 +71,10 @@ struct ManageDataView: View {
             } message: {
                 Text("Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?")
             }
+            .sheet(item: $viewModel.fileToExport, content: { item in
+                ActivityView(activityItems: [item])
+                    .ignoresSafeArea(edges: .bottom)
+            })
         }
     }
     
@@ -89,6 +97,20 @@ struct ManageDataView: View {
                 .foregroundStyle(.red)
         }
         .listRowBackground(Color.red.opacity(0.1))
+    }
+    
+    private var exportButton: some View {
+        HStack {
+            Button("Export all data", systemImage: "square.and.arrow.up") {
+                viewModel.getDataToExport()
+            }
+            
+            if viewModel.isDataFetchingForExport {
+                ProgressView()
+            }
+            
+            Spacer()
+        }
     }
     
     //MARK: - Methods

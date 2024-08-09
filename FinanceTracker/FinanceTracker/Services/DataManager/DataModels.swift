@@ -269,7 +269,7 @@ final class Tag: @unchecked Sendable, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
-        try container.encode(transactions, forKey: .transactions)
+        try container.encode([Transaction](), forKey: .transactions) //Encodes empty transactions array to prevent encoding cycle (encode Tag -> Transaction -> same Tag -> same Transaction ...
         
         let colorData = try NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false)
         try container.encode(colorData, forKey: .uiColor)

@@ -13,9 +13,14 @@ protocol ManageDataViewModelDelegate: AnyObject {
     func didDeleteAllData()
 }
 
-final class ManageDataViewModel: ObservableObject {
+final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any ManageDataViewModelDelegate)?
+    
+    //MARK: Published
+    @MainActor @Published private(set) var isDataFetchingForExport = false
+    @MainActor @Published var fileToExport: URL?
+    @MainActor @Published var dataExportError: Error?
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
@@ -35,6 +40,31 @@ final class ManageDataViewModel: ObservableObject {
     func deleteAllStoredData() {
         Task { [dataManager] in
             await dataManager.deleteAllStoredData()
+        }
+    }
+    
+    func getDataToExport() {
+        Task {
+            await MainActor.run {
+                isDataFetchingForExport = true
+            }
+            
+            do {
+                let dataContainer = try await dataManager.createDataContainer()
+                let data = try JSONEncoder().encode(dataContainer)
+                let fileURL = data.dataToFile(fileName: "FinanceTrackerData.json")
+                
+                await MainActor.run {
+                    fileToExport = fileURL
+                    isDataFetchingForExport = false
+                }
+            } catch {
+                await MainActor.run {
+                    dataExportError = error
+                    isDataFetchingForExport = false
+                }
+                return
+            }
         }
     }
 }

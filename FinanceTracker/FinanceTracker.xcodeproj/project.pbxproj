@@ -12,6 +12,7 @@
 		7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */; };
 		731EE8242C0A157E006C7B0F /* FTFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8232C0A157E006C7B0F /* FTFormatters.swift */; };
 		731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731EE8252C0B88E9006C7B0F /* Date+Extension.swift */; };
+		732EF8BA2C66B4B20072B11C /* URL+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732EF8B92C66B4B20072B11C /* URL+Extension.swift */; };
 		732F594E2C46FC9F0087C59A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594D2C46FC9F0087C59A /* Localizable.xcstrings */; };
 		732F59502C4712B00087C59A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 732F594F2C4712B00087C59A /* InfoPlist.xcstrings */; };
 		733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */; };
@@ -114,6 +115,7 @@
 		7305BACB2C1A4CC000F712BC /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		731EE8232C0A157E006C7B0F /* FTFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTFormatters.swift; sourceTree = "<group>"; };
 		731EE8252C0B88E9006C7B0F /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		732EF8B92C66B4B20072B11C /* URL+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extension.swift"; sourceTree = "<group>"; };
 		732F594D2C46FC9F0087C59A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		732F594F2C4712B00087C59A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		733397BF2C4BF5D000BAE878 /* AddingBudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBudgetViewModel.swift; sourceTree = "<group>"; };
@@ -370,6 +372,7 @@
 				736389172C22F5AF00D6478E /* GlobalMethods.swift */,
 				733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */,
 				73DFF0AE2C653E7B00BFDBAF /* Data+Extension.swift */,
+				732EF8B92C66B4B20072B11C /* URL+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -590,6 +593,7 @@
 				73AE90492C499B05002267F4 /* BudgetCard.swift in Sources */,
 				733397C22C4C05CA00BAE878 /* AddingBudgetView.swift in Sources */,
 				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
+				732EF8BA2C66B4B20072B11C /* URL+Extension.swift in Sources */,
 				7363891A2C246B7D00D6478E /* BalanceAccountsView.swift in Sources */,
 				73F9232C2C0DF6E1001D96D4 /* GroupedSpendIncomeCell.swift in Sources */,
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
