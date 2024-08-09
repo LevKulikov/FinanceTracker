@@ -203,7 +203,7 @@ final class Category: @unchecked Sendable, Codable {
 
 //MARK: - Tag Model
 @Model
-final class Tag: @unchecked Sendable {
+final class Tag: @unchecked Sendable, Codable {
     //MARK: Properties
     @Attribute(.unique) let id: String
     var name: String
@@ -233,11 +233,43 @@ final class Tag: @unchecked Sendable {
         let uiColor = UIColor(color == nil ? .init(uiColor: .random) : color!)
         self.init(id: id, name: name, uiColor: uiColor, transactions: transactions)
     }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case name
+        case uiColor
+        case transactions
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        transactions = try container.decode([Transaction].self, forKey: .transactions)
+        
+        let colorData = try container.decode(Data.self, forKey: .uiColor)
+        if let uiColor = UIColorValueTransformer().reverseTransformedValue(colorData) as? UIColor {
+            self.uiColor = uiColor
+        } else {
+            self.uiColor = UIColor(.init(uiColor: .random))
+        }
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(transactions, forKey: .transactions)
+        
+        let colorData = try NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false)
+        try container.encode(colorData, forKey: .uiColor)
+    }
 }
 
 //MARK: - Transaction Model
 @Model
-final class Transaction: @unchecked Sendable {
+final class Transaction: @unchecked Sendable, Codable {
     //MARK: Properties
     @Attribute(.unique) let id: String
     private(set) var typeRawValue: String
@@ -301,6 +333,54 @@ final class Transaction: @unchecked Sendable {
         self.category = nil
         self.balanceAccount = nil
         tags = []
+    }
+    
+    //MARK: Codable
+    enum CodingError: Error {
+        case balanceAccountIsNil
+        case categoryIsNil
+    }
+    
+    enum CodingKeys: CodingKey {
+        case id
+        case typeRawValue
+        case comment
+        case value
+        case date
+        case balanceAccount
+        case category
+        case tags
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        typeRawValue = try container.decode(String.self, forKey: .typeRawValue)
+        comment = try container.decode(String.self, forKey: .comment)
+        value = try container.decode(Float.self, forKey: .value)
+        date = try container.decode(Date.self, forKey: .date)
+        balanceAccount = try container.decode(BalanceAccount.self, forKey: .balanceAccount)
+        category = try container.decode(Category.self, forKey: .category)
+        tags = try container.decode([Tag].self, forKey: .tags)
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        guard let balanceAccount else {
+            throw CodingError.balanceAccountIsNil
+        }
+        guard let category else {
+            throw CodingError.categoryIsNil
+        }
+        
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(typeRawValue, forKey: .typeRawValue)
+        try container.encode(comment, forKey: .comment)
+        try container.encode(value, forKey: .value)
+        try container.encode(date, forKey: .date)
+        try container.encode(balanceAccount, forKey: .balanceAccount)
+        try container.encode(category, forKey: .category)
+        try container.encode(tags, forKey: .tags)
     }
 }
 
