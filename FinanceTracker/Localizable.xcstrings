@@ -275,6 +275,26 @@
         }
       }
     },
+    "An error occurred during creating a Excel (csv) file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создании файла Excel (csv). Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "An error occurred while creating a JSON file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создания JSON файла. Текст ошибки: %@"
+          }
+        }
+      }
+    },
     "Any text or number" : {
       "localizations" : {
         "ru" : {
@@ -1183,6 +1203,16 @@
         }
       }
     },
+    "Excel (csv) file creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания Excel (csv) файла"
+          }
+        }
+      }
+    },
     "Export all data" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1200,6 +1230,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Экспортировать данные в виде JSON файла"
+          }
+        }
+      }
+    },
+    "Export transactions as Excel file (csv) for date range" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать транзакции в виде Excel файла (csv) за промежуток дат"
           }
         }
       }
@@ -1450,6 +1490,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошая возможность чтобы попробовать!"
+          }
+        }
+      }
+    },
+    "JSON creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания JSON файла"
           }
         }
       }

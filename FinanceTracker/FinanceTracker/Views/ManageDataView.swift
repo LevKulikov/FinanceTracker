@@ -26,6 +26,8 @@ struct ManageDataView: View {
     var body: some View {
         NavigationStack {
             List {
+                csvSection
+                
                 Section {
                     exportButton
                 }
@@ -75,6 +77,16 @@ struct ManageDataView: View {
                 ActivityView(activityItems: [item])
                     .ignoresSafeArea(edges: .bottom)
             })
+            .alert("JSON creation error", isPresented: .init(get: { viewModel.dataExportError != nil }, set: {_ in viewModel.dataExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred while creating a JSON file. Error text: \(viewModel.dataExportError?.localizedDescription ?? "no text")")
+            }
+            .alert("Excel (csv) file creation error", isPresented: .init(get: { viewModel.csvExportError != nil }, set: {_ in viewModel.csvExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during creating a Excel (csv) file. Error text: \(viewModel.csvExportError?.localizedDescription ?? "no text")")
+            }
         }
     }
     
@@ -110,6 +122,23 @@ struct ManageDataView: View {
             if viewModel.isDataFetchingForExport {
                 ProgressView()
             }
+        }
+    }
+    
+    private var csvSection: some View {
+        Section {
+            HStack {
+                Button("Export transactions as Excel file (csv) for date range", systemImage: "tablecells.badge.ellipsis") {
+                    viewModel.getCSVToExport()
+                }
+                
+                if viewModel.isDataFetchingForCSVExport {
+                    ProgressView()
+                }
+            }
+            
+            DateRangePicker(startDate: $viewModel.csvStartDate, endDate: $viewModel.csvEndDate, dateRange: FTAppAssets.availableDateRange)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
     
