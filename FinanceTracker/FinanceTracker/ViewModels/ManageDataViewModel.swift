@@ -110,13 +110,16 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private methods
     private func createCSVFile(for transactions: [Transaction]) async throws -> URL {
-        var csvString = "Date,Type,Value,Currency,Category,Balance Account,Comment,Tags\n\n"
+        var csvString = String(localized: "Date;Time;Type;Value;Currency;Category;Balance Account;Comment;Tags\n")
         for transaction in transactions {
             var tagsNames: String = ""
             for tag in transaction.tags {
-                tagsNames += "\(tag.name);"
+                tagsNames += (tagsNames.isEmpty ? "" : ", ") + "\(tag.name)"
             }
-            csvString.append("\(String(describing: transaction.date)),\(transaction.typeRawValue),\(transaction.value),\(transaction.balanceAccount?.currency ?? "nil"),\(transaction.category?.name ?? "nil"),\(transaction.balanceAccount?.name ?? "nil"),\(transaction.comment.isEmpty ? "" : transaction.comment),\(tagsNames.isEmpty ? "" : tagsNames)\n")
+            let dateString = transaction.date.formatted(date: .numeric, time: .omitted)
+            let timeString = transaction.date.formatted(date: .omitted, time: .shortened)
+            let typeString: String = transaction.type == nil ? transaction.typeRawValue : String(localized: transaction.type!.localizedString)
+            csvString.append("\(dateString);\(timeString);\(typeString);\(transaction.value);\(transaction.balanceAccount?.currency ?? "nil");\(transaction.category?.name ?? "nil");\(transaction.balanceAccount?.name ?? "nil");\(transaction.comment);\(tagsNames)\n")
         }
         
         let fileManager = FileManager.default

@@ -131,6 +131,7 @@ struct ManageDataView: View {
                 Button("Export transactions as Excel file (csv) for date range", systemImage: "tablecells.badge.ellipsis") {
                     viewModel.getCSVToExport()
                 }
+                .foregroundStyle(Color.green)
                 
                 if viewModel.isDataFetchingForCSVExport {
                     ProgressView()

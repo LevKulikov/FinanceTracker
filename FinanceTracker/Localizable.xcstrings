@@ -836,6 +836,16 @@
         }
       }
     },
+    "Date;Time;Type;Value;Currency;Category;Balance Account;Comment;Tags\n" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата;Время;Тип;Значение;Валюта;Категория;Счет;Комментарий;Теги\n"
+          }
+        }
+      }
+    },
     "default" : {
       "localizations" : {
         "ru" : {
