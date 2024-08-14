@@ -14,6 +14,9 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     var isFirstLaunch: Bool { get set }
     
     @MainActor
+    func getContext() -> ModelContext
+    
+    @MainActor
     func save() throws
     
     func saveFromBackground() async throws
@@ -152,6 +155,10 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     //MARK: - Methods
+    func getContext() -> ModelContext {
+        return container.mainContext
+    }
+    
     func save() throws {
         try container.mainContext.save()
     }

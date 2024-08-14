@@ -32,12 +32,26 @@ enum CodingError: Error {
     case categoryIsNil
 }
 
-struct FTDataContainer: Codable {
+struct FTDataContainer: Codable, Identifiable {
+    var id = UUID().uuidString
+    
     let balanceAccounts: [BalanceAccount]
     let categories: [Category]
     let tags: [Tag]
     let transactions: [Transaction]
     let budgets: [Budget]
+    
+    enum Field: LocalizedStringResource, Codable, CaseIterable, Identifiable {
+        case transactions = "Transactions"
+        case balanceAccounts = "Balance Accounts"
+        case categories = "Categories"
+        case tags = "Tags"
+        case budgets = "Budgets"
+        
+        var id: Self {
+            return self
+        }
+    }
 }
 
 //MARK: - BalanceAccount Model

@@ -285,6 +285,9 @@
         }
       }
     },
+    "An error occurred during decoding selected file. Error text: %@" : {
+
+    },
     "An error occurred while creating a JSON file. Error text: %@" : {
       "localizations" : {
         "ru" : {
@@ -1264,6 +1267,9 @@
         }
       }
     },
+    "File decoding error" : {
+
+    },
     "Filters" : {
       "localizations" : {
         "ru" : {
@@ -1453,6 +1459,9 @@
           }
         }
       }
+    },
+    "Import data from JSON file" : {
+
     },
     "In development" : {
       "localizations" : {

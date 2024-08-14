@@ -19,10 +19,16 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     weak var delegate: (any ManageDataViewModelDelegate)?
     
     //MARK: Published
-    /// Used for JSON export, CSV export and etc
+    /// Used for JSON export, CSV export
     @MainActor @Published var fileToExport: URL?
+    
     @MainActor @Published private(set) var isDataFetchingForExport = false
     @MainActor @Published var dataExportError: Error?
+    
+    @MainActor @Published private(set) var isDataDecoding = false
+    @MainActor @Published var dataDecodingError: Error?
+    @MainActor @Published var decodedContainer: FTDataContainer?
+    
     @MainActor @Published private(set) var isDataFetchingForCSVExport = false
     @MainActor @Published var csvExportError: Error?
     @MainActor @Published var csvStartDate: Date = .now.startOfMonth() ?? .now
@@ -104,6 +110,34 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
                     isDataFetchingForCSVExport = false
                     csvExportError = error
                 }
+            }
+        }
+    }
+    
+    func getDataFromImportedJSON(fileURL: URL) async {
+        await MainActor.run {
+            isDataDecoding = true
+        }
+        
+        do {
+            let data = try Data(contentsOf: fileURL)
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            await MainActor.run {
+                decoder.userInfo[CodingUserInfoKey(rawValue: "modelcontext")!] = dataManager.getContext()
+            }
+            
+            let container = try decoder.decode(FTDataContainer.self, from: data)
+            
+            await MainActor.run {
+                decodedContainer = container
+                isDataDecoding = false
+            }
+        } catch {
+            await MainActor.run {
+                isDataDecoding = false
+                dataDecodingError = error
             }
         }
     }

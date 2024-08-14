@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ManageDataView: View {
     //MARK: - Properties
@@ -16,6 +17,8 @@ struct ManageDataView: View {
     
     @State private var deleteAllDataFirstAlert = false
     @State private var deleteAllDataSecondAlert = false
+    
+    @State private var showFileImporter = false
     
     //MARK: - Initializer
     init(viewModel: ManageDataViewModel) {
@@ -28,9 +31,7 @@ struct ManageDataView: View {
             List {
                 csvSection
                 
-                Section {
-                    exportButton
-                }
+                jsonSection
                 
                 Section {
                     deleteAllTransactionsRow
@@ -111,16 +112,43 @@ struct ManageDataView: View {
         .listRowBackground(Color.red.opacity(0.1))
     }
     
-    private var exportButton: some View {
-        HStack {
-            Button("Export all data as JSON file", systemImage: "square.and.arrow.up") {
-                viewModel.getDataToExport()
+    private var jsonSection: some View {
+        Section {
+            HStack {
+                Button("Export all data as JSON file", systemImage: "square.and.arrow.up") {
+                    viewModel.getDataToExport()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataFetchingForExport {
+                    ProgressView()
+                }
             }
             
-            Spacer()
-            
-            if viewModel.isDataFetchingForExport {
-                ProgressView()
+            HStack {
+                Button("Import data from JSON file", systemImage: "square.and.arrow.down") {
+                    showFileImporter.toggle()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataDecoding {
+                    ProgressView()
+                }
+            }
+            .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.json]) { result in
+                importFile(result: result)
+            }
+            .alert("File decoding error", isPresented: .init(get: { viewModel.dataDecodingError != nil }, set: {_ in viewModel.dataDecodingError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text")")
+            }
+            .fullScreenCover(item: $viewModel.decodedContainer) { container in
+                ImportDataPreview(container: container) {
+                    print("Import tapped")
+                }
             }
         }
     }
@@ -144,6 +172,21 @@ struct ManageDataView: View {
     }
     
     //MARK: - Methods
+    private func importFile(result: Result<URL, any Error>) {
+        Task {
+            do {
+                let fileURL = try result.get()
+                if fileURL.startAccessingSecurityScopedResource() {
+                    await viewModel.getDataFromImportedJSON(fileURL: fileURL)
+                }
+                fileURL.stopAccessingSecurityScopedResource()
+            } catch {
+                await MainActor.run {
+                    viewModel.dataDecodingError = error
+                }
+            }
+        }
+    }
 }
 
 #Preview {
