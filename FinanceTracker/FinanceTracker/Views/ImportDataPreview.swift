@@ -124,7 +124,7 @@ struct ImportDataPreview: View {
     private var selectedForEach: some View {
         switch selectedField {
         case .transactions:
-            if container.transactions.isEmpty {
+            if container.transactionContainers.isEmpty {
                 ContentUnavailableView(
                     "No transactions imported",
                     systemImage: "folder",
@@ -132,8 +132,8 @@ struct ImportDataPreview: View {
                 )
                 .listRowBackground(Color.clear)
             } else {
-                ForEach(container.transactions.sorted { $0.date > $1.date }) { transaction in
-                    rowForTransaction(transaction)
+                ForEach(container.transactionContainers.sorted { $0.transaction.date > $1.transaction.date }) { transactionContainer in
+                    rowForTransaction(transactionContainer.transaction)
                 }
             }
         case .balanceAccounts:
@@ -273,7 +273,7 @@ struct ImportDataPreview: View {
 }
 
 #Preview {
-    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactions: [], budgets: [])
+    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactionContainers: [], budgets: [])
     let onImportAction: () -> Void = {
         print("Import action")
     }

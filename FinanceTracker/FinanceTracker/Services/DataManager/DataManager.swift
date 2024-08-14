@@ -77,6 +77,8 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     /// - Returns: codable data container with all stored data
     func createDataContainer() async throws -> FTDataContainer
     
+    func importDataFromContainer(_ container: FTDataContainer) async
+    
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
     func getDefaultBalanceAccount() -> BalanceAccount?
@@ -390,18 +392,69 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         async let allBalanceAccounts = nonNilBackgroundActor.fetch(FetchDescriptor<BalanceAccount>())
         async let allCategories = nonNilBackgroundActor.fetch(FetchDescriptor<Category>())
         async let allTags = nonNilBackgroundActor.fetch(FetchDescriptor<Tag>())
-        async let allTransactions = nonNilBackgroundActor.fetch(FetchDescriptor<Transaction>())
+        async let allTransactions = nonNilBackgroundActor.fetch(FetchDescriptor<Transaction>()).compactMap { FTDataContainer.TransactionContainer(transaction: $0) }
         async let allBudgets = nonNilBackgroundActor.fetch(FetchDescriptor<Budget>())
         
         let dataContainer = FTDataContainer(
             balanceAccounts: try await allBalanceAccounts,
             categories: try await allCategories,
             tags: try await allTags,
-            transactions: try await allTransactions,
+            transactionContainers: try await allTransactions,
             budgets: try await allBudgets
         )
         
         return dataContainer
+    }
+    
+    @MainActor
+    func importDataFromContainer(_ dataContainer: FTDataContainer) async {
+        
+        print("Insering balance accounts\n")
+        for balanceAccount in dataContainer.balanceAccounts {
+            insert(balanceAccount)
+        }
+        
+        print("Insering categories\n")
+        for category in dataContainer.categories {
+            insert(category)
+        }
+        
+        print("Insering tags\n")
+        for tag in dataContainer.tags {
+            insert(tag)
+        }
+        
+        print("Insering transactions\n")
+        let savedBAs = try? fetch(FetchDescriptor<BalanceAccount>())
+        let savedCategs = try? fetch(FetchDescriptor<Category>())
+        let savedTags = try? fetch(FetchDescriptor<Tag>())
+        for transactionContainer in dataContainer.transactionContainers {
+            let transaction = transactionContainer.transaction
+            guard let balanceAccount = savedBAs?.first(where: { $0.id ==  transactionContainer.balanceAccountID }) else {
+                continue
+            }
+            guard let category = savedCategs?.first(where: { $0.id == transactionContainer.categoryID }) else {
+                continue
+            }
+            guard let type = transaction.type else {
+                continue
+            }
+            let tags = savedTags?.filter { transactionContainer.tagIDs.contains($0.id) }
+            
+            let newTransaction = Transaction(type: type, comment: transaction.comment, value: transaction.value, date: transaction.date, balanceAccount: balanceAccount, category: category, tags: tags ?? [])
+            insert(newTransaction)
+        }
+        
+        print("Insering budgets\n")
+        for budget in dataContainer.budgets {
+            insert(budget)
+        }
+        
+        do {
+            try save()
+        } catch {
+            print("Error saving: \(error)")
+        }
     }
     
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount) {

@@ -265,6 +265,9 @@
         }
       }
     },
+    "All stored data will be deleted and replaced with imported data, even it is empty" : {
+
+    },
     "All time" : {
       "localizations" : {
         "ru" : {
@@ -528,6 +531,9 @@
           }
         }
       }
+    },
+    "Cancel the import?" : {
+
     },
     "Card type" : {
       "localizations" : {
@@ -1216,6 +1222,9 @@
         }
       }
     },
+    "Err" : {
+
+    },
     "Excel (csv) file creation error" : {
       "localizations" : {
         "ru" : {
@@ -1460,7 +1469,19 @@
         }
       }
     },
+    "Import" : {
+
+    },
     "Import data from JSON file" : {
+
+    },
+    "Import data?" : {
+
+    },
+    "Imported data will be cleaned" : {
+
+    },
+    "Imported objects" : {
 
     },
     "In development" : {
@@ -1633,6 +1654,9 @@
         }
       }
     },
+    "No balance accounts imported" : {
+
+    },
     "No budgets" : {
       "localizations" : {
         "ru" : {
@@ -1642,6 +1666,12 @@
           }
         }
       }
+    },
+    "No budgets imported" : {
+
+    },
+    "No categories imported" : {
+
     },
     "No currencies with \"%@\"" : {
       "localizations" : {
@@ -1663,6 +1693,9 @@
         }
       }
     },
+    "No tags imported" : {
+
+    },
     "No transactions" : {
       "localizations" : {
         "ru" : {
@@ -1673,6 +1706,9 @@
         }
       }
     },
+    "No transactions imported" : {
+
+    },
     "No, cancel" : {
       "localizations" : {
         "ru" : {
@@ -1682,6 +1718,9 @@
           }
         }
       }
+    },
+    "No, stay here" : {
+
     },
     "Nothing here yet" : {
       "localizations" : {
@@ -2213,6 +2252,9 @@
         }
       }
     },
+    "Some information cannot be previewed until the imported data is saved to the device. After saving, all information will be available for viewing and editing" : {
+
+    },
     "Some save error happened" : {
       "localizations" : {
         "ru" : {
@@ -2574,6 +2616,9 @@
         }
       }
     },
+    "Try searching for other items using the picker at the top" : {
+
+    },
     "Type" : {
       "localizations" : {
         "ru" : {
@@ -2714,6 +2759,9 @@
         }
       }
     },
+    "Why I don't see some information" : {
+
+    },
     "www.flaticon.com" : {
       "localizations" : {
         "ru" : {
@@ -2723,6 +2771,9 @@
           }
         }
       }
+    },
+    "Yes, cancel" : {
+
     },
     "Yes, delete" : {
       "localizations" : {

@@ -147,7 +147,7 @@ struct ManageDataView: View {
             }
             .fullScreenCover(item: $viewModel.decodedContainer) { container in
                 ImportDataPreview(container: container) {
-                    print("Import tapped")
+                    viewModel.deleteAndImportData()
                 }
             }
         }

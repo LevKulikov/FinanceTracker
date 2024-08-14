@@ -27,7 +27,13 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor @Published private(set) var isDataDecoding = false
     @MainActor @Published var dataDecodingError: Error?
-    @MainActor @Published var decodedContainer: FTDataContainer?
+    @MainActor @Published var decodedContainer: FTDataContainer? {
+        didSet {
+            if let decodedContainer {
+                decodedContainerCopy = decodedContainer
+            }
+        }
+    }
     
     @MainActor @Published private(set) var isDataFetchingForCSVExport = false
     @MainActor @Published var csvExportError: Error?
@@ -36,6 +42,7 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private props
     private let dataManager: any DataManagerProtocol
+    private var decodedContainerCopy: FTDataContainer?
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -138,6 +145,30 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
             await MainActor.run {
                 isDataDecoding = false
                 dataDecodingError = error
+            }
+        }
+    }
+    
+    func deleteAndImportData() {
+        Task { [decodedContainerCopy] in
+            guard let decodedContainerCopy else {
+                print("Container is nil")
+                return
+            }
+            
+            await MainActor.run {
+                isDataDecoding = true
+            }
+            
+            await dataManager.deleteAllStoredData()
+            await dataManager.importDataFromContainer(decodedContainerCopy)
+            
+            if let balanceAccount = decodedContainerCopy.balanceAccounts.first {
+                dataManager.setDefaultBalanceAccount(balanceAccount)
+            }
+            
+            await MainActor.run {
+                isDataDecoding = false
             }
         }
     }
