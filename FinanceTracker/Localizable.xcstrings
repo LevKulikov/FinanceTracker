@@ -115,7 +115,14 @@
       }
     },
     "+" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+"
+          }
+        }
+      }
     },
     "+%lld" : {
       "localizations" : {
@@ -269,7 +276,14 @@
       }
     },
     "All stored data will be deleted and replaced with imported data, even it is empty" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все сохраненные данные будут удалены и заменены на импортированные, даже если импортированный файл не содержит значений"
+          }
+        }
+      }
     },
     "All time" : {
       "localizations" : {
@@ -292,7 +306,14 @@
       }
     },
     "An error occurred during decoding selected file. Error text: %@" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@"
+          }
+        }
+      }
     },
     "An error occurred while creating a JSON file. Error text: %@" : {
       "localizations" : {
@@ -536,7 +557,14 @@
       }
     },
     "Cancel the import?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить импорт?"
+          }
+        }
+      }
     },
     "Card type" : {
       "localizations" : {
@@ -594,6 +622,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Графики"
+          }
+        }
+      }
+    },
+    "Check other items using the picker at the top" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посмотрите другие объекты с помощью пикера вверху"
           }
         }
       }
@@ -679,7 +717,14 @@
       }
     },
     "Comment: %@" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий: %@"
+          }
+        }
+      }
     },
     "Completely open source, all information is stored on your device. No need to worry about privacy!" : {
       "localizations" : {
@@ -1229,7 +1274,14 @@
       }
     },
     "Err" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошбк"
+          }
+        }
+      }
     },
     "Excel (csv) file creation error" : {
       "localizations" : {
@@ -1283,7 +1335,14 @@
       }
     },
     "File decoding error" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка декодирования файла"
+          }
+        }
+      }
     },
     "Filters" : {
       "localizations" : {
@@ -1476,19 +1535,54 @@
       }
     },
     "Import" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать"
+          }
+        }
+      }
     },
     "Import data from JSON file" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные из JSON файла"
+          }
+        }
+      }
     },
     "Import data?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные?"
+          }
+        }
+      }
     },
     "Imported data will be cleaned" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные данные будут очищены"
+          }
+        }
+      }
     },
     "Imported objects" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные объекты"
+          }
+        }
+      }
     },
     "In development" : {
       "localizations" : {
@@ -1661,7 +1755,14 @@
       }
     },
     "No balance accounts imported" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных счетов"
+          }
+        }
+      }
     },
     "No budgets" : {
       "localizations" : {
@@ -1674,10 +1775,24 @@
       }
     },
     "No budgets imported" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных бюджетов"
+          }
+        }
+      }
     },
     "No categories imported" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных категорий"
+          }
+        }
+      }
     },
     "No currencies with \"%@\"" : {
       "localizations" : {
@@ -1700,7 +1815,14 @@
       }
     },
     "No tags imported" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных тегов"
+          }
+        }
+      }
     },
     "No transactions" : {
       "localizations" : {
@@ -1713,7 +1835,14 @@
       }
     },
     "No transactions imported" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных транзакций"
+          }
+        }
+      }
     },
     "No, cancel" : {
       "localizations" : {
@@ -1726,7 +1855,14 @@
       }
     },
     "No, stay here" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, остаться здесь"
+          }
+        }
+      }
     },
     "Nothing here yet" : {
       "localizations" : {
@@ -2259,7 +2395,14 @@
       }
     },
     "Some information cannot be previewed until the imported data is saved to the device. After saving, all information will be available for viewing and editing" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторую информацию невозможно отобразить в превью до того, как ипортированные данные будут сохранены на устройство. После сохранения вся информацию будет доступна для просмотра и редактирования"
+          }
+        }
+      }
     },
     "Some save error happened" : {
       "localizations" : {
@@ -2623,7 +2766,15 @@
       }
     },
     "Try searching for other items using the picker at the top" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте поискать другие объекты с помощью пикера вверху"
+          }
+        }
+      }
     },
     "Type" : {
       "localizations" : {
@@ -2766,7 +2917,14 @@
       }
     },
     "Why I don't see some information" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почему я не вижу некоторую информацию"
+          }
+        }
+      }
     },
     "www.flaticon.com" : {
       "localizations" : {
@@ -2779,7 +2937,14 @@
       }
     },
     "Yes, cancel" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, отменить"
+          }
+        }
+      }
     },
     "Yes, delete" : {
       "localizations" : {

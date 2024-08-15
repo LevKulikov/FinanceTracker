@@ -36,7 +36,7 @@ struct ImportDataPreview: View {
                     }
                     .popover(isPresented: $infoPopover) {
                         Text("Some information cannot be previewed until the imported data is saved to the device. After saving, all information will be available for viewing and editing")
-                            .frame(height: 120)
+                            .frame(height: 160)
                             .padding()
                             .presentationCompactAdaptation(.popover)
                     }
@@ -129,7 +129,7 @@ struct ImportDataPreview: View {
                 ContentUnavailableView(
                     "No transactions imported",
                     systemImage: "folder",
-                    description: Text("Try searching for other items using the picker at the top")
+                    description: Text("Check other items using the picker at the top")
                 )
                 .listRowBackground(Color.clear)
             } else {
@@ -142,7 +142,7 @@ struct ImportDataPreview: View {
                 ContentUnavailableView(
                     "No balance accounts imported",
                     systemImage: "folder",
-                    description: Text("Try searching for other items using the picker at the top")
+                    description: Text("Check other items using the picker at the top")
                 )
                 .listRowBackground(Color.clear)
             } else {
@@ -155,7 +155,7 @@ struct ImportDataPreview: View {
                 ContentUnavailableView(
                     "No categories imported",
                     systemImage: "folder",
-                    description: Text("Try searching for other items using the picker at the top")
+                    description: Text("Check other items using the picker at the top")
                 )
                 .listRowBackground(Color.clear)
             } else {
@@ -168,7 +168,7 @@ struct ImportDataPreview: View {
                 ContentUnavailableView(
                     "No tags imported",
                     systemImage: "folder",
-                    description: Text("Try searching for other items using the picker at the top")
+                    description: Text("Check other items using the picker at the top")
                 )
                 .listRowBackground(Color.clear)
             } else {
@@ -181,7 +181,7 @@ struct ImportDataPreview: View {
                 ContentUnavailableView(
                     "No budgets imported",
                     systemImage: "folder",
-                    description: Text("Try searching for other items using the picker at the top")
+                    description: Text("Check other items using the picker at the top")
                 )
                 .listRowBackground(Color.clear)
             } else {
