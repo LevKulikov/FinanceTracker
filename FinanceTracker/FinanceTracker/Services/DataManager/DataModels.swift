@@ -33,6 +33,7 @@ enum CodingError: Error {
 }
 
 struct FTDataContainer: Codable, Identifiable {
+    
     struct TransactionContainer: Codable, Identifiable {
         var id = UUID().uuidString
         let transaction: Transaction
@@ -50,20 +51,34 @@ struct FTDataContainer: Codable, Identifiable {
         }
     }
     
+    struct BudgetContainer: Codable, Identifiable {
+        var id = UUID().uuidString
+        let budget: Budget
+        let balanceAccountID: String
+        let categoryID: String?
+        
+        init?(budget: Budget) {
+            self.budget = budget
+            guard let baID = budget.balanceAccount?.id else { return nil }
+            self.balanceAccountID = baID
+            self.categoryID = budget.category?.id
+        }
+    }
+    
     var id = UUID().uuidString
     
     let balanceAccounts: [BalanceAccount]
     let categories: [Category]
     let tags: [Tag]
     let transactionContainers: [TransactionContainer]
-    let budgets: [Budget]
+    let budgetContainers: [BudgetContainer]
     
-    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgets: [Budget]) {
+    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgetContainers: [BudgetContainer]) {
         self.balanceAccounts = balanceAccounts
         self.categories = categories
         self.tags = tags
         self.transactionContainers = transactionContainers
-        self.budgets = budgets
+        self.budgetContainers = budgetContainers
     }
     
     enum Field: LocalizedStringResource, Codable, CaseIterable, Identifiable {

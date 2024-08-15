@@ -176,7 +176,7 @@ struct ImportDataPreview: View {
                 }
             }
         case .budgets:
-            if container.budgets.isEmpty {
+            if container.budgetContainers.isEmpty {
                 ContentUnavailableView(
                     "No budgets imported",
                     systemImage: "folder",
@@ -184,8 +184,8 @@ struct ImportDataPreview: View {
                 )
                 .listRowBackground(Color.clear)
             } else {
-                ForEach(container.budgets) { budget in
-                    rowForBudget(budget)
+                ForEach(container.budgetContainers) { budgetContainer in
+                    rowForBudget(budgetContainer.budget)
                 }
             }
         }
@@ -273,7 +273,7 @@ struct ImportDataPreview: View {
 }
 
 #Preview {
-    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactionContainers: [], budgets: [])
+    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactionContainers: [], budgetContainers: [])
     let onImportAction: () -> Void = {
         print("Import action")
     }
