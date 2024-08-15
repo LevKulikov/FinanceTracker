@@ -133,7 +133,7 @@ struct ImportDataPreview: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(container.transactionContainers.sorted { $0.transaction.date > $1.transaction.date }) { transactionContainer in
-                    rowForTransaction(transactionContainer.transaction)
+                    TransactionRow(transactionContainer: transactionContainer, container: container)
                 }
             }
         case .balanceAccounts:
@@ -185,29 +185,71 @@ struct ImportDataPreview: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(container.budgetContainers) { budgetContainer in
-                    rowForBudget(budgetContainer.budget)
+                    rowForBudget(budgetContainer)
                 }
             }
         }
     }
     
     //MARK: - Methods
-    @ViewBuilder
-    private func rowForTransaction(_ transaction: Transaction) -> some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(transaction.date.formatted(date: .numeric, time: .omitted))
-                
-                Spacer()
-                
-                Text(FTFormatters.numberFormatterWithDecimals.string(for: transaction.value) ?? "Err")
-                    .foregroundStyle(transaction.type == .spending ? .red : .green)
-            }
-            
-            if !transaction.comment.isEmpty {
-                Text(transaction.comment)
+    private struct TransactionRow: View {
+        let transactionContainer: FTDataContainer.TransactionContainer
+        let container: FTDataContainer
+        @State private var balanceAccount: BalanceAccount?
+        @State private var category: Category?
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                Text(transactionContainer.transaction.date.formatted(date: .numeric, time: .omitted))
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.leading)
+                    .font(.footnote)
+                
+                HStack {
+                    if let category {
+                        FTAppAssets.iconImageOrEpty(name: category.iconName)
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(category.color)
+                    }
+                    
+                    Text(category?.name ?? "Transaction")
+                        .lineLimit(3)
+                    
+                    Spacer()
+                    
+                    Text(FTFormatters.numberFormatterWithDecimals.string(for: transactionContainer.transaction.value) ?? "Err")
+                        .foregroundStyle(transactionContainer.transaction.type == .spending ? .red : .green)
+                    
+                    if let balanceAccount {
+                        Text(balanceAccount.currency)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                HStack {
+                    if !transactionContainer.tagIDs.isEmpty {
+                        Text("\(transactionContainer.tagIDs.count) \(transactionContainer.tagIDs.count > 1 ? "tags" : "tag")")
+                    }
+                    
+                    if !transactionContainer.tagIDs.isEmpty && !transactionContainer.transaction.comment.isEmpty {
+                        Text("+")
+                    }
+                    
+                    if !transactionContainer.transaction.comment.isEmpty {
+                        Text("Comment: \(transactionContainer.transaction.comment)")
+                            .lineLimit(1)
+                    }
+                }
+                .foregroundStyle(.secondary)
+                .font(.footnote)
+            }
+            .task {
+                let balanceAccount = container.balanceAccounts.first { $0.id == transactionContainer.balanceAccountID }
+                let category = container.categories.first { $0.id == transactionContainer.categoryID }
+                
+                await MainActor.run {
+                    self.balanceAccount = balanceAccount
+                    self.category = category
+                }
             }
         }
     }
@@ -257,17 +299,17 @@ struct ImportDataPreview: View {
     }
     
     @ViewBuilder
-    private func rowForBudget(_ budget: Budget) -> some View {
+    private func rowForBudget(_ container: FTDataContainer.BudgetContainer) -> some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(budget.name.isEmpty ? "Budget" : budget.name)
-                Text(budget.period.localizedString)
+                Text(container.budget.name.isEmpty ? "Budget" : container.budget.name)
+                Text(container.budget.period.localizedString)
                     .foregroundStyle(.secondary)
             }
             
             Spacer()
             
-            Text(FTFormatters.numberFormatterWithDecimals.string(for: budget.value) ?? "Err")
+            Text(FTFormatters.numberFormatterWithDecimals.string(for: container.budget.value) ?? "Err")
         }
     }
 }

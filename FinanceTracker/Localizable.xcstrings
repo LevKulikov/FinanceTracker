@@ -114,6 +114,9 @@
         }
       }
     },
+    "+" : {
+
+    },
     "+%lld" : {
       "localizations" : {
         "ru" : {
@@ -674,6 +677,9 @@
           }
         }
       }
+    },
+    "Comment: %@" : {
+
     },
     "Completely open source, all information is stored on your device. No need to worry about privacy!" : {
       "localizations" : {
