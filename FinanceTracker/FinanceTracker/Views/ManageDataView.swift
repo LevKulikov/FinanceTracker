@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ManageDataView: View {
     //MARK: - Properties
@@ -17,6 +18,8 @@ struct ManageDataView: View {
     @State private var deleteAllDataFirstAlert = false
     @State private var deleteAllDataSecondAlert = false
     
+    @State private var showFileImporter = false
+    
     //MARK: - Initializer
     init(viewModel: ManageDataViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -26,6 +29,10 @@ struct ManageDataView: View {
     var body: some View {
         NavigationStack {
             List {
+                csvSection
+                
+                jsonSection
+                
                 Section {
                     deleteAllTransactionsRow
                 }
@@ -67,6 +74,20 @@ struct ManageDataView: View {
             } message: {
                 Text("Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?")
             }
+            .sheet(item: $viewModel.fileToExport, content: { item in
+                ActivityView(activityItems: [item])
+                    .ignoresSafeArea(edges: .bottom)
+            })
+            .alert("JSON creation error", isPresented: .init(get: { viewModel.dataExportError != nil }, set: {_ in viewModel.dataExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred while creating a JSON file. Error text: \(viewModel.dataExportError?.localizedDescription ?? "no text")")
+            }
+            .alert("Excel (csv) file creation error", isPresented: .init(get: { viewModel.csvExportError != nil }, set: {_ in viewModel.csvExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during creating a Excel (csv) file. Error text: \(viewModel.csvExportError?.localizedDescription ?? "no text")")
+            }
         }
     }
     
@@ -91,7 +112,81 @@ struct ManageDataView: View {
         .listRowBackground(Color.red.opacity(0.1))
     }
     
+    private var jsonSection: some View {
+        Section {
+            HStack {
+                Button("Export all data as JSON file", systemImage: "square.and.arrow.up") {
+                    viewModel.getDataToExport()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataFetchingForExport {
+                    ProgressView()
+                }
+            }
+            
+            HStack {
+                Button("Import data from JSON file", systemImage: "square.and.arrow.down") {
+                    showFileImporter.toggle()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataDecoding {
+                    ProgressView()
+                }
+            }
+            .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.json]) { result in
+                importFile(result: result)
+            }
+            .alert("File decoding error", isPresented: .init(get: { viewModel.dataDecodingError != nil }, set: {_ in viewModel.dataDecodingError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text")")
+            }
+            .fullScreenCover(item: $viewModel.decodedContainer) { container in
+                ImportDataPreview(container: container) {
+                    viewModel.deleteAndImportData()
+                }
+            }
+        }
+    }
+    
+    private var csvSection: some View {
+        Section {
+            HStack {
+                Button("Export transactions as Excel file (csv) for date range", systemImage: "tablecells.badge.ellipsis") {
+                    viewModel.getCSVToExport()
+                }
+                .foregroundStyle(Color.green)
+                
+                if viewModel.isDataFetchingForCSVExport {
+                    ProgressView()
+                }
+            }
+            
+            DateRangePicker(startDate: $viewModel.csvStartDate, endDate: $viewModel.csvEndDate, dateRange: FTAppAssets.availableDateRange)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+    
     //MARK: - Methods
+    private func importFile(result: Result<URL, any Error>) {
+        Task {
+            do {
+                let fileURL = try result.get()
+                if fileURL.startAccessingSecurityScopedResource() {
+                    await viewModel.getDataFromImportedJSON(fileURL: fileURL)
+                }
+                fileURL.stopAccessingSecurityScopedResource()
+            } catch {
+                await MainActor.run {
+                    viewModel.dataDecodingError = error
+                }
+            }
+        }
+    }
 }
 
 #Preview {

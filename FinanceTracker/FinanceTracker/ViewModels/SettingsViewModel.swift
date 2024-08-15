@@ -167,6 +167,10 @@ extension SettingsViewModel: ManageDataViewModelDelegate {
     func didDeleteAllData() {
         delegate?.didUpdateSettingsSection(.data)
     }
+    
+    func didDeleteAndImportNewData() {
+        delegate?.didUpdateSettingsSection(.data)
+    }
 }
 
 //MARK: Extensions for BudgetsViewModelDelegate
