@@ -64,6 +64,7 @@ struct ImportDataPreview: View {
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .alert("Cancel the import?", isPresented: $cancelationAlert) {
                 Button("Yes, cancel", role: .destructive) {
                     dismiss()
@@ -185,7 +186,7 @@ struct ImportDataPreview: View {
                 .listRowBackground(Color.clear)
             } else {
                 ForEach(container.budgetContainers) { budgetContainer in
-                    rowForBudget(budgetContainer)
+                    BudgetRow(budgetContainer: budgetContainer, container: container)
                 }
             }
         }
@@ -200,9 +201,17 @@ struct ImportDataPreview: View {
         
         var body: some View {
             VStack(alignment: .leading) {
-                Text(transactionContainer.transaction.date.formatted(date: .numeric, time: .omitted))
-                    .foregroundStyle(.secondary)
-                    .font(.footnote)
+                HStack {
+                    Text(transactionContainer.transaction.date.formatted(date: .numeric, time: .omitted))
+                        
+                    Spacer()
+                    
+                    if let balanceAccount {
+                        Text(balanceAccount.name)
+                    }
+                }
+                .foregroundStyle(.secondary)
+                .font(.footnote)
                 
                 HStack {
                     if let category {
@@ -254,6 +263,71 @@ struct ImportDataPreview: View {
         }
     }
     
+    struct BudgetRow: View {
+        let budgetContainer: FTDataContainer.BudgetContainer
+        let container: FTDataContainer
+        @State private var balanceAccount: BalanceAccount?
+        @State private var category: Category?
+        private var title: String {
+            if !budgetContainer.budget.name.isEmpty {
+                return budgetContainer.budget.name
+            } else {
+                if let category {
+                    return category.name
+                } else {
+                    return String(localized: "For all categories")
+                }
+            }
+        }
+        
+        var body: some View {
+            VStack {
+                HStack {
+                    if let category {
+                        FTAppAssets.iconImageOrEpty(name: category.iconName)
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(category.color)
+                    }
+                    
+                    Text(title)
+                        .lineLimit(3)
+                    
+                    Spacer()
+                    
+                    Text(FTFormatters.numberFormatterWithDecimals.string(for: budgetContainer.budget.value) ?? "Err")
+                    
+                    if let balanceAccount {
+                        Text(balanceAccount.currency)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                HStack {
+                    Text(budgetContainer.budget.period.localizedString)
+                        .layoutPriority(1)
+                    
+                    Spacer()
+                    
+                    if let balanceAccount {
+                        Text(balanceAccount.name)
+                            .lineLimit(1)
+                    }
+                }
+                .foregroundStyle(.secondary)
+                .font(.footnote)
+            }
+            .task {
+                let balanceAccount = container.balanceAccounts.first { $0.id == budgetContainer.balanceAccountID }
+                let category = container.categories.first { $0.id == budgetContainer.categoryID }
+                
+                await MainActor.run {
+                    self.balanceAccount = balanceAccount
+                    self.category = category
+                }
+            }
+        }
+    }
+    
     @MainActor @ViewBuilder
     private func rowForBalanceAccount(_ balanceAccount: BalanceAccount) -> some View {
         HStack {
@@ -295,21 +369,6 @@ struct ImportDataPreview: View {
             Text(tag.name)
             
             Spacer()
-        }
-    }
-    
-    @ViewBuilder
-    private func rowForBudget(_ container: FTDataContainer.BudgetContainer) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(container.budget.name.isEmpty ? "Budget" : container.budget.name)
-                Text(container.budget.period.localizedString)
-                    .foregroundStyle(.secondary)
-            }
-            
-            Spacer()
-            
-            Text(FTFormatters.numberFormatterWithDecimals.string(for: container.budget.value) ?? "Err")
         }
     }
 }
