@@ -391,13 +391,6 @@ final class Transaction: @unchecked Sendable, Codable {
         tags.removeAll { $0 == tag }
     }
     
-    /// For iOS 18 Deletion fixing
-    func prepareForDeletion() {
-        self.category = nil
-        self.balanceAccount = nil
-        tags = []
-    }
-    
     //MARK: Codable
     enum CodingKeys: CodingKey {
         case id

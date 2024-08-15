@@ -12,6 +12,8 @@ protocol ManageDataViewModelDelegate: AnyObject {
     func didDeleteAllTransactions()
     
     func didDeleteAllData()
+    
+    func didDeleteAndImportNewData()
 }
 
 final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
@@ -166,6 +168,7 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
             if let balanceAccount = decodedContainerCopy.balanceAccounts.first {
                 dataManager.setDefaultBalanceAccount(balanceAccount)
             }
+            delegate?.didDeleteAndImportNewData()
             
             await MainActor.run {
                 isDataDecoding = false

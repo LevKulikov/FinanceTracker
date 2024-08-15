@@ -318,8 +318,12 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteAllTransactions() async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
         do {
-            try container.mainContext.delete(model: Transaction.self)
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            for transaction in allTransactions {
+                container.mainContext.delete(transaction)
+            }
             try save()
         } catch {
             print(error)
@@ -328,13 +332,21 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteAllStoredData() async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let fetchTagDescriptor = FetchDescriptor<Tag>()
         do {
-            try container.mainContext.delete(model: Transaction.self)
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            for transaction in allTransactions {
+                container.mainContext.delete(transaction)
+            }
             try container.mainContext.delete(model: Budget.self)
             try container.mainContext.delete(model: BalanceAccount.self)
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
-            try container.mainContext.delete(model: Tag.self)
+            let allTags = try fetch(fetchTagDescriptor)
+            for tag in allTags {
+                container.mainContext.delete(tag)
+            }
             try save()
         } catch {
             print(error)
@@ -435,12 +447,15 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         for transactionContainer in dataContainer.transactionContainers {
             let transaction = transactionContainer.transaction
             guard let balanceAccount = savedBAs?.first(where: { $0.id ==  transactionContainer.balanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance account for transaction")
                 continue
             }
             guard let category = savedCategs?.first(where: { $0.id == transactionContainer.categoryID }) else {
+                print("DataManager.importDataFromContainer: did not find category for transaction")
                 continue
             }
             guard let type = transaction.type else {
+                print("DataManager.importDataFromContainer: imported transaction type is nil")
                 continue
             }
             let tags = savedTags?.filter { transactionContainer.tagIDs.contains($0.id) }
@@ -455,6 +470,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         for budgetContainer in dataContainer.budgetContainers {
             let budget = budgetContainer.budget
             guard let balanceAccount = savedBAs?.first(where: { $0.id ==  budgetContainer.balanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance account for budget")
                 continue
             }
             var category: Category? = nil
