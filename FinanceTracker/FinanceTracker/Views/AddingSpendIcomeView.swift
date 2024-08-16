@@ -20,6 +20,7 @@ struct AddingSpendIcomeView: View {
     @State private var showAddingBalanceAccountView = false
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
+    @State private var didExitByScroll = false
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
@@ -114,6 +115,9 @@ struct AddingSpendIcomeView: View {
                         .fill(.clear)
                         .frame(height: 50)
                 }
+                .safeAreaInset(edge: .top) {
+                    scrollTopToExitGeometry
+                }
             }
             .scrollIndicators(.hidden)
             .frame(maxWidth: frameMaxWidthHeight.maxWidth, maxHeight: frameMaxWidthHeight.maxHeight)
@@ -178,6 +182,20 @@ struct AddingSpendIcomeView: View {
                 .foregroundStyle(.secondary)
                 .labelsHidden()
         }
+    }
+    
+    private var scrollTopToExitGeometry: some View {
+        GeometryReader { proxy in
+            let minY = proxy.frame(in: .scrollView(axis: .vertical)).minY
+            EmptyView()
+                .onChange(of: minY) {
+                    if minY > 150, !didExitByScroll {
+                        didExitByScroll = true
+                        closeView()
+                    }
+                }
+        }
+        .frame(height: 0)
     }
     
     private var headerSection: some View {
