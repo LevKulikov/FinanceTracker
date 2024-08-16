@@ -371,7 +371,7 @@ struct AddingSpendIcomeView: View {
             Spacer()
             
             Menu(viewModel.balanceAccount.name) {
-                Picker("", selection: $viewModel.balanceAccount) {
+                Picker("Balance Accounts", selection: $viewModel.balanceAccount) {
                     ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
                         HStack {
                             Text(balanceAcc.name)

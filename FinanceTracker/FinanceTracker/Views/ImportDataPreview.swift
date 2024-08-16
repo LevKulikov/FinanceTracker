@@ -74,16 +74,17 @@ struct ImportDataPreview: View {
             } message: {
                 Text("Imported data will be cleaned")
             }
-            .confirmationDialog("Import data?", isPresented: $deletionAlert, titleVisibility: .visible) {
-                Button("Import", role: .destructive) {
-                    onImportAction()
-                    dismiss()
-                }
-            } message: {
-                Text("All stored data will be deleted and replaced with imported data, even it is empty")
-            }
             .overlay(alignment: .bottom) {
                 importButton
+                    .confirmationDialog("Import data?", isPresented: $deletionAlert, titleVisibility: .visible) {
+                        Button("Import", role: .destructive) {
+                            print("Import button pressed")
+                            onImportAction()
+                            dismiss()
+                        }
+                    } message: {
+                        Text("All stored data will be deleted and replaced with imported data, even it is empty")
+                    }
             }
         }
     }

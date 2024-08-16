@@ -17,6 +17,9 @@ struct TagsView: View {
     @Namespace private var namespace
     @State private var tagDeletionFlag: Tag?
     @State private var showSettings = false
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: TagsViewModel) {
@@ -83,7 +86,8 @@ struct TagsView: View {
             }
             .confirmationDialog(
                 "Delete tag?",
-                isPresented: .init(get: {tagDeletionFlag != nil}, set: { _ in tagDeletionFlag = nil }),
+                isPresented: 
+                        .init(get: { isIpad ? false : tagDeletionFlag != nil }, set: { _ in tagDeletionFlag = nil }),
                 titleVisibility: .visible) {
                     Button("Delete tag only", role: .destructive) {
                         if let tagDeletionFlag {
@@ -99,7 +103,24 @@ struct TagsView: View {
                 } message: {
                     Text("This action is irretable. There are two ways to delete:\n\n - Delete tag only: only selected tag will be deleted and removed from transactions \n\n - Delete with transactions: tag and transactions marked with this tag will be deleted all together")
                 }
-
+            .alert(
+                "Delete tag?",
+                isPresented:
+                        .init(get: { isIpad ? tagDeletionFlag != nil : false }, set: { _ in tagDeletionFlag = nil })) {
+                    Button("Delete tag only", role: .destructive) {
+                        if let tagDeletionFlag {
+                            viewModel.deleteTag(tagDeletionFlag, withAnimation: true)
+                        }
+                    }
+                    
+                    Button("Delete with transactions", role: .destructive) {
+                        if let tagDeletionFlag {
+                            viewModel.deleteTagWithTransactions(tagDeletionFlag, withAnimation: true)
+                        }
+                    }
+                } message: {
+                    Text("This action is irretable. There are two ways to delete:\n\n - Delete tag only: only selected tag will be deleted and removed from transactions \n\n - Delete with transactions: tag and transactions marked with this tag will be deleted all together")
+                }
         }
     }
     

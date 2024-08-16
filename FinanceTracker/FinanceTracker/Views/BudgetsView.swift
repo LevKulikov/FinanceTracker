@@ -18,6 +18,9 @@ struct BudgetsView: View {
     private var backgroundColor: Color {
         colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
     }
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: BudgetsViewModel) {
@@ -76,7 +79,8 @@ struct BudgetsView: View {
             .navigationTitle("Budgets")
             .confirmationDialog(
                 "Delete budget?",
-                isPresented: .init(get: { deletionAlertItem != nil }, set: { _ in deletionAlertItem = nil }),
+                isPresented: 
+                        .init(get: { isIpad ? false : deletionAlertItem != nil }, set: { _ in deletionAlertItem = nil }),
                 titleVisibility: .visible,
                 actions: {
                     Button("Delete", role: .destructive) {
@@ -86,6 +90,21 @@ struct BudgetsView: View {
                     }
                 },
                 message: {
+                    Text("This action is irretable")
+                })
+            .alert(
+                "Delete budget?",
+                isPresented:
+                        .init(get: { isIpad ? deletionAlertItem != nil : false }, set: { _ in deletionAlertItem = nil }),
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let deletionAlertItem {
+                            viewModel.deleteBudget(deletionAlertItem)
+                        }
+                    }
+                    
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
                     Text("This action is irretable")
                 })
             .toolbar {

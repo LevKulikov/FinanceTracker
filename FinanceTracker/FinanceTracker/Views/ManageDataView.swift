@@ -42,13 +42,6 @@ struct ManageDataView: View {
                 }
             }
             .navigationTitle("Data settings")
-            .confirmationDialog("Delete all transactions?", isPresented: $deleteTransactionsFirstAlert, titleVisibility: .visible) {
-                Button("Delete", role: .destructive) {
-                    deleteTransactionsSecondAlert.toggle()
-                }
-            } message: {
-                Text("Are you sure? All transactions will be deleted, this action is irretable")
-            }
             .alert("Final alert!", isPresented: $deleteTransactionsSecondAlert) {
                 Button("Yes, delete", role: .destructive) {
                     viewModel.deleteAllTransactions()
@@ -57,13 +50,6 @@ struct ManageDataView: View {
                 Button("No, cancel", role: .cancel, action: {})
             } message: {
                 Text("Again, this action is irretable. Do you want to delete all transactions?")
-            }
-            .confirmationDialog("Delete all data?", isPresented: $deleteAllDataFirstAlert, titleVisibility: .visible) {
-                Button("Delete", role: .destructive) {
-                    deleteAllDataSecondAlert.toggle()
-                }
-            } message: {
-                Text("Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
             }
             .alert("Final alert!", isPresented: $deleteAllDataSecondAlert) {
                 Button("Yes, delete anyway", role: .destructive) {
@@ -100,6 +86,13 @@ struct ManageDataView: View {
                 .foregroundStyle(.red)
         }
         .listRowBackground(Color.red.opacity(0.1))
+        .confirmationDialog("Delete all transactions?", isPresented: $deleteTransactionsFirstAlert, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                deleteTransactionsSecondAlert.toggle()
+            }
+        } message: {
+            Text("Are you sure? All transactions will be deleted, this action is irretable")
+        }
     }
     
     private var deleteAllStoredDataRow: some View {
@@ -110,6 +103,13 @@ struct ManageDataView: View {
                 .foregroundStyle(.red)
         }
         .listRowBackground(Color.red.opacity(0.1))
+        .confirmationDialog("Delete all data?", isPresented: $deleteAllDataFirstAlert, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                deleteAllDataSecondAlert.toggle()
+            }
+        } message: {
+            Text("Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
+        }
     }
     
     private var jsonSection: some View {
@@ -143,7 +143,7 @@ struct ManageDataView: View {
             .alert("File decoding error", isPresented: .init(get: { viewModel.dataDecodingError != nil }, set: {_ in viewModel.dataDecodingError = nil })) {
                 Button("Ok") { }
             } message: {
-                Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text")")
+                Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text"). Probably, you selected wrong file ")
             }
             .fullScreenCover(item: $viewModel.decodedContainer) { container in
                 ImportDataPreview(container: container) {

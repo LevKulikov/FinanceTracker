@@ -306,11 +306,22 @@
       }
     },
     "An error occurred during decoding selected file. Error text: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "An error occurred during decoding selected file. Error text: %@. Probably, you selected wrong file " : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@. Возможно, вы выбрали не тот файл"
           }
         }
       }
@@ -427,6 +438,7 @@
       }
     },
     "Balance account picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1995,6 +2007,7 @@
       }
     },
     "Picker title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2015,6 +2028,7 @@
       }
     },
     "Pie chart date type picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2242,6 +2256,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите цвет"
+          }
+        }
+      }
+    },
+    "Select date for bars" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать промежуток для столбцов"
+          }
+        }
+      }
+    },
+    "Select date type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип даты"
+          }
+        }
+      }
+    },
+    "Select displayed transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать отображаемые транзакции"
+          }
+        }
+      }
+    },
+    "Select transaction type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип транзакций"
           }
         }
       }
@@ -2736,6 +2790,7 @@
       }
     },
     "Transaction type for tags picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

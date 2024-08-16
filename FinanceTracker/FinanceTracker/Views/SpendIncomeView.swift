@@ -19,6 +19,9 @@ struct SpendIncomeView: View {
     //For drag gesture
     @State private var dragXOffset: CGFloat = 0
     @State private var scrollDisabled = false
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: Init
     init(viewModel: SpendIncomeViewModel, namespace: Namespace.ID) {
@@ -77,8 +80,23 @@ struct SpendIncomeView: View {
             .scrollDisabled(scrollDisabled)
             .confirmationDialog(
                 "Delete transactions?",
-                isPresented: .init(get: { transactionsToDelete != nil }, set: { _ in transactionsToDelete = nil }),
+                isPresented: 
+                        .init(get: { isIpad ? false : transactionsToDelete != nil }, set: { _ in transactionsToDelete = nil }),
                 titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionsToDelete {
+                            viewModel.deleteTransactions(transactionsToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .alert(
+                "Delete transactions?",
+                isPresented: 
+                        .init(get: { isIpad ? transactionsToDelete != nil : false }, set: { _ in transactionsToDelete = nil }),
                 actions: {
                     Button("Delete", role: .destructive) {
                         if let transactionsToDelete {
@@ -156,7 +174,7 @@ struct SpendIncomeView: View {
         VStack(spacing: 0) {
             HStack {
                 Menu {
-                    Picker("", selection: $viewModel.balanceAccountToFilter) {
+                    Picker("Balance Accounts", selection: $viewModel.balanceAccountToFilter) {
                         ForEach(viewModel.availableBalanceAccounts) { balanceAcc in
                             HStack {
                                 Text(balanceAcc.name)

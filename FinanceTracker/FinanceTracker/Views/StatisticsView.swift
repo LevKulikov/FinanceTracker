@@ -105,7 +105,7 @@ struct StatisticsView: View {
                 Spacer()
                 
                 Menu(viewModel.balanceAccountToFilter.name) {
-                    Picker("Picker title", selection: $viewModel.balanceAccountToFilter) {
+                    Picker("Balance Accounts", selection: $viewModel.balanceAccountToFilter) {
                         ForEach(viewModel.balanceAccounts) { balanceAccount in
                             HStack {
                                 Text(balanceAccount.name)
@@ -167,7 +167,7 @@ struct StatisticsView: View {
                 Spacer()
                 
                 Menu(String(localized: viewModel.transactionTypeForTags.localizedString)) {
-                    Picker("Transaction type for tags picker", selection: $viewModel.transactionTypeForTags) {
+                    Picker("Select transaction type", selection: $viewModel.transactionTypeForTags) {
                         ForEach(TransactionsType.allCases) { type in
                             Text(type.localizedString)
                                 .tag(type)
@@ -238,7 +238,7 @@ struct StatisticsView: View {
                 Spacer()
                 
                 Menu(String(localized: viewModel.pieChartTransactionType.localizedString)) {
-                    Picker("Pie chart picker", selection: $viewModel.pieChartTransactionType) {
+                    Picker("Select transaction type", selection: $viewModel.pieChartTransactionType) {
                         ForEach(TransactionsType.allCases) { type in
                             Text(type.localizedString)
                                 .tag(type)
@@ -270,7 +270,7 @@ struct StatisticsView: View {
         VStack {
             HStack {
                 Menu(String(localized: viewModel.pieChartMenuDateFilterSelected.rawValue), systemImage: "chevron.up.chevron.down") {
-                    Picker("Pie chart date type picker", selection: $viewModel.pieChartMenuDateFilterSelected) {
+                    Picker("Select date type", selection: $viewModel.pieChartMenuDateFilterSelected) {
                         ForEach(PieChartDateFilter.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
                                 .tag(dateFilterType)
@@ -353,7 +353,7 @@ struct StatisticsView: View {
                 Spacer()
                 
                 Menu(String(localized: viewModel.barChartTransactionTypeFilter.rawValue)) {
-                    Picker("Bar chart picker", selection: $viewModel.barChartTransactionTypeFilter) {
+                    Picker("Select displayed transactions", selection: $viewModel.barChartTransactionTypeFilter) {
                         ForEach(TransactionFilterTypes.allCases) { type in
                             Text(type.rawValue)
                                 .tag(type)
@@ -374,7 +374,7 @@ struct StatisticsView: View {
             
             HStack {
                 Menu(String(localized: viewModel.barChartPerDateFilter.rawValue), systemImage: "chevron.up.chevron.down") {
-                    Picker("Bar chart date sride type picker", selection: $viewModel.barChartPerDateFilter) {
+                    Picker("Select date for bars", selection: $viewModel.barChartPerDateFilter) {
                         ForEach(BarChartPerDateFilter.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
                                 .tag(dateFilterType)

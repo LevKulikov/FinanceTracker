@@ -43,6 +43,9 @@ struct CategoriesView: View {
     private let replaceToCategoryId = "replaceToCategoryId"
     private let toTextId = "toTextId"
     private let fromTextId = "fromTextId"
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: CategoriesViewModel) {
@@ -124,8 +127,25 @@ struct CategoriesView: View {
             }
             .confirmationDialog(
                 "Delete category?",
-                isPresented: .init(get: { categoryToDeleteFlag != nil }, set: { _ in categoryToDeleteFlag = nil }),
+                isPresented: 
+                        .init(get: { isIpad ? false : categoryToDeleteFlag != nil }, set: { _ in categoryToDeleteFlag = nil }),
                 titleVisibility: .visible) {
+                    Button("Delete category only") {
+                        categoryToDelete = categoryToDeleteFlag
+                        showReplacementSheet.toggle()
+                    }
+                    
+                    Button("Delete with transactions", role: .destructive) {
+                        if let categoryToDeleteFlag {
+                            viewModel.deleteCategoryWithTransactions(categoryToDeleteFlag)
+                        }
+                    }
+                } message: {
+                    Text("This action is irretable. There are two ways to delete:\n\n - Delete category only: all transactions binded to deleted category will be moved to another one of your choice. Before deletion app will ask you where transactions should be moved to\n\n - Delete with transactions: category and binded to it transactions will be deleted all together")
+                }
+            .alert(
+                "Delete category?",
+                isPresented: .init(get: { isIpad ? categoryToDeleteFlag != nil : false }, set: { _ in categoryToDeleteFlag = nil })) {
                     Button("Delete category only") {
                         categoryToDelete = categoryToDeleteFlag
                         showReplacementSheet.toggle()
