@@ -185,7 +185,7 @@ struct AddingBudgetView: View {
             Spacer()
             
             Menu(viewModel.balanceAccount.name) {
-                Picker("Balance account picker", selection: $viewModel.balanceAccount) {
+                Picker("Balance Accounts", selection: $viewModel.balanceAccount) {
                     ForEach(viewModel.allBalanceAccounts) { balanceAccount in
                         HStack {
                             Text(balanceAccount.name)

@@ -15,6 +15,9 @@ struct TransactionListView<Content: View>: View {
     @State private var transactionToDelete: Transaction?
     @Namespace private var namespace
     @ViewBuilder private let topContent: ([Transaction]) -> Content
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: TransactionListViewModel) where Content == EmptyView {
@@ -74,8 +77,23 @@ struct TransactionListView<Content: View>: View {
             }
             .confirmationDialog(
                 "Delete transaction?",
-                isPresented: .init(get: { transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
+                isPresented: 
+                        .init(get: { isIpad ? false : transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
                 titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionToDelete {
+                            viewModel.deleteTransaction(transactionToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .alert(
+                "Delete transaction?",
+                isPresented: 
+                        .init(get: { isIpad ? transactionToDelete != nil : false }, set: { _ in transactionToDelete = nil}),
                 actions: {
                     Button("Delete", role: .destructive) {
                         if let transactionToDelete {

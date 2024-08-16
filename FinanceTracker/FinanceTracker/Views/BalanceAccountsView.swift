@@ -17,6 +17,9 @@ struct BalanceAccountsView: View {
         guard let defaultBalanceAccount = viewModel.defaultBalanceAccount else { return false }
         return defaultBalanceAccount != deleteBalanceAccountFlag
     }
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: BalanceAccountsViewModel) {
@@ -60,8 +63,17 @@ struct BalanceAccountsView: View {
                 })
             .confirmationDialog(
                 canDeleteBalanceAccount ? "Delete balance account?" : "Unable to delete",
-                isPresented: .init(get: { deleteBalanceAccountFlag != nil }, set: { _ in deleteBalanceAccountFlag = nil }),
+                isPresented: 
+                        .init(get: { isIpad ? false : deleteBalanceAccountFlag != nil }, set: { _ in deleteBalanceAccountFlag = nil }),
                 titleVisibility: .visible) {
+                    getActionsForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)
+                } message: {
+                    getMessageForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)
+                }
+            .alert(
+                canDeleteBalanceAccount ? "Delete balance account?" : "Unable to delete",
+                isPresented: 
+                        .init(get: { isIpad ? deleteBalanceAccountFlag != nil : false }, set: { _ in deleteBalanceAccountFlag = nil })) {
                     getActionsForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)
                 } message: {
                     getMessageForDeleteDialog(balanceAccount: deleteBalanceAccountFlag)

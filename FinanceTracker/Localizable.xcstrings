@@ -114,6 +114,16 @@
         }
       }
     },
+    "+" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+"
+          }
+        }
+      }
+    },
     "+%lld" : {
       "localizations" : {
         "ru" : {
@@ -265,12 +275,63 @@
         }
       }
     },
+    "All stored data will be deleted and replaced with imported data, even it is empty" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все сохраненные данные будут удалены и заменены на импортированные, даже если импортированный файл не содержит значений"
+          }
+        }
+      }
+    },
     "All time" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Все время"
+          }
+        }
+      }
+    },
+    "An error occurred during creating a Excel (csv) file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создании файла Excel (csv). Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "An error occurred during decoding selected file. Error text: %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "An error occurred during decoding selected file. Error text: %@. Probably, you selected wrong file " : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@. Возможно, вы выбрали не тот файл"
+          }
+        }
+      }
+    },
+    "An error occurred while creating a JSON file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создания JSON файла. Текст ошибки: %@"
           }
         }
       }
@@ -377,6 +438,7 @@
       }
     },
     "Balance account picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -506,6 +568,16 @@
         }
       }
     },
+    "Cancel the import?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить импорт?"
+          }
+        }
+      }
+    },
     "Card type" : {
       "localizations" : {
         "ru" : {
@@ -562,6 +634,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Графики"
+          }
+        }
+      }
+    },
+    "Check other items using the picker at the top" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посмотрите другие объекты с помощью пикера вверху"
           }
         }
       }
@@ -642,6 +724,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментарий"
+          }
+        }
+      }
+    },
+    "Comment: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий: %@"
           }
         }
       }
@@ -812,6 +904,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тип даты"
+          }
+        }
+      }
+    },
+    "Date;Time;Type;Value;Currency;Category;Balance Account;Comment;Tags\n" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата;Время;Тип;Значение;Валюта;Категория;Счет;Комментарий;Теги\n"
           }
         }
       }
@@ -1183,12 +1285,73 @@
         }
       }
     },
+    "Err" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошбк"
+          }
+        }
+      }
+    },
+    "Excel (csv) file creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания Excel (csv) файла"
+          }
+        }
+      }
+    },
+    "Export all data" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать все данные"
+          }
+        }
+      }
+    },
+    "Export all data as JSON file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать данные в виде JSON файла"
+          }
+        }
+      }
+    },
+    "Export transactions as Excel file (csv) for date range" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать транзакции в виде Excel файла (csv) за промежуток дат"
+          }
+        }
+      }
+    },
     "Family" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Семья"
+          }
+        }
+      }
+    },
+    "File decoding error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка декодирования файла"
           }
         }
       }
@@ -1383,6 +1546,56 @@
         }
       }
     },
+    "Import" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать"
+          }
+        }
+      }
+    },
+    "Import data from JSON file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные из JSON файла"
+          }
+        }
+      }
+    },
+    "Import data?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные?"
+          }
+        }
+      }
+    },
+    "Imported data will be cleaned" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные данные будут очищены"
+          }
+        }
+      }
+    },
+    "Imported objects" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные объекты"
+          }
+        }
+      }
+    },
     "In development" : {
       "localizations" : {
         "ru" : {
@@ -1429,6 +1642,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошая возможность чтобы попробовать!"
+          }
+        }
+      }
+    },
+    "JSON creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания JSON файла"
           }
         }
       }
@@ -1543,12 +1766,42 @@
         }
       }
     },
+    "No balance accounts imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных счетов"
+          }
+        }
+      }
+    },
     "No budgets" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет бюджетов"
+          }
+        }
+      }
+    },
+    "No budgets imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных бюджетов"
+          }
+        }
+      }
+    },
+    "No categories imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных категорий"
           }
         }
       }
@@ -1573,6 +1826,16 @@
         }
       }
     },
+    "No tags imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных тегов"
+          }
+        }
+      }
+    },
     "No transactions" : {
       "localizations" : {
         "ru" : {
@@ -1583,12 +1846,32 @@
         }
       }
     },
+    "No transactions imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных транзакций"
+          }
+        }
+      }
+    },
     "No, cancel" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет, отменить"
+          }
+        }
+      }
+    },
+    "No, stay here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, остаться здесь"
           }
         }
       }
@@ -1724,6 +2007,7 @@
       }
     },
     "Picker title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1744,6 +2028,7 @@
       }
     },
     "Pie chart date type picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1975,6 +2260,46 @@
         }
       }
     },
+    "Select date for bars" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать промежуток для столбцов"
+          }
+        }
+      }
+    },
+    "Select date type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип даты"
+          }
+        }
+      }
+    },
+    "Select displayed transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать отображаемые транзакции"
+          }
+        }
+      }
+    },
+    "Select transaction type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип транзакций"
+          }
+        }
+      }
+    },
     "Selected (%@) and Default (%@) balance accounts have different currency. Moved transactions will change currency to %@. Continue?" : {
       "localizations" : {
         "en" : {
@@ -2119,6 +2444,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Некоторые существующие категории"
+          }
+        }
+      }
+    },
+    "Some information cannot be previewed until the imported data is saved to the device. After saving, all information will be available for viewing and editing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторую информацию невозможно отобразить в превью до того, как ипортированные данные будут сохранены на устройство. После сохранения вся информация будет доступна для просмотра и редактирования"
           }
         }
       }
@@ -2455,6 +2790,7 @@
       }
     },
     "Transaction type for tags picker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2480,6 +2816,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транспорт"
+          }
+        }
+      }
+    },
+    "Try searching for other items using the picker at the top" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте поискать другие объекты с помощью пикера вверху"
           }
         }
       }
@@ -2519,7 +2866,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Невозможно удалить базовый счет. Установить другой счет в качестве базового, если вам необходимо удалить выбранный счет"
+            "value" : "Невозможно удалить базовый счет. Установите другой счет в качестве базового, если вам необходимо удалить выбранный счет"
           }
         }
       }
@@ -2624,12 +2971,32 @@
         }
       }
     },
+    "Why I don't see some information" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почему я не вижу некоторую информацию"
+          }
+        }
+      }
+    },
     "www.flaticon.com" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "www.flaticon.com"
+          }
+        }
+      }
+    },
+    "Yes, cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, отменить"
           }
         }
       }

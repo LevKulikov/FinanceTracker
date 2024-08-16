@@ -14,6 +14,9 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     var isFirstLaunch: Bool { get set }
     
     @MainActor
+    func getContext() -> ModelContext
+    
+    @MainActor
     func save() throws
     
     func saveFromBackground() async throws
@@ -69,6 +72,12 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
     
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel
+    
+    /// Fetches all data from background and creates codable data container
+    /// - Returns: codable data container with all stored data
+    func createDataContainer() async throws -> FTDataContainer
+    
+    func importDataFromContainer(_ container: FTDataContainer) async
     
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
@@ -148,6 +157,10 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     //MARK: - Methods
+    func getContext() -> ModelContext {
+        return container.mainContext
+    }
+    
     func save() throws {
         try container.mainContext.save()
     }
@@ -305,8 +318,12 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteAllTransactions() async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
         do {
-            try container.mainContext.delete(model: Transaction.self)
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            for transaction in allTransactions {
+                container.mainContext.delete(transaction)
+            }
             try save()
         } catch {
             print(error)
@@ -315,13 +332,21 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteAllStoredData() async {
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let fetchTagDescriptor = FetchDescriptor<Tag>()
         do {
-            try container.mainContext.delete(model: Transaction.self)
+            let allTransactions = try fetch(fetchTransactionDescriptor)
+            for transaction in allTransactions {
+                container.mainContext.delete(transaction)
+            }
+            try container.mainContext.delete(model: Budget.self)
             try container.mainContext.delete(model: BalanceAccount.self)
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
-            try container.mainContext.delete(model: Tag.self)
-            try container.mainContext.delete(model: Budget.self)
+            let allTags = try fetch(fetchTagDescriptor)
+            for tag in allTags {
+                container.mainContext.delete(tag)
+            }
             try save()
         } catch {
             print(error)
@@ -370,6 +395,104 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         } else {
             backgroundActor = BackgroundDataActor(modelContainer: container)
             return try await backgroundActor!.fetch(descriptor)
+        }
+    }
+    
+    func createDataContainer() async throws -> FTDataContainer {
+        let nonNilBackgroundActor = backgroundActor ?? BackgroundDataActor(modelContainer: container)
+        
+        async let allBalanceAccounts = nonNilBackgroundActor.fetch(FetchDescriptor<BalanceAccount>())
+        async let allCategories = nonNilBackgroundActor.fetch(FetchDescriptor<Category>())
+        async let allTags = nonNilBackgroundActor.fetch(FetchDescriptor<Tag>())
+        async let allTransactions = nonNilBackgroundActor.fetch(FetchDescriptor<Transaction>())
+            .compactMap { FTDataContainer.TransactionContainer(transaction: $0) }
+        async let allBudgets = nonNilBackgroundActor.fetch(FetchDescriptor<Budget>())
+            .compactMap { FTDataContainer.BudgetContainer(budget: $0) }
+         
+        let dataContainer = FTDataContainer(
+            balanceAccounts: try await allBalanceAccounts,
+            categories: try await allCategories,
+            tags: try await allTags,
+            transactionContainers: try await allTransactions,
+            budgetContainers: try await allBudgets
+        )
+        
+        return dataContainer
+    }
+    
+    @MainActor
+    func importDataFromContainer(_ dataContainer: FTDataContainer) async {
+        print("DataManager.importDataFromContainer: Inserting balance accounts")
+        for balanceAccount in dataContainer.balanceAccounts {
+            insert(balanceAccount)
+        }
+        
+        print("DataManager.importDataFromContainer: Inserting categories")
+        for category in dataContainer.categories {
+            insert(category)
+        }
+        
+        print("DataManager.importDataFromContainer: Inserting tags")
+        for tag in dataContainer.tags {
+            insert(tag)
+        }
+        
+        // Because of relationships in transactions and budgets, it is needed to insert new object with stored other objects (like Category and etc)
+        print("DataManager.importDataFromContainer: Fetching Balance Accounts, Categories and tags")
+        let savedBAs = try? fetch(FetchDescriptor<BalanceAccount>())
+        let savedCategs = try? fetch(FetchDescriptor<Category>())
+        let savedTags = try? fetch(FetchDescriptor<Tag>())
+        
+        print("DataManager.importDataFromContainer: Inserting transactions")
+        for transactionContainer in dataContainer.transactionContainers {
+            let transaction = transactionContainer.transaction
+            guard let balanceAccount = savedBAs?.first(where: { $0.id ==  transactionContainer.balanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance account for transaction")
+                continue
+            }
+            guard let category = savedCategs?.first(where: { $0.id == transactionContainer.categoryID }) else {
+                print("DataManager.importDataFromContainer: did not find category for transaction")
+                continue
+            }
+            guard let type = transaction.type else {
+                print("DataManager.importDataFromContainer: imported transaction type is nil")
+                continue
+            }
+            let tags = savedTags?.filter { transactionContainer.tagIDs.contains($0.id) }
+            
+            // It is needed to create new one transaction and provide it balance account and category
+            // otherwise (if we set those objects dirctly to imported transaction) we get SwiftData error (like EXC_BAD_ACCESS and etc)
+            let newTransaction = Transaction(type: type, comment: transaction.comment, value: transaction.value, date: transaction.date, balanceAccount: balanceAccount, category: category, tags: tags ?? [])
+            insert(newTransaction)
+        }
+        
+        print("DataManager.importDataFromContainer: Inserting budgets")
+        for budgetContainer in dataContainer.budgetContainers {
+            let budget = budgetContainer.budget
+            guard let balanceAccount = savedBAs?.first(where: { $0.id ==  budgetContainer.balanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance account for budget")
+                continue
+            }
+            var category: Category? = nil
+            if let categoryID = budgetContainer.categoryID, !categoryID.isEmpty {
+                if let findCategory = savedCategs?.first(where: { $0.id == categoryID }) {
+                    category = findCategory
+                }
+            }
+            
+            // It is needed to create new one budget and provide it balance account and category
+            // otherwise (if we set those objects dirctly to imported budget) we get SwiftData error (like EXC_BAD_ACCESS and etc)
+            let newBudget = Budget(name: budget.name, value: budget.value, period: budget.period, category: category, balanceAccount: balanceAccount)
+            insert(newBudget)
+        }
+        
+        do {
+            print("DataManager.importDataFromContainer: Saving on main context")
+            try save()
+            print("DataManager.importDataFromContainer: Saving on background context")
+            try await saveFromBackground()
+        } catch {
+            print("DataManager.importDataFromContainer: Saving error: \(error)")
         }
     }
     

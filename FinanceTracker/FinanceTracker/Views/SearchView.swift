@@ -25,6 +25,9 @@ struct SearchView: View {
         }
         return .infinity
     }
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: SearchViewModel) {
@@ -85,17 +88,25 @@ struct SearchView: View {
             .refreshable {
                 showRefreshAlert = true
             }
-            .confirmationDialog("Refresh?", isPresented: $showRefreshAlert, titleVisibility: .visible) {
-                Button("Yes, refresh") {
-                    viewModel.refetchData()
-                }
-            } message: {
-                Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")
-            }
             .confirmationDialog(
                 "Delete transaction?",
-                isPresented: .init(get: { transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
+                isPresented: 
+                        .init(get: { isIpad ? false : transactionToDelete != nil }, set: { _ in transactionToDelete = nil}),
                 titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transactionToDelete {
+                            viewModel.deleteTransaction(transactionToDelete)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .alert(
+                "Delete transaction?",
+                isPresented: 
+                        .init(get: { isIpad ? transactionToDelete != nil : false }, set: { _ in transactionToDelete = nil}),
                 actions: {
                     Button("Delete", role: .destructive) {
                         if let transactionToDelete {
@@ -161,6 +172,13 @@ struct SearchView: View {
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowSeparator(.hidden)
+        .confirmationDialog("Refresh?", isPresented: $showRefreshAlert, titleVisibility: .visible) {
+            Button("Yes, refresh") {
+                viewModel.refetchData()
+            }
+        } message: {
+            Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")
+        }
     }
     
     private var statisticsButton: some View {

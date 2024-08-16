@@ -561,6 +561,16 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    /// Cleans properties with data for UI by setting empty values
+    @MainActor
+    private func cleanData() {
+        balanceAccounts = []
+        totalForBalanceAccount = 0
+        tagsTotalData = []
+        pieChartTransactionData = []
+        barChartTransactionData = []
+    }
+    
     /// Fetches all data and executes completion handler
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @Sendable @escaping () -> Void) {
@@ -654,8 +664,8 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
     
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         if tabView == .welcomeView {
-            DispatchQueue.main.async { [weak self] in
-                self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
             }
             return
         }
@@ -673,6 +683,9 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         case .appearance:
             return
         case .data:
+            Task { @MainActor in
+                cleanData()
+            }
             isTransactionUpdatedFromAnotherView = true
         case .budgets:
             return
