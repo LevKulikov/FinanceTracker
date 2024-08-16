@@ -336,6 +336,16 @@
         }
       }
     },
+    "Analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
+    },
     "Any text or number" : {
       "localizations" : {
         "ru" : {
