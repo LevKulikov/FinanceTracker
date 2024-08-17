@@ -683,10 +683,12 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         case .appearance:
             return
         case .data:
-            Task { @MainActor in
-                cleanData()
-            }
             isTransactionUpdatedFromAnotherView = true
+            if tabView == .settingsView {
+                Task { @MainActor in
+                    cleanData()
+                }
+            }
         case .budgets:
             return
         case .notifications:
