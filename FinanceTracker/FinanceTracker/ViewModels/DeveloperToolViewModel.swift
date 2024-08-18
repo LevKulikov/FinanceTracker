@@ -27,6 +27,7 @@ final class DeveloperToolViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Methods
+    @MainActor
     func insertTransactions() async {
         await MainActor.run {
             isProcessing = true
@@ -35,23 +36,36 @@ final class DeveloperToolViewModel: ObservableObject, @unchecked Sendable {
         let countCopyString = await MainActor.run { return transactionsCountString }
         guard let count = Int(countCopyString) else {
             print("DeveloperToolViewModel, insertTransactions, cannot convert String to Int")
+            await MainActor.run {
+                isProcessing = false
+            }
             return
         }
         
         let copyBalanceAcc = await MainActor.run { return selectedBalanceAccount }
         guard let copyBalanceAcc else {
             print("DeveloperToolViewModel, insertTransactions, Balance Account is nil")
+            await MainActor.run {
+                isProcessing = false
+            }
             return
         }
         
         let copyCategory = await MainActor.run { return selectedCategory }
         guard let copyCategory else {
             print("DeveloperToolViewModel, insertTransactions, Category is nil")
+            await MainActor.run {
+                isProcessing = false
+            }
             return
         }
         
         let countFloat = Float(count)
-        for _ in 0..<count {
+        for i in 0..<count {
+            if i % 100 == 0 {
+                try? await Task.sleep(for: .seconds(0.2))
+            }
+            
             let transaction = Transaction(
                 type: copyCategory.type ?? TransactionsType(rawValue: copyCategory.typeRawValue) ?? .spending,
                 comment: "",
@@ -62,9 +76,8 @@ final class DeveloperToolViewModel: ObservableObject, @unchecked Sendable {
                 tags: []
             )
             
-            await MainActor.run {
-                dataManager.insert(transaction)
-            }
+            dataManager.insert(transaction)
+            print("Transaction number \(i) is inserted")
         }
         
         await MainActor.run {

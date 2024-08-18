@@ -49,6 +49,14 @@ struct DeveloperToolView: View {
                 }
             }
             .navigationTitle("Developer tool")
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
+            .overlay {
+                if viewModel.isProcessing {
+                    ProgressView()
+                        .controlSize(.large)
+                }
+            }
         }
     }
     

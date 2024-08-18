@@ -1128,6 +1128,9 @@
         }
       }
     },
+    "Developer tool" : {
+
+    },
     "Different currency" : {
       "localizations" : {
         "ru" : {
@@ -1264,6 +1267,9 @@
           }
         }
       }
+    },
+    "Enter number" : {
+
     },
     "Entertainments" : {
       "localizations" : {
@@ -1635,6 +1641,9 @@
           }
         }
       }
+    },
+    "Insert" : {
+
     },
     "Interest" : {
       "localizations" : {
@@ -2259,6 +2268,12 @@
           }
         }
       }
+    },
+    "Select balance account" : {
+
+    },
+    "Select category" : {
+
     },
     "Select color" : {
       "localizations" : {
