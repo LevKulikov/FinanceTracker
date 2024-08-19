@@ -15,9 +15,11 @@ struct FinanceTrackerApp: App {
     @StateObject private var dataManager: DataManager
 
     var body: some Scene {
-        WindowGroup {            
-            FTFactory.shared.createCustomTabView(dataManager: dataManager)
-                .preferredColorScheme(dataManager.preferredColorScheme)
+        WindowGroup {
+            RootView {
+                FTFactory.shared.createCustomTabView(dataManager: dataManager)
+                    .preferredColorScheme(dataManager.preferredColorScheme)
+            }
         }
     }
     

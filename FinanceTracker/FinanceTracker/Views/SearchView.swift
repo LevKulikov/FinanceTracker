@@ -174,7 +174,22 @@ struct SearchView: View {
         .listRowSeparator(.hidden)
         .confirmationDialog("Refresh?", isPresented: $showRefreshAlert, titleVisibility: .visible) {
             Button("Yes, refresh") {
-                viewModel.refetchData()
+                viewModel.refetchData {
+                    Toast.shared.present(
+                        title: String(localized: "Some error occurred"),
+                        subtitle: String(localized:"Please try again"),
+                        symbol: "exclamationmark.warninglight",
+                        tint: .red
+                    )
+                } completionHandler: {
+                    Toast.shared.present(
+                        title: String(localized: "Refreshed"),
+                        subtitle: String(localized: "All is up to date"),
+                        symbol: "checkmark.circle",
+                        tint: .blue
+                    )
+                }
+
             }
         } message: {
             Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")
