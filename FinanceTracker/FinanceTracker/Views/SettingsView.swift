@@ -158,6 +158,11 @@ struct SettingsView: View {
                 .confirmationDialog("@" + viewModel.developerTelegramUsername, isPresented: $telegramConfirmationFlag, titleVisibility: .visible) {
                     Button("Copy username") {
                         copyAsPlainText("@" + viewModel.developerTelegramUsername)
+                        Toast.shared.present(
+                            title: String(localized: "Username is copied"),
+                            symbol: "doc.on.doc",
+                            tint: .blue
+                        )
                     }
                     
                     Link("Send message", destination: URL(string: "https://t.me/" + viewModel.developerTelegramUsername)!)
@@ -172,6 +177,11 @@ struct SettingsView: View {
                 .confirmationDialog(viewModel.developerEmail, isPresented: $emailConfirmationFlag, titleVisibility: .visible) {
                     Button("Copy email") {
                         copyAsPlainText(viewModel.developerEmail)
+                        Toast.shared.present(
+                            title: String(localized: "Email is copied"),
+                            symbol: "doc.on.doc",
+                            tint: .blue
+                        )
                     }
                     
                     Button("Send mail", action: sendMailToDeveloper)

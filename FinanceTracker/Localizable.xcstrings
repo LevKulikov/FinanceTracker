@@ -1221,6 +1221,9 @@
         }
       }
     },
+    "Email is copied" : {
+
+    },
     "Empty" : {
       "localizations" : {
         "ru" : {
@@ -3009,6 +3012,9 @@
           }
         }
       }
+    },
+    "Username is copied" : {
+
     },
     "Value cannot be zero or empy" : {
       "localizations" : {
