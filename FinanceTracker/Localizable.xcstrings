@@ -275,6 +275,16 @@
         }
       }
     },
+    "All is up to date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все актуально"
+          }
+        }
+      }
+    },
     "All stored data will be deleted and replaced with imported data, even it is empty" : {
       "localizations" : {
         "ru" : {
@@ -879,7 +889,14 @@
       }
     },
     "Data is deleted" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данные удалены"
+          }
+        }
+      }
     },
     "Data settings" : {
       "localizations" : {
@@ -1222,7 +1239,14 @@
       }
     },
     "Email is copied" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email скопирован"
+          }
+        }
+      }
     },
     "Empty" : {
       "localizations" : {
@@ -2105,7 +2129,14 @@
       }
     },
     "Please try again" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
     },
     "Please wait" : {
       "localizations" : {
@@ -2174,6 +2205,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновить?"
+          }
+        }
+      }
+    },
+    "Refreshed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено"
           }
         }
       }
@@ -2487,7 +2528,14 @@
       }
     },
     "Show?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать?"
+          }
+        }
+      }
     },
     "Simple" : {
       "localizations" : {
@@ -2511,7 +2559,14 @@
       }
     },
     "Some error occurred" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка"
+          }
+        }
+      }
     },
     "Some existing categories" : {
       "localizations" : {
@@ -2896,7 +2951,14 @@
       }
     },
     "Transactions are deleted" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции удалены"
+          }
+        }
+      }
     },
     "Transport" : {
       "localizations" : {
@@ -3020,7 +3082,14 @@
       }
     },
     "Username is copied" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя скопировано"
+          }
+        }
+      }
     },
     "Value cannot be zero or empy" : {
       "localizations" : {
