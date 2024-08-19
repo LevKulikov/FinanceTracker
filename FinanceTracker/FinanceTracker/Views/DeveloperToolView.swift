@@ -20,22 +20,34 @@ struct DeveloperToolView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Select balance account", selection: $viewModel.selectedBalanceAccount) {
-                    ForEach(viewModel.balanceAccounts) { balanceAccount in
-                        Text(balanceAccount.name)
-                            .tag(Optional(balanceAccount))
-                    }
-                }
+                Text("This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App")
+                    .foregroundStyle(.secondary)
                 
-                Picker("Select category", selection: $viewModel.selectedCategory) {
-                    ForEach(viewModel.categories) { category in
-                        Text(category.name)
-                            .tag(Optional(category))
+                Section {
+                    Picker("Select balance account", selection: $viewModel.selectedBalanceAccount) {
+                        ForEach(viewModel.balanceAccounts) { balanceAccount in
+                            Text(balanceAccount.name)
+                                .tag(Optional(balanceAccount))
+                        }
                     }
+                    
+                    Picker("Select category", selection: $viewModel.selectedCategory) {
+                        ForEach(viewModel.categories) { category in
+                            Text(category.name)
+                                .tag(Optional(category))
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Enter number")
+                        
+                        TextField("Enter number", text: $viewModel.transactionsCountString)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                    }
+                } footer: {
+                    Text("Value of each transaction will be equal to the number entered")
                 }
-                
-                TextField("Enter number", text: $viewModel.transactionsCountString)
-                    .keyboardType(.numberPad)
                 
                 Section {
                     Button {
