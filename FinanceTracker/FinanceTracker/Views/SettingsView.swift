@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
     
+    @State private var showDeveloperTool = false
+    
     //MARK: - Initializer
     init(viewModel: SettingsViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -50,6 +52,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showTabsSettingsView) {
             viewModel.getTabsSettingsView()
+        }
+        .sheet(isPresented: $showDeveloperTool) {
+            viewModel.getDeveloperToolView()
         }
     }
     
@@ -185,6 +190,9 @@ struct SettingsView: View {
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .multilineTextAlignment(.center)
+            .onTapGesture(count: 3, perform: {
+                showDeveloperTool.toggle()
+            })
     }
     
     //MARK: - Methods

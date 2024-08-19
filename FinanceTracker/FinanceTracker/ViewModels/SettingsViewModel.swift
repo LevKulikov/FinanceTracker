@@ -114,6 +114,12 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     func getTabsSettingsView() -> some View {
         return FTFactory.shared.createTabsSettingsView(dataManager: dataManager, delegate: self)
     }
+    
+    @MainActor
+    func getDeveloperToolView() -> some View {
+        let viewModel = DeveloperToolViewModel(dataManager: dataManager)
+        return DeveloperToolView(viewModel: viewModel)
+    }
 }
 
 //MARK: - Extensions

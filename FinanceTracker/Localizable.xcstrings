@@ -1128,6 +1128,16 @@
         }
       }
     },
+    "Developer tool" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструмент разработчика"
+          }
+        }
+      }
+    },
     "Different currency" : {
       "localizations" : {
         "ru" : {
@@ -1261,6 +1271,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите имя"
+          }
+        }
+      }
+    },
+    "Enter number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите количество"
           }
         }
       }
@@ -1632,6 +1652,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Стартовый баланс"
+          }
+        }
+      }
+    },
+    "Insert" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вставить"
           }
         }
       }
@@ -2260,6 +2290,26 @@
         }
       }
     },
+    "Select balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите счет"
+          }
+        }
+      }
+    },
+    "Select category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите категорию"
+          }
+        }
+      }
+    },
     "Select color" : {
       "localizations" : {
         "ru" : {
@@ -2718,6 +2768,16 @@
         }
       }
     },
+    "This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное окно используется для теста производительности приложения в процессе высокой нагрузки. Оно создает огромное количество транзакций (базово 5000) для выбранных Счета и Категории. Все транзакции создаются на текущую дату, так что __не нажимайте кнопку \"Вставить\"__ если вы не хотите сильно замедлить приложение"
+          }
+        }
+      }
+    },
     "Time, Title and Body" : {
       "localizations" : {
         "ru" : {
@@ -2947,6 +3007,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Значение не может быть нулем или пустым"
+          }
+        }
+      }
+    },
+    "Value of each transaction will be equal to the number entered" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение каждой транзакции будет равно введенному количеству"
           }
         }
       }
