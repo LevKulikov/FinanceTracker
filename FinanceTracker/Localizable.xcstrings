@@ -2104,6 +2104,9 @@
         }
       }
     },
+    "Please try again" : {
+
+    },
     "Please wait" : {
       "localizations" : {
         "ru" : {
@@ -2506,6 +2509,9 @@
           }
         }
       }
+    },
+    "Some error occurred" : {
+
     },
     "Some existing categories" : {
       "localizations" : {

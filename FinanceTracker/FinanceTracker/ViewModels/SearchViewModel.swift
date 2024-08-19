@@ -246,10 +246,18 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: currency)
     }
     
-    func refetchData() {
-        fetchAllData(competionHandler:  { [weak self] in
+    func refetchData(errorHandler: (@MainActor @Sendable () -> Void)? = nil, completionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+        fetchAllData { _ in
+            Task { @MainActor in
+                errorHandler?()
+            }
+        } competionHandler: { [weak self] in
             self?.filterAndSetTransactions()
-        })
+            Task { @MainActor in
+                completionHandler?()
+            }
+        }
+
     }
     
     func deleteTransaction(_ transaction: Transaction) {
