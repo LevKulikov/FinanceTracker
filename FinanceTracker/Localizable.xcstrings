@@ -878,6 +878,9 @@
         }
       }
     },
+    "Data is deleted" : {
+
+    },
     "Data settings" : {
       "localizations" : {
         "ru" : {
@@ -2882,6 +2885,9 @@
           }
         }
       }
+    },
+    "Transactions are deleted" : {
+
     },
     "Transport" : {
       "localizations" : {
