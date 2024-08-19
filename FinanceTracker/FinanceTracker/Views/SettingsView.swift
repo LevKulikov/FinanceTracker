@@ -190,9 +190,16 @@ struct SettingsView: View {
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .multilineTextAlignment(.center)
-            .onTapGesture(count: 3, perform: {
-                showDeveloperTool.toggle()
-            })
+            .onTapGesture(count: 3) {
+                Toast.shared.present(
+                    title: String(localized: "Show?"),
+                    subtitle: String(localized: "Developer tool"),
+                    symbol: "chevron.left.forwardslash.chevron.right",
+                    action: .init(symbol: "lock.open", hideAfterAction: true, action: {
+                        showDeveloperTool.toggle()
+                    })
+                )
+            }
     }
     
     //MARK: - Methods

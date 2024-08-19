@@ -14,7 +14,7 @@ struct RootView<Content: View>: View {
     var body: some View {
         content
             .onAppear {
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, overlayWindow == nil {
+                if overlayWindow == nil, let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                     let window = PassthroughWindow(windowScene: windowScene)
                     window.backgroundColor = .clear
                     
@@ -42,7 +42,7 @@ fileprivate class PassthroughWindow: UIWindow {
 }
 
 @Observable
-final class Toast: Sendable {
+final class Toast: @unchecked Sendable {
     nonisolated static let shared = Toast()
     @MainActor private(set) var toasts: [ToastItem] = []
     
@@ -83,7 +83,7 @@ struct ToastItem: Identifiable {
     struct ToastAction {
         let symbol: String
         let hideAfterAction: Bool
-        let action: @Sendable () -> Void
+        let action: @MainActor @Sendable () -> Void
     }
 }
 
@@ -169,7 +169,6 @@ fileprivate struct ToastView: View {
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.circle)
                 .foregroundStyle(item.tint == .primary ? .blue : item.tint)
-                .scaleEffect(1.25)
             }
         }
         .foregroundStyle(item.tint)
