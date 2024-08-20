@@ -131,7 +131,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         didSet {
             guard dateFilterType != oldValue else { return }
             Task {
-                await fetchTransactions()
+                await fetchTransactions(showFetching: true)
                 filterAndSetTransactions()
             }
         }
@@ -140,7 +140,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         didSet {
             guard filterDate != oldValue else { return }
             Task {
-                await fetchTransactions()
+                await fetchTransactions(showFetching: true)
                 filterAndSetTransactions()
             }
         }
@@ -149,7 +149,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         didSet {
             guard filterDateStart != oldValue else { return }
             Task {
-                await fetchTransactions()
+                await fetchTransactions(showFetching: true)
                 filterAndSetTransactions()
             }
         }
@@ -158,7 +158,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         didSet {
             guard filterDateEnd != oldValue else { return }
             Task {
-                await fetchTransactions()
+                await fetchTransactions(showFetching: true)
                 filterAndSetTransactions()
             }
         }
@@ -183,7 +183,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //For UI
-    @Published private(set) var isListCalculating: Bool = false
+    @Published private(set) var isFiltering: Bool = false
+    @Published private(set) var isFetching: Bool = false
     @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
     @MainActor @Published private(set) var filteredTransactionsCurrencies: [String] = []
     
@@ -272,7 +273,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     //MARK: Private props
     private func filterAndSetTransactions() {
         Task { @MainActor in
-            isListCalculating = true
+            isFiltering = true
         }
         
         Task.detached(priority: .high) { [weak self] in
@@ -324,7 +325,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
             
             await MainActor.run {
-                self.isListCalculating = false
+                self.isFiltering = false
                 withAnimation {
                     self.filteredTransactionGroups = sortedGroupedData
                 }
@@ -334,7 +335,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     
     private func filterTransactionsWithSearch() {
         Task { @MainActor in
-            isListCalculating = true
+            isFiltering = true
         }
         
         Task.detached(priority: .high) { [weak self] in
@@ -348,7 +349,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                 let groups = self.groupAndSortTransactionArray(searchFiltered)
                 
                 await MainActor.run {
-                    self.isListCalculating = false
+                    self.isFiltering = false
                     withAnimation {
                         self.filteredTransactionGroups = groups
                     }
@@ -361,7 +362,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                 }
                 
                 await MainActor.run {
-                    self.isListCalculating = false
+                    self.isFiltering = false
                     withAnimation {
                         self.filteredTransactionGroups = groups
                     }
@@ -435,9 +436,17 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     
     private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil, competionHandler: (@Sendable () -> Void)? = nil) {
         Task {
+            await MainActor.run {
+                isFetching = true
+            }
+            
             await fetchCategories(errorHandler: errorHandler)
             await fetchTags(errorHandler: errorHandler)
             await fetchBalanceAccounts(errorHandler: errorHandler)
+            
+            await MainActor.run {
+                isFetching = false
+            }
             Task.detached(priority: .background) { [weak self] in
                 await self?.fetchTransactions(errorHandler: errorHandler)
                 competionHandler?()
@@ -445,19 +454,31 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func fetchTransactions(errorHandler: ((Error) -> Void)? = nil) async {
+    private func fetchTransactions(showFetching: Bool = false, errorHandler: ((Error) -> Void)? = nil) async {
+        if showFetching {
+            await MainActor.run {
+                isFetching = true
+            }
+        }
+        
         let lowerBound = dateFilterRange.lowerBound
         let upperBound = dateFilterRange.upperBound
         let predicate = #Predicate<Transaction> {
             (lowerBound...upperBound).contains($0.date)
         }
-        
         let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        
         do {
             let fetchedTransactions: [Transaction] = try await dataManager.fetchFromBackground(descriptor)
             allTransactions = fetchedTransactions
         } catch {
             errorHandler?(error)
+        }
+        
+        if showFetching {
+            await MainActor.run {
+                isFetching = false
+            }
         }
     }
     
