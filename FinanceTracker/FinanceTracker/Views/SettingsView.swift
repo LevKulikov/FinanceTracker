@@ -102,7 +102,7 @@ struct SettingsView: View {
     }
     
     private var enitiesSection: some View {
-        Section("Entities") {
+        Section {
             NavigationLink(value: SettingsSectionAndDataType.balanceAccounts) {
                 Label("Balance Accounts", systemImage: "person.crop.circle")
             }
@@ -149,25 +149,6 @@ struct SettingsView: View {
     
     private var contactsSection: some View {
         Section("Developer") {
-            Label("Telegram", systemImage: "paperplane")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    telegramConfirmationFlag.toggle()
-                }
-                .confirmationDialog("@" + viewModel.developerTelegramUsername, isPresented: $telegramConfirmationFlag, titleVisibility: .visible) {
-                    Button("Copy username") {
-                        copyAsPlainText("@" + viewModel.developerTelegramUsername)
-                        Toast.shared.present(
-                            title: String(localized: "Username is copied"),
-                            symbol: "doc.on.doc",
-                            tint: .blue
-                        )
-                    }
-                    
-                    Link("Send message", destination: URL(string: "https://t.me/" + viewModel.developerTelegramUsername)!)
-                }
-            
             Label("Email", systemImage: "envelope")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -194,7 +175,7 @@ struct SettingsView: View {
     }
     
     private var bottomAppVersionView: some View {
-        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
+        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "👍")")
             .frame(maxWidth: .infinity)
             .foregroundStyle(.tertiary)
             .listRowBackground(Color.clear)

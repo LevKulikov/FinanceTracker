@@ -30,7 +30,6 @@ enum SettingsSectionAndDataType {
 final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SettingsViewModelDelegate)?
-    let developerTelegramUsername = "k_lev_s"
     let developerEmail = "levkulikov.appdev@gmail.com"
     let codeSource = "https://github.com/LevKulikov/FinanceTracker.git"
     
