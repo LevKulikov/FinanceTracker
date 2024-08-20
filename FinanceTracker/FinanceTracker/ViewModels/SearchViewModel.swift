@@ -86,7 +86,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: UI props
     // To filter
-    @Published var searchText: String = "" {
+    @MainActor @Published var searchText: String = "" {
         didSet {
             searchDispatchWorkItem?.cancel()
             searchDispatchWorkItem = DispatchWorkItem { [weak self] in
@@ -315,8 +315,9 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             self.filteredTransactions = filteredData
             
             var searchData = filteredData
-            if !self.searchText.isEmpty {
-                searchData = self.getFilteredTransactionWithSearchText(arrayToFilter: searchData)
+            let searchTextIsEmpty = await MainActor.run { return self.searchText.isEmpty }
+            if !searchTextIsEmpty {
+                searchData = await self.getFilteredTransactionWithSearchText(arrayToFilter: searchData)
             }
             Task { [searchData] in
                 await self.setFilteredTransactionsCurrencies(for: searchData)
@@ -341,8 +342,9 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         Task.detached(priority: .high) { [weak self] in
             guard let self else { return }
             
-            if !self.searchText.isEmpty {
-                let searchFiltered = self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransactions)
+            let searchTextIsEmpty = await MainActor.run { return self.searchText.isEmpty }
+            if !searchTextIsEmpty {
+                let searchFiltered = await self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransactions)
                 self.searchedTransactions = searchFiltered
                 Task { await self.setFilteredTransactionsCurrencies(for: searchFiltered) }
                 
@@ -388,34 +390,38 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func getFilteredTransactionWithSearchText(arrayToFilter: [Transaction]) -> [Transaction] {
+    private func getFilteredTransactionWithSearchText(arrayToFilter: [Transaction]) async -> [Transaction] {
+        let immutableCopyString = await MainActor.run { return searchText }
+        // Check if it is number
+        var copyString = immutableCopyString
+        if copyString.contains(",") {
+            copyString.replace(",", with: ".")
+        }
+        
+        if copyString.contains(" ") {
+            copyString.replace(" ", with: "")
+        }
+        let floatSearchNumber = Float(copyString)
+        let isNumber = floatSearchNumber != nil
+        
         return arrayToFilter
             .filter { trans in
                 // If searchText is number
-                var copyString = self.searchText
-                
-                if copyString.contains(",") {
-                    copyString.replace(",", with: ".")
-                }
-                
-                if copyString.contains(" ") {
-                    copyString.replace(" ", with: "")
-                }
-                
-                if let floatSearchNumber = Float(copyString) {
-                    return trans.value == floatSearchNumber
+                var valueIsEqual = false
+                if isNumber {
+                    valueIsEqual = trans.value == floatSearchNumber
                 }
                 
                 // if searchText is text
                 guard let balanceAccount = trans.balanceAccount, let category = trans.category else { return false }
                 
-                let baNameHasSuchString = balanceAccount.name.localizedCaseInsensitiveContains(self.searchText)
-                let currencyHasSuchString = balanceAccount.currency.localizedCaseInsensitiveContains(self.searchText)
-                let catNameHasSuchString = category.name.localizedCaseInsensitiveContains(self.searchText)
-                let tagsHaveSuchString = trans.tags.map { $0.name }.joined().localizedCaseInsensitiveContains(self.searchText)
-                let commentHasSuchString = trans.comment.localizedCaseInsensitiveContains(self.searchText)
+                let baNameHasSuchString = balanceAccount.name.localizedCaseInsensitiveContains(immutableCopyString)
+                let currencyHasSuchString = balanceAccount.currency.localizedCaseInsensitiveContains(immutableCopyString)
+                let catNameHasSuchString = category.name.localizedCaseInsensitiveContains(immutableCopyString)
+                let tagsHaveSuchString = trans.tags.map { $0.name }.joined().localizedCaseInsensitiveContains(immutableCopyString)
+                let commentHasSuchString = trans.comment.localizedCaseInsensitiveContains(immutableCopyString)
                 
-                return (baNameHasSuchString || currencyHasSuchString || catNameHasSuchString || tagsHaveSuchString || commentHasSuchString)
+                return (valueIsEqual || baNameHasSuchString || currencyHasSuchString || catNameHasSuchString || tagsHaveSuchString || commentHasSuchString)
             }
     }
     
