@@ -149,7 +149,12 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Flag to determine if data is currently fetching, works in fetchAllData method
     @Published private(set) var isFetchingData = false
     /// Flag to determine if statistics is complete or light weighted
-    @Published private(set) var lightWeightStatistics = false
+    @Published var lightWeightStatistics = false {
+        didSet {
+            dataManager.setLightWeightStatistics(lightWeightStatistics)
+            refreshData()
+        }
+    }
     /// For which period of time light weight statistics are displayed
     @Published var lightWeightDateType: DateFilterType = .month
     /// For which date light weight statistics are displayed
@@ -233,6 +238,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
         DispatchQueue.main.async { [weak self] in
             self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
         }
