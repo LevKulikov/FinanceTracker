@@ -74,10 +74,6 @@ struct StatisticsView: View {
                         showStatitsticsSettings = true
                     }
                     .labelStyle(.iconOnly)
-                    .popover(isPresented: $showStatitsticsSettings) {
-                        settingsPopoverView
-                            .presentationCompactAdaptation(.popover)
-                    }
                 }
             }
             .navigationTitle("Statistics")
@@ -89,6 +85,9 @@ struct StatisticsView: View {
             } content: { transactionListData in
                 viewModel.getTransactionListView(transactions: transactionListData.transactions, title: transactionListData.title)
             }
+            .sheet(isPresented: $showStatitsticsSettings) {
+                settingsPopoverView
+            }
             .onAppear {
                 viewModel.refreshDataIfNeeded()
             }
@@ -99,21 +98,31 @@ struct StatisticsView: View {
     //MARK: - Computed View Props
     private var settingsPopoverView: some View {
         VStack {
-            Text("If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart")
-                .foregroundStyle(.secondary)
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(cellColor)
+                
+                Text("If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart")
+                    .foregroundStyle(.secondary)
+                    .padding()
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.bottom)
+            
+            Toggle("Light version", isOn: $viewModel.lightWeightStatistics)
                 .padding()
                 .background {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(cellColor)
                 }
-                .frame(height: 220)
-            
-            Toggle("Light version", isOn: $viewModel.lightWeightStatistics)
-                .padding(.horizontal)
-                .bold()
         }
         .padding()
         .background(backgroundColor)
+        .presentationBackground(backgroundColor)
+        .presentationDetents([.fraction(0.45), .fraction(0.7)])
+        .onChange(of: viewModel.lightWeightStatistics) {
+            showStatitsticsSettings = false
+        }
     }
     
     private var topStatisticsSection: some View {
