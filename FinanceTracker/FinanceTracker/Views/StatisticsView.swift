@@ -13,12 +13,13 @@ struct StatisticsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: StatisticsViewModel
     @State private var showTagsView = false
+    @State private var showStatitsticsSettings = false
     @State private var showTransactionListWithData: TransactionListUIData?
     private var windowWidth: CGFloat {
         FTAppAssets.getWindowSize().width
     }
     private var pieChartHeight: CGFloat {
-        return 350
+        return viewModel.lightWeightStatistics ? 290 : 350
     }
     private var backgroundColor: Color {
         colorScheme == .light ? Color(.secondarySystemBackground) : Color(.systemBackground)
@@ -38,14 +39,14 @@ struct StatisticsView: View {
             ScrollView {
                 VStack {
                     if windowWidth <= FTAppAssets.maxCustomSheetWidth {
-                        totalValueSection
+                        topStatisticsSection
                             .padding(.bottom)
                         
                         pieChartSection
                             .padding(.bottom)
                     } else {
                         HStack {
-                            totalValueSection
+                            topStatisticsSection
                             
                             pieChartSection
                         }
@@ -64,11 +65,18 @@ struct StatisticsView: View {
                 viewModel.refreshData()
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if viewModel.isFetchingData {
-                        ProgressView()
-                            .controlSize(.regular)
-                            .scaleEffect(1.3, anchor: .trailing)
+                if viewModel.isFetchingData {
+                    ProgressView()
+                        .controlSize(.regular)
+                        .scaleEffect(1.3, anchor: .trailing)
+                } else {
+                    Button("Settings", systemImage: "gear") {
+                        showStatitsticsSettings = true
+                    }
+                    .labelStyle(.iconOnly)
+                    .popover(isPresented: $showStatitsticsSettings) {
+                        settingsPopoverView
+                            .presentationCompactAdaptation(.popover)
                     }
                 }
             }
@@ -89,7 +97,51 @@ struct StatisticsView: View {
     }
     
     //MARK: - Computed View Props
-    private var totalValueSection: some View {
+    private var settingsPopoverView: some View {
+        VStack {
+            Text("If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart")
+                .foregroundStyle(.secondary)
+                .padding()
+                .background {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(cellColor)
+                }
+                .frame(height: 220)
+            
+            Toggle("Light version", isOn: $viewModel.lightWeightStatistics)
+                .padding(.horizontal)
+                .bold()
+        }
+        .padding()
+        .background(backgroundColor)
+    }
+    
+    private var topStatisticsSection: some View {
+        VStack {
+            if viewModel.lightWeightStatistics {
+                lightWeightStatisticsFilters
+                    .padding(.bottom)
+            } else {
+                totalValueView
+            }
+            
+            Divider()
+            
+            tagsStatSection
+            
+            if windowWidth > FTAppAssets.maxCustomSheetWidth {
+                Spacer()
+            }
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(cellColor)
+        }
+        .frame(maxHeight: pieChartHeight)
+    }
+    
+    private var totalValueView: some View {
         VStack {
             HStack {
                 Text("Total balance")
@@ -135,21 +187,74 @@ struct StatisticsView: View {
                 
                 Spacer()
             }
-            
-            Divider()
-            
-            tagsStatSection
-            
-            if windowWidth > FTAppAssets.maxCustomSheetWidth {
+        }
+    }
+    
+    private var lightWeightStatisticsFilters: some View {
+        VStack {
+            HStack {
+                Text("Balance Account")
+                    .bold()
+                    .font(.title2)
+                
                 Spacer()
+                
+                Menu(viewModel.balanceAccountToFilter.name) {
+                    Picker("Balance Accounts", selection: $viewModel.balanceAccountToFilter) {
+                        ForEach(viewModel.balanceAccounts) { balanceAccount in
+                            HStack {
+                                Text(balanceAccount.name)
+                                
+                                if let uiImage = FTAppAssets.iconUIImage(name: balanceAccount.iconName) {
+                                    Image(uiImage: uiImage)
+                                } else {
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .tag(balanceAccount)
+                        }
+                    }
+                }
+                .lineLimit(1)
+                .buttonStyle(.bordered)
+                .hoverEffect(.highlight)
+            }
+            
+            HStack {
+                Menu(String(localized: viewModel.lightWeightDateType.rawValue), systemImage: "chevron.up.chevron.down") {
+                    Picker("Select date type", selection: $viewModel.lightWeightDateType) {
+                        ForEach(DateFilterType.allCases) { dateFilterType in
+                            Text(dateFilterType.rawValue)
+                                .tag(dateFilterType)
+                        }
+                    }
+                }
+                .foregroundStyle(.primary)
+                .hoverEffect(.highlight)
+                
+                Spacer()
+                
+                switch viewModel.lightWeightDateType {
+                case .day:
+                    DatePicker("One day date picker", selection: $viewModel.lightWeightDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
+                        .labelsHidden()
+                case .week:
+                    DatePicker("Week day picker", selection: $viewModel.lightWeightDate, in: FTAppAssets.availableDateRange, displayedComponents: .date)
+                        .labelsHidden()
+                case .month:
+                    MonthYearPicker(date: $viewModel.lightWeightDate, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
+                case .year:
+                    MonthYearPicker(date: $viewModel.lightWeightDate, dateRange: FTAppAssets.availableDateRange, components: .year)
+                case .customDateRange:
+                    EmptyView()
+                }
+            }
+            
+            if case .customDateRange = viewModel.lightWeightDateType {
+                DateRangePicker(startDate: $viewModel.lightWeightDateStart, endDate: $viewModel.lightWeightDateEnd, dateRange: FTAppAssets.availableDateRange)
+                    .padding(.vertical, 5)
             }
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(cellColor)
-        }
-        .frame(maxHeight: pieChartHeight)
     }
     
     private var tagsStatSection: some View {
@@ -256,7 +361,9 @@ struct StatisticsView: View {
             }
             .padding(.bottom)
             
-            pieChartMenuDatePickerView
+            if !viewModel.lightWeightStatistics {
+                pieChartMenuDatePickerView
+            }
         }
         .padding()
         .background {

@@ -126,8 +126,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let endDate = lightWeightDate.endOfYear() ?? lightWeightDate
             return startDate...endDate
         case .customDateRange:
-            let startDate = lightWeightDate.startOfDay()
-            let endDate = lightWeightDate.endOfDay() ?? lightWeightDate
+            let startDate = lightWeightDateStart.startOfDay()
+            let endDate = lightWeightDateEnd.endOfDay() ?? lightWeightDate
             return startDate...endDate
         }
     }
@@ -156,9 +156,21 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     /// For which period of time light weight statistics are displayed
-    @Published var lightWeightDateType: DateFilterType = .month
+    @Published var lightWeightDateType: DateFilterType = .month {
+        didSet {
+            refreshData()
+        }
+    }
     /// For which date light weight statistics are displayed
-    @Published var lightWeightDate: Date = .now
+    @Published var lightWeightDate: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
+    /// For custom date range of light weight statistics
+    @Published var lightWeightDateStart: Date = .now
+    /// For custom date range of light weight statistics
+    @Published var lightWeightDateEnd: Date = .now
     
     
     //MARK: For tags statistics
@@ -461,11 +473,13 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         DispatchQueue.global(qos: .utility).async { [weak self, lightWeightStatistics, transactions] in
             guard let self else { return }
             print("calculateDataForPieChart, started to calculate returnData")
-            var dateFilteredData = transactions
-            if !lightWeightStatistics {
-                dateFilteredData = dateFilteredData
+            var dateAndTypeFilteredData = transactions
                     .filter { singleTransaction in
+                        guard !lightWeightStatistics else {
+                            return singleTransaction.type == self.pieChartTransactionType
+                        }
                         guard singleTransaction.type == self.pieChartTransactionType else { return false }
+                        
                         
                         switch self.pieChartMenuDateFilterSelected {
                         case .day:
@@ -482,9 +496,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                             return true
                         }
                     }
-            }
             
-            var returnData = dateFilteredData
+            var returnData = dateAndTypeFilteredData
                 .grouped { $0.category }
                 .map { singleDict in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)

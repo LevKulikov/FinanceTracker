@@ -1608,6 +1608,9 @@
         }
       }
     },
+    "If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart" : {
+
+    },
     "Import" : {
       "localizations" : {
         "ru" : {
@@ -1737,6 +1740,9 @@
           }
         }
       }
+    },
+    "Light version" : {
+
     },
     "List" : {
       "localizations" : {
@@ -3125,6 +3131,9 @@
           }
         }
       }
+    },
+    "Week day picker" : {
+
     },
     "Week picker" : {
       "localizations" : {
