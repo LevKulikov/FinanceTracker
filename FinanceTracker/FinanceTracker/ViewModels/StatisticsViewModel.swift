@@ -171,7 +171,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     @Published var lightWeightDateStart: Date = .now
     /// For custom date range of light weight statistics
     @Published var lightWeightDateEnd: Date = .now
-    
+    /// Total value of spending for a selected balance account. Used for light weight statistics
+    @Published private(set) var balanceAccountTotalSpending: Float = 0
+    /// Total value of spending for a selected balance account. Used for light weight statistics
+    @Published private(set) var balanceAccountTotalIncome: Float = 0
     
     //MARK: For tags statistics
     /// Data array to be provided in tags statistics
@@ -261,8 +264,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         print("refreshData, started")
         fetchAllData { [weak self] in
-            if let self, !self.lightWeightStatistics {
-                self.calculateTotalForBalanceAccount()
+            if let self, self.lightWeightStatistics {
+                self.calculateSpendIncomeValues()
+            } else {
+                self?.calculateTotalForBalanceAccount()
             }
             self?.calculateTagsTotal(animated: true)
             self?.calculateDataForPieChart(animated: true)
@@ -353,7 +358,11 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         isCalculationAllowed = true
         switch calculationData {
         case .totalValue:
-            calculateTotalForBalanceAccount()
+            if lightWeightStatistics {
+                calculateSpendIncomeValues()
+            } else {
+                calculateTotalForBalanceAccount()
+            }
         case .tagsValue:
             calculateTagsTotal()
         case .pieChart:
@@ -361,7 +370,11 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         case .barChart:
             calculateDataForBarChart()
         case .none:
-            calculateTotalForBalanceAccount()
+            if lightWeightStatistics {
+                calculateSpendIncomeValues()
+            } else {
+                calculateTotalForBalanceAccount()
+            }
             calculateTagsTotal()
             calculateDataForPieChart()
             calculateDataForBarChart()
@@ -396,6 +409,31 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 self.totalIsCalculating = false
                 self.totalForBalanceAccount = totalValue
                 print("calculateTotalForBalanceAccount, ended")
+            }
+        }
+    }
+    
+    /// Calculates total spendings and total incomes values for a selected balance account. Used for light weight statistics
+    private func calculateSpendIncomeValues() {
+        guard isCalculationAllowed else { return }
+        
+        Task.detached(priority: .high) { [transactions] in
+            var totalSpendings: Float = 0
+            var totalIncome: Float = 0
+            for transaction in transactions {
+                switch transaction.type {
+                case .spending:
+                    totalSpendings += transaction.value
+                case .income:
+                    totalIncome += transaction.value
+                case .none:
+                    continue
+                }
+            }
+            
+            await MainActor.run { [totalSpendings, totalIncome] in
+                self.balanceAccountTotalSpending = totalSpendings
+                self.balanceAccountTotalIncome = totalIncome
             }
         }
     }

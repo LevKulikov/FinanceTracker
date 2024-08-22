@@ -15,6 +15,14 @@ struct StatisticsView: View {
     @State private var showTagsView = false
     @State private var showStatitsticsSettings = false
     @State private var showTransactionListWithData: TransactionListUIData?
+    @State private var currency: Currency?
+    private var currencyString: String {
+        if let currency {
+            return currency.symbol
+        } else {
+            return viewModel.balanceAccountToFilter.currency
+        }
+    }
     private var windowWidth: CGFloat {
         FTAppAssets.getWindowSize().width
     }
@@ -38,6 +46,15 @@ struct StatisticsView: View {
         NavigationStack {
             ScrollView {
                 VStack {
+                    if viewModel.lightWeightStatistics {
+                        lightWeightStatisticsFilters
+                            .frame(maxWidth: 450)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.bottom)
+                        
+                        spendIncomeValuesSection
+                    }
+                    
                     if windowWidth <= FTAppAssets.maxCustomSheetWidth {
                         topStatisticsSection
                             .padding(.bottom)
@@ -92,6 +109,13 @@ struct StatisticsView: View {
                 viewModel.refreshDataIfNeeded()
             }
             .background(content: { backgroundColor.ignoresSafeArea() })
+            .onChange(of: viewModel.balanceAccountToFilter) {
+                setCurrency()
+            }
+            .task {
+                guard currency == nil else { return }
+                currency = await FTAppAssets.getCurrency(for: viewModel.balanceAccountToFilter.currency)
+            }
         }
     }
     
@@ -107,7 +131,7 @@ struct StatisticsView: View {
                     .padding()
             }
             .fixedSize(horizontal: false, vertical: true)
-            .padding(.bottom)
+            .padding(.vertical)
             
             Toggle("Light version", isOn: $viewModel.lightWeightStatistics)
                 .padding()
@@ -115,11 +139,13 @@ struct StatisticsView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(cellColor)
                 }
+            
+            Spacer()
         }
         .padding()
         .background(backgroundColor)
         .presentationBackground(backgroundColor)
-        .presentationDetents([.fraction(0.45), .fraction(0.7)])
+        .presentationDetents([.fraction(0.45), .large])
         .onChange(of: viewModel.lightWeightStatistics) {
             showStatitsticsSettings = false
         }
@@ -127,14 +153,11 @@ struct StatisticsView: View {
     
     private var topStatisticsSection: some View {
         VStack {
-            if viewModel.lightWeightStatistics {
-                lightWeightStatisticsFilters
-                    .padding(.bottom)
-            } else {
+            if !viewModel.lightWeightStatistics {
                 totalValueView
+                
+                Divider()
             }
-            
-            Divider()
             
             tagsStatSection
             
@@ -147,7 +170,43 @@ struct StatisticsView: View {
             RoundedRectangle(cornerRadius: 15)
                 .fill(cellColor)
         }
-        .frame(maxHeight: pieChartHeight)
+    }
+    
+    private var spendIncomeValuesSection: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                Text(TransactionsType.spending.localizedString)
+                    .foregroundStyle(.red)
+                    .bold()
+                    .font(.title2)
+                
+                Text("\(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.balanceAccountTotalSpending) ?? "Err") \(Text(currencyString).foregroundStyle(.secondary))")
+                    .font(.title3)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(cellColor)
+            }
+            
+            VStack(alignment: .leading) {
+                Text(TransactionsType.income.localizedString)
+                    .foregroundStyle(.green)
+                    .bold()
+                    .font(.title2)
+                
+                Text("\(FTFormatters.numberFormatterWithDecimals.string(for: viewModel.balanceAccountTotalIncome) ?? "Err") \(Text(currencyString).foregroundStyle(.secondary))")
+                    .font(.title3)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(cellColor)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     private var totalValueView: some View {
@@ -511,6 +570,11 @@ struct StatisticsView: View {
     }
     
     //MARK: - Methods
+    private func setCurrency() {
+        Task {
+            currency = await FTAppAssets.getCurrency(for: viewModel.balanceAccountToFilter.currency)
+        }
+    }
 }
 
 #Preview {
