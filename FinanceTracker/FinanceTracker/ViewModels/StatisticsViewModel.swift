@@ -473,7 +473,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         DispatchQueue.global(qos: .utility).async { [weak self, lightWeightStatistics, transactions] in
             guard let self else { return }
             print("calculateDataForPieChart, started to calculate returnData")
-            var dateAndTypeFilteredData = transactions
+            let dateAndTypeFilteredData = transactions
                     .filter { singleTransaction in
                         guard !lightWeightStatistics else {
                             return singleTransaction.type == self.pieChartTransactionType
