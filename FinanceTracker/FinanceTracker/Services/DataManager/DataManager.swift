@@ -79,6 +79,9 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func importDataFromContainer(_ container: FTDataContainer) async
     
+    @MainActor
+    func saveDefaultCategories()
+    
     func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
     
     func getDefaultBalanceAccount() -> BalanceAccount?
@@ -91,8 +94,9 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func getSecondThirdTabsArray() -> [TabViewType]
     
-    @MainActor
-    func saveDefaultCategories()
+    func isLightWeightStatistics() -> Bool
+    
+    func setLightWeightStatistics(_ isLight: Bool)
 }
 
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
@@ -530,6 +534,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func getSecondThirdTabsArray() -> [TabViewType] {
         settingsManager.getSecondThirdTabsArray()
+    }
+    
+    func isLightWeightStatistics() -> Bool {
+        settingsManager.isLightWeightStatistics()
+    }
+    
+    func setLightWeightStatistics(_ isLight: Bool) {
+        settingsManager.setLightWeightStatistics(isLight)
     }
     
     //MARK: Private methods
