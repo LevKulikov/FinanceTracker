@@ -106,6 +106,31 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private var transactions: [Transaction] = []
     /// All tags
     private(set) var allTags: [Tag] = []
+    /// Date range for selected date (period) type for light weight statistics
+    private var lightWeightDateFilterRange: ClosedRange<Date> {
+        switch lightWeightDateType {
+        case .day:
+            let startDate = lightWeightDate.startOfDay()
+            let endDate = lightWeightDate.endOfDay() ?? lightWeightDate
+            return startDate...endDate
+        case .week:
+            let startDate = lightWeightDate.startOfWeek() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfWeek() ?? lightWeightDate
+            return startDate...endDate
+        case .month:
+            let startDate = lightWeightDate.startOfMonth() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfMonth() ?? lightWeightDate
+            return startDate...endDate
+        case .year:
+            let startDate = lightWeightDate.startOfYear() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfYear() ?? lightWeightDate
+            return startDate...endDate
+        case .customDateRange:
+            let startDate = lightWeightDate.startOfDay()
+            let endDate = lightWeightDate.endOfDay() ?? lightWeightDate
+            return startDate...endDate
+        }
+    }
     
     //MARK: Published
     /// All balance accounts
@@ -123,6 +148,13 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     }
     /// Flag to determine if data is currently fetching, works in fetchAllData method
     @Published private(set) var isFetchingData = false
+    /// Flag to determine if statistics is complete or light weighted
+    @Published private(set) var lightWeightStatistics = false
+    /// For which period of time light weight statistics are displayed
+    @Published var lightWeightDateType: DateFilterType = .month
+    /// For which date light weight statistics are displayed
+    @Published var lightWeightDate: Date = .now
+    
     
     //MARK: For tags statistics
     /// Data array to be provided in tags statistics
@@ -211,7 +243,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         print("refreshData, started")
         fetchAllData { [weak self] in
-            self?.calculateTotalForBalanceAccount()
+            if let self, !self.lightWeightStatistics {
+                self.calculateTotalForBalanceAccount()
+            }
             self?.calculateTagsTotal(animated: true)
             self?.calculateDataForPieChart(animated: true)
             self?.calculateDataForBarChart()
@@ -418,28 +452,33 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             self?.pieDataIsCalculating = true
         }
         
-        DispatchQueue.global(qos: .utility).async { [weak self] in
+        DispatchQueue.global(qos: .utility).async { [weak self, lightWeightStatistics, transactions] in
             guard let self else { return }
             print("calculateDataForPieChart, started to calculate returnData")
-            var returnData = self.transactions
-                .filter { singleTransaction in
-                    guard singleTransaction.type == self.pieChartTransactionType else { return false }
-                    
-                    switch self.pieChartMenuDateFilterSelected {
-                    case .day:
-                        return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .day)
-                    case .month:
-                        return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .month)
-                    case .year:
-                        return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .year)
-                    case .dateRange:
-                        let lowerBound = self.calendar.startOfDay(for: self.pieChartDateStart)
-                        let higherBound = self.calendar.startOfDay(for: self.calendar.date(byAdding: .day, value: 1, to: self.pieChartDateEnd) ?? self.pieChartDateEnd)
-                        return (lowerBound...higherBound).contains(singleTransaction.date)
-                    case .allTime:
-                        return true
+            var dateFilteredData = transactions
+            if !lightWeightStatistics {
+                dateFilteredData = dateFilteredData
+                    .filter { singleTransaction in
+                        guard singleTransaction.type == self.pieChartTransactionType else { return false }
+                        
+                        switch self.pieChartMenuDateFilterSelected {
+                        case .day:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .day)
+                        case .month:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .month)
+                        case .year:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .year)
+                        case .dateRange:
+                            let lowerBound = self.calendar.startOfDay(for: self.pieChartDateStart)
+                            let higherBound = self.calendar.startOfDay(for: self.calendar.date(byAdding: .day, value: 1, to: self.pieChartDateEnd) ?? self.pieChartDateEnd)
+                            return (lowerBound...higherBound).contains(singleTransaction.date)
+                        case .allTime:
+                            return true
+                        }
                     }
-                }
+            }
+            
+            var returnData = dateFilteredData
                 .grouped { $0.category }
                 .map { singleDict in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
@@ -543,9 +582,6 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     return arrayOfBarData
                 }
             
-            // Useless code because of Bar Charts algorithms
-            //let filledBarData = addEmptyDataTo(availableBarData)
-            
             DispatchQueue.main.async {
                 print("calculateDataForBarChart, providing data for bar chart")
                 self.barDataIsCalculating = false
@@ -595,7 +631,11 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 await self?.fetchTags()
                 print("fetchAllData, ended to fetch tags")
                 print("fetchAllData, started to fetch transactions")
-                await self?.fetchTransactions()
+                if let self, self.lightWeightStatistics {
+                    await self.fetchTransactionszForDate()
+                } else {
+                    await self?.fetchTransactions()
+                }
                 print("fetchAllData, ended to fetch transactions")
                 localCompletion()
             }
@@ -620,6 +660,30 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             transactions = fetchedTranses
         } catch {
             print("StatisticsViewModel: Unable to fetch transactions, error: \(error)")
+        }
+    }
+    
+    ///Fetches transactions with date filter and sets to transactions, uses background fetching. Used for light weigh statistics
+    private func fetchTransactionszForDate() async {
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        let lowerBound = lightWeightDateFilterRange.lowerBound
+        let upperBound = lightWeightDateFilterRange.upperBound
+        
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == copyBalanceAccountId && (lowerBound...upperBound).contains($0.date)
+        }
+        
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
+        )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
+        
+        do {
+            let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
+            transactions = fetchedTranses
+        } catch {
+            print("StatisticsViewModel, fetchTransactionsForDate() : Unable to fetch transactions, error: \(error)")
         }
     }
     

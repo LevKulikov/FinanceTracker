@@ -789,6 +789,7 @@
       }
     },
     "Copy username" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1326,6 +1327,7 @@
       }
     },
     "Entities" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2437,6 +2439,7 @@
       }
     },
     "Send message" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2759,6 +2762,7 @@
       }
     },
     "Telegram" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -3082,6 +3086,7 @@
       }
     },
     "Username is copied" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
