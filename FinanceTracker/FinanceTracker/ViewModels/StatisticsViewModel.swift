@@ -86,28 +86,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     var pieDateRangeCanBeMovedForward: Bool {
         return calendar.startOfDay(for: pieChartDateEnd) != calendar.startOfDay(for: FTAppAssets.availableDateRange.upperBound)
     }
-    
-    //MARK: Private
-    /// DataManager to manipulate with ModelContainer of SwiftData
-    private let dataManager: any DataManagerProtocol
-    /// Flag for allowing data calculation for all data types (enitites)
-    private var isCalculationAllowed = true
-    /// Flag to determine if any transaction was updated from another view. Prevents multiple recalculations if several transactions were updated
-    private var isTransactionUpdatedFromAnotherView = false
-    /// Array of years those are available
-    private var availableYearDates: [Date] = []
-    /// Array of years with months those are available
-    private var availableYearMonthDates: [Date] = []
-    /// Array of years with months and week number those are available
-    private var availableYearMonthWeekDates: [Date] = []
-    /// Array of years with months and days those are available
-    private var availableYearMonthDayDates: [Date] = []
-    /// All transactions
-    private var transactions: [Transaction] = []
-    /// All tags
-    private(set) var allTags: [Tag] = []
     /// Date range for selected date (period) type for light weight statistics
-    private var lightWeightDateFilterRange: ClosedRange<Date> {
+    var lightWeightDateFilterRange: ClosedRange<Date> {
         switch lightWeightDateType {
         case .day:
             let startDate = lightWeightDate.startOfDay()
@@ -131,6 +111,26 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             return startDate...endDate
         }
     }
+    
+    //MARK: Private
+    /// DataManager to manipulate with ModelContainer of SwiftData
+    private let dataManager: any DataManagerProtocol
+    /// Flag for allowing data calculation for all data types (enitites)
+    private var isCalculationAllowed = true
+    /// Flag to determine if any transaction was updated from another view. Prevents multiple recalculations if several transactions were updated
+    private var isTransactionUpdatedFromAnotherView = false
+    /// Array of years those are available
+    private var availableYearDates: [Date] = []
+    /// Array of years with months those are available
+    private var availableYearMonthDates: [Date] = []
+    /// Array of years with months and week number those are available
+    private var availableYearMonthWeekDates: [Date] = []
+    /// Array of years with months and days those are available
+    private var availableYearMonthDayDates: [Date] = []
+    /// All transactions
+    private var transactions: [Transaction] = []
+    /// All tags
+    private(set) var allTags: [Tag] = []
     
     //MARK: Published
     /// All balance accounts

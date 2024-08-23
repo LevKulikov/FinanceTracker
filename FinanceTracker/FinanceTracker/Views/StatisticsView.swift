@@ -328,7 +328,7 @@ struct StatisticsView: View {
     private var tagsStatSection: some View {
         VStack {
             HStack {
-                Text("Tags stats")
+                Text("Tags")
                     .font(.title2)
                     .bold()
                 
@@ -539,10 +539,13 @@ struct StatisticsView: View {
                 .hoverEffect(.highlight)
             }
             
+            let lightWeightRangeUpperBound = viewModel.lightWeightDateFilterRange.upperBound
+            let xScaleEndDate: Date = viewModel.lightWeightStatistics ? (lightWeightRangeUpperBound < .now ? lightWeightRangeUpperBound : .now) : .now
             TransactionBarChart(
                 transactionsData: viewModel.barChartTransactionData,
                 perDate: $viewModel.barChartPerDateFilter,
-                transactionType: $viewModel.barChartTransactionTypeFilter
+                transactionType: $viewModel.barChartTransactionTypeFilter,
+                xScaleEndDate: xScaleEndDate
             )
             .frame(height: 300)
             .padding(.bottom)
