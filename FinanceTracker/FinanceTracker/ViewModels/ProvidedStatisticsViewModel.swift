@@ -21,6 +21,7 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Published properties
     @MainActor @Published private(set) var providedTransactionType: TransactionFilterTypes = .both
+    @MainActor @Published private(set) var transactionMaxDate: Date?
     
     /// Array of total values. Its is array because of there can be different transaction types so it is needed to get total values for spendings, income and profit
     @MainActor @Published private(set) var totalValues: [TotalValueData] = []
@@ -103,7 +104,7 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    /// Checkes if provided transactions have same  type or they are different
+    /// Checkes if provided transactions have same  type or they are different, also finds max transaction date for bar chart
     private func checkTransactionsType() async {
         guard let firstTransactionType = transactions.first?.type else {
             await MainActor.run {
@@ -112,19 +113,31 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
+        var maxDate: Date? = nil
+        var differentTypes = false
         for transaction in transactions {
-            if transaction.type != firstTransactionType {
-                await MainActor.run { providedTransactionType = .both }
-                return
+            if maxDate == nil {
+                maxDate = transaction.date
+            } else if maxDate! < transaction.date {
+                maxDate = transaction.date
+            }
+            
+            if !differentTypes, transaction.type != firstTransactionType {
+                differentTypes = true
             }
         }
         
-        await MainActor.run {
-            switch firstTransactionType {
-            case .spending:
-                providedTransactionType = .spending
-            case .income:
-                providedTransactionType = .income
+        await MainActor.run { [differentTypes, maxDate] in
+            transactionMaxDate = maxDate
+            if differentTypes {
+                providedTransactionType = .both
+            } else {
+                switch firstTransactionType {
+                case .spending:
+                    providedTransactionType = .spending
+                case .income:
+                    providedTransactionType = .income
+                }
             }
         }
     }

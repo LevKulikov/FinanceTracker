@@ -2788,6 +2788,7 @@
       }
     },
     "Tags stats" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

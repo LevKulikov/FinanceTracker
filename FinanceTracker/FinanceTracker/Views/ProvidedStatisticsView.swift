@@ -170,7 +170,8 @@ struct ProvidedStatisticsView: View {
             TransactionBarChart(
                 transactionsData: viewModel.barChartTransactionData,
                 perDate: $viewModel.barChartPerDateFilter,
-                transactionType: $viewModel.barChartTransactionTypeFilter
+                transactionType: $viewModel.barChartTransactionTypeFilter,
+                xScaleEndDate: viewModel.transactionMaxDate == nil ? .now : viewModel.transactionMaxDate!
             )
             .frame(height: 300)
             .padding(.bottom)
