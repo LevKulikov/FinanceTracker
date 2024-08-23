@@ -26,6 +26,10 @@ protocol SettingsManagerProtocol: AnyObject {
     func setSecondThirdTabsArray(_ tabsArray: [TabViewType])
     
     func getSecondThirdTabsArray() -> [TabViewType]
+    
+    func isLightWeightStatistics() -> Bool
+    
+    func setLightWeightStatistics(_ isLight: Bool)
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -34,6 +38,7 @@ final class SettingsManager: SettingsManagerProtocol {
     private let appColorSchemeUserDefaultsKey = "appColorSchemeUserDefaultsKey"
     private let firstLaunchCkeckKey = "firstLaunchCkeckKey"
     private let tabsArrayKey = "tabsArrayKey"
+    private let lightWeightStatisticsKey = "lightWeightStatisticsKey"
     
     //MARK: - Initializer
     init() {
@@ -111,5 +116,13 @@ final class SettingsManager: SettingsManagerProtocol {
     func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
         let stringArray = tabsArray.map { $0.rawValue }
         UserDefaults.standard.set(stringArray, forKey: tabsArrayKey)
+    }
+    
+    func isLightWeightStatistics() -> Bool {
+        UserDefaults.standard.bool(forKey: lightWeightStatisticsKey)
+    }
+    
+    func setLightWeightStatistics(_ isLight: Bool) {
+        UserDefaults.standard.set(isLight, forKey: lightWeightStatisticsKey)
     }
 }

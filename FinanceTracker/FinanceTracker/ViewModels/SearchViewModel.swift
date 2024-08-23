@@ -441,22 +441,23 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     }
     
     private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil, competionHandler: (@Sendable () -> Void)? = nil) {
-        Task {
+        Task.detached(priority: .medium) { 
             await MainActor.run {
-                isFetching = true
+                self.isFetching = true
             }
-            
-            await fetchCategories(errorHandler: errorHandler)
-            await fetchTags(errorHandler: errorHandler)
-            await fetchBalanceAccounts(errorHandler: errorHandler)
-            
+            print("SearchViewModel, fetchAllData: starts fetching categories")
+            await self.fetchCategories(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching tags")
+            await self.fetchTags(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching balance accounts")
+            await self.fetchBalanceAccounts(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching transactions")
+            await self.fetchTransactions(errorHandler: errorHandler)
             await MainActor.run {
-                isFetching = false
+                self.isFetching = false
             }
-            Task.detached(priority: .background) { [weak self] in
-                await self?.fetchTransactions(errorHandler: errorHandler)
-                competionHandler?()
-            }
+            print("SearchViewModel, fetchAllData: ended all fetch")
+            competionHandler?()
         }
     }
     
@@ -494,10 +495,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        Task { @MainActor in
-            withAnimation(.snappy) {
-                self.allCategories = fetchedCategories
-            }
+        await MainActor.run {
+            self.allCategories = fetchedCategories
         }
     }
     
@@ -507,10 +506,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        Task { @MainActor in
-            withAnimation(.snappy) {
-                self.allTags = fetchedTags
-            }
+        await MainActor.run {
+            self.allTags = fetchedTags
         }
     }
     
@@ -520,10 +517,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        Task { @MainActor in
-            withAnimation(.snappy) {
-                self.allBalanceAccounts = fetchedBalanceAccounts
-            }
+        await MainActor.run {
+            self.allBalanceAccounts = fetchedBalanceAccounts
         }
     }
     
@@ -534,7 +529,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         )
         
         do {
-            let fetchedItems = try await dataManager.fetch(descriptor)
+            let fetchedItems = try await dataManager.fetchFromBackground(descriptor)
             return fetchedItems
         } catch {
             print(error.localizedDescription)

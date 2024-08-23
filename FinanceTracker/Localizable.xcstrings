@@ -61,6 +61,22 @@
         }
       }
     },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%@: %@" : {
       "localizations" : {
         "en" : {
@@ -789,6 +805,7 @@
       }
     },
     "Copy username" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1326,6 +1343,7 @@
       }
     },
     "Entities" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1606,6 +1624,16 @@
         }
       }
     },
+    "If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если статистика долго загружается, вы можете выбрать отображение легкой версии. Легкая версия статистики быстрее, однако она не отображает текущий баланс счета, а также показывает меньший промежуток на столбчатом графике"
+          }
+        }
+      }
+    },
     "Import" : {
       "localizations" : {
         "ru" : {
@@ -1732,6 +1760,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Светлый режим"
+          }
+        }
+      }
+    },
+    "Light version" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Легкая весия"
           }
         }
       }
@@ -2437,6 +2475,7 @@
       }
     },
     "Send message" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2759,6 +2798,7 @@
       }
     },
     "Telegram" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -3082,6 +3122,7 @@
       }
     },
     "Username is copied" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -3117,6 +3158,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неделя"
+          }
+        }
+      }
+    },
+    "Week day picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер дня недели"
           }
         }
       }
