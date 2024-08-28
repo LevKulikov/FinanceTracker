@@ -79,9 +79,6 @@ struct SearchView: View {
                         .controlSize(.large)
                 }
             }
-            .onChange(of: searchIsPreseneted) {
-                viewModel.hideTabBar(searchIsPreseneted)
-            }
             .fullScreenCover(item: $showTransaction) { transaction in
                 viewModel.getTransactionView(for: transaction, namespace: namespace)
             }

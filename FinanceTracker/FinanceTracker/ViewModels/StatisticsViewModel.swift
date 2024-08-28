@@ -262,6 +262,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Methods
     /// Refreshes all data
     func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+        guard !isFetchingData else {
+            print("refreshData, data is already being refetched")
+            return
+        }
         print("refreshData, started")
         fetchAllData { [weak self] in
             if let self, self.lightWeightStatistics {

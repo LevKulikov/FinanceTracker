@@ -128,6 +128,7 @@ struct AddingCategoryView: View {
             TextField("Category name", text: $viewModel.name.animation(), prompt: Text("Enter name here"))
                 .focused($nameTextFieldFocus)
                 .font(.title2)
+                .submitLabel(.done)
                 .padding(.horizontal)
             
             if nameTextFieldFocus && !viewModel.filteredCategories.isEmpty {

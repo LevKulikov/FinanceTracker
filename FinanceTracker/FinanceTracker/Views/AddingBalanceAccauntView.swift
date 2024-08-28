@@ -102,6 +102,7 @@ struct AddingBalanceAccauntView: View {
         TextField("Balance account name", text: $viewModel.name, prompt: Text("Enter name here"))
             .focused($nameTextFieldFocus)
             .font(.title2)
+            .submitLabel(.done)
             .padding(.horizontal)
             .padding(.top)
     }
@@ -136,6 +137,7 @@ struct AddingBalanceAccauntView: View {
                     .autocorrectionDisabled()
                     .font(.title2)
                     .textFieldStyle(.roundedBorder)
+                    .submitLabel(.done)
                     .frame(minWidth: windowWidth * 1/5.5)
                 
                 Button(viewModel.currencyPrecised == nil ? String(localized: "Select") : viewModel.currencyPrecised!.symbol) {
