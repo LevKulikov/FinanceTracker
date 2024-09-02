@@ -129,7 +129,7 @@ struct SpendIncomeView: View {
         GeometryReader { proxy in
             let minY = proxy.frame(in: .scrollView(axis: .vertical)).minY
             let scrollViewHeight = proxy.bounds(of: .scrollView(axis: .vertical))?.height ?? 0
-            let scaleProgress = minY > 0 ? 1 + max(min(minY / scrollViewHeight, 1), 0) * 0.5 : 1
+            let scaleProgress = minY > 0 ? 1 + min(max(min(minY / scrollViewHeight, 1), 0) * 0.5, 0.1) : 1
             let reversedScaleProgress = minY < 0 ? max(((scrollViewHeight + minY) / scrollViewHeight), 0.8) : 1
             let yOffset = minY < 0 ? -minY + max((minY / 5), -5) : 0
             
@@ -144,14 +144,16 @@ struct SpendIncomeView: View {
                 .padding(.leading)
                 .scaleEffect(reversedScaleProgress, anchor: .topLeading)
                 .offset(y: yOffset)
+                .zIndex(0)
                 
                 Spacer()
                 
                 SpendIncomePicker(transactionsTypeSelected: $viewModel.transactionsTypeSelected)
                     .matchedGeometryEffect(id: "picker", in: namespace)
-                    .scaleEffect(scaleProgress, anchor: .top)
+                    .scaleEffect(scaleProgress, anchor: .center)
                     .scaleEffect(reversedScaleProgress, anchor: .top)
                     .offset(y: yOffset)
+                    .zIndex(1)
                 
                 Spacer()
                 
@@ -165,6 +167,7 @@ struct SpendIncomeView: View {
                 .padding(.trailing)
                 .scaleEffect(reversedScaleProgress, anchor: .topTrailing)
                 .offset(y: yOffset)
+                .zIndex(0)
             }
         }
         .frame(height: 70)

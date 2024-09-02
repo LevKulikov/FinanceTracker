@@ -1454,6 +1454,16 @@
         }
       }
     },
+    "Finance Tracker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Финансовый Трекер"
+          }
+        }
+      }
+    },
     "Finances are important" : {
       "localizations" : {
         "ru" : {
@@ -1590,6 +1600,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть"
+          }
+        }
+      }
+    },
+    "Hide this view" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спрятать данное окно"
           }
         }
       }

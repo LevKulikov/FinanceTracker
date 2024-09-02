@@ -195,7 +195,9 @@ struct SettingsView: View {
     
     //MARK: - Methods
     private func sendMailToDeveloper() {
-        let mail = "mailto:" + viewModel.developerEmail
+        let subject = "\(String(localized: "Finance Tracker")) \(FTAppAssets.appVersion ?? "👍")"
+        let body = "\n\n\n\n\(FTAppAssets.currnetUserDeviseName), \(UIDevice.current.systemName) \(UIDevice.current.systemVersion), \(Locale.current.region?.identifier ?? "No region id")"
+        let mail = "mailto:\(viewModel.developerEmail)?subject=\(subject)&body=\(body)"
         guard let mailURL = URL(string: mail) else { return }
         openURL(mailURL)
     }
