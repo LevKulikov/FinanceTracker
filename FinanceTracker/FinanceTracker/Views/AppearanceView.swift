@@ -28,7 +28,7 @@ struct AppearanceView: View {
         NavigationStack {
             List {
                 Section {
-                    Toggle("Always show add transaction button", isOn: $viewModel.showAddButtonFromEvetyTab)
+                    Toggle("Always show add button", isOn: $viewModel.showAddButtonFromEvetyTab)
                 } header: {
                     Text("Large blue circle button with plus")
                 } footer: {

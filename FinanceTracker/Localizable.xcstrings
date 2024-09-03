@@ -321,8 +321,15 @@
         }
       }
     },
-    "Always show add transaction button" : {
-
+    "Always show add button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать кнопку Добавить все время"
+          }
+        }
+      }
     },
     "An error occurred during creating a Excel (csv) file. Error text: %@" : {
       "localizations" : {
@@ -1779,7 +1786,14 @@
       }
     },
     "Large blue circle button with plus" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Большая синяя круглая кнопка с плюсом"
+          }
+        }
+      }
     },
     "Light mode" : {
       "localizations" : {
@@ -2838,10 +2852,24 @@
       }
     },
     "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сейчас кнопка добавления транзакции показывается на всех вкладках, так что вы можете добавить транзакцию в любое время"
+          }
+        }
+      }
     },
     "The Add Transaction button is only displayed when you tap the \"List\" tab." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка добавления транзакции показывается только когда вы находитесь на вкладке \"Список\""
+          }
+        }
+      }
     },
     "There are no saved transactions for this date" : {
       "localizations" : {
