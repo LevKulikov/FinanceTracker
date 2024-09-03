@@ -59,13 +59,17 @@ struct CustomTabView: View  {
                 .disabled(!viewModel.showTabBar)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
-        .overlay(content: {
-            addingSpendIncomeView
-        })
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .overlay {
+            if case .add = actionWithTransaction {
+                viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+            } else if case .update = actionWithTransaction  {
+                viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+            }
+        }
         .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
             viewModel.getWelcomeView()
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
     private var customTabView: some View {
@@ -155,15 +159,6 @@ struct CustomTabView: View  {
             if case .none = actionWithTransaction {
                 viewModel.showTabBar = true
             }
-        }
-    }
-    
-    @ViewBuilder
-    private var addingSpendIncomeView: some View {
-        if case .add = actionWithTransaction {
-            viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
-        } else if case .update = actionWithTransaction  {
-            viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
         }
     }
     
