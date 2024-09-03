@@ -30,6 +30,10 @@ protocol SettingsManagerProtocol: AnyObject {
     func isLightWeightStatistics() -> Bool
     
     func setLightWeightStatistics(_ isLight: Bool)
+    
+    func showAddButtonFromEvetyTab() -> Bool
+    
+    func showAddButtonFromEvetyTab(_ show: Bool)
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -39,6 +43,7 @@ final class SettingsManager: SettingsManagerProtocol {
     private let firstLaunchCkeckKey = "firstLaunchCkeckKey"
     private let tabsArrayKey = "tabsArrayKey"
     private let lightWeightStatisticsKey = "lightWeightStatisticsKey"
+    private let showAddButtonFromEvetyTabKey = "showAddButtonFromEvetyTabKey"
     
     //MARK: - Initializer
     init() {
@@ -124,5 +129,13 @@ final class SettingsManager: SettingsManagerProtocol {
     
     func setLightWeightStatistics(_ isLight: Bool) {
         UserDefaults.standard.set(isLight, forKey: lightWeightStatisticsKey)
+    }
+    
+    func showAddButtonFromEvetyTab() -> Bool {
+        UserDefaults.standard.bool(forKey: showAddButtonFromEvetyTabKey)
+    }
+    
+    func showAddButtonFromEvetyTab(_ show: Bool) {
+        UserDefaults.standard.set(show, forKey: showAddButtonFromEvetyTabKey)
     }
 }
