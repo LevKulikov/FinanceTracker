@@ -12,6 +12,7 @@ struct CustomTabView: View  {
     //MARK: - Propeties
     @Namespace private var namespace
     @StateObject private var viewModel: CustomTabViewModel
+    @State private var actionWithTransaction: ActionWithTransaction = .none
     private var availableYOffset: CGFloat {
         if FTAppAssets.currnetUserDeviseName == "iPhone SE (3rd generation)" {
             return 5
@@ -58,6 +59,9 @@ struct CustomTabView: View  {
                 .disabled(!viewModel.showTabBar)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
+        .overlay(content: {
+            addingSpendIncomeView
+        })
         .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
             viewModel.getWelcomeView()
         }
@@ -96,7 +100,7 @@ struct CustomTabView: View  {
                 Spacer()
                 
                 Button {
-                    viewModel.addButtonPressed()
+                    addButtonTapped()
                 } label: {
                     ZStack {
                         Circle()
@@ -147,6 +151,20 @@ struct CustomTabView: View  {
                 .fill(.ultraThinMaterial)
         }
         .padding(.horizontal)
+        .onChange(of: actionWithTransaction) {
+            if case .none = actionWithTransaction {
+                viewModel.showTabBar = true
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var addingSpendIncomeView: some View {
+        if case .add = actionWithTransaction {
+            viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+        } else if case .update = actionWithTransaction  {
+            viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+        }
     }
     
     //MARK: - Methods
@@ -158,6 +176,17 @@ struct CustomTabView: View  {
             }
         } else {
             viewModel.tabSelection = tabId
+        }
+    }
+    
+    private func addButtonTapped() {
+        if viewModel.tabSelection == 1 {
+            viewModel.addButtonPressed()
+        } else {
+            withAnimation {
+                actionWithTransaction = .add(.now)
+                viewModel.showTabBar = false
+            }
         }
     }
 }

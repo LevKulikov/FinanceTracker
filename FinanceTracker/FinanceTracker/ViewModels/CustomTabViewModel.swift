@@ -19,6 +19,7 @@ protocol CustomTabViewModelDelegate: AnyObject {
 
 enum TabViewType: String, Equatable, Hashable, Identifiable {
     case spendIncomeView
+    case addingSpendIncomeView
     case searchView
     case statisticsView
     case settingsView
@@ -51,6 +52,8 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
         switch self {
         case .spendIncomeView:
             return "list.bullet.clipboard"
+        case .addingSpendIncomeView:
+            return "plus"
         case .searchView:
             return "magnifyingglass"
         case .statisticsView:
@@ -68,6 +71,8 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
         switch self {
         case .spendIncomeView:
             return "List"
+        case .addingSpendIncomeView:
+            return "Add"
         case .searchView:
             return "Search"
         case .statisticsView:
@@ -98,6 +103,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
     private var delegates: [WeakReferenceDelegate] = []
+    private var defaultBalanceAccount: BalanceAccount?
     
     //MARK: Published props
     @Published var tabSelection = 1
@@ -135,6 +141,9 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
         self._secondAndThirdTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        }
     }
     
     //MARK: - Methods
@@ -186,6 +195,8 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         switch first {
         case .spendIncomeView:
             return AnyView(page404)
+        case .addingSpendIncomeView:
+            return AnyView(page404)
         case .searchView:
             return AnyView(getSearchView())
         case .statisticsView:
@@ -205,6 +216,8 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         switch secondAndThirdTabs[1] {
         case .spendIncomeView:
             return AnyView(page404)
+        case .addingSpendIncomeView:
+            return AnyView(page404)
         case .searchView:
             return AnyView(getSearchView())
         case .statisticsView:
@@ -216,6 +229,19 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         case .budgetsView:
             return AnyView(getBudgetsView())
         }
+    }
+    
+    @MainActor
+    func getAddingSpendIncomeView(forAction: Binding<ActionWithTransaction>,namespace: Namespace.ID) -> some View {
+        return FTFactory.shared.createAddingSpendIcomeView(
+            dataManager: dataManager,
+            threadToUse: .main,
+            transactionType: .spending,
+            balanceAccount: defaultBalanceAccount  ?? .emptyBalanceAccount,
+            forAction: forAction,
+            namespace: namespace,
+            delegate: self
+        )
     }
     
     //MARK: Private methods
@@ -288,6 +314,9 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
     
     func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
         delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
+        if section == .balanceAccounts {
+            defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        }
     }
 }
 
@@ -332,6 +361,37 @@ extension CustomTabViewModel: BudgetsViewModelDelegate {
     func didUpdateTransaction() {
         delegates.forEach {
             $0.object?.didUpdateData(for: .transactions, from: .budgetsView)
+        }
+    }
+}
+
+//MARK: Extension for AddingSpendIcomeViewModelDelegate
+extension CustomTabViewModel: AddingSpendIcomeViewModelDelegate {
+    func addedNewTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func updateTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func deletedTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        return
+    }
+    
+    func categoryUpdated() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .data, from: .addingSpendIncomeView)
         }
     }
 }
