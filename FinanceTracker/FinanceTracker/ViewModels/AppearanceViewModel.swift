@@ -8,20 +8,33 @@
 import Foundation
 import SwiftUI
 
+protocol AppearanceViewModelDelegate: AnyObject {
+    func didSetShowAddButtonFromEvetyTab(_ show: Bool)
+}
+
 final class AppearanceViewModel: ObservableObject {
     //MARK: - Properties
+    weak var delegate: AppearanceViewModelDelegate?
     private let dataManager: any DataManagerProtocol
     
     //MARK: Published props
-    @Published private(set) var preferredColorScheme: ColorScheme? = nil
+    @MainActor @Published var showAddButtonFromEvetyTab: Bool {
+        didSet {
+            dataManager.showAddButtonFromEvetyTab(showAddButtonFromEvetyTab)
+            delegate?.didSetShowAddButtonFromEvetyTab(showAddButtonFromEvetyTab)
+        }
+    }
+    @MainActor @Published private(set) var preferredColorScheme: ColorScheme?
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        self.preferredColorScheme = dataManager.getPreferredColorScheme()
+        self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
+        self._preferredColorScheme = Published(wrappedValue: dataManager.getPreferredColorScheme())
     }
     
     //MARK: - Methods
+    @MainActor
     func setPreferredColorScheme(_ colorScheme: ColorScheme?) {
         dataManager.setPreferredColorScheme(colorScheme)
         withAnimation {
