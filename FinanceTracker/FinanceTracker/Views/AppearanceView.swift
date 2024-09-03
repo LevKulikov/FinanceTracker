@@ -9,8 +9,14 @@ import SwiftUI
 
 struct AppearanceView: View {
     //MARK: - Properties
-    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: AppearanceViewModel
+    private var showAddButtonSectionFooterText: LocalizedStringResource {
+        if viewModel.showAddButtonFromEvetyTab {
+            return "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time"
+        }
+        
+        return "The Add Transaction button is only displayed when you tap the \"List\" tab."
+    }
     
     //MARK: - Initializer
     init(viewModel: AppearanceViewModel) {
@@ -21,15 +27,19 @@ struct AppearanceView: View {
     var body: some View {
         NavigationStack {
             List {
-                Toggle("Always show add transaction button", isOn: $viewModel.showAddButtonFromEvetyTab)
-                
                 Section {
-                    getRowFor(colorScheme: nil, title: "System mode")
-                    
-                    getRowFor(colorScheme: .light, title: "Light mode")
-                    
-                    getRowFor(colorScheme: .dark, title: "Dark mode")
+                    Toggle("Always show add transaction button", isOn: $viewModel.showAddButtonFromEvetyTab)
+                } header: {
+                    Text("Large blue circle button with plus")
+                } footer: {
+                    Text(showAddButtonSectionFooterText)
                 }
+                
+                getRowFor(colorScheme: nil, title: "System mode")
+                
+                getRowFor(colorScheme: .light, title: "Light mode")
+                
+                getRowFor(colorScheme: .dark, title: "Dark mode")
             }
             .navigationTitle("Appearance")
         }
