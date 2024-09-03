@@ -321,6 +321,9 @@
         }
       }
     },
+    "Always how add transaction button" : {
+
+    },
     "An error occurred during creating a Excel (csv) file. Error text: %@" : {
       "localizations" : {
         "ru" : {

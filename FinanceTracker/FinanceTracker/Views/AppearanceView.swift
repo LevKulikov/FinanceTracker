@@ -21,11 +21,15 @@ struct AppearanceView: View {
     var body: some View {
         NavigationStack {
             List {
-                getRowFor(colorScheme: nil, title: "System mode")
+                Toggle("Always show add transaction button", isOn: $viewModel.showAddButtonFromEvetyTab)
                 
-                getRowFor(colorScheme: .light, title: "Light mode")
-                
-                getRowFor(colorScheme: .dark, title: "Dark mode")
+                Section {
+                    getRowFor(colorScheme: nil, title: "System mode")
+                    
+                    getRowFor(colorScheme: .light, title: "Light mode")
+                    
+                    getRowFor(colorScheme: .dark, title: "Dark mode")
+                }
             }
             .navigationTitle("Appearance")
         }

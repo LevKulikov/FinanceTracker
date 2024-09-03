@@ -96,7 +96,7 @@ struct CustomTabView: View  {
             .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
-            if viewModel.tabSelection == 1 {
+            if viewModel.tabSelection == 1 || viewModel.showAddButtonFromEvetyTab {
                 Spacer()
                 
                 Button {
