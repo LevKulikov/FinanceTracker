@@ -1605,6 +1605,7 @@
       }
     },
     "Hide this view" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
