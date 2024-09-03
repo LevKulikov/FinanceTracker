@@ -75,7 +75,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getAppearanceView() -> some View {
-        return FTFactory.shared.createAppearanceView(dataManager: dataManager)
+        return FTFactory.shared.createAppearanceView(dataManager: dataManager, delegate: self)
     }
     
     @MainActor
@@ -225,5 +225,12 @@ extension SettingsViewModel: TabsSettingsViewModelDelegate {
             let notSaved = TabViewType.changableTabs.filter { !tabsPositions.contains($0) }
             additionalTab = notSaved.first
         }
+    }
+}
+
+//MARK: Extensions for AppearanceViewModelDelegate
+extension SettingsViewModel: AppearanceViewModelDelegate {
+    func didSetShowAddButtonFromEvetyTab(_ show: Bool) {
+        delegate?.didUpdateSettingsSection(.appearance)
     }
 }

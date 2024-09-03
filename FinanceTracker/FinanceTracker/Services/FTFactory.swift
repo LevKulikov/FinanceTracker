@@ -112,8 +112,9 @@ final class FTFactory {
         return AnyView(TagsView(viewModel: viewModel))
     }
     
-    func createAppearanceView(dataManager: some DataManagerProtocol) -> AnyView {
+    func createAppearanceView(dataManager: some DataManagerProtocol, delegate: (some AppearanceViewModelDelegate)?) -> AnyView {
         let viewModel = AppearanceViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
         return AnyView(AppearanceView(viewModel: viewModel))
     }
     

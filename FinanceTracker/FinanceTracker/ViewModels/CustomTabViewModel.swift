@@ -110,6 +110,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     @Published var showTabBar = true
     @Published var isFirstLaunch = false
     @MainActor @Published private(set) var secondAndThirdTabs: [TabViewType]
+    @MainActor @Published private(set) var showAddButtonFromEvetyTab: Bool
     
     @ViewBuilder
     var page404: some View {
@@ -141,6 +142,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
         self._secondAndThirdTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
         }
@@ -314,8 +316,15 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
     
     func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
         delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
-        if section == .balanceAccounts {
+        switch section {
+        case .balanceAccounts:
             defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        case .appearance:
+            Task { @MainActor in
+                showAddButtonFromEvetyTab = dataManager.showAddButtonFromEvetyTab()
+            }
+        default:
+            break
         }
     }
 }
