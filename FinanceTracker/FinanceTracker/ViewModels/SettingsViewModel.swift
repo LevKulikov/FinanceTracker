@@ -30,7 +30,6 @@ enum SettingsSectionAndDataType {
 final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SettingsViewModelDelegate)?
-    let developerTelegramUsername = "k_lev_s"
     let developerEmail = "levkulikov.appdev@gmail.com"
     let codeSource = "https://github.com/LevKulikov/FinanceTracker.git"
     
@@ -113,6 +112,12 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     func getTabsSettingsView() -> some View {
         return FTFactory.shared.createTabsSettingsView(dataManager: dataManager, delegate: self)
+    }
+    
+    @MainActor
+    func getDeveloperToolView() -> some View {
+        let viewModel = DeveloperToolViewModel(dataManager: dataManager)
+        return DeveloperToolView(viewModel: viewModel)
     }
 }
 

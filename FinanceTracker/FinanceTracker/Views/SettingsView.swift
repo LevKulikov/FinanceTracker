@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
     
+    @State private var showDeveloperTool = false
+    
     //MARK: - Initializer
     init(viewModel: SettingsViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -50,6 +52,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showTabsSettingsView) {
             viewModel.getTabsSettingsView()
+        }
+        .sheet(isPresented: $showDeveloperTool) {
+            viewModel.getDeveloperToolView()
         }
     }
     
@@ -97,7 +102,7 @@ struct SettingsView: View {
     }
     
     private var enitiesSection: some View {
-        Section("Entities") {
+        Section {
             NavigationLink(value: SettingsSectionAndDataType.balanceAccounts) {
                 Label("Balance Accounts", systemImage: "person.crop.circle")
             }
@@ -144,20 +149,6 @@ struct SettingsView: View {
     
     private var contactsSection: some View {
         Section("Developer") {
-            Label("Telegram", systemImage: "paperplane")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    telegramConfirmationFlag.toggle()
-                }
-                .confirmationDialog("@" + viewModel.developerTelegramUsername, isPresented: $telegramConfirmationFlag, titleVisibility: .visible) {
-                    Button("Copy username") {
-                        copyAsPlainText("@" + viewModel.developerTelegramUsername)
-                    }
-                    
-                    Link("Send message", destination: URL(string: "https://t.me/" + viewModel.developerTelegramUsername)!)
-                }
-            
             Label("Email", systemImage: "envelope")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -167,6 +158,11 @@ struct SettingsView: View {
                 .confirmationDialog(viewModel.developerEmail, isPresented: $emailConfirmationFlag, titleVisibility: .visible) {
                     Button("Copy email") {
                         copyAsPlainText(viewModel.developerEmail)
+                        Toast.shared.present(
+                            title: String(localized: "Email is copied"),
+                            symbol: "doc.on.doc",
+                            tint: .blue
+                        )
                     }
                     
                     Button("Send mail", action: sendMailToDeveloper)
@@ -179,17 +175,29 @@ struct SettingsView: View {
     }
     
     private var bottomAppVersionView: some View {
-        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "Yes")")
+        Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "👍")")
             .frame(maxWidth: .infinity)
             .foregroundStyle(.tertiary)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .multilineTextAlignment(.center)
+            .onTapGesture(count: 3) {
+                Toast.shared.present(
+                    title: String(localized: "Show?"),
+                    subtitle: String(localized: "Developer tool"),
+                    symbol: "chevron.left.forwardslash.chevron.right",
+                    action: .init(symbol: "lock.open", hideAfterAction: true, action: {
+                        showDeveloperTool.toggle()
+                    })
+                )
+            }
     }
     
     //MARK: - Methods
     private func sendMailToDeveloper() {
-        let mail = "mailto:" + viewModel.developerEmail
+        let subject = "\(String(localized: "Finance Tracker")) \(FTAppAssets.appVersion ?? "👍")"
+        let body = "\n\n\n\n\(FTAppAssets.currnetUserDeviseName), \(UIDevice.current.systemName) \(UIDevice.current.systemVersion), \(Locale.current.region?.identifier ?? "No region id")"
+        let mail = "mailto:\(viewModel.developerEmail)?subject=\(subject)&body=\(body)"
         guard let mailURL = URL(string: mail) else { return }
         openURL(mailURL)
     }

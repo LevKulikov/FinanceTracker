@@ -42,24 +42,6 @@ struct ManageDataView: View {
                 }
             }
             .navigationTitle("Data settings")
-            .alert("Final alert!", isPresented: $deleteTransactionsSecondAlert) {
-                Button("Yes, delete", role: .destructive) {
-                    viewModel.deleteAllTransactions()
-                }
-                
-                Button("No, cancel", role: .cancel, action: {})
-            } message: {
-                Text("Again, this action is irretable. Do you want to delete all transactions?")
-            }
-            .alert("Final alert!", isPresented: $deleteAllDataSecondAlert) {
-                Button("Yes, delete anyway", role: .destructive) {
-                    viewModel.deleteAllStoredData()
-                }
-                
-                Button("No, cancel", role: .cancel, action: {})
-            } message: {
-                Text("Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?")
-            }
             .sheet(item: $viewModel.fileToExport, content: { item in
                 ActivityView(activityItems: [item])
                     .ignoresSafeArea(edges: .bottom)
@@ -93,6 +75,20 @@ struct ManageDataView: View {
         } message: {
             Text("Are you sure? All transactions will be deleted, this action is irretable")
         }
+        .alert("Final alert!", isPresented: $deleteTransactionsSecondAlert) {
+            Button("Yes, delete", role: .destructive) {
+                viewModel.deleteAllTransactions {
+                    Toast.shared.present(
+                        title: String(localized: "Transactions are deleted"),
+                        symbol: "trash"
+                    )
+                }
+            }
+            
+            Button("No, cancel", role: .cancel, action: {})
+        } message: {
+            Text("Again, this action is irretable. Do you want to delete all transactions?")
+        }
     }
     
     private var deleteAllStoredDataRow: some View {
@@ -109,6 +105,20 @@ struct ManageDataView: View {
             }
         } message: {
             Text("Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
+        }
+        .alert("Final alert!", isPresented: $deleteAllDataSecondAlert) {
+            Button("Yes, delete anyway", role: .destructive) {
+                viewModel.deleteAllStoredData {
+                    Toast.shared.present(
+                        title: String(localized: "Data is deleted"),
+                        symbol: "trash"
+                    )
+                }
+            }
+            
+            Button("No, cancel", role: .cancel, action: {})
+        } message: {
+            Text("Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?")
         }
     }
     

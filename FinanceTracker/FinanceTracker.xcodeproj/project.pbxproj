@@ -74,6 +74,9 @@
 		73DFF0B12C6547D800BFDBAF /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73DFF0B02C6547D800BFDBAF /* ActivityView.swift */; };
 		73EC38642C18A40C004A7BA9 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38632C18A40C004A7BA9 /* CustomTabView.swift */; };
 		73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */; };
+		73EC8DC22C7276DB00DC5899 /* DeveloperToolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC8DC12C7276DB00DC5899 /* DeveloperToolViewModel.swift */; };
+		73EC8DC42C727FAB00DC5899 /* DeveloperToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC8DC32C727FAB00DC5899 /* DeveloperToolView.swift */; };
+		73EC8DE32C73B3B000DC5899 /* ToastPopsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC8DE22C73B3B000DC5899 /* ToastPopsViews.swift */; };
 		73EF650E2C5A883300E50221 /* CurrencyWidePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */; };
 		73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */; };
 		73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F628FA2C01057000E9FEB9 /* DataModels.swift */; };
@@ -178,6 +181,9 @@
 		73DFF0B02C6547D800BFDBAF /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		73EC38632C18A40C004A7BA9 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		73EC38652C18CEF2004A7BA9 /* CustomTabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabViewModel.swift; sourceTree = "<group>"; };
+		73EC8DC12C7276DB00DC5899 /* DeveloperToolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperToolViewModel.swift; sourceTree = "<group>"; };
+		73EC8DC32C727FAB00DC5899 /* DeveloperToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperToolView.swift; sourceTree = "<group>"; };
+		73EC8DE22C73B3B000DC5899 /* ToastPopsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastPopsViews.swift; sourceTree = "<group>"; };
 		73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyWidePickerView.swift; sourceTree = "<group>"; };
 		73F628F32C01057000E9FEB9 /* FinanceTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73F628F62C01057000E9FEB9 /* FinanceTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceTrackerApp.swift; sourceTree = "<group>"; };
@@ -324,6 +330,7 @@
 				73633E532C556AE000E3B9CF /* TabsSettingsView.swift */,
 				73DFF0AC2C60CB0100BFDBAF /* ProvidedStatisticsView.swift */,
 				7386B2E32C6D195300CDCAB4 /* ImportDataPreview.swift */,
+				73EC8DC32C727FAB00DC5899 /* DeveloperToolView.swift */,
 				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
@@ -353,6 +360,7 @@
 				733397C72C4EB6B600BAE878 /* NotificationsViewModel.swift */,
 				73633E512C55696800E3B9CF /* TabsSettingsViewModel.swift */,
 				73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */,
+				73EC8DC12C7276DB00DC5899 /* DeveloperToolViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -401,6 +409,7 @@
 				733397C32C4C07EE00BAE878 /* WideCategoryPickerView.swift */,
 				73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */,
 				73DFF0B02C6547D800BFDBAF /* ActivityView.swift */,
+				73EC8DE22C73B3B000DC5899 /* ToastPopsViews.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -584,6 +593,7 @@
 				73F629332C039D0800E9FEB9 /* SpendIncomePicker.swift in Sources */,
 				73D000D42C2D804800AACFCE /* SearchViewModel.swift in Sources */,
 				73C562FD2C17A2DD00FCB65D /* FTFactory.swift in Sources */,
+				73EC8DC22C7276DB00DC5899 /* DeveloperToolViewModel.swift in Sources */,
 				736389182C22F5AF00D6478E /* GlobalMethods.swift in Sources */,
 				735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */,
 				733397CA2C4EF12E00BAE878 /* NotificationsView.swift in Sources */,
@@ -603,6 +613,7 @@
 				73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */,
 				73CCF3E32C2B51AB009D8001 /* ManageDataViewModel.swift in Sources */,
 				73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */,
+				73EC8DC42C727FAB00DC5899 /* DeveloperToolView.swift in Sources */,
 				733397CC2C4EF3CD00BAE878 /* UIApplication+Extension.swift in Sources */,
 				7305BACC2C1A4CC000F712BC /* StatisticsViewModel.swift in Sources */,
 				73F923282C0DE5A3001D96D4 /* TagsSectionView.swift in Sources */,
@@ -613,6 +624,7 @@
 				73DFF0AD2C60CB0100BFDBAF /* ProvidedStatisticsView.swift in Sources */,
 				73F629232C01F01000E9FEB9 /* UIColor+Extension.swift in Sources */,
 				736389162C22EA5C00D6478E /* SettingsView.swift in Sources */,
+				73EC8DE32C73B3B000DC5899 /* ToastPopsViews.swift in Sources */,
 				73D000E02C31DCCF00AACFCE /* WelcomeView.swift in Sources */,
 				73F6292E2C020BA700E9FEB9 /* SpendIncomeViewModel.swift in Sources */,
 				73CCF3D72C2765E7009D8001 /* CategoriesViewModel.swift in Sources */,
@@ -798,7 +810,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = finance.FinanceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -831,7 +843,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = finance.FinanceTracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

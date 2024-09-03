@@ -40,9 +40,6 @@ struct AddingBalanceAccauntView: View {
     var body: some View {
         ScrollView {
             VStack {
-//                headerView
-//                    .padding(.vertical, 10)
-                
                 nameSection
                 
                 Divider()
@@ -50,6 +47,7 @@ struct AddingBalanceAccauntView: View {
                     .padding(.bottom)
                 
                 balanceSection
+                    .padding(.bottom)
                 
                 Divider()
                     .padding(.horizontal)
@@ -101,16 +99,12 @@ struct AddingBalanceAccauntView: View {
     }
     
     private var nameSection: some View {
-        VStack(alignment: .leading) {
-            Text("Name")
-                .font(.title2)
-                .fontWeight(.medium)
-            
-            TextField("Balance account name", text: $viewModel.name, prompt: Text("Enter name here"))
-                .focused($nameTextFieldFocus)
-                .font(.title2)
-        }
-        .padding(.horizontal)
+        TextField("Balance account name", text: $viewModel.name, prompt: Text("Enter name here"))
+            .focused($nameTextFieldFocus)
+            .font(.title2)
+            .submitLabel(.done)
+            .padding(.horizontal)
+            .padding(.top)
     }
     
     private var balanceSection: some View {
@@ -143,6 +137,7 @@ struct AddingBalanceAccauntView: View {
                     .autocorrectionDisabled()
                     .font(.title2)
                     .textFieldStyle(.roundedBorder)
+                    .submitLabel(.done)
                     .frame(minWidth: windowWidth * 1/5.5)
                 
                 Button(viewModel.currencyPrecised == nil ? String(localized: "Select") : viewModel.currencyPrecised!.symbol) {
@@ -340,5 +335,5 @@ struct AddingBalanceAccauntView: View {
     let dataManager = DataManager(container: container)
     let viewModel = AddingBalanceAccountViewModel(dataManager: dataManager, action: .add)
     
-    return AddingBalanceAccauntView(viewModel: viewModel)
+    return NavigationStack { AddingBalanceAccauntView(viewModel: viewModel) }
 }

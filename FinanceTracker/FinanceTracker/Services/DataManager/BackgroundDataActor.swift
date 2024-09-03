@@ -12,7 +12,8 @@ import SwiftData
 actor BackgroundDataActor {
     //MARK: - Methods
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
-        return try modelContext.fetch(descriptor)
+        let fetchedData = try modelContext.fetch(descriptor)
+        return fetchedData
     }
     
     func insert<T>(_ model: T) where T : PersistentModel {

@@ -61,6 +61,7 @@ struct CustomTabView: View  {
         .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
             viewModel.getWelcomeView()
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
     private var customTabView: some View {

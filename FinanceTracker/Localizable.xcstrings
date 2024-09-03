@@ -61,6 +61,22 @@
         }
       }
     },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%@: %@" : {
       "localizations" : {
         "en" : {
@@ -275,6 +291,16 @@
         }
       }
     },
+    "All is up to date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все актуально"
+          }
+        }
+      }
+    },
     "All stored data will be deleted and replaced with imported data, even it is empty" : {
       "localizations" : {
         "ru" : {
@@ -332,6 +358,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Случилась ошибка при создания JSON файла. Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "Analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
           }
         }
       }
@@ -769,6 +805,7 @@
       }
     },
     "Copy username" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -864,6 +901,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Темный режим"
+          }
+        }
+      }
+    },
+    "Data is deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данные удалены"
           }
         }
       }
@@ -1118,6 +1165,16 @@
         }
       }
     },
+    "Developer tool" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструмент разработчика"
+          }
+        }
+      }
+    },
     "Different currency" : {
       "localizations" : {
         "ru" : {
@@ -1198,6 +1255,16 @@
         }
       }
     },
+    "Email is copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email скопирован"
+          }
+        }
+      }
+    },
     "Empty" : {
       "localizations" : {
         "ru" : {
@@ -1255,6 +1322,16 @@
         }
       }
     },
+    "Enter number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите количество"
+          }
+        }
+      }
+    },
     "Entertainments" : {
       "localizations" : {
         "ru" : {
@@ -1266,6 +1343,7 @@
       }
     },
     "Entities" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1372,6 +1450,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Последнее предупреждение!"
+          }
+        }
+      }
+    },
+    "Finance Tracker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Финансовый Трекер"
           }
         }
       }
@@ -1516,6 +1604,17 @@
         }
       }
     },
+    "Hide this view" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спрятать данное окно"
+          }
+        }
+      }
+    },
     "Home" : {
       "localizations" : {
         "ru" : {
@@ -1542,6 +1641,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Icons made by Freepik from"
+          }
+        }
+      }
+    },
+    "If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если статистика долго загружается, вы можете выбрать отображение легкой версии. Легкая версия статистики быстрее, однако она не отображает текущий баланс счета, а также показывает меньший промежуток на столбчатом графике"
           }
         }
       }
@@ -1626,6 +1735,16 @@
         }
       }
     },
+    "Insert" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вставить"
+          }
+        }
+      }
+    },
     "Interest" : {
       "localizations" : {
         "ru" : {
@@ -1662,6 +1781,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Светлый режим"
+          }
+        }
+      }
+    },
+    "Light version" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Легкая весия"
           }
         }
       }
@@ -1707,6 +1836,7 @@
       }
     },
     "Name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2058,6 +2188,16 @@
         }
       }
     },
+    "Please try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
+    },
     "Please wait" : {
       "localizations" : {
         "ru" : {
@@ -2125,6 +2265,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновить?"
+          }
+        }
+      }
+    },
+    "Refreshed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено"
           }
         }
       }
@@ -2250,6 +2400,26 @@
         }
       }
     },
+    "Select balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите счет"
+          }
+        }
+      }
+    },
+    "Select category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите категорию"
+          }
+        }
+      }
+    },
     "Select color" : {
       "localizations" : {
         "ru" : {
@@ -2327,6 +2497,7 @@
       }
     },
     "Send message" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2417,6 +2588,16 @@
         }
       }
     },
+    "Show?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать?"
+          }
+        }
+      }
+    },
     "Simple" : {
       "localizations" : {
         "ru" : {
@@ -2434,6 +2615,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пропустить"
+          }
+        }
+      }
+    },
+    "Some error occurred" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка"
           }
         }
       }
@@ -2619,6 +2810,7 @@
       }
     },
     "Tags stats" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2629,6 +2821,7 @@
       }
     },
     "Telegram" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -2704,6 +2897,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Данный экран обновляется автоматически, так что нет необходимости делать это вручную. Но, если вы не видите нужных изменений, нажмите кнопку ниже чтобы обновить"
+          }
+        }
+      }
+    },
+    "This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное окно используется для теста производительности приложения в процессе высокой нагрузки. Оно создает огромное количество транзакций (базово 5000) для выбранных Счета и Категории. Все транзакции создаются на текущую дату, так что __не нажимайте кнопку \"Вставить\"__ если вы не хотите сильно замедлить приложение"
           }
         }
       }
@@ -2806,6 +3009,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транзакции"
+          }
+        }
+      }
+    },
+    "Transactions are deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции удалены"
           }
         }
       }
@@ -2931,6 +3144,17 @@
         }
       }
     },
+    "Username is copied" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя скопировано"
+          }
+        }
+      }
+    },
     "Value cannot be zero or empy" : {
       "localizations" : {
         "ru" : {
@@ -2941,12 +3165,32 @@
         }
       }
     },
+    "Value of each transaction will be equal to the number entered" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение каждой транзакции будет равно введенному количеству"
+          }
+        }
+      }
+    },
     "Week" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неделя"
+          }
+        }
+      }
+    },
+    "Week day picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер дня недели"
           }
         }
       }

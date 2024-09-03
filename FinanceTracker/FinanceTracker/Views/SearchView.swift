@@ -43,7 +43,7 @@ struct SearchView: View {
                 showFilterButton
                     .padding(.vertical)
                 
-                if !viewModel.isListCalculating, viewModel.filteredTransactionGroups.isEmpty {
+                if !viewModel.isFiltering, viewModel.filteredTransactionGroups.isEmpty {
                     if searchIsPreseneted {
                         ContentUnavailableView("No results for \"\(viewModel.searchText)\"", systemImage: "magnifyingglass", description: Text("There is not a matching transaction"))
                             .listRowBackground(Color.clear)
@@ -74,13 +74,10 @@ struct SearchView: View {
             }
             .navigationTitle("Search")
             .overlay {
-                if viewModel.isListCalculating {
+                if viewModel.isFiltering {
                     ProgressView()
                         .controlSize(.large)
                 }
-            }
-            .onChange(of: searchIsPreseneted) {
-                viewModel.hideTabBar(searchIsPreseneted)
             }
             .fullScreenCover(item: $showTransaction) { transaction in
                 viewModel.getTransactionView(for: transaction, namespace: namespace)
@@ -119,8 +116,14 @@ struct SearchView: View {
                 })
             .searchable(text: $viewModel.searchText, isPresented: $searchIsPreseneted, prompt: Text("Any text or number"))
             .toolbar {
-                if !viewModel.filteredTransactionsCurrencies.isEmpty {
-                    statisticsButton
+                if viewModel.isFetching {
+                    ProgressView()
+                        .controlSize(.regular)
+                        .scaleEffect(1.3, anchor: .trailing)
+                } else {
+                    if !viewModel.filteredTransactionsCurrencies.isEmpty {
+                        statisticsButton
+                    }
                 }
             }
             .sheet(item: $currencyForStatistics) { currency in
@@ -174,7 +177,22 @@ struct SearchView: View {
         .listRowSeparator(.hidden)
         .confirmationDialog("Refresh?", isPresented: $showRefreshAlert, titleVisibility: .visible) {
             Button("Yes, refresh") {
-                viewModel.refetchData()
+                viewModel.refetchData {
+                    Toast.shared.present(
+                        title: String(localized: "Some error occurred"),
+                        subtitle: String(localized:"Please try again"),
+                        symbol: "exclamationmark.warninglight",
+                        tint: .red
+                    )
+                } completionHandler: {
+                    Toast.shared.present(
+                        title: String(localized: "Refreshed"),
+                        subtitle: String(localized: "All is up to date"),
+                        symbol: "checkmark.circle",
+                        tint: .blue
+                    )
+                }
+
             }
         } message: {
             Text("This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh")

@@ -40,14 +40,12 @@ struct AddingCategoryView: View {
     var body: some View {
         ScrollView {
             VStack {
-//                headerView
-//                    .padding(.vertical, 10)
-                
                 if showPreview {
                     categoryPreview
                 }
                 
                 nameSection
+                    .padding(.top)
                 
                 Divider()
                     .padding(.horizontal)
@@ -127,18 +125,10 @@ struct AddingCategoryView: View {
     
     private var nameSection: some View {
         VStack {
-            HStack {
-                Text("Name")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-            
             TextField("Category name", text: $viewModel.name.animation(), prompt: Text("Enter name here"))
                 .focused($nameTextFieldFocus)
                 .font(.title2)
+                .submitLabel(.done)
                 .padding(.horizontal)
             
             if nameTextFieldFocus && !viewModel.filteredCategories.isEmpty {

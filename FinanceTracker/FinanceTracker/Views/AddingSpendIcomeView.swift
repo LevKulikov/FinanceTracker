@@ -77,39 +77,47 @@ struct AddingSpendIcomeView: View {
                         .padding(.bottom)
                     
                     categoryPickerSection
-                        .padding(.bottom)
+                        .padding(.bottom, 30)
                     
-                    Divider()
-                        .padding(.horizontal)
-                        .padding(.bottom)
+                    VStack {
+                        datePicker
+                            .padding(.bottom)
+                        
+                        Divider()
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                        
+                        balanceAccountPicker
+                    }
+                    .padding(10)
+                    .background {
+                        RoundedRectangle(cornerRadius: 15.0)
+                            .fill(.ultraThinMaterial)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 30)
                     
-                    datePicker
-                        .padding(.bottom)
-                    
-                    Divider()
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                    
-                    balanceAccountPicker
-                        .padding(.bottom)
-                    
-                    Divider()
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                    
-                    TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
-                        .onChange(of: searchTagsTextFieldFocus) {
-                            if searchTagsTextFieldFocus {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    withAnimation {
-                                        proxy.scrollTo("existing tags", anchor: .bottom)
+                    VStack {
+                        TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showMoreTagsOptions, focusState: $searchTagsTextFieldFocus)
+                            .onChange(of: searchTagsTextFieldFocus) {
+                                if searchTagsTextFieldFocus {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        withAnimation {
+                                            proxy.scrollTo("existing tags", anchor: .bottom)
+                                        }
                                     }
                                 }
                             }
-                        }
-                    
-                    commentSection
-                        .padding(.bottom)
+                        
+                        commentSection
+                    }
+                    .padding(.vertical)
+                    .background {
+                        RoundedRectangle(cornerRadius: 15.0)
+                            .fill(.ultraThinMaterial)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom)
                     
                     Rectangle()
                         .fill(.clear)
@@ -362,7 +370,7 @@ struct AddingSpendIcomeView: View {
             HStack {
                 Picker("", selection: $viewModel.date) {
                     ForEach(viewModel.threeDatesArray, id: \.self) { dateToSet in
-                        Text("\(dateToSet.get(.day)) \(dateToSet.month)")
+                        Text("\(dateToSet.get(.day)) \(dateToSet.month.prefix(3)).")
                             .tag(dateToSet)
                     }
                 }
@@ -376,7 +384,6 @@ struct AddingSpendIcomeView: View {
                 // overrides tap gesture to fix ios 17.1 bug
             }
         }
-        .padding(.horizontal, 10)
     }
     
     private var balanceAccountPicker: some View {
@@ -413,7 +420,6 @@ struct AddingSpendIcomeView: View {
             .foregroundStyle(.primary)
             .hoverEffect(.highlight)
         }
-        .padding(.horizontal, 10)
         .sheet(isPresented: $showAddingBalanceAccountView) {
             NavigationStack {
                 viewModel.getAddingBalanceAccountView()

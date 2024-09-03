@@ -28,19 +28,23 @@ struct ProvidedStatisticsView: View {
     
     //MARK: - Body
     var body: some View {
-        ScrollView {
-            VStack {
-                totalsSection
-                
-                pieChartSection
-                
-                barChartSection
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    totalsSection
+                    
+                    pieChartSection
+                    
+                    barChartSection
+                }
+                .padding()
             }
-            .padding()
-        }
-        .scrollIndicators(.hidden)
-        .background {
-            backgroundColor.ignoresSafeArea()
+            .scrollIndicators(.hidden)
+            .navigationTitle("Analytics")
+            .navigationBarTitleDisplayMode(.inline)
+            .background {
+                backgroundColor.ignoresSafeArea()
+            }
         }
     }
     
@@ -166,7 +170,8 @@ struct ProvidedStatisticsView: View {
             TransactionBarChart(
                 transactionsData: viewModel.barChartTransactionData,
                 perDate: $viewModel.barChartPerDateFilter,
-                transactionType: $viewModel.barChartTransactionTypeFilter
+                transactionType: $viewModel.barChartTransactionTypeFilter,
+                xScaleEndDate: viewModel.transactionMaxDate == nil ? .now : viewModel.transactionMaxDate!
             )
             .frame(height: 300)
             .padding(.bottom)

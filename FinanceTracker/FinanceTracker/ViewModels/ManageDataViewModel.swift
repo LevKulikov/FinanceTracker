@@ -52,15 +52,17 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Methods
-    func deleteAllTransactions() {
+    func deleteAllTransactions(completionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         Task { [dataManager] in
             await dataManager.deleteAllTransactions()
+            await completionHandler?()
         }
     }
     
-    func deleteAllStoredData() {
+    func deleteAllStoredData(completionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         Task { [dataManager] in
             await dataManager.deleteAllStoredData()
+            await completionHandler?()
         }
     }
     

@@ -41,6 +41,7 @@ struct TransactionBarChart: View {
     private let transactionsData: [[TransactionBarChartData]]
     @Binding private var perDate: BarChartPerDateFilter
     @Binding private var transactionType: TransactionFilterTypes
+    private let xScaleEndDate: Date
     
     private var maxVisibleBars: Int {
         let isBothTypesShown = transactionType == .both
@@ -103,21 +104,21 @@ struct TransactionBarChart: View {
         let calendar = Calendar.current
         switch perDate {
         case .perDay:
-            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -2 : -3, to: .now) ?? .now
-            if let day = calendar.dateComponents([.day], from: .now).day, day < 11 {
-                startDate = startDate.startOfMonth() ?? .now
+            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -2 : -3, to: xScaleEndDate) ?? xScaleEndDate
+            if let day = calendar.dateComponents([.day], from: xScaleEndDate).day, day < 11 {
+                startDate = startDate.startOfMonth() ?? xScaleEndDate
             }
-            return startDate...(Date.now.endOfDay() ?? .now)
+            return startDate...(xScaleEndDate.endOfDay() ?? xScaleEndDate)
         case .perWeek:
-            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -1 : -2, to: .now) ?? .now
-            let endDate = Date.now.endOfWeek() ?? .now
+            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -1 : -2, to: xScaleEndDate) ?? xScaleEndDate
+            let endDate = xScaleEndDate.endOfWeek() ?? xScaleEndDate
             return startDate...endDate
         case .perMonth:
-            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -3 : -5, to: .now) ?? .now
-            let endDate = Date.now.endOfMonth() ?? .now
+            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -3 : -5, to: xScaleEndDate) ?? xScaleEndDate
+            let endDate = xScaleEndDate.endOfMonth() ?? xScaleEndDate
             return startDate...endDate
         case .perYear:
-            let endDate = Date.now.endOfYear() ?? .now
+            let endDate = xScaleEndDate.endOfYear() ?? xScaleEndDate
             return FTAppAssets.availableDateRange.lowerBound...endDate
         }
     }
@@ -149,8 +150,8 @@ struct TransactionBarChart: View {
         return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
     }
     
-    @Environment(\.colorScheme) var colorScheme
-    @State private var xScrollPosition: Date = (Date.now.endOfDay() ?? .now)
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var xScrollPosition: Date
     @State private var yScale: ClosedRange<Float> = 0...50_000
     @State private var selection: Date?
     @State private var selectionBuffer: Date?
@@ -159,10 +160,12 @@ struct TransactionBarChart: View {
     @State private var yScaleDispatchWorkItem: DispatchWorkItem?
     
     //MARK: - Init
-    init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>) {
+    init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>, xScaleEndDate: Date = .now) {
         self.transactionsData = transactionsData
         self._perDate = perDate
         self._transactionType = transactionType
+        self.xScaleEndDate = xScaleEndDate
+        self._xScrollPosition = State(wrappedValue: xScaleEndDate.endOfDay() ?? xScaleEndDate)
     }
     
     //MARK: - Body
@@ -268,16 +271,16 @@ struct TransactionBarChart: View {
             setSelected(nil, date: nil)
             adaptYAxisScaleToVisibleData(isInitial: true) {
                 withAnimation {
-                    xScrollPosition = .now
+                    xScrollPosition = xScaleEndDate
                 }
             }
         })
         .onAppear {
-            if xScrollPosition.startOfDay() == Date.now.startOfDay() {
+            if xScrollPosition.startOfDay() == xScaleEndDate.startOfDay() {
                 adaptYAxisScaleToVisibleData(isInitial: true) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         withAnimation {
-                            xScrollPosition = .now
+                            xScrollPosition = xScaleEndDate
                         }
                     }
                 }
@@ -371,7 +374,7 @@ struct TransactionBarChart: View {
         }
         if isInitial {
             DispatchQueue.main.asyncAfter(deadline: .now() + delayForInitial) {
-                let startDate: Date = .now.addingTimeInterval(-Double(maxXVisibleLenth))
+                let startDate: Date = xScaleEndDate.addingTimeInterval(-Double(maxXVisibleLenth))
                 setYScaleRange(withAnimation: true, scrollStart: startDate)
                 compeletionHandler?()
             }
