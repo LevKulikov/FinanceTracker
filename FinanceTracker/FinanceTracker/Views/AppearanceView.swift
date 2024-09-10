@@ -10,7 +10,14 @@ import SwiftUI
 struct AppearanceView: View {
     //MARK: - Properties
     @StateObject private var viewModel: AppearanceViewModel
+    private var isSpendIncomeViewInTabs: Bool {
+        viewModel.firstThreeTabs.contains(.spendIncomeView)
+    }
     private var showAddButtonSectionFooterText: LocalizedStringResource {
+        if !isSpendIncomeViewInTabs {
+            return "Since you have removed the List tab from the bottom menu, the Add Transaction button is always displayed"
+        }
+        
         if viewModel.showAddButtonFromEvetyTab {
             return "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time"
         }
@@ -28,7 +35,8 @@ struct AppearanceView: View {
         NavigationStack {
             List {
                 Section {
-                    Toggle("Always show add button", isOn: $viewModel.showAddButtonFromEvetyTab)
+                    Toggle("Always show add button", isOn: isSpendIncomeViewInTabs ? $viewModel.showAddButtonFromEvetyTab : .constant(true))
+                        .disabled(!isSpendIncomeViewInTabs)
                 } header: {
                     Text("Large blue circle button with plus")
                 } footer: {

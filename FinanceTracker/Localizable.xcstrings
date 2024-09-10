@@ -2631,6 +2631,9 @@
         }
       }
     },
+    "Since you have removed the List tab from the bottom menu, the Add Transaction button is always displayed" : {
+
+    },
     "Skip" : {
       "extractionState" : "stale",
       "localizations" : {
