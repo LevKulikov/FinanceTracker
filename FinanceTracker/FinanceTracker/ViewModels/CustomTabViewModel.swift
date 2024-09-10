@@ -192,11 +192,11 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getSecondTab() -> AnyView {
+    func getSecondTab(namespace: Namespace.ID) -> AnyView {
         guard let first = secondAndThirdTabs.first else { return AnyView(page404) }
         switch first {
         case .spendIncomeView:
-            return AnyView(page404)
+            return AnyView(getSpendIncomeView(namespace: namespace))
         case .addingSpendIncomeView:
             return AnyView(page404)
         case .searchView:
@@ -213,11 +213,11 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getThirdTab() -> some View {
+    func getThirdTab(namespace: Namespace.ID) -> some View {
         guard secondAndThirdTabs.count > 1 else { return AnyView(page404) }
         switch secondAndThirdTabs[1] {
         case .spendIncomeView:
-            return AnyView(page404)
+            return AnyView(getSpendIncomeView(namespace: namespace))
         case .addingSpendIncomeView:
             return AnyView(page404)
         case .searchView:
@@ -234,7 +234,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getAddingSpendIncomeView(forAction: Binding<ActionWithTransaction>,namespace: Namespace.ID) -> some View {
+    func getAddingSpendIncomeView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(
             dataManager: dataManager,
             threadToUse: .main,

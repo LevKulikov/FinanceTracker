@@ -23,9 +23,9 @@ protocol SettingsManagerProtocol: AnyObject {
     
     func isFirstLaunch() -> Bool
     
-    func setSecondThirdTabsArray(_ tabsArray: [TabViewType])
+    func setThreeTabsArray(_ tabsArray: [TabViewType])
     
-    func getSecondThirdTabsArray() -> [TabViewType]
+    func getThreeTabsArray() -> [TabViewType]
     
     func isLightWeightStatistics() -> Bool
     
@@ -107,18 +107,18 @@ final class SettingsManager: SettingsManagerProtocol {
         return isFirst
     }
     
-    func getSecondThirdTabsArray() -> [TabViewType] {
+    func getThreeTabsArray() -> [TabViewType] {
         guard let stringArray = UserDefaults.standard.stringArray(forKey: tabsArrayKey) else {
-            return [.statisticsView, .searchView]
+            return [.spendIncomeView, .statisticsView, .searchView]
         }
         let tabsArray = stringArray.compactMap { TabViewType(rawValue: $0) }
-        guard tabsArray.count > 1 else {
-            return [.settingsView, .searchView]
+        guard tabsArray.count > 2 else {
+            return [.spendIncomeView, .statisticsView, .searchView]
         }
         return tabsArray
     }
     
-    func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
+    func setThreeTabsArray(_ tabsArray: [TabViewType]) {
         let stringArray = tabsArray.map { $0.rawValue }
         UserDefaults.standard.set(stringArray, forKey: tabsArrayKey)
     }

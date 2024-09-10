@@ -34,7 +34,7 @@ struct CustomTabView: View  {
                 .tag(1)
             
             if viewModel.isSecondTabCanBeShown {
-                viewModel.getSecondTab()
+                viewModel.getSecondTab(namespace: namespace)
                     .tag(2)
             } else {
                 viewModel.getStatisticsView()
@@ -42,7 +42,7 @@ struct CustomTabView: View  {
             }
             
             if viewModel.isThirdTabCanBeShown {
-                viewModel.getThirdTab()
+                viewModel.getThirdTab(namespace: namespace)
                     .tag(3)
             } else {
                 viewModel.getSearchView()

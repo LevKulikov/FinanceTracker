@@ -533,11 +533,11 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
-        settingsManager.setSecondThirdTabsArray(tabsArray)
+        settingsManager.setThreeTabsArray(tabsArray)
     }
     
     func getSecondThirdTabsArray() -> [TabViewType] {
-        settingsManager.getSecondThirdTabsArray()
+        settingsManager.getThreeTabsArray()
     }
     
     func isLightWeightStatistics() -> Bool {
