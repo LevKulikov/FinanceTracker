@@ -1665,6 +1665,9 @@
         }
       }
     },
+    "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
+
+    },
     "Import" : {
       "localizations" : {
         "ru" : {
@@ -2698,6 +2701,9 @@
           }
         }
       }
+    },
+    "Sorry, this tab is only available from the bottom menu" : {
+
     },
     "Spending" : {
       "localizations" : {

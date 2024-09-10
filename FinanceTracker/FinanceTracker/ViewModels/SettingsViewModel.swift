@@ -37,7 +37,6 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     private let dataManager: any DataManagerProtocol
     
     //MARK: Published props
-    
     @MainActor @Published var selectedSettings: SettingsSectionAndDataType? {
         didSet {
             if FTAppAssets.currentUserDevise == .phone {
@@ -47,6 +46,11 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor @Published private(set) var additionalTab: TabViewType?
+    
+    @ViewBuilder
+    private var spendIncomeViewPlaceholder: some View {
+        ContentUnavailableView("Sorry, this tab is only available from the bottom menu", systemImage: "hand.raised", description: Text("If you want to open it, please reorder the tabs in Settings. To do so, press \"\(Image(systemName: "ellipsis.rectangle")) Reorder tabs\""))
+    }
     
     //MARK: - Initializer
     
@@ -98,6 +102,8 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
             return FTFactory.shared.createStatisticsView(dataManager: dataManager, delegate: self)
         case .budgetsView:
             return FTFactory.shared.createBudgetsView(dataManager: dataManager, delegate: self)
+        case .spendIncomeView:
+            return AnyView(spendIncomeViewPlaceholder)
         default:
             return AnyView(EmptyView())
         }
@@ -234,3 +240,4 @@ extension SettingsViewModel: AppearanceViewModelDelegate {
         delegate?.didUpdateSettingsSection(.appearance)
     }
 }
+

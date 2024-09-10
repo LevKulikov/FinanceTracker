@@ -14,7 +14,6 @@ struct SettingsView: View {
     @State private var showTabsSettingsView = false
     @State private var telegramConfirmationFlag = false
     @State private var emailConfirmationFlag = false
-    
     @State private var showDeveloperTool = false
     
     //MARK: - Initializer

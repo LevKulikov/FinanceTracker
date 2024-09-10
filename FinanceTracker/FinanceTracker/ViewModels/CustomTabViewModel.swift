@@ -161,7 +161,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
-        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
+        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace, strongReference: true) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
