@@ -15,7 +15,7 @@ protocol TabsSettingsViewModelDelegate: AnyObject {
 final class TabsSettingsViewModel: ObservableObject {
     //MARK: - Properties
     weak var delegate: (any TabsSettingsViewModelDelegate)?
-    let numberOfTabsThatCanBeSet = 2
+    let numberOfTabsThatCanBeSet = 3
     
     //MARK: Published properties
     @Published var changableTabs: [TabViewType]

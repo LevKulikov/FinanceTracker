@@ -22,6 +22,10 @@ struct CustomTabView: View  {
             return 20
         }
     }
+    private var showAddButton: Bool {
+        isSpendIncomeView(tab: viewModel.tabSelection) || viewModel.showAddButtonFromEvetyTab || !viewModel.firstThreeTabs.contains(.spendIncomeView)
+    }
+    
     //MARK: - Init
     init(viewModel: CustomTabViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -109,7 +113,7 @@ struct CustomTabView: View  {
             .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
-            if viewModel.tabSelection == 1 || viewModel.showAddButtonFromEvetyTab {
+            if showAddButton {
                 Spacer()
                 
                 Button {
@@ -184,7 +188,7 @@ struct CustomTabView: View  {
     }
     
     private func addButtonTapped() {
-        if viewModel.tabSelection == 1 {
+        if isSpendIncomeView(tab: viewModel.tabSelection) {
             viewModel.addButtonPressed()
         } else {
             withAnimation {
@@ -196,7 +200,7 @@ struct CustomTabView: View  {
     
     /// Tabs count starts from 1
     private func isSpendIncomeView(tab: Int) -> Bool {
-        guard viewModel.firstThreeTabs.count > tab else { return false }
+        guard viewModel.firstThreeTabs.count > (tab - 1) else { return false }
         return viewModel.firstThreeTabs[tab - 1] == .spendIncomeView
     }
 }

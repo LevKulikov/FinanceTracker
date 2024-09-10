@@ -88,7 +88,7 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
     
     var imageHeight: CGFloat { 20 }
     
-    static var changableTabs: [Self] { [.statisticsView, .searchView, .budgetsView] }
+    static var changableTabs: [Self] { [.spendIncomeView, .statisticsView, .searchView, .budgetsView] }
 }
 
 final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
