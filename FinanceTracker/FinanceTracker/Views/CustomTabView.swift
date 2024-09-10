@@ -82,9 +82,13 @@ struct CustomTabView: View  {
             let buttonWidth: CGFloat = 70
             
             Button {
-                selectTab(1, animated: true)
+                selectTab(1, animated: isSpendIncomeView(tab: 1))
             } label: {
-                TabViewType.spendIncomeView.tabLabel
+                if viewModel.isFirstTabCanBeShown {
+                    viewModel.firstThreeTabs[0].tabLabel
+                } else {
+                    TabViewType.spendIncomeView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 1 ? .blue : .secondary)
@@ -93,10 +97,10 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(2)
+                selectTab(2, animated: isSpendIncomeView(tab: 2))
             } label: {
                 if viewModel.isSecondTabCanBeShown {
-                    viewModel.secondAndThirdTabs[1].tabLabel
+                    viewModel.firstThreeTabs[1].tabLabel
                 } else {
                     TabViewType.statisticsView.tabLabel
                 }
@@ -129,10 +133,10 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(3)
+                selectTab(3, animated: isSpendIncomeView(tab: 3))
             } label: {
                 if viewModel.isThirdTabCanBeShown {
-                    viewModel.secondAndThirdTabs[2].tabLabel
+                    viewModel.firstThreeTabs[2].tabLabel
                 } else {
                     TabViewType.searchView.tabLabel
                 }
@@ -188,6 +192,12 @@ struct CustomTabView: View  {
                 viewModel.showTabBar = false
             }
         }
+    }
+    
+    /// Tabs count starts from 1
+    private func isSpendIncomeView(tab: Int) -> Bool {
+        guard viewModel.firstThreeTabs.count > tab else { return false }
+        return viewModel.firstThreeTabs[tab - 1] == .spendIncomeView
     }
 }
 

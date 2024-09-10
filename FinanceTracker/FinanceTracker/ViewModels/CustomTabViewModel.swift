@@ -109,7 +109,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     @Published var tabSelection = 1
     @Published var showTabBar = true
     @Published var isFirstLaunch = false
-    @MainActor @Published private(set) var secondAndThirdTabs: [TabViewType]
+    @MainActor @Published private(set) var firstThreeTabs: [TabViewType]
     @MainActor @Published private(set) var showAddButtonFromEvetyTab: Bool
     
     @ViewBuilder
@@ -127,19 +127,19 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     var isFirstTabCanBeShown: Bool {
-        guard secondAndThirdTabs.count > 0 else { return false }
+        guard firstThreeTabs.count > 0 else { return false }
         return true
     }
     
     @MainActor
     var isSecondTabCanBeShown: Bool {
-        guard secondAndThirdTabs.count > 1 else { return false }
+        guard firstThreeTabs.count > 1 else { return false }
         return true
     }
     
     @MainActor
     var isThirdTabCanBeShown: Bool {
-        guard secondAndThirdTabs.count > 2 else { return false }
+        guard firstThreeTabs.count > 2 else { return false }
         return true
     }
     
@@ -147,7 +147,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
-        self._secondAndThirdTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._firstThreeTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
         self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
@@ -199,7 +199,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getFirstTab(namespace: Namespace.ID) -> AnyView {
-        guard let first = secondAndThirdTabs.first else { return AnyView(page404) }
+        guard let first = firstThreeTabs.first else { return AnyView(page404) }
         switch first {
         case .spendIncomeView:
             return AnyView(getSpendIncomeView(namespace: namespace))
@@ -220,8 +220,8 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getSecondTab(namespace: Namespace.ID) -> AnyView {
-        guard secondAndThirdTabs.count > 1 else { return AnyView(page404) }
-        switch secondAndThirdTabs[1] {
+        guard firstThreeTabs.count > 1 else { return AnyView(page404) }
+        switch firstThreeTabs[1] {
         case .spendIncomeView:
             return AnyView(getSpendIncomeView(namespace: namespace))
         case .addingSpendIncomeView:
@@ -241,8 +241,8 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getThirdTab(namespace: Namespace.ID) -> some View {
-        guard secondAndThirdTabs.count > 2 else { return AnyView(page404) }
-        switch secondAndThirdTabs[2] {
+        guard firstThreeTabs.count > 2 else { return AnyView(page404) }
+        switch firstThreeTabs[2] {
         case .spendIncomeView:
             return AnyView(getSpendIncomeView(namespace: namespace))
         case .addingSpendIncomeView:
@@ -323,7 +323,7 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
 extension CustomTabViewModel: SettingsViewModelDelegate {
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
         Task { @MainActor in
-            secondAndThirdTabs = tabsPositions
+            firstThreeTabs = tabsPositions
         }
     }
     
