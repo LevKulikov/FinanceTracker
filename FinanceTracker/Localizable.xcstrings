@@ -1666,7 +1666,14 @@
       }
     },
     "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы хотите открыть ее, пожалуйста, переставьте вкладки в настройках. Чтобы это сделать, нажмите кнопку \"%@ Упорядочить вкладки\""
+          }
+        }
+      }
     },
     "Import" : {
       "localizations" : {
@@ -2632,7 +2639,14 @@
       }
     },
     "Since you have removed the List tab from the bottom menu, the Add Transaction button is always displayed" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поскольку вы убрали вкладку Список из нижнего меню, кнопка Добавить Транзакцию показывается всегда"
+          }
+        }
+      }
     },
     "Skip" : {
       "extractionState" : "stale",
@@ -2706,7 +2720,14 @@
       }
     },
     "Sorry, this tab is only available from the bottom menu" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, но данная вкладка доступна только из нижнего меню"
+          }
+        }
+      }
     },
     "Spending" : {
       "localizations" : {
