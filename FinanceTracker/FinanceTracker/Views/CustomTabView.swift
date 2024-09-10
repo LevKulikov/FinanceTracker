@@ -30,8 +30,13 @@ struct CustomTabView: View  {
     //MARK: - Body
     var body: some View {
         TabView(selection: $viewModel.tabSelection) {
-            viewModel.getSpendIncomeView(namespace: namespace)
-                .tag(1)
+            if viewModel.isFirstTabCanBeShown {
+                viewModel.getFirstTab(namespace: namespace)
+                    .tag(1)
+            } else {
+                viewModel.getSpendIncomeView(namespace: namespace)
+                    .tag(1)
+            }
             
             if viewModel.isSecondTabCanBeShown {
                 viewModel.getSecondTab(namespace: namespace)
@@ -91,7 +96,7 @@ struct CustomTabView: View  {
                 selectTab(2)
             } label: {
                 if viewModel.isSecondTabCanBeShown {
-                    viewModel.secondAndThirdTabs.first!.tabLabel
+                    viewModel.secondAndThirdTabs[1].tabLabel
                 } else {
                     TabViewType.statisticsView.tabLabel
                 }
@@ -127,7 +132,7 @@ struct CustomTabView: View  {
                 selectTab(3)
             } label: {
                 if viewModel.isThirdTabCanBeShown {
-                    viewModel.secondAndThirdTabs[1].tabLabel
+                    viewModel.secondAndThirdTabs[2].tabLabel
                 } else {
                     TabViewType.searchView.tabLabel
                 }

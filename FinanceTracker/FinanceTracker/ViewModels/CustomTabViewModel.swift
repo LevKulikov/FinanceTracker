@@ -126,14 +126,20 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    var isSecondTabCanBeShown: Bool {
+    var isFirstTabCanBeShown: Bool {
         guard secondAndThirdTabs.count > 0 else { return false }
         return true
     }
     
     @MainActor
-    var isThirdTabCanBeShown: Bool {
+    var isSecondTabCanBeShown: Bool {
         guard secondAndThirdTabs.count > 1 else { return false }
+        return true
+    }
+    
+    @MainActor
+    var isThirdTabCanBeShown: Bool {
+        guard secondAndThirdTabs.count > 2 else { return false }
         return true
     }
     
@@ -192,7 +198,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getSecondTab(namespace: Namespace.ID) -> AnyView {
+    func getFirstTab(namespace: Namespace.ID) -> AnyView {
         guard let first = secondAndThirdTabs.first else { return AnyView(page404) }
         switch first {
         case .spendIncomeView:
@@ -213,9 +219,30 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getThirdTab(namespace: Namespace.ID) -> some View {
+    func getSecondTab(namespace: Namespace.ID) -> AnyView {
         guard secondAndThirdTabs.count > 1 else { return AnyView(page404) }
         switch secondAndThirdTabs[1] {
+        case .spendIncomeView:
+            return AnyView(getSpendIncomeView(namespace: namespace))
+        case .addingSpendIncomeView:
+            return AnyView(page404)
+        case .searchView:
+            return AnyView(getSearchView())
+        case .statisticsView:
+            return AnyView(getStatisticsView())
+        case .settingsView:
+            return AnyView(getSettingsView())
+        case .welcomeView:
+            return AnyView(page404)
+        case .budgetsView:
+            return AnyView(getBudgetsView())
+        }
+    }
+    
+    @MainActor
+    func getThirdTab(namespace: Namespace.ID) -> some View {
+        guard secondAndThirdTabs.count > 2 else { return AnyView(page404) }
+        switch secondAndThirdTabs[2] {
         case .spendIncomeView:
             return AnyView(getSpendIncomeView(namespace: namespace))
         case .addingSpendIncomeView:
