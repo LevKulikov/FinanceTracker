@@ -809,6 +809,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
             Task { @MainActor in
                 if isViewDisplayed {
+                    try await Task.sleep(for: .seconds(0.3))
                     refreshDataIfNeeded()
                 }
             }
