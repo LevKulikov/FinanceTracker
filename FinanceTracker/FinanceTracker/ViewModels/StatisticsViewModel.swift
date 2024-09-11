@@ -111,6 +111,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             return startDate...endDate
         }
     }
+    /// Flag that indicates if statistics view is currently displayed
     @MainActor var isViewDisplayed = false
     
     //MARK: Private
