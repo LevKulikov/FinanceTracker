@@ -106,7 +106,11 @@ struct StatisticsView: View {
                 settingsPopoverView
             }
             .onAppear {
+                viewModel.isViewDisplayed = true
                 viewModel.refreshDataIfNeeded()
+            }
+            .onDisappear {
+                viewModel.isViewDisplayed = false
             }
             .background(content: { backgroundColor.ignoresSafeArea() })
             .onChange(of: viewModel.balanceAccountToFilter) {

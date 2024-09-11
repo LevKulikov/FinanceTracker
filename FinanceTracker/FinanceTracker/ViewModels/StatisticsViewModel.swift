@@ -111,6 +111,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             return startDate...endDate
         }
     }
+    @MainActor var isViewDisplayed = false
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
@@ -805,6 +806,11 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
         case .transactions:
             isTransactionUpdatedFromAnotherView = true
+            Task { @MainActor in
+                if isViewDisplayed {
+                    refreshDataIfNeeded()
+                }
+            }
         case .appearance:
             return
         case .data:
