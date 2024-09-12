@@ -18,7 +18,7 @@ final class TabsSettingsViewModel: ObservableObject {
     let numberOfTabsThatCanBeSet = 4
     
     //MARK: Published properties
-    @Published var changableTabs: [TabViewType]
+    @MainActor @Published var changableTabs: [TabViewType]
     
     //MARK: Private properites
     private let dataManager: any DataManagerProtocol
@@ -34,7 +34,15 @@ final class TabsSettingsViewModel: ObservableObject {
     //MARK: - Methods
     @MainActor
     func moveTabs(indices: IndexSet, newOffset: Int) {
-        changableTabs.move(fromOffsets: indices, toOffset: newOffset)
+        var copyTabs = changableTabs
+        copyTabs.move(fromOffsets: indices, toOffset: newOffset)
+        // Prevent settings tab to be hidden
+        guard copyTabs.last != .settingsView else {
+            changableTabs = changableTabs
+            return
+        }
+        
+        changableTabs = copyTabs
         let toSave = Array(changableTabs.prefix(numberOfTabsThatCanBeSet))
         dataManager.setSecondThirdTabsArray(toSave)
         delegate?.didSetSecondThirdTabsPosition(for: toSave)
