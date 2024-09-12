@@ -97,6 +97,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func isLightWeightStatistics() -> Bool
     
     func setLightWeightStatistics(_ isLight: Bool)
+    
+    func showAddButtonFromEvetyTab() -> Bool
+    
+    func showAddButtonFromEvetyTab(_ show: Bool)
 }
 
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
@@ -529,11 +533,11 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
-        settingsManager.setSecondThirdTabsArray(tabsArray)
+        settingsManager.setThreeTabsArray(tabsArray)
     }
     
     func getSecondThirdTabsArray() -> [TabViewType] {
-        settingsManager.getSecondThirdTabsArray()
+        settingsManager.getThreeTabsArray()
     }
     
     func isLightWeightStatistics() -> Bool {
@@ -542,6 +546,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func setLightWeightStatistics(_ isLight: Bool) {
         settingsManager.setLightWeightStatistics(isLight)
+    }
+    
+    func showAddButtonFromEvetyTab() -> Bool {
+        settingsManager.showAddButtonFromEvetyTab()
+    }
+    
+    func showAddButtonFromEvetyTab(_ show: Bool) {
+        settingsManager.showAddButtonFromEvetyTab(show)
     }
     
     //MARK: Private methods

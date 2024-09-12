@@ -111,6 +111,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             return startDate...endDate
         }
     }
+    /// Flag that indicates if statistics view is currently displayed
+    @MainActor var isViewDisplayed = false
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
@@ -805,6 +807,12 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
         case .transactions:
             isTransactionUpdatedFromAnotherView = true
+            Task { @MainActor in
+                if isViewDisplayed {
+                    try await Task.sleep(for: .seconds(0.3))
+                    refreshDataIfNeeded()
+                }
+            }
         case .appearance:
             return
         case .data:

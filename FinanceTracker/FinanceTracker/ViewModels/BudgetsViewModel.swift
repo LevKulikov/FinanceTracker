@@ -62,6 +62,7 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
             }
         }
     }
+    @MainActor var isViewDisplayed = false
     
     //MARK: - Initializer
     init(dataManager: any DataManagerProtocol) {
@@ -241,6 +242,10 @@ extension BudgetsViewModel: CustomTabViewModelDelegate {
             neededToBeRefreshed = true
             Task { @MainActor in
                 budgets = []
+                if isViewDisplayed {
+                    try await Task.sleep(for: .seconds(0.3))
+                    refreshIfNeeded()
+                }
             }
         case .appearance:
             return
