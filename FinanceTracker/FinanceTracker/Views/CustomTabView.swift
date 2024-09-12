@@ -58,8 +58,13 @@ struct CustomTabView: View  {
                     .tag(3)
             }
             
-            viewModel.getSettingsView()
-                .tag(4)
+            if viewModel.isForthTabCanBeShown {
+                viewModel.getForthTab(namespace: namespace)
+                    .tag(4)
+            } else {
+                viewModel.getSettingsView()
+                    .tag(4)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
@@ -152,9 +157,13 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(4)
+                selectTab(4, animated: isSpendIncomeView(tab: 4))
             } label: {
-                TabViewType.settingsView.tabLabel
+                if viewModel.isForthTabCanBeShown {
+                    viewModel.firstThreeTabs[3].tabLabel
+                } else {
+                    TabViewType.settingsView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 4 ? .blue : .secondary)

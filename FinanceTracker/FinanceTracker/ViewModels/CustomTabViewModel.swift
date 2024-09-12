@@ -88,7 +88,7 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
     
     var imageHeight: CGFloat { 20 }
     
-    static var changableTabs: [Self] { [.spendIncomeView, .statisticsView, .searchView, .budgetsView] }
+    static var changableTabs: [Self] { [.spendIncomeView, .statisticsView, .searchView, .settingsView, .budgetsView] }
 }
 
 final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
@@ -140,6 +140,12 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     var isThirdTabCanBeShown: Bool {
         guard firstThreeTabs.count > 2 else { return false }
+        return true
+    }
+    
+    @MainActor
+    var isForthTabCanBeShown: Bool {
+        guard firstThreeTabs.count > 3 else { return false }
         return true
     }
     
@@ -199,65 +205,22 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getFirstTab(namespace: Namespace.ID) -> AnyView {
-        guard let first = firstThreeTabs.first else { return AnyView(page404) }
-        switch first {
-        case .spendIncomeView:
-            return AnyView(getSpendIncomeView(namespace: namespace))
-        case .addingSpendIncomeView:
-            return AnyView(page404)
-        case .searchView:
-            return AnyView(getSearchView())
-        case .statisticsView:
-            return AnyView(getStatisticsView())
-        case .settingsView:
-            return AnyView(getSettingsView())
-        case .welcomeView:
-            return AnyView(page404)
-        case .budgetsView:
-            return AnyView(getBudgetsView())
-        }
+        getTab(index: 0, namespace: namespace)
     }
     
     @MainActor
     func getSecondTab(namespace: Namespace.ID) -> AnyView {
-        guard firstThreeTabs.count > 1 else { return AnyView(page404) }
-        switch firstThreeTabs[1] {
-        case .spendIncomeView:
-            return AnyView(getSpendIncomeView(namespace: namespace))
-        case .addingSpendIncomeView:
-            return AnyView(page404)
-        case .searchView:
-            return AnyView(getSearchView())
-        case .statisticsView:
-            return AnyView(getStatisticsView())
-        case .settingsView:
-            return AnyView(getSettingsView())
-        case .welcomeView:
-            return AnyView(page404)
-        case .budgetsView:
-            return AnyView(getBudgetsView())
-        }
+        getTab(index: 1, namespace: namespace)
     }
     
     @MainActor
-    func getThirdTab(namespace: Namespace.ID) -> some View {
-        guard firstThreeTabs.count > 2 else { return AnyView(page404) }
-        switch firstThreeTabs[2] {
-        case .spendIncomeView:
-            return AnyView(getSpendIncomeView(namespace: namespace))
-        case .addingSpendIncomeView:
-            return AnyView(page404)
-        case .searchView:
-            return AnyView(getSearchView())
-        case .statisticsView:
-            return AnyView(getStatisticsView())
-        case .settingsView:
-            return AnyView(getSettingsView())
-        case .welcomeView:
-            return AnyView(page404)
-        case .budgetsView:
-            return AnyView(getBudgetsView())
-        }
+    func getThirdTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 2, namespace: namespace)
+    }
+    
+    @MainActor
+    func getForthTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 3, namespace: namespace)
     }
     
     @MainActor
@@ -278,6 +241,27 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
         delegates = delegates.filter { $0.object != nil }
+    }
+    
+    @MainActor
+    private func getTab(index: Int, namespace: Namespace.ID) -> AnyView {
+        guard firstThreeTabs.count > index else { return AnyView(page404) }
+        switch firstThreeTabs[index] {
+        case .spendIncomeView:
+            return AnyView(getSpendIncomeView(namespace: namespace))
+        case .addingSpendIncomeView:
+            return AnyView(page404)
+        case .searchView:
+            return AnyView(getSearchView())
+        case .statisticsView:
+            return AnyView(getStatisticsView())
+        case .settingsView:
+            return AnyView(getSettingsView())
+        case .welcomeView:
+            return AnyView(page404)
+        case .budgetsView:
+            return AnyView(getBudgetsView())
+        }
     }
 }
 
