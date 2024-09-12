@@ -990,7 +990,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Базовый цвет"
+            "value" : "Цвет по умолчанию"
           }
         }
       }
