@@ -109,11 +109,11 @@ final class SettingsManager: SettingsManagerProtocol {
     
     func getThreeTabsArray() -> [TabViewType] {
         guard let stringArray = UserDefaults.standard.stringArray(forKey: tabsArrayKey) else {
-            return [.spendIncomeView, .statisticsView, .searchView]
+            return [.spendIncomeView, .statisticsView, .searchView, .settingsView]
         }
         let tabsArray = stringArray.compactMap { TabViewType(rawValue: $0) }
-        guard tabsArray.count > 2 else {
-            return [.spendIncomeView, .statisticsView, .searchView]
+        guard tabsArray.count > 3 else {
+            return [.spendIncomeView, .statisticsView, .searchView, .settingsView]
         }
         return tabsArray
     }
