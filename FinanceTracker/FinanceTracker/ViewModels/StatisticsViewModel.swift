@@ -170,9 +170,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     /// For custom date range of light weight statistics
-    @Published var lightWeightDateStart: Date = .now
+    @Published var lightWeightDateStart: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
     /// For custom date range of light weight statistics
-    @Published var lightWeightDateEnd: Date = .now
+    @Published var lightWeightDateEnd: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
     /// Total value of spending for a selected balance account. Used for light weight statistics
     @Published private(set) var balanceAccountTotalSpending: Float = 0
     /// Total value of spending for a selected balance account. Used for light weight statistics
