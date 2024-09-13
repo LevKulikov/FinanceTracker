@@ -542,6 +542,73 @@ struct AddingSpendIcomeView: View {
             action = .none
         }
     }
+    
+    func calculate(formulaArray: [String]) -> Float? {
+        guard formulaArray.count > 1 else {
+            guard let first = formulaArray.first else { return nil }
+            return Float(first)
+        }
+        var copyArray = formulaArray
+        
+        func calculateBySing(sing: String) {
+            func doMath(left: Float, right: Float) -> Float? {
+                switch sing {
+                case "/":
+                    return left / right
+                case "*":
+                    return left * right
+                case "+":
+                    return left + right
+                case "-":
+                    return left - right
+                default:
+                    return nil
+                }
+            }
+            
+            var copy = copyArray
+            while let divideIndex = copy.firstIndex(of: sing) {
+                let prevIndex = divideIndex - 1
+                let nextIndex = divideIndex + 1
+                guard prevIndex >= 0, nextIndex < copy.count else { return }
+                // Getting numbers
+                let prevStr = copy[prevIndex]
+                let nextStr = copy[nextIndex]
+                // Making math
+                guard let prevNumber = Float(prevStr) else { return }
+                guard let nextNumber = Float(nextStr) else { return }
+                guard let exitNumber = doMath(left: prevNumber, right: nextNumber) else { return }
+                // Removing numbers and sing from array
+                copy.remove(at: nextIndex)
+                copy.remove(at: divideIndex)
+                copy.remove(at: prevIndex)
+                // Inserting exit number in array
+                let exitStr = String(exitNumber)
+                copy.insert(exitStr, at: prevIndex)
+            }
+            
+            copyArray = copy
+        }
+        
+        if copyArray.contains("/") {
+            calculateBySing(sing: "/")
+        }
+        
+        if copyArray.contains("*") {
+            calculateBySing(sing: "*")
+        }
+        
+        if copyArray.contains("-") {
+            calculateBySing(sing: "-")
+        }
+        
+        if copyArray.contains("+") {
+            calculateBySing(sing: "+")
+        }
+        
+        guard let resultString = copyArray.first else { return nil }
+        return Float(resultString)
+    }
 }
 
 #Preview {
