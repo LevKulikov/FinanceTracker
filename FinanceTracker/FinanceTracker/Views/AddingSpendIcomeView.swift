@@ -214,7 +214,7 @@ struct AddingSpendIcomeView: View {
                             Spacer()
                             
                             Button("", systemImage: "divide") {
-                                viewModel.valueString.append(" / ")
+                                viewModel.valueString.append(" ÷ ")
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -515,18 +515,39 @@ struct AddingSpendIcomeView: View {
         var copyString = viewModel.valueString
         guard !copyString.isEmpty else { return }
         
+        // replace comma with dot
         if copyString.contains(",") {
             copyString.replace(",", with: ".")
         }
         
+        // remove spaces
         if copyString.contains(" ") {
             copyString.replace(" ", with: "")
         }
         
-        if showCalculatorSigns, copyString.contains(where: { ["×", "/", "-", "+"].contains($0) }) {
+        let signsArray: [String] = ["×", "÷", "-", "+"]
+        
+        // check if value starts with math sing, which is not allowed
+        if let first = copyString.first, signsArray.contains(String(first)) {
+            viewModel.valueString = ""
+            return
+        }
+        
+        // check if value ends with 2 math sings, and replace previous one with the last
+        let lastTwo = Array(copyString.suffix(2)).map { String($0) }
+        if lastTwo.count > 1 {
+            if signsArray.contains(lastTwo[0]) && signsArray.contains(lastTwo[1]) {
+                copyString.removeLast(2)
+                copyString += lastTwo[1]
+                viewModel.valueString.removeLast(6) // space + sing + space 2 times = 6
+                viewModel.valueString += " \(lastTwo[1]) "
+            }
+        }
+        
+        // final step - get value. If there are math signs, calculation is taken, if there is not, just check that value is number
+        if copyString.contains(where: { signsArray.contains(String($0)) }) {
             let strArr = splitStringToFormulaArray(string: copyString)
             guard let floatValue = calculate(formulaArray: strArr) else {
-//                viewModel.valueString = ""
                 return
             }
             
@@ -580,11 +601,11 @@ struct AddingSpendIcomeView: View {
             }
         }
         
-        if string.contains("/") {
-            let dividerArray = string.split(separator: "/", omittingEmptySubsequences: true).map { String($0) }
+        if string.contains("÷") {
+            let dividerArray = string.split(separator: "÷", omittingEmptySubsequences: true).map { String($0) }
             stringArray = dividerArray
             for i in 1..<dividerArray.count {
-                stringArray.insert("/", at: i+i-1)
+                stringArray.insert("÷", at: i+i-1)
             }
         }
         
@@ -613,7 +634,7 @@ struct AddingSpendIcomeView: View {
         func calculateBySing(sing: String) {
             func doMath(left: Float, right: Float) -> Float? {
                 switch sing {
-                case "/":
+                case "/", "÷":
                     return left / right
                 case "x", "*", "×":
                     return left * right
@@ -650,8 +671,8 @@ struct AddingSpendIcomeView: View {
             copyArray = copy
         }
         
-        if copyArray.contains("/") {
-            calculateBySing(sing: "/")
+        if copyArray.contains("÷") {
+            calculateBySing(sing: "÷")
         }
         
         if copyArray.contains("×") {
