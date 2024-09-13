@@ -543,6 +543,56 @@ struct AddingSpendIcomeView: View {
         }
     }
     
+    private func splitStringToFormulaArray(string: String) -> [String] {
+        guard string.count > 1 else { return [string]}
+        var stringArray: [String] = []
+        
+        func splitAndInsert(by sign: String) {
+            if stringArray.isEmpty {
+                let multiplierArray = string.split(separator: sign, omittingEmptySubsequences: true).map { String($0) }
+                stringArray = multiplierArray
+                for i in 1..<multiplierArray.count {
+                    stringArray.insert(sign, at: i+i-1)
+                }
+            } else {
+                let multiplierArray = stringArray.flatMap { element in
+                    if element.contains(sign) {
+                        var arr = element.split(separator: sign, omittingEmptySubsequences: true).map { String($0) }
+                        let count = arr.count
+                        for i in 1..<count {
+                            arr.insert(sign, at: i+i-1)
+                        }
+                        return arr
+                    }
+                    return [element]
+                }
+                stringArray = multiplierArray
+            }
+        }
+        
+        if string.contains("/") {
+            let dividerArray = string.split(separator: "/", omittingEmptySubsequences: true).map { String($0) }
+            stringArray = dividerArray
+            for i in 1..<dividerArray.count {
+                stringArray.insert("/", at: i+i-1)
+            }
+        }
+        
+        if string.contains("*") {
+            splitAndInsert(by: "*")
+        }
+        
+        if string.contains("+") {
+            splitAndInsert(by: "+")
+        }
+        
+        if string.contains("-") {
+            splitAndInsert(by: "-")
+        }
+        
+        return stringArray
+    }
+    
     func calculate(formulaArray: [String]) -> Float? {
         guard formulaArray.count > 1 else {
             guard let first = formulaArray.first else { return nil }
