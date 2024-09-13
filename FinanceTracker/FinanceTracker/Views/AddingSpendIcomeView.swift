@@ -617,7 +617,6 @@ struct AddingSpendIcomeView: View {
         }
         
         if string.contains(where: { ["÷", "/"].contains($0) }) {
-            print("Devider sds")
             var dividerArray = string.split(separator: "÷", omittingEmptySubsequences: true).map { String($0) }
             if string.contains("/") {
                 dividerArray = dividerArray.flatMap { $0.split(separator: "/", omittingEmptySubsequences: true).map { String($0) } }
@@ -643,7 +642,7 @@ struct AddingSpendIcomeView: View {
         if string.contains("-") {
             splitAndInsert(by: "-")
         }
-        print(stringArray)
+        
         return stringArray
     }
     
