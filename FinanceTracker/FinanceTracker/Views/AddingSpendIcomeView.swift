@@ -196,25 +196,25 @@ struct AddingSpendIcomeView: View {
                     if showCalculatorSigns {
                         HStack {
                             Button("", systemImage: "plus") {
-                                
+                                viewModel.valueString.append(" + ")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "minus") {
-                                
+                                viewModel.valueString.append(" - ")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "multiply") {
-                                
+                                viewModel.valueString.append(" × ")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "divide") {
-                                
+                                viewModel.valueString.append(" / ")
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -523,15 +523,25 @@ struct AddingSpendIcomeView: View {
             copyString.replace(" ", with: "")
         }
         
-        guard let floatValue = Float(copyString) else {
-            viewModel.valueString = ""
-            return
-        }
-        
-        viewModel.value = floatValue
-        
-        if let firstChar = copyString.first, firstChar == "0" {
-            viewModel.valueString.removeFirst()
+        if showCalculatorSigns, copyString.contains(where: { ["×", "/", "-", "+"].contains($0) }) {
+            let strArr = splitStringToFormulaArray(string: copyString)
+            guard let floatValue = calculate(formulaArray: strArr) else {
+//                viewModel.valueString = ""
+                return
+            }
+            
+            viewModel.value = floatValue
+        } else {
+            guard let floatValue = Float(copyString) else {
+                viewModel.valueString = ""
+                return
+            }
+            
+            viewModel.value = floatValue
+            
+            if let firstChar = copyString.first, firstChar == "0" {
+                viewModel.valueString.removeFirst()
+            }
         }
     }
     
@@ -578,8 +588,8 @@ struct AddingSpendIcomeView: View {
             }
         }
         
-        if string.contains("*") {
-            splitAndInsert(by: "*")
+        if string.contains("×") {
+            splitAndInsert(by: "×")
         }
         
         if string.contains("+") {
@@ -605,7 +615,7 @@ struct AddingSpendIcomeView: View {
                 switch sing {
                 case "/":
                     return left / right
-                case "*":
+                case "x", "*", "×":
                     return left * right
                 case "+":
                     return left + right
@@ -644,8 +654,8 @@ struct AddingSpendIcomeView: View {
             calculateBySing(sing: "/")
         }
         
-        if copyArray.contains("*") {
-            calculateBySing(sing: "*")
+        if copyArray.contains("×") {
+            calculateBySing(sing: "×")
         }
         
         if copyArray.contains("-") {
