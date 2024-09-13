@@ -538,7 +538,7 @@ struct AddingSpendIcomeView: View {
             copyString.replace(" ", with: "")
         }
         
-        let signsArray: [String] = ["×", "÷", "-", "+"]
+        let signsArray: [String] = ["×", "÷", "-", "+", "*", "/"]
         
         // check if value starts with math sing, which is not allowed
         if let first = copyString.first, signsArray.contains(String(first)) {
@@ -616,8 +616,12 @@ struct AddingSpendIcomeView: View {
             }
         }
         
-        if string.contains("÷") {
-            let dividerArray = string.split(separator: "÷", omittingEmptySubsequences: true).map { String($0) }
+        if string.contains(where: { ["÷", "/"].contains($0) }) {
+            print("Devider sds")
+            var dividerArray = string.split(separator: "÷", omittingEmptySubsequences: true).map { String($0) }
+            if string.contains("/") {
+                dividerArray = dividerArray.flatMap { $0.split(separator: "/", omittingEmptySubsequences: true).map { String($0) } }
+            }
             stringArray = dividerArray
             for i in 1..<dividerArray.count {
                 stringArray.insert("÷", at: i+i-1)
@@ -628,6 +632,10 @@ struct AddingSpendIcomeView: View {
             splitAndInsert(by: "×")
         }
         
+        if string.contains("*") {
+            splitAndInsert(by: "*")
+        }
+        
         if string.contains("+") {
             splitAndInsert(by: "+")
         }
@@ -635,7 +643,7 @@ struct AddingSpendIcomeView: View {
         if string.contains("-") {
             splitAndInsert(by: "-")
         }
-        
+        print(stringArray)
         return stringArray
     }
     
@@ -651,7 +659,7 @@ struct AddingSpendIcomeView: View {
                 switch sing {
                 case "/", "÷":
                     return left / right
-                case "x", "*", "×":
+                case "*", "×":
                     return left * right
                 case "+":
                     return left + right
@@ -692,6 +700,10 @@ struct AddingSpendIcomeView: View {
         
         if copyArray.contains("×") {
             calculateBySing(sing: "×")
+        }
+        
+        if copyArray.contains("*") {
+            calculateBySing(sing: "*")
         }
         
         if copyArray.contains("-") {
