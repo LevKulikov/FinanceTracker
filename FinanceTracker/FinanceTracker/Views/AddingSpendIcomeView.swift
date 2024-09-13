@@ -21,6 +21,7 @@ struct AddingSpendIcomeView: View {
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
     @State private var didExitByScroll = false
+    @State private var showCalculatorSigns = false
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
@@ -184,11 +185,54 @@ struct AddingSpendIcomeView: View {
     //MARK: Computed View Props
     private var toolbarView: some ToolbarContent {
         ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            
-            Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
-                .foregroundStyle(.secondary)
-                .labelsHidden()
+            if valueTextFieldFocus {
+                HStack {
+                    Button("", systemImage: showCalculatorSigns ? "multiply.circle" : "plus.forwardslash.minus") {
+                        showCalculatorSigns.toggle()
+                    }
+                    .labelStyle(.iconOnly)
+                    .padding(.trailing)
+                    
+                    if showCalculatorSigns {
+                        HStack {
+                            Button("", systemImage: "plus") {
+                                
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "minus") {
+                                
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "multiply") {
+                                
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "divide") {
+                                
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .labelStyle(.iconOnly)
+                    } else {
+                        Spacer()
+                    }
+                    
+                    Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                        .labelsHidden()
+                        .padding(.leading)
+                }
+            } else {
+                Spacer()
+                
+                Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                    .labelsHidden()
+            }
         }
     }
     
