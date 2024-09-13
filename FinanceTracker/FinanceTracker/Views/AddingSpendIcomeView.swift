@@ -22,6 +22,7 @@ struct AddingSpendIcomeView: View {
     @State private var deletionAlert = false
     @State private var didExitByScroll = false
     @State private var showCalculatorSigns = false
+    @State private var calculatedValueString = ""
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
@@ -286,27 +287,36 @@ struct AddingSpendIcomeView: View {
     }
     
     private var valueTextField: some View {
-        HStack {
-            TextField("0", text: $viewModel.valueString)
-                .focused($valueTextFieldFocus)
-                .keyboardType(.decimalPad)
-                .autocorrectionDisabled()
-                .onChange(of: viewModel.valueString, onChangeOfValueString)
-                .font(.title)
-                .onSubmit {
-                    viewModel.valueString = FTFormatters
-                        .numberFormatterWithDecimals
-                        .string(for: viewModel.value) ?? ""
-                }
-                .onAppear {
-                    if isAdding {
-                        valueTextFieldFocus = true
+        VStack {
+            HStack {
+                TextField("0", text: $viewModel.valueString)
+                    .focused($valueTextFieldFocus)
+                    .keyboardType(.decimalPad)
+                    .autocorrectionDisabled()
+                    .onChange(of: viewModel.valueString, onChangeOfValueString)
+                    .font(.title)
+                    .onSubmit {
+                        viewModel.valueString = FTFormatters
+                            .numberFormatterWithDecimals
+                            .string(for: viewModel.value) ?? ""
                     }
-                }
+                    .onAppear {
+                        if isAdding {
+                            valueTextFieldFocus = true
+                        }
+                    }
+                
+                Text(viewModel.balanceAccount.currency)
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
             
-            Text(viewModel.balanceAccount.currency)
-                .font(.title2)
-                .foregroundStyle(.secondary)
+            if !calculatedValueString.isEmpty {
+                Text(calculatedValueString)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title2)
+                    .bold()
+            }
         }
         .padding()
         .background {
@@ -513,7 +523,10 @@ struct AddingSpendIcomeView: View {
     
     private func onChangeOfValueString() {
         var copyString = viewModel.valueString
-        guard !copyString.isEmpty else { return }
+        guard !copyString.isEmpty else {
+            calculatedValueString = ""
+            return
+        }
         
         // replace comma with dot
         if copyString.contains(",") {
@@ -552,6 +565,7 @@ struct AddingSpendIcomeView: View {
             }
             
             viewModel.value = floatValue
+            calculatedValueString = "= \(FTFormatters.numberFormatterWithDecimals.string(for: floatValue) ?? "Err")"
         } else {
             guard let floatValue = Float(copyString) else {
                 viewModel.valueString = ""
@@ -559,6 +573,7 @@ struct AddingSpendIcomeView: View {
             }
             
             viewModel.value = floatValue
+            calculatedValueString = ""
             
             if let firstChar = copyString.first, firstChar == "0" {
                 viewModel.valueString.removeFirst()
