@@ -12,6 +12,7 @@ struct CustomTabView: View  {
     //MARK: - Propeties
     @Namespace private var namespace
     @StateObject private var viewModel: CustomTabViewModel
+    @State private var actionWithTransaction: ActionWithTransaction = .none
     private var availableYOffset: CGFloat {
         if FTAppAssets.currnetUserDeviseName == "iPhone SE (3rd generation)" {
             return 5
@@ -21,6 +22,10 @@ struct CustomTabView: View  {
             return 20
         }
     }
+    private var showAddButton: Bool {
+        isSpendIncomeView(tab: viewModel.tabSelection) || viewModel.showAddButtonFromEvetyTab || !viewModel.firstThreeTabs.contains(.spendIncomeView)
+    }
+    
     //MARK: - Init
     init(viewModel: CustomTabViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -29,11 +34,16 @@ struct CustomTabView: View  {
     //MARK: - Body
     var body: some View {
         TabView(selection: $viewModel.tabSelection) {
-            viewModel.getSpendIncomeView(namespace: namespace)
-                .tag(1)
+            if viewModel.isFirstTabCanBeShown {
+                viewModel.getFirstTab(namespace: namespace)
+                    .tag(1)
+            } else {
+                viewModel.getSpendIncomeView(namespace: namespace)
+                    .tag(1)
+            }
             
             if viewModel.isSecondTabCanBeShown {
-                viewModel.getSecondTab()
+                viewModel.getSecondTab(namespace: namespace)
                     .tag(2)
             } else {
                 viewModel.getStatisticsView()
@@ -41,15 +51,20 @@ struct CustomTabView: View  {
             }
             
             if viewModel.isThirdTabCanBeShown {
-                viewModel.getThirdTab()
+                viewModel.getThirdTab(namespace: namespace)
                     .tag(3)
             } else {
                 viewModel.getSearchView()
                     .tag(3)
             }
             
-            viewModel.getSettingsView()
-                .tag(4)
+            if viewModel.isForthTabCanBeShown {
+                viewModel.getForthTab(namespace: namespace)
+                    .tag(4)
+            } else {
+                viewModel.getSettingsView()
+                    .tag(4)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
@@ -58,10 +73,17 @@ struct CustomTabView: View  {
                 .disabled(!viewModel.showTabBar)
                 .opacity(viewModel.showTabBar ? 1 : 0)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .overlay {
+            if case .add = actionWithTransaction {
+                viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+            } else if case .update = actionWithTransaction  {
+                viewModel.getAddingSpendIncomeView(forAction: $actionWithTransaction, namespace: namespace)
+            }
+        }
         .fullScreenCover(isPresented: $viewModel.isFirstLaunch) {
             viewModel.getWelcomeView()
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
     private var customTabView: some View {
@@ -69,9 +91,13 @@ struct CustomTabView: View  {
             let buttonWidth: CGFloat = 70
             
             Button {
-                selectTab(1, animated: true)
+                selectTab(1, animated: isSpendIncomeView(tab: 1))
             } label: {
-                TabViewType.spendIncomeView.tabLabel
+                if viewModel.isFirstTabCanBeShown {
+                    viewModel.firstThreeTabs[0].tabLabel
+                } else {
+                    TabViewType.spendIncomeView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 1 ? .blue : .secondary)
@@ -80,10 +106,10 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(2)
+                selectTab(2, animated: isSpendIncomeView(tab: 2))
             } label: {
                 if viewModel.isSecondTabCanBeShown {
-                    viewModel.secondAndThirdTabs.first!.tabLabel
+                    viewModel.firstThreeTabs[1].tabLabel
                 } else {
                     TabViewType.statisticsView.tabLabel
                 }
@@ -92,11 +118,11 @@ struct CustomTabView: View  {
             .foregroundStyle(viewModel.tabSelection == 2 ? .blue : .secondary)
             .hoverEffect(.highlight)
             
-            if viewModel.tabSelection == 1 {
+            if showAddButton {
                 Spacer()
                 
                 Button {
-                    viewModel.addButtonPressed()
+                    addButtonTapped()
                 } label: {
                     ZStack {
                         Circle()
@@ -116,10 +142,10 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(3)
+                selectTab(3, animated: isSpendIncomeView(tab: 3))
             } label: {
                 if viewModel.isThirdTabCanBeShown {
-                    viewModel.secondAndThirdTabs[1].tabLabel
+                    viewModel.firstThreeTabs[2].tabLabel
                 } else {
                     TabViewType.searchView.tabLabel
                 }
@@ -131,9 +157,13 @@ struct CustomTabView: View  {
             Spacer()
             
             Button {
-                selectTab(4)
+                selectTab(4, animated: isSpendIncomeView(tab: 4))
             } label: {
-                TabViewType.settingsView.tabLabel
+                if viewModel.isForthTabCanBeShown {
+                    viewModel.firstThreeTabs[3].tabLabel
+                } else {
+                    TabViewType.settingsView.tabLabel
+                }
             }
             .frame(width: buttonWidth)
             .foregroundStyle(viewModel.tabSelection == 4 ? .blue : .secondary)
@@ -147,6 +177,11 @@ struct CustomTabView: View  {
                 .fill(.ultraThinMaterial)
         }
         .padding(.horizontal)
+        .onChange(of: actionWithTransaction) {
+            if case .none = actionWithTransaction {
+                viewModel.showTabBar = true
+            }
+        }
     }
     
     //MARK: - Methods
@@ -159,6 +194,23 @@ struct CustomTabView: View  {
         } else {
             viewModel.tabSelection = tabId
         }
+    }
+    
+    private func addButtonTapped() {
+        if isSpendIncomeView(tab: viewModel.tabSelection) {
+            viewModel.addButtonPressed()
+        } else {
+            withAnimation {
+                actionWithTransaction = .add(.now)
+                viewModel.showTabBar = false
+            }
+        }
+    }
+    
+    /// Tabs count starts from 1
+    private func isSpendIncomeView(tab: Int) -> Bool {
+        guard viewModel.firstThreeTabs.count > (tab - 1) else { return false }
+        return viewModel.firstThreeTabs[tab - 1] == .spendIncomeView
     }
 }
 

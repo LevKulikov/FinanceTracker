@@ -32,8 +32,8 @@ final class FTFactory {
         return CustomTabView(viewModel: viewModel)
     }
     
-    func createSpendIncomeView(dataManager: some DataManagerProtocol, delegate: (some SpendIncomeViewModelDelegate)? = nil, namespace: Namespace.ID, actionWithViewModel: ((SpendIncomeViewModel) -> Void)? = nil) -> AnyView {
-        if let spendIncomeViewModel {
+    func createSpendIncomeView(dataManager: some DataManagerProtocol, delegate: (some SpendIncomeViewModelDelegate)? = nil, namespace: Namespace.ID, strongReference: Bool = false, actionWithViewModel: ((SpendIncomeViewModel) -> Void)? = nil) -> AnyView {
+        if strongReference, let spendIncomeViewModel {
             spendIncomeViewModel.delegate = delegate
             actionWithViewModel?(spendIncomeViewModel)
             return AnyView(SpendIncomeView(viewModel: spendIncomeViewModel, namespace: namespace))
@@ -41,7 +41,9 @@ final class FTFactory {
         
         let viewModel = SpendIncomeViewModel(dataManager: dataManager)
         viewModel.delegate = delegate
-        spendIncomeViewModel = viewModel
+        if strongReference {
+            spendIncomeViewModel = viewModel
+        }
         actionWithViewModel?(viewModel)
         return AnyView(SpendIncomeView(viewModel: viewModel, namespace: namespace))
     }
@@ -112,8 +114,9 @@ final class FTFactory {
         return AnyView(TagsView(viewModel: viewModel))
     }
     
-    func createAppearanceView(dataManager: some DataManagerProtocol) -> AnyView {
+    func createAppearanceView(dataManager: some DataManagerProtocol, delegate: (some AppearanceViewModelDelegate)?) -> AnyView {
         let viewModel = AppearanceViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
         return AnyView(AppearanceView(viewModel: viewModel))
     }
     

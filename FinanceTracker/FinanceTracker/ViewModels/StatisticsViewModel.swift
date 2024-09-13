@@ -111,6 +111,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             return startDate...endDate
         }
     }
+    /// Flag that indicates if statistics view is currently displayed
+    @MainActor var isViewDisplayed = false
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
@@ -168,9 +170,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     /// For custom date range of light weight statistics
-    @Published var lightWeightDateStart: Date = .now
+    @Published var lightWeightDateStart: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
     /// For custom date range of light weight statistics
-    @Published var lightWeightDateEnd: Date = .now
+    @Published var lightWeightDateEnd: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
     /// Total value of spending for a selected balance account. Used for light weight statistics
     @Published private(set) var balanceAccountTotalSpending: Float = 0
     /// Total value of spending for a selected balance account. Used for light weight statistics
@@ -805,6 +815,12 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
         case .transactions:
             isTransactionUpdatedFromAnotherView = true
+            Task { @MainActor in
+                if isViewDisplayed {
+                    try await Task.sleep(for: .seconds(0.3))
+                    refreshDataIfNeeded()
+                }
+            }
         case .appearance:
             return
         case .data:

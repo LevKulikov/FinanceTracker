@@ -321,6 +321,16 @@
         }
       }
     },
+    "Always show add button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать кнопку Добавить постоянно"
+          }
+        }
+      }
+    },
     "An error occurred during creating a Excel (csv) file. Error text: %@" : {
       "localizations" : {
         "ru" : {
@@ -900,7 +910,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Темный режим"
+            "value" : "Темная тема"
           }
         }
       }
@@ -980,7 +990,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Базовый цвет"
+            "value" : "Цвет по умолчанию"
           }
         }
       }
@@ -1655,6 +1665,16 @@
         }
       }
     },
+    "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы хотите открыть ее, пожалуйста, переставьте вкладки в настройках. Чтобы это сделать, нажмите кнопку \"%@ Упорядочить вкладки\""
+          }
+        }
+      }
+    },
     "Import" : {
       "localizations" : {
         "ru" : {
@@ -1775,12 +1795,22 @@
         }
       }
     },
+    "Large blue circle button with plus" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Большая синяя круглая кнопка с плюсом"
+          }
+        }
+      }
+    },
     "Light mode" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Светлый режим"
+            "value" : "Светлая мема"
           }
         }
       }
@@ -2243,7 +2273,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Случайный цвет по дефолту"
+            "value" : "Случайный цвет по умолчанию"
           }
         }
       }
@@ -2608,6 +2638,16 @@
         }
       }
     },
+    "Since you have removed the List tab from the bottom menu, the Add Transaction button is always displayed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поскольку вы убрали вкладку Список из нижнего меню, кнопка Добавить показывается всегда"
+          }
+        }
+      }
+    },
     "Skip" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2675,6 +2715,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Извините, произошла неизвестная ошибка. Данная страница не существует"
+          }
+        }
+      }
+    },
+    "Sorry, this tab is only available from the bottom menu" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, но данная вкладка доступна только из нижнего меню"
           }
         }
       }
@@ -2754,7 +2804,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Режим системы"
+            "value" : "Системная тема"
           }
         }
       }
@@ -2827,6 +2877,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Telegram"
+          }
+        }
+      }
+    },
+    "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сейчас кнопка добавления транзакции показывается на всех вкладках, так что вы можете добавить транзакцию в любое время"
+          }
+        }
+      }
+    },
+    "The Add Transaction button is only displayed when you tap the \"List\" tab." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка добавления транзакции показывается только когда вы находитесь на вкладке \"Список\""
           }
         }
       }

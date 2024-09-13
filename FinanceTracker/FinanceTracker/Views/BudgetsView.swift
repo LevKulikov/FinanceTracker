@@ -144,7 +144,11 @@ struct BudgetsView: View {
                 viewModel.getTransactionsListView(for: budgetData)
             }
             .onAppear {
+                viewModel.isViewDisplayed = true
                 viewModel.refreshIfNeeded()
+            }
+            .onDisappear {
+                viewModel.isViewDisplayed = false
             }
             .background { backgroundColor.ignoresSafeArea() }
         }

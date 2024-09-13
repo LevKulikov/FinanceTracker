@@ -19,6 +19,7 @@ protocol CustomTabViewModelDelegate: AnyObject {
 
 enum TabViewType: String, Equatable, Hashable, Identifiable {
     case spendIncomeView
+    case addingSpendIncomeView
     case searchView
     case statisticsView
     case settingsView
@@ -51,6 +52,8 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
         switch self {
         case .spendIncomeView:
             return "list.bullet.clipboard"
+        case .addingSpendIncomeView:
+            return "plus"
         case .searchView:
             return "magnifyingglass"
         case .statisticsView:
@@ -68,6 +71,8 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
         switch self {
         case .spendIncomeView:
             return "List"
+        case .addingSpendIncomeView:
+            return "Add"
         case .searchView:
             return "Search"
         case .statisticsView:
@@ -83,7 +88,7 @@ enum TabViewType: String, Equatable, Hashable, Identifiable {
     
     var imageHeight: CGFloat { 20 }
     
-    static var changableTabs: [Self] { [.statisticsView, .searchView, .budgetsView] }
+    static var changableTabs: [Self] { [.spendIncomeView, .statisticsView, .searchView, .settingsView, .budgetsView] }
 }
 
 final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
@@ -98,12 +103,14 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
     private var delegates: [WeakReferenceDelegate] = []
+    private var defaultBalanceAccount: BalanceAccount?
     
     //MARK: Published props
     @Published var tabSelection = 1
     @Published var showTabBar = true
     @Published var isFirstLaunch = false
-    @MainActor @Published private(set) var secondAndThirdTabs: [TabViewType]
+    @MainActor @Published private(set) var firstThreeTabs: [TabViewType]
+    @MainActor @Published private(set) var showAddButtonFromEvetyTab: Bool
     
     @ViewBuilder
     var page404: some View {
@@ -119,14 +126,26 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
+    var isFirstTabCanBeShown: Bool {
+        guard firstThreeTabs.count > 0 else { return false }
+        return true
+    }
+    
+    @MainActor
     var isSecondTabCanBeShown: Bool {
-        guard secondAndThirdTabs.count > 0 else { return false }
+        guard firstThreeTabs.count > 1 else { return false }
         return true
     }
     
     @MainActor
     var isThirdTabCanBeShown: Bool {
-        guard secondAndThirdTabs.count > 1 else { return false }
+        guard firstThreeTabs.count > 2 else { return false }
+        return true
+    }
+    
+    @MainActor
+    var isForthTabCanBeShown: Bool {
+        guard firstThreeTabs.count > 3 else { return false }
         return true
     }
     
@@ -134,7 +153,11 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
-        self._secondAndThirdTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._firstThreeTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        }
     }
     
     //MARK: - Methods
@@ -144,7 +167,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getSpendIncomeView(namespace: Namespace.ID) -> some View {
-        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace) { [weak self] viewModel in
+        return FTFactory.shared.createSpendIncomeView(dataManager: dataManager, delegate: self, namespace: namespace, strongReference: true) { [weak self] viewModel in
             self?.addDelegate(object: viewModel)
         }
     }
@@ -181,41 +204,36 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
-    func getSecondTab() -> AnyView {
-        guard let first = secondAndThirdTabs.first else { return AnyView(page404) }
-        switch first {
-        case .spendIncomeView:
-            return AnyView(page404)
-        case .searchView:
-            return AnyView(getSearchView())
-        case .statisticsView:
-            return AnyView(getStatisticsView())
-        case .settingsView:
-            return AnyView(getSettingsView())
-        case .welcomeView:
-            return AnyView(page404)
-        case .budgetsView:
-            return AnyView(getBudgetsView())
-        }
+    func getFirstTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 0, namespace: namespace)
     }
     
     @MainActor
-    func getThirdTab() -> some View {
-        guard secondAndThirdTabs.count > 1 else { return AnyView(page404) }
-        switch secondAndThirdTabs[1] {
-        case .spendIncomeView:
-            return AnyView(page404)
-        case .searchView:
-            return AnyView(getSearchView())
-        case .statisticsView:
-            return AnyView(getStatisticsView())
-        case .settingsView:
-            return AnyView(getSettingsView())
-        case .welcomeView:
-            return AnyView(page404)
-        case .budgetsView:
-            return AnyView(getBudgetsView())
-        }
+    func getSecondTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 1, namespace: namespace)
+    }
+    
+    @MainActor
+    func getThirdTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 2, namespace: namespace)
+    }
+    
+    @MainActor
+    func getForthTab(namespace: Namespace.ID) -> AnyView {
+        getTab(index: 3, namespace: namespace)
+    }
+    
+    @MainActor
+    func getAddingSpendIncomeView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
+        return FTFactory.shared.createAddingSpendIcomeView(
+            dataManager: dataManager,
+            threadToUse: .main,
+            transactionType: .spending,
+            balanceAccount: defaultBalanceAccount  ?? .emptyBalanceAccount,
+            forAction: forAction,
+            namespace: namespace,
+            delegate: self
+        )
     }
     
     //MARK: Private methods
@@ -223,6 +241,27 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
         guard !delegates.contains(where: { $0.object?.id == object.id }) else { return }
         delegates.append(WeakReferenceDelegate(object))
         delegates = delegates.filter { $0.object != nil }
+    }
+    
+    @MainActor
+    private func getTab(index: Int, namespace: Namespace.ID) -> AnyView {
+        guard firstThreeTabs.count > index else { return AnyView(page404) }
+        switch firstThreeTabs[index] {
+        case .spendIncomeView:
+            return AnyView(getSpendIncomeView(namespace: namespace))
+        case .addingSpendIncomeView:
+            return AnyView(page404)
+        case .searchView:
+            return AnyView(getSearchView())
+        case .statisticsView:
+            return AnyView(getStatisticsView())
+        case .settingsView:
+            return AnyView(getSettingsView())
+        case .welcomeView:
+            return AnyView(page404)
+        case .budgetsView:
+            return AnyView(getBudgetsView())
+        }
     }
 }
 
@@ -268,7 +307,7 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
 extension CustomTabViewModel: SettingsViewModelDelegate {
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
         Task { @MainActor in
-            secondAndThirdTabs = tabsPositions
+            firstThreeTabs = tabsPositions
         }
     }
     
@@ -288,6 +327,16 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
     
     func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
         delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
+        switch section {
+        case .balanceAccounts:
+            defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        case .appearance:
+            Task { @MainActor in
+                showAddButtonFromEvetyTab = dataManager.showAddButtonFromEvetyTab()
+            }
+        default:
+            break
+        }
     }
 }
 
@@ -332,6 +381,37 @@ extension CustomTabViewModel: BudgetsViewModelDelegate {
     func didUpdateTransaction() {
         delegates.forEach {
             $0.object?.didUpdateData(for: .transactions, from: .budgetsView)
+        }
+    }
+}
+
+//MARK: Extension for AddingSpendIcomeViewModelDelegate
+extension CustomTabViewModel: AddingSpendIcomeViewModelDelegate {
+    func addedNewTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func updateTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func deletedTransaction(_ transaction: Transaction) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+        }
+    }
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        return
+    }
+    
+    func categoryUpdated() {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .data, from: .addingSpendIncomeView)
         }
     }
 }
