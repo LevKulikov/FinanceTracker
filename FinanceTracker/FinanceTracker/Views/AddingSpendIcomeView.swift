@@ -197,25 +197,25 @@ struct AddingSpendIcomeView: View {
                     if showCalculatorSigns {
                         HStack {
                             Button("", systemImage: "plus") {
-                                viewModel.valueString.append(" + ")
+                                viewModel.valueString.append("+")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "minus") {
-                                viewModel.valueString.append(" - ")
+                                viewModel.valueString.append("-")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "multiply") {
-                                viewModel.valueString.append(" × ")
+                                viewModel.valueString.append("×")
                             }
                             
                             Spacer()
                             
                             Button("", systemImage: "divide") {
-                                viewModel.valueString.append(" ÷ ")
+                                viewModel.valueString.append("÷")
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -553,10 +553,13 @@ struct AddingSpendIcomeView: View {
             if signsArray.contains(lastTwo[0]) && signsArray.contains(lastTwo[1]) {
                 copyString.removeLast(2)
                 copyString += lastTwo[1]
-                viewModel.valueString.removeLast(6) // space + sing + space 2 times = 6
-                viewModel.valueString += " \(lastTwo[1]) "
+                viewModel.valueString.removeLast(2) // 2 sings
+                viewModel.valueString += "\(lastTwo[1])"
             } else if ["/", "÷"].contains(lastTwo[0]) && lastTwo[1] == "0" {
                 viewModel.valueString.removeLast()
+            } else if signsArray.contains(lastTwo[0]) && lastTwo[1] == "." {
+                let dotOrComma = viewModel.valueString.removeLast()
+                viewModel.valueString += "0\(dotOrComma)"
             }
         }
         
