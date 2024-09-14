@@ -3225,6 +3225,26 @@
         }
       }
     },
+    "Value cannot be infinite or not a number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть бесконечным или не числом"
+          }
+        }
+      }
+    },
+    "Value cannot be negative" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть отрицательным"
+          }
+        }
+      }
+    },
     "Value cannot be zero or empy" : {
       "localizations" : {
         "ru" : {
