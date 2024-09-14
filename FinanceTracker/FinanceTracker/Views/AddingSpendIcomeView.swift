@@ -547,6 +547,7 @@ struct AddingSpendIcomeView: View {
         }
         
         // check if value ends with 2 math sings, and replace previous one with the last
+        // or if there is division by zero
         let lastTwo = Array(copyString.suffix(2)).map { String($0) }
         if lastTwo.count > 1 {
             if signsArray.contains(lastTwo[0]) && signsArray.contains(lastTwo[1]) {
@@ -554,6 +555,8 @@ struct AddingSpendIcomeView: View {
                 copyString += lastTwo[1]
                 viewModel.valueString.removeLast(6) // space + sing + space 2 times = 6
                 viewModel.valueString += " \(lastTwo[1]) "
+            } else if ["/", "÷"].contains(lastTwo[0]) && lastTwo[1] == "0" {
+                viewModel.valueString.removeLast()
             }
         }
         
@@ -563,7 +566,6 @@ struct AddingSpendIcomeView: View {
             guard let floatValue = calculate(formulaArray: strArr) else {
                 return
             }
-            
             viewModel.value = floatValue
             calculatedValueString = "= \(FTFormatters.numberFormatterWithDecimals.string(for: floatValue) ?? "Err")"
         } else {
