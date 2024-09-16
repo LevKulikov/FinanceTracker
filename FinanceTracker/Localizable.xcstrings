@@ -1195,6 +1195,9 @@
         }
       }
     },
+    "Do not hide the window after adding a transaction" : {
+
+    },
     "Don't forget to add your spendings" : {
       "localizations" : {
         "ru" : {
@@ -1664,6 +1667,9 @@
           }
         }
       }
+    },
+    "If you are adding multiple transactions at a time, enable this option so that the Add window is not hidden after pressing the Add button" : {
+
     },
     "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
       "localizations" : {

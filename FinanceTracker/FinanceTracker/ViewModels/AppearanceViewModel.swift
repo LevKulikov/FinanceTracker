@@ -24,6 +24,11 @@ final class AppearanceViewModel: ObservableObject {
             delegate?.didSetShowAddButtonFromEvetyTab(showAddButtonFromEvetyTab)
         }
     }
+    @MainActor @Published var stayAtAddingViewAfterAdd: Bool {
+        didSet {
+            dataManager.stayAtAddingViewAfterAdd(stayAtAddingViewAfterAdd)
+        }
+    }
     @MainActor @Published private(set) var preferredColorScheme: ColorScheme?
     @MainActor @Published private(set) var firstThreeTabs: [TabViewType]
     
@@ -31,6 +36,7 @@ final class AppearanceViewModel: ObservableObject {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
+        self._stayAtAddingViewAfterAdd = Published(wrappedValue: dataManager.stayAtAddingViewAfterAdd())
         self._preferredColorScheme = Published(wrappedValue: dataManager.getPreferredColorScheme())
         self._firstThreeTabs = Published(wrappedValue: dataManager.getThreeTabsArray())
     }
@@ -43,7 +49,4 @@ final class AppearanceViewModel: ObservableObject {
             preferredColorScheme = colorScheme
         }
     }
-    
-    //MARK: Private methods
-    
 }

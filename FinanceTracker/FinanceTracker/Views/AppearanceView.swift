@@ -43,6 +43,12 @@ struct AppearanceView: View {
                     Text(showAddButtonSectionFooterText)
                 }
                 
+                Section {
+                    Toggle("Do not hide the window after adding a transaction", isOn: $viewModel.stayAtAddingViewAfterAdd)
+                } footer: {
+                    Text("If you are adding multiple transactions at a time, enable this option so that the Add window is not hidden after pressing the Add button")
+                }
+                
                 getRowFor(colorScheme: nil, title: "System mode")
                 
                 getRowFor(colorScheme: .light, title: "Light mode")
