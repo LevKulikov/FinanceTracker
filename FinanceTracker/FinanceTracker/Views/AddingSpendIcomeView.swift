@@ -586,7 +586,11 @@ struct AddingSpendIcomeView: View {
                 saveError = error
                 return
             } else {
-                closeView()
+                if viewModel.stayAfterAction() {
+                    Toast.shared.present(title: String(localized: "Transaction added"), symbol: "checkmark.circle", tint: .green, timing: .short)
+                } else {
+                    closeView()
+                }
             }
         }
     }

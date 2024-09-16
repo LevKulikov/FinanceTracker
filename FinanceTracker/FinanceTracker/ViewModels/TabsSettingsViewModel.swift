@@ -26,7 +26,7 @@ final class TabsSettingsViewModel: ObservableObject {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        let savedTabs = dataManager.getSecondThirdTabsArray()
+        let savedTabs = dataManager.getThreeTabsArray()
         let canBeSet = Array(TabViewType.changableTabs.filter { !savedTabs.contains($0) })
         self._changableTabs = Published(wrappedValue: savedTabs + canBeSet)
     }
@@ -44,7 +44,7 @@ final class TabsSettingsViewModel: ObservableObject {
         
         changableTabs = copyTabs
         let toSave = Array(changableTabs.prefix(numberOfTabsThatCanBeSet))
-        dataManager.setSecondThirdTabsArray(toSave)
+        dataManager.setThreeTabsArray(toSave)
         delegate?.didSetSecondThirdTabsPosition(for: toSave)
     }
     

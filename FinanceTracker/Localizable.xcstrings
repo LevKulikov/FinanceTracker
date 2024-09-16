@@ -1195,6 +1195,16 @@
         }
       }
     },
+    "Do not hide the window after adding a transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не прятать окно после добавления транзакции"
+          }
+        }
+      }
+    },
     "Don't forget to add your spendings" : {
       "localizations" : {
         "ru" : {
@@ -1661,6 +1671,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если статистика долго загружается, вы можете выбрать отображение легкой версии. Легкая версия статистики быстрее, однако она не отображает текущий баланс счета, а также показывает меньший промежуток на столбчатом графике"
+          }
+        }
+      }
+    },
+    "If you are adding multiple transactions at a time, enable this option so that the Add window is not hidden after pressing the Add button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы добавляете несколько транзакций за раз, включите данную опцию, чтобы окно добавления не пряталось после нажатия кнопки Добавить"
           }
         }
       }
@@ -3048,6 +3068,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транзакция"
+          }
+        }
+      }
+    },
+    "Transaction added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакция добавлена"
           }
         }
       }

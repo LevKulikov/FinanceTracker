@@ -153,7 +153,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
-        self._firstThreeTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._firstThreeTabs = Published(wrappedValue: dataManager.getThreeTabsArray())
         self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.defaultBalanceAccount = dataManager.getDefaultBalanceAccount()

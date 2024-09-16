@@ -186,6 +186,25 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    /// Checks if view should be hidden after action. If it is not, it cleans some information about previous transaction
+    @MainActor
+    func stayAfterAction() -> Bool {
+        if case .add = action {
+            let stay = dataManager.stayAtAddingViewAfterAdd()
+            if stay {
+                withAnimation {
+                    valueString = ""
+                    category = nil
+                }
+                comment = ""
+                value = 0
+                tags = []
+            }
+            return stay
+        }
+        return false
+    }
+    
     func addRemoveTag(_ tag: Tag) {
         if tags.contains(tag) {
             withAnimation {
