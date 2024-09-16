@@ -1196,7 +1196,14 @@
       }
     },
     "Do not hide the window after adding a transaction" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не прятать окно после добавления транзакции"
+          }
+        }
+      }
     },
     "Don't forget to add your spendings" : {
       "localizations" : {
@@ -1669,7 +1676,14 @@
       }
     },
     "If you are adding multiple transactions at a time, enable this option so that the Add window is not hidden after pressing the Add button" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы добавляете несколько транзакций за раз, включите данную опцию, чтобы окно добавления не пряталось после нажатия кнопки Добавить"
+          }
+        }
+      }
     },
     "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
       "localizations" : {
@@ -3054,6 +3068,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транзакция"
+          }
+        }
+      }
+    },
+    "Transaction added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакция добавлена"
           }
         }
       }

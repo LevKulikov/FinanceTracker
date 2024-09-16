@@ -587,7 +587,7 @@ struct AddingSpendIcomeView: View {
                 return
             } else {
                 if viewModel.stayAfterAction() {
-                    Toast.shared.present(title: "Transaction added", symbol: "checkmark.circle", tint: .green, timing: .short)
+                    Toast.shared.present(title: String(localized: "Transaction added"), symbol: "checkmark.circle", tint: .green, timing: .short)
                 } else {
                     closeView()
                 }
