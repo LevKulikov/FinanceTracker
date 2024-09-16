@@ -56,7 +56,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        let savedTabs = dataManager.getSecondThirdTabsArray()
+        let savedTabs = dataManager.getThreeTabsArray()
         let notSaved = TabViewType.changableTabs.filter { !savedTabs.contains($0) }
         self._additionalTab = Published(wrappedValue: notSaved.first)
     }

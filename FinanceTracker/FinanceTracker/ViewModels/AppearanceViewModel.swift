@@ -32,7 +32,7 @@ final class AppearanceViewModel: ObservableObject {
         self.dataManager = dataManager
         self._showAddButtonFromEvetyTab = Published(wrappedValue: dataManager.showAddButtonFromEvetyTab())
         self._preferredColorScheme = Published(wrappedValue: dataManager.getPreferredColorScheme())
-        self._firstThreeTabs = Published(wrappedValue: dataManager.getSecondThirdTabsArray())
+        self._firstThreeTabs = Published(wrappedValue: dataManager.getThreeTabsArray())
     }
     
     //MARK: - Methods
