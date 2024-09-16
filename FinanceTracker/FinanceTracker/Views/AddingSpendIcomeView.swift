@@ -494,13 +494,7 @@ struct AddingSpendIcomeView: View {
     
     private var addUpdateButton: some View {
         Button {
-            viewModel.saveTransaction { error in
-                guard let error else {
-                    closeView()
-                    return
-                }
-                saveError = error
-            }
+            addUpdateButtonTapped()
         } label: {
             Label(isAdding ? "Add" : "Update", systemImage: isAdding ? "plus" : "pencil.and.outline")
                 .frame(width: 170, height: 50)
@@ -582,6 +576,17 @@ struct AddingSpendIcomeView: View {
             
             if let firstChar = copyString.first, firstChar == "0" {
                 viewModel.valueString.removeFirst()
+            }
+        }
+    }
+    
+    private func addUpdateButtonTapped() {
+        viewModel.saveTransaction { error in
+            if let error {
+                saveError = error
+                return
+            } else {
+                closeView()
             }
         }
     }
