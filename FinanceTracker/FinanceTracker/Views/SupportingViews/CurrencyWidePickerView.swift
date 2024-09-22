@@ -95,13 +95,12 @@ struct CurrencyWidePickerView: View {
 }
 
 #Preview {
-    let someCurr = Currency(
+    @Previewable @State var currency: Currency? = Currency(
         symbol: "$",
         name: "US Dollar",
         code: "USD"
     )
+    @Previewable @State var show = true
     
-    @State var currency: Currency? = someCurr
-    @State var show = true
     return CurrencyWidePickerView(currency: $currency, show: $show)
 }

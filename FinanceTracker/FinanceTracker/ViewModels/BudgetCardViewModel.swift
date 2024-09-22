@@ -64,7 +64,7 @@ final class BudgetCardViewModel: ObservableObject, @unchecked Sendable {
     private func calculateTotalValue() async {
         let value = transactions.map { $0.value }.reduce(0, +)
         
-        Task.detached { @MainActor in
+        await MainActor.run {
             withAnimation {
                 self.totalValue = value
             }

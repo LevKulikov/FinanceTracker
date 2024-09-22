@@ -733,13 +733,13 @@ struct AddingSpendIcomeView: View {
 }
 
 #Preview {
+    @Previewable @Namespace var namespace
+    @Previewable @State var action: ActionWithTransaction = .add(.now)
+    
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let transactionsTypeSelected: TransactionsType = .spending
     let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, use: .main, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
-    
-    @Namespace var namespace
-    @State var action: ActionWithTransaction = .add(.now)
     
     return AddingSpendIcomeView(action: $action, namespace: namespace, viewModel: viewModel)
 }

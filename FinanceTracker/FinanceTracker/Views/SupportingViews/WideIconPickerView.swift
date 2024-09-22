@@ -71,8 +71,8 @@ struct WideIconPickerView: View {
 }
 
 #Preview {
-    @State var show = true
-    @State var onSelect = ""
+    @Previewable @State var show = true
+    @Previewable @State var onSelect = ""
     
     return WideIconPickerView(showPicker: $show, selectIcon: $onSelect, onSelectColorTint: .red)
 }

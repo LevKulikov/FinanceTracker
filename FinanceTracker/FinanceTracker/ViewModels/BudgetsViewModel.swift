@@ -41,7 +41,7 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published var action: ActionWithBudget?
     @MainActor @Published var selectedBalanceAccount: BalanceAccount = .emptyBalanceAccount {
         didSet {
-            Task.detached { @MainActor in
+            Task {
                 self.isFetching = true
                 await self.fetchBudgets()
                 self.isFetching = false

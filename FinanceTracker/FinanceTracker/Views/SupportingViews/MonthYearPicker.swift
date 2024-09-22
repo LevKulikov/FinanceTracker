@@ -111,7 +111,7 @@ struct MonthYearPicker: View {
 }
 
 #Preview {
-    @State var date = Calendar.current.date(byAdding: .year, value: -1, to: Date.now)!
+    @Previewable @State var date = Calendar.current.date(byAdding: .year, value: -1, to: Date.now)!
     
     return MonthYearPicker(date: $date, dateRange: FTAppAssets.availableDateRange, components: .monthYear)
 }

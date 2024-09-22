@@ -149,17 +149,13 @@ final class AddingCategoryViewModel: ObservableObject {
         }
     }
     
-    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortWithString keyPath: KeyPath<T, String>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
+    private func fetch<T>(withPredicate: Predicate<T>? = nil) async -> [T]? where T: PersistentModel, T: Sendable {
         let descriptor = FetchDescriptor<T>(
-            predicate: withPredicate,
-            sortBy: keyPath == nil ? [] : [SortDescriptor(keyPath!)]
+            predicate: withPredicate
         )
         
         do {
             var fetchedItems = try dataManager.fetch(descriptor)
-            if keyPath == nil {
-                fetchedItems.reverse()
-            }
             return fetchedItems
         } catch {
             print(error.localizedDescription)

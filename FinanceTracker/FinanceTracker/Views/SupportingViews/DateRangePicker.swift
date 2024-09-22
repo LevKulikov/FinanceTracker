@@ -74,8 +74,8 @@ struct DateRangePicker: View {
 }
 
 #Preview {
-    @State var startDate = Date.now
-    @State var endDate = Date.now
+    @Previewable @State var startDate = Date.now
+    @Previewable @State var endDate = Date.now
     
     return DateRangePicker(startDate: $startDate, endDate: $endDate, dateRange: FTAppAssets.availableDateRange)
 }
