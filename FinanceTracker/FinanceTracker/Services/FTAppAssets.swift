@@ -642,6 +642,24 @@ struct FTAppAssets {
         )
     ]
     
+    static let popularCurrencies = [
+        Currency(
+            symbol: "$",
+            name: "US Dollar",
+            code: "USD"
+        ),
+        Currency(
+            symbol: "€",
+            name: "Euro",
+            code: "EUR"
+        ),
+        Currency(
+            symbol: "₽",
+            name: "Russian Ruble",
+            code: "RUB"
+        ),
+    ]
+    
     //MARK: Methods
     static func iconUIImage(name: String, bundle: String = "IconImages.bundle") -> UIImage? {
         let location = bundle + "/" + name

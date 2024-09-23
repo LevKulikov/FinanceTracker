@@ -281,6 +281,16 @@
         }
       }
     },
+    "All currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все валюты"
+          }
+        }
+      }
+    },
     "All Icons" : {
       "localizations" : {
         "ru" : {
@@ -1362,17 +1372,6 @@
         }
       }
     },
-    "Entities" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сущности"
-          }
-        }
-      }
-    },
     "Epty" : {
       "localizations" : {
         "ru" : {
@@ -2254,6 +2253,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пожалуйста, ожидайте"
+          }
+        }
+      }
+    },
+    "Popular currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Популярные валюты"
           }
         }
       }

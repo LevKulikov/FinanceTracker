@@ -155,7 +155,7 @@ final class AddingCategoryViewModel: ObservableObject {
         )
         
         do {
-            var fetchedItems = try dataManager.fetch(descriptor)
+            let fetchedItems = try dataManager.fetch(descriptor)
             return fetchedItems
         } catch {
             print(error.localizedDescription)
