@@ -21,6 +21,7 @@ struct AddingSpendIcomeView: View {
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
     @State private var didExitByScroll = false
+    @State private var topScrollScale: CGFloat = 1
     @State private var showCalculatorSigns = false
     @State private var calculatedValueString = ""
     @FocusState private var valueTextFieldFocus
@@ -125,6 +126,7 @@ struct AddingSpendIcomeView: View {
                         .fill(.clear)
                         .frame(height: 50)
                 }
+                .scaleEffect(topScrollScale)
                 .safeAreaInset(edge: .top) {
                     scrollTopToExitGeometry
                 }
@@ -240,8 +242,11 @@ struct AddingSpendIcomeView: View {
     private var scrollTopToExitGeometry: some View {
         GeometryReader { proxy in
             let minY = proxy.frame(in: .scrollView(axis: .vertical)).minY
+            let scale = minY > 0 ? (1 - minY / (150 * 8)) : 1
+            
             EmptyView()
                 .onChange(of: minY) {
+                    topScrollScale = scale
                     if minY > 150, !didExitByScroll {
                         didExitByScroll = true
                         closeView()
