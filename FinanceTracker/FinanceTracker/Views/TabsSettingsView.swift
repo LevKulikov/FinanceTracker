@@ -9,7 +9,15 @@ import SwiftUI
 
 struct TabsSettingsView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: TabsSettingsViewModel
+    private var footerText: LocalizedStringResource {
+        if viewModel.changedSettingsPosition {
+            return "As you have changed the position of the Settings tab, click Save to apply the changes"
+        } else {
+            return "Changes are saved automatically"
+        }
+    }
     
     //MARK: - Initializer
     init(viewModel: TabsSettingsViewModel) {
@@ -20,17 +28,43 @@ struct TabsSettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Drag to reorder") {
+                Section {
                     ForEach(viewModel.changableTabs) { tab in
                         rowForTab(tab)
                     }
                     .onMove(perform: { indices, newOffset in
                         viewModel.moveTabs(indices: indices, newOffset: newOffset)
                     })
+                } header: {
+                    Text("Drag to reorder")
+                } footer: {
+                    Text(footerText)
+                }
+
+                
+                Section {
+                    Rectangle()
+                        .fill(.clear)
+                        .listRowBackground(Color.clear)
                 }
             }
             .navigationTitle("Tabs placements")
             .navigationBarTitleDisplayMode(.inline)
+            .overlay(alignment: .bottom) {
+                if viewModel.changedSettingsPosition {
+                    Button {
+                        viewModel.saveTabs()
+                        dismiss()
+                    } label: {
+                        Text("Save")
+                            .frame(height: 25)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding()
+                    .padding(.horizontal)
+                }
+            }
         }
     }
     

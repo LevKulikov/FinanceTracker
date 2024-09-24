@@ -93,17 +93,6 @@
         }
       }
     },
-    "%lld" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld"
-          }
-        }
-      }
-    },
     "%lld %@" : {
       "localizations" : {
         "en" : {
@@ -176,17 +165,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить"
-          }
-        }
-      }
-    },
-    "Add %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить %@"
           }
         }
       }
@@ -351,17 +329,6 @@
         }
       }
     },
-    "An error occurred during decoding selected file. Error text: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@"
-          }
-        }
-      }
-    },
     "An error occurred during decoding selected file. Error text: %@. Probably, you selected wrong file " : {
       "localizations" : {
         "ru" : {
@@ -432,23 +399,22 @@
         }
       }
     },
-    "Are you sure? All stored data (transactions, balance accounts, categories, tags) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы уверены? Все данные (транзакции, счета, категории, теги) будут безвозвратно удалены \n\nВы можете удалить только транзакции, если желаете "
-          }
-        }
-      }
-    },
     "Are you sure? All transactions will be deleted, this action is irretable" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены? Все транзакции будут удалены, данное действие безвозвратно"
+          }
+        }
+      }
+    },
+    "As you have changed the position of the Settings tab, click Save to apply the changes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поскольку вы поменяли позицию вкладки Настройки, нажмите кнопку Сохранить, чтобы применить изменения"
           }
         }
       }
@@ -489,17 +455,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Имя счета"
-          }
-        }
-      }
-    },
-    "Balance account picker" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пикер счета"
           }
         }
       }
@@ -684,6 +639,16 @@
         }
       }
     },
+    "Changes are saved automatically" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменения сохраняются автоматически"
+          }
+        }
+      }
+    },
     "Charts" : {
       "localizations" : {
         "ru" : {
@@ -820,17 +785,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Копировать email"
-          }
-        }
-      }
-    },
-    "Copy username" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копировать имя пользователя"
           }
         }
       }
@@ -1305,23 +1259,6 @@
         }
       }
     },
-    "Empy" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empty"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Пустой"
-          }
-        }
-      }
-    },
     "End date" : {
       "localizations" : {
         "ru" : {
@@ -1398,17 +1335,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка создания Excel (csv) файла"
-          }
-        }
-      }
-    },
-    "Export all data" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Экспортировать все данные"
           }
         }
       }
@@ -1619,17 +1545,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть"
-          }
-        }
-      }
-    },
-    "Hide this view" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Спрятать данное окно"
           }
         }
       }
@@ -1880,17 +1795,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Переместить транзакции"
-          }
-        }
-      }
-    },
-    "Name" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имя"
           }
         }
       }
@@ -2185,34 +2089,12 @@
         }
       }
     },
-    "Picker title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Заголовок пикера"
-          }
-        }
-      }
-    },
     "Pie chart" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Диаграмма"
-          }
-        }
-      }
-    },
-    "Pie chart date type picker" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пикер дат для круговой диаграммы"
           }
         }
       }
@@ -2307,17 +2189,6 @@
         }
       }
     },
-    "Refresh" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обновить"
-          }
-        }
-      }
-    },
     "Refresh?" : {
       "localizations" : {
         "ru" : {
@@ -2384,17 +2255,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упорядочить вкладки"
-          }
-        }
-      }
-    },
-    "Replace and delete" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Переставить и удалить"
           }
         }
       }
@@ -2555,17 +2415,6 @@
         }
       }
     },
-    "Send message" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправить сообщение"
-          }
-        }
-      }
-    },
     "Set as default" : {
       "localizations" : {
         "ru" : {
@@ -2582,17 +2431,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сначала установите базовый счет"
-          }
-        }
-      }
-    },
-    "Setting" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Настройки"
           }
         }
       }
@@ -2673,17 +2511,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поскольку вы убрали вкладку Список из нижнего меню, кнопка Добавить показывается всегда"
-          }
-        }
-      }
-    },
-    "Skip" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пропустить"
           }
         }
       }
@@ -2888,28 +2715,6 @@
         }
       }
     },
-    "Tags stats" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Данные по тегам"
-          }
-        }
-      }
-    },
-    "Telegram" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telegram"
-          }
-        }
-      }
-    },
     "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time" : {
       "localizations" : {
         "ru" : {
@@ -3050,17 +2855,6 @@
         }
       }
     },
-    "Total value" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Итого"
-          }
-        }
-      }
-    },
     "Track your finances with customizable graphs" : {
       "localizations" : {
         "ru" : {
@@ -3101,17 +2895,6 @@
         }
       }
     },
-    "Transaction type for tags picker" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип транзакции для пикера тегов"
-          }
-        }
-      }
-    },
     "Transactions" : {
       "localizations" : {
         "ru" : {
@@ -3138,17 +2921,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транспорт"
-          }
-        }
-      }
-    },
-    "Try searching for other items using the picker at the top" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробуйте поискать другие объекты с помощью пикера вверху"
           }
         }
       }
@@ -3249,17 +3021,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "RUB"
-          }
-        }
-      }
-    },
-    "Username is copied" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имя скопировано"
           }
         }
       }
