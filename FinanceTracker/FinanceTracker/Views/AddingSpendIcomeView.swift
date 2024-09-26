@@ -21,6 +21,9 @@ struct AddingSpendIcomeView: View {
     @State private var saveError: AddingSpendIcomeViewModel.SaveErrors?
     @State private var deletionAlert = false
     @State private var didExitByScroll = false
+    @State private var topScrollScale: CGFloat = 1
+    @State private var showCalculatorSigns = false
+    @State private var calculatedValueString = ""
     @FocusState private var valueTextFieldFocus
     @FocusState private var searchTagsTextFieldFocus
     @FocusState private var commentTextFieldFocus
@@ -123,6 +126,7 @@ struct AddingSpendIcomeView: View {
                         .fill(.clear)
                         .frame(height: 50)
                 }
+                .scaleEffect(topScrollScale)
                 .safeAreaInset(edge: .top) {
                     scrollTopToExitGeometry
                 }
@@ -184,19 +188,65 @@ struct AddingSpendIcomeView: View {
     //MARK: Computed View Props
     private var toolbarView: some ToolbarContent {
         ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            
-            Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
-                .foregroundStyle(.secondary)
-                .labelsHidden()
+            if valueTextFieldFocus {
+                HStack {
+                    Button("", systemImage: showCalculatorSigns ? "multiply.circle" : "plus.forwardslash.minus") {
+                        showCalculatorSigns.toggle()
+                    }
+                    .labelStyle(.iconOnly)
+                    .padding(.trailing)
+                    
+                    if showCalculatorSigns {
+                        HStack {
+                            Button("", systemImage: "plus") {
+                                viewModel.valueString.append("+")
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "minus") {
+                                viewModel.valueString.append("-")
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "multiply") {
+                                viewModel.valueString.append("×")
+                            }
+                            
+                            Spacer()
+                            
+                            Button("", systemImage: "divide") {
+                                viewModel.valueString.append("÷")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .labelStyle(.iconOnly)
+                    } else {
+                        Spacer()
+                    }
+                    
+                    Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                        .labelsHidden()
+                        .padding(.leading)
+                }
+            } else {
+                Spacer()
+                
+                Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                    .labelsHidden()
+            }
         }
     }
     
     private var scrollTopToExitGeometry: some View {
         GeometryReader { proxy in
             let minY = proxy.frame(in: .scrollView(axis: .vertical)).minY
+            let scale = minY > 0 ? (1 - minY / (150 * 8)) : 1
+            
             EmptyView()
                 .onChange(of: minY) {
+                    topScrollScale = scale
                     if minY > 150, !didExitByScroll {
                         didExitByScroll = true
                         closeView()
@@ -242,27 +292,36 @@ struct AddingSpendIcomeView: View {
     }
     
     private var valueTextField: some View {
-        HStack {
-            TextField("0", text: $viewModel.valueString)
-                .focused($valueTextFieldFocus)
-                .keyboardType(.decimalPad)
-                .autocorrectionDisabled()
-                .onChange(of: viewModel.valueString, onChangeOfValueString)
-                .font(.title)
-                .onSubmit {
-                    viewModel.valueString = FTFormatters
-                        .numberFormatterWithDecimals
-                        .string(for: viewModel.value) ?? ""
-                }
-                .onAppear {
-                    if isAdding {
-                        valueTextFieldFocus = true
+        VStack {
+            HStack {
+                TextField("0", text: $viewModel.valueString)
+                    .focused($valueTextFieldFocus)
+                    .keyboardType(.decimalPad)
+                    .autocorrectionDisabled()
+                    .onChange(of: viewModel.valueString, onChangeOfValueString)
+                    .font(.title)
+                    .onSubmit {
+                        viewModel.valueString = FTFormatters
+                            .numberFormatterWithDecimals
+                            .string(for: viewModel.value) ?? ""
                     }
-                }
+                    .onAppear {
+                        if isAdding {
+                            valueTextFieldFocus = true
+                        }
+                    }
+                
+                Text(viewModel.balanceAccount.currency)
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
             
-            Text(viewModel.balanceAccount.currency)
-                .font(.title2)
-                .foregroundStyle(.secondary)
+            if !calculatedValueString.isEmpty {
+                Text(calculatedValueString)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title2)
+                    .bold()
+            }
         }
         .padding()
         .background {
@@ -440,13 +499,7 @@ struct AddingSpendIcomeView: View {
     
     private var addUpdateButton: some View {
         Button {
-            viewModel.saveTransaction { error in
-                guard let error else {
-                    closeView()
-                    return
-                }
-                saveError = error
-            }
+            addUpdateButtonTapped()
         } label: {
             Label(isAdding ? "Add" : "Update", systemImage: isAdding ? "plus" : "pencil.and.outline")
                 .frame(width: 170, height: 50)
@@ -469,25 +522,81 @@ struct AddingSpendIcomeView: View {
     
     private func onChangeOfValueString() {
         var copyString = viewModel.valueString
-        guard !copyString.isEmpty else { return }
+        guard !copyString.isEmpty else {
+            calculatedValueString = ""
+            return
+        }
         
+        // replace comma with dot
         if copyString.contains(",") {
             copyString.replace(",", with: ".")
         }
         
+        // remove spaces
         if copyString.contains(" ") {
             copyString.replace(" ", with: "")
         }
         
-        guard let floatValue = Float(copyString) else {
+        let signsArray: [String] = ["×", "÷", "-", "+", "*", "/"]
+        
+        // check if value starts with math sing, which is not allowed
+        if let first = copyString.first, signsArray.contains(String(first)) {
             viewModel.valueString = ""
             return
         }
         
-        viewModel.value = floatValue
+        // check if value ends with 2 math sings, and replace previous one with the last
+        // or if there is division by zero
+        let lastTwo = Array(copyString.suffix(2)).map { String($0) }
+        if lastTwo.count > 1 {
+            if signsArray.contains(lastTwo[0]) && signsArray.contains(lastTwo[1]) {
+                copyString.removeLast(2)
+                copyString += lastTwo[1]
+                viewModel.valueString.removeLast(2) // 2 sings
+                viewModel.valueString += "\(lastTwo[1])"
+            } else if ["/", "÷"].contains(lastTwo[0]) && lastTwo[1] == "0" {
+                viewModel.valueString.removeLast()
+            } else if signsArray.contains(lastTwo[0]) && lastTwo[1] == "." {
+                let dotOrComma = viewModel.valueString.removeLast()
+                viewModel.valueString += "0\(dotOrComma)"
+            }
+        }
         
-        if let firstChar = copyString.first, firstChar == "0" {
-            viewModel.valueString.removeFirst()
+        // final step - get value. If there are math signs, calculation is taken, if there is not, just check that value is number
+        if copyString.contains(where: { signsArray.contains(String($0)) }) {
+            let strArr = splitStringToFormulaArray(string: copyString)
+            guard let floatValue = calculate(formulaArray: strArr) else {
+                return
+            }
+            viewModel.value = floatValue
+            calculatedValueString = "= \(FTFormatters.numberFormatterWithDecimals.string(for: floatValue) ?? "Err")"
+        } else {
+            guard let floatValue = Float(copyString) else {
+                viewModel.valueString = ""
+                return
+            }
+            
+            viewModel.value = floatValue
+            calculatedValueString = ""
+            
+            if let firstChar = copyString.first, firstChar == "0" {
+                viewModel.valueString.removeFirst()
+            }
+        }
+    }
+    
+    private func addUpdateButtonTapped() {
+        viewModel.saveTransaction { error in
+            if let error {
+                saveError = error
+                return
+            } else {
+                if viewModel.stayAfterAction() {
+                    Toast.shared.present(title: String(localized: "Transaction added"), symbol: "checkmark.circle", tint: .green, timing: .short)
+                } else {
+                    closeView()
+                }
+            }
         }
     }
     
@@ -498,16 +607,144 @@ struct AddingSpendIcomeView: View {
             action = .none
         }
     }
+    
+    private func splitStringToFormulaArray(string: String) -> [String] {
+        guard string.count > 1 else { return [string]}
+        var stringArray: [String] = []
+        
+        func splitAndInsert(by sign: String) {
+            if stringArray.isEmpty {
+                let multiplierArray = string.split(separator: sign, omittingEmptySubsequences: true).map { String($0) }
+                stringArray = multiplierArray
+                for i in 1..<multiplierArray.count {
+                    stringArray.insert(sign, at: i+i-1)
+                }
+            } else {
+                let multiplierArray = stringArray.flatMap { element in
+                    if element.contains(sign) {
+                        var arr = element.split(separator: sign, omittingEmptySubsequences: true).map { String($0) }
+                        let count = arr.count
+                        for i in 1..<count {
+                            arr.insert(sign, at: i+i-1)
+                        }
+                        return arr
+                    }
+                    return [element]
+                }
+                stringArray = multiplierArray
+            }
+        }
+        
+        if string.contains(where: { ["÷", "/"].contains($0) }) {
+            var dividerArray = string.split(separator: "÷", omittingEmptySubsequences: true).map { String($0) }
+            if string.contains("/") {
+                dividerArray = dividerArray.flatMap { $0.split(separator: "/", omittingEmptySubsequences: true).map { String($0) } }
+            }
+            stringArray = dividerArray
+            for i in 1..<dividerArray.count {
+                stringArray.insert("÷", at: i+i-1)
+            }
+        }
+        
+        if string.contains("×") {
+            splitAndInsert(by: "×")
+        }
+        
+        if string.contains("*") {
+            splitAndInsert(by: "*")
+        }
+        
+        if string.contains("+") {
+            splitAndInsert(by: "+")
+        }
+        
+        if string.contains("-") {
+            splitAndInsert(by: "-")
+        }
+        
+        return stringArray
+    }
+    
+    func calculate(formulaArray: [String]) -> Float? {
+        guard formulaArray.count > 1 else {
+            guard let first = formulaArray.first else { return nil }
+            return Float(first)
+        }
+        var copyArray = formulaArray
+        
+        func calculateBySing(sing: String) {
+            func doMath(left: Float, right: Float) -> Float? {
+                switch sing {
+                case "/", "÷":
+                    return left / right
+                case "*", "×":
+                    return left * right
+                case "+":
+                    return left + right
+                case "-":
+                    return left - right
+                default:
+                    return nil
+                }
+            }
+            
+            var copy = copyArray
+            while let divideIndex = copy.firstIndex(of: sing) {
+                let prevIndex = divideIndex - 1
+                let nextIndex = divideIndex + 1
+                guard prevIndex >= 0, nextIndex < copy.count else { return }
+                // Getting numbers
+                let prevStr = copy[prevIndex]
+                let nextStr = copy[nextIndex]
+                // Making math
+                guard let prevNumber = Float(prevStr) else { return }
+                guard let nextNumber = Float(nextStr) else { return }
+                guard let exitNumber = doMath(left: prevNumber, right: nextNumber) else { return }
+                // Removing numbers and sing from array
+                copy.remove(at: nextIndex)
+                copy.remove(at: divideIndex)
+                copy.remove(at: prevIndex)
+                // Inserting exit number in array
+                let exitStr = String(exitNumber)
+                copy.insert(exitStr, at: prevIndex)
+            }
+            
+            copyArray = copy
+        }
+        
+        if copyArray.contains("÷") {
+            calculateBySing(sing: "÷")
+        }
+        
+        if copyArray.contains("×") {
+            calculateBySing(sing: "×")
+        }
+        
+        if copyArray.contains("*") {
+            calculateBySing(sing: "*")
+        }
+        
+        if copyArray.contains("-") {
+            calculateBySing(sing: "-")
+        }
+        
+        if copyArray.contains("+") {
+            calculateBySing(sing: "+")
+        }
+        
+        guard let resultString = copyArray.first else { return nil }
+        return Float(resultString)
+    }
 }
 
 #Preview {
+    @Previewable @Namespace var namespace
+    @Previewable @State var action: ActionWithTransaction = .add(.now)
+    
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let transactionsTypeSelected: TransactionsType = .spending
     let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, use: .main, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
-    
-    @Namespace var namespace
-    @State var action: ActionWithTransaction = .add(.now)
     
     return AddingSpendIcomeView(action: $action, namespace: namespace, viewModel: viewModel)
 }

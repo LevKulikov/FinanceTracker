@@ -267,10 +267,10 @@ struct BudgetCard<MenuItems: View>: View {
 }
 
 #Preview {
+    @Previewable @Namespace var namespace
+    @Previewable @State var flag = false
     let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
     let viewModel = BudgetCardViewModel(dataManager: dataManager, budget: .empty)
-    @Namespace var namespace
-    @State var flag = false
     
     return BudgetCard(viewModel: viewModel, namespace: namespace, type: .line) { _ in
         EmptyView()

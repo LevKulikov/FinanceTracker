@@ -196,12 +196,12 @@ struct GroupedSpendIncomeCell: View {
 }
 
 #Preview {
+    @Previewable @Namespace var namespace
+    @Previewable @State var flag = false
+    
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-    
-    @Namespace var namespace
-    @State var flag = false
     
     return GroupedSpendIncomeCell(transactions: viewModel.filteredGroupedTranactions.first ?? [], namespace: namespace, closeGroupFlag: $flag, totalValue: 100) {
         print($0.typeRawValue)

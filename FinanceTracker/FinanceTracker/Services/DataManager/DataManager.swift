@@ -90,9 +90,9 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func getPreferredColorScheme() -> ColorScheme?
     
-    func setSecondThirdTabsArray(_ tabsArray: [TabViewType])
+    func setThreeTabsArray(_ tabsArray: [TabViewType])
     
-    func getSecondThirdTabsArray() -> [TabViewType]
+    func getThreeTabsArray() -> [TabViewType]
     
     func isLightWeightStatistics() -> Bool
     
@@ -101,6 +101,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func showAddButtonFromEvetyTab() -> Bool
     
     func showAddButtonFromEvetyTab(_ show: Bool)
+    
+    func stayAtAddingViewAfterAdd() -> Bool
+    
+    func stayAtAddingViewAfterAdd(_ stay: Bool)
 }
 
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
@@ -532,11 +536,11 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
-    func setSecondThirdTabsArray(_ tabsArray: [TabViewType]) {
+    func setThreeTabsArray(_ tabsArray: [TabViewType]) {
         settingsManager.setThreeTabsArray(tabsArray)
     }
     
-    func getSecondThirdTabsArray() -> [TabViewType] {
+    func getThreeTabsArray() -> [TabViewType] {
         settingsManager.getThreeTabsArray()
     }
     
@@ -554,6 +558,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func showAddButtonFromEvetyTab(_ show: Bool) {
         settingsManager.showAddButtonFromEvetyTab(show)
+    }
+    
+    func stayAtAddingViewAfterAdd() -> Bool {
+        settingsManager.stayAtAddingViewAfterAdd()
+    }
+    
+    func stayAtAddingViewAfterAdd(_ stay: Bool) {
+        settingsManager.stayAtAddingViewAfterAdd(stay)
     }
     
     //MARK: Private methods

@@ -34,6 +34,10 @@ protocol SettingsManagerProtocol: AnyObject {
     func showAddButtonFromEvetyTab() -> Bool
     
     func showAddButtonFromEvetyTab(_ show: Bool)
+    
+    func stayAtAddingViewAfterAdd() -> Bool
+    
+    func stayAtAddingViewAfterAdd(_ stay: Bool)
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -44,6 +48,7 @@ final class SettingsManager: SettingsManagerProtocol {
     private let tabsArrayKey = "tabsArrayKey"
     private let lightWeightStatisticsKey = "lightWeightStatisticsKey"
     private let showAddButtonFromEvetyTabKey = "showAddButtonFromEvetyTabKey"
+    private let stayAtAddingViewAfterAddKey = "doNotCloseAddingViewAfterAddKey"
     
     //MARK: - Initializer
     init() {
@@ -137,5 +142,13 @@ final class SettingsManager: SettingsManagerProtocol {
     
     func showAddButtonFromEvetyTab(_ show: Bool) {
         UserDefaults.standard.set(show, forKey: showAddButtonFromEvetyTabKey)
+    }
+    
+    func stayAtAddingViewAfterAdd() -> Bool {
+        UserDefaults.standard.bool(forKey: stayAtAddingViewAfterAddKey)
+    }
+    
+    func stayAtAddingViewAfterAdd(_ stay: Bool) {
+        UserDefaults.standard.set(stay, forKey: stayAtAddingViewAfterAddKey)
     }
 }

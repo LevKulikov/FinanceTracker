@@ -189,7 +189,8 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
             let dateString = transaction.date.formatted(date: .numeric, time: .omitted)
             let timeString = transaction.date.formatted(date: .omitted, time: .shortened)
             let typeString: String = transaction.type == nil ? transaction.typeRawValue : String(localized: transaction.type!.localizedString)
-            csvString.append("\(dateString);\(timeString);\(typeString);\(transaction.value);\(transaction.balanceAccount?.currency ?? "nil");\(transaction.category?.name ?? "nil");\(transaction.balanceAccount?.name ?? "nil");\(transaction.comment);\(tagsNames)\n")
+            let comment = transaction.comment.replacing("\n", with: "  ")
+            csvString.append("\(dateString);\(timeString);\(typeString);\(transaction.value);\(transaction.balanceAccount?.currency ?? "nil");\(transaction.category?.name ?? "nil");\(transaction.balanceAccount?.name ?? "nil");\(comment);\(tagsNames)\n")
         }
         
         let fileManager = FileManager.default

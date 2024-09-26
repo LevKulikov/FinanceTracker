@@ -224,8 +224,7 @@ struct TransactionPieChart: View {
 }
 
 #Preview {
-    let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
-    @StateObject var viewModel = StatisticsViewModel(dataManager: dataManger)
+    @Previewable @StateObject var viewModel = StatisticsViewModel(dataManager: DataManager(container: FinanceTrackerApp.createModelContainer()))
     
     return TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData) { _ in
         

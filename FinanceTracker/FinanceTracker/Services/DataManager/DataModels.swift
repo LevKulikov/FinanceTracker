@@ -100,7 +100,7 @@ final class BalanceAccount: @unchecked Sendable, Codable {
     static let emptyBalanceAccount = BalanceAccount(name: "empty", currency: "RUB", balance: 0, iconName: "", color: .clear)
     
     //MARK: Properties
-    @Attribute(.unique) let id: String
+    @Attribute(.unique) var id: String
     var name: String
     var currency: String
     var balance: Float
@@ -178,7 +178,7 @@ final class Category: @unchecked Sendable, Codable {
     static let emptyCategory = Category(type: .spending, name: "empty", iconName: "", color: .clear, placement: 0)
     
     //MARK: Properties
-    @Attribute(.unique) let id: String
+    @Attribute(.unique) var id: String
     var typeRawValue: String
     var name: String
     var iconName: String
@@ -268,7 +268,7 @@ final class Category: @unchecked Sendable, Codable {
 @Model
 final class Tag: @unchecked Sendable, Codable {
     //MARK: Properties
-    @Attribute(.unique) let id: String
+    @Attribute(.unique) var id: String
     var name: String
     @Attribute(.transformable(by: UIColorValueTransformer.self)) var uiColor: UIColor
     var transactions: [Transaction] = []
@@ -334,7 +334,7 @@ final class Tag: @unchecked Sendable, Codable {
 @Model
 final class Transaction: @unchecked Sendable, Codable {
     //MARK: Properties
-    @Attribute(.unique) let id: String
+    @Attribute(.unique) var id: String
     private(set) var typeRawValue: String
     var comment: String
     var value: Float
@@ -461,7 +461,7 @@ final class Budget: @unchecked Sendable, Codable {
     }
     
     //MARK: - Properties
-    @Attribute(.unique) let id: String
+    @Attribute(.unique) var id: String
     var name: String
     var value: Float
     var period: Period

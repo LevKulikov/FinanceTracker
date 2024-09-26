@@ -56,6 +56,11 @@ struct ManageDataView: View {
             } message: {
                 Text("An error occurred during creating a Excel (csv) file. Error text: \(viewModel.csvExportError?.localizedDescription ?? "no text")")
             }
+            .fullScreenCover(item: $viewModel.decodedContainer) { container in
+                ImportDataPreview(container: container) {
+                    viewModel.deleteAndImportData()
+                }
+            }
         }
     }
     
@@ -154,11 +159,6 @@ struct ManageDataView: View {
                 Button("Ok") { }
             } message: {
                 Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text"). Probably, you selected wrong file ")
-            }
-            .fullScreenCover(item: $viewModel.decodedContainer) { container in
-                ImportDataPreview(container: container) {
-                    viewModel.deleteAndImportData()
-                }
             }
         }
     }

@@ -80,7 +80,7 @@ struct SpendIncomeCell: View {
 }
 
 #Preview {
-    @Namespace var namespace
+    @Previewable @Namespace var namespace
     let transaction = Transaction(
         type: .spending,
         comment: "",

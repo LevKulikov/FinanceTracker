@@ -70,8 +70,7 @@ struct CategoryItemView: View {
 }
 
 #Preview {
-    let category = Category(type: .spending, name: "Show me", iconName: "001-gamepad", color: .cyan, placement: 1)
-    @State var picked: Category? = category
+    @Previewable @State var picked: Category? = Category(type: .spending, name: "Show me", iconName: "001-gamepad", color: .cyan, placement: 1)
     
-    return CategoryItemView(category: category, selectedCategory: $picked)
+    return CategoryItemView(category: picked!, selectedCategory: $picked)
 }

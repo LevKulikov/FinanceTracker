@@ -62,7 +62,7 @@ struct SpendIncomePicker: View {
 }
 
 #Preview {
-    @State var type = TransactionsType.spending
+    @Previewable @State var type = TransactionsType.spending
     
     return SpendIncomePicker(transactionsTypeSelected: $type)
 }

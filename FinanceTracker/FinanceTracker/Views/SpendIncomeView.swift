@@ -270,11 +270,10 @@ struct SpendIncomeView: View {
 }
 
 #Preview {
+    @Previewable @Namespace var namespace
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let viewModel = SpendIncomeViewModel(dataManager: dataManager)
-    
-    @Namespace var namespace
     
     return SpendIncomeView(viewModel: viewModel, namespace: namespace)
 }

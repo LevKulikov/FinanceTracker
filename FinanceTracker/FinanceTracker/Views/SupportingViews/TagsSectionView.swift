@@ -91,13 +91,12 @@ struct TagsSectionView: View {
 }
 
 #Preview {
+    @Previewable @State var showOpt = false
+    @Previewable @FocusState var focusState
     let container = FinanceTrackerApp.createModelContainer()
     let dataManager = DataManager(container: container)
     let transactionsTypeSelected: TransactionsType = .spending
     let viewModel = AddingSpendIcomeViewModel(dataManager: dataManager, use: .main, transactionsTypeSelected: transactionsTypeSelected, balanceAccount: .emptyBalanceAccount)
-    
-    @State var showOpt = false
-    @FocusState var focusState
     
     return TagsSectionView(viewModel: viewModel, showMoreTagsOptions: $showOpt, focusState: $focusState)
 }

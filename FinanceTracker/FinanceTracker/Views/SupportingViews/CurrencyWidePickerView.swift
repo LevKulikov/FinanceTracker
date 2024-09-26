@@ -28,9 +28,20 @@ struct CurrencyWidePickerView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 List {
-                    ForEach(isSearching ? searchCurrencies : allCurrencies) { currency in
-                        rowForCurrency(currency)
-                            .id(currency)
+                    if searchCurrencyText.isEmpty {
+                        Section(header: Text("Popular currencies")) {
+                            ForEach(FTAppAssets.popularCurrencies) { currency in
+                                rowForCurrency(currency)
+                                    .id(currency)
+                            }
+                        }
+                    }
+                    
+                    Section(header: Text("All currencies")) {
+                        ForEach(isSearching ? searchCurrencies : allCurrencies) { currency in
+                            rowForCurrency(currency)
+                                .id(currency)
+                        }
                     }
                     
                     if isSearching, searchCurrencies.isEmpty {
@@ -95,13 +106,12 @@ struct CurrencyWidePickerView: View {
 }
 
 #Preview {
-    let someCurr = Currency(
+    @Previewable @State var currency: Currency? = Currency(
         symbol: "$",
         name: "US Dollar",
         code: "USD"
     )
+    @Previewable @State var show = true
     
-    @State var currency: Currency? = someCurr
-    @State var show = true
     return CurrencyWidePickerView(currency: $currency, show: $show)
 }

@@ -28,6 +28,8 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     enum SaveErrors: Error {
         case categoryIsNil
         case valueIsZero
+        case valueIsNegative
+        case valueIsInfiniteOrNaN
         case contextSaveError
         
         var saveErrorLocalizedDescription: LocalizedStringResource {
@@ -36,6 +38,10 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
                 return "Category is not selected"
             case .valueIsZero:
                 return "Value cannot be zero or empy"
+            case .valueIsNegative:
+                return "Value cannot be negative"
+            case .valueIsInfiniteOrNaN:
+                return "Value cannot be infinite or not a number"
             case .contextSaveError:
                 return "Some save error occured"
             }
@@ -111,9 +117,16 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     /// Updates or saves new transaction
     func saveTransaction(completionHanler: (@MainActor @Sendable (SaveErrors?) -> Void)? = nil) {
         // Field checking
-        guard value > 0 else {
-            Task { @MainActor in
-                completionHanler?(.valueIsZero)
+        guard value > 0, value.isFinite, !value.isNaN else {
+            Task { @MainActor [value] in
+                switch value {
+                case ..<0:
+                    completionHanler?(.valueIsNegative)
+                case .infinity, .nan:
+                    completionHanler?(.valueIsInfiniteOrNaN)
+                default:
+                    completionHanler?(.valueIsZero)
+                }
             }
             return
         }
@@ -171,6 +184,25 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
         Task { @MainActor in
             completionHanler?(nil)
         }
+    }
+    
+    /// Checks if view should be hidden after action. If it is not, it cleans some information about previous transaction
+    @MainActor
+    func stayAfterAction() -> Bool {
+        if case .add = action {
+            let stay = dataManager.stayAtAddingViewAfterAdd()
+            if stay {
+                withAnimation {
+                    valueString = ""
+                    category = nil
+                }
+                comment = ""
+                value = 0
+                tags = []
+            }
+            return stay
+        }
+        return false
     }
     
     func addRemoveTag(_ tag: Tag) {
