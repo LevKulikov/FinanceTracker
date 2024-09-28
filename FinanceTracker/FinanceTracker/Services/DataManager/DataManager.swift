@@ -234,14 +234,17 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
         guard let defaultBA = getDefaultBalanceAccount() else { return }
         guard balanceAccount != defaultBA else { return }
+        let baID = balanceAccount.persistentModelID
         
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == baID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
             // Replace selected balance account to default one for each transaction
-            filtered.forEach { $0.setBalanceAccount(defaultBA) }
+            allTransactions.forEach { $0.setBalanceAccount(defaultBA) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
@@ -254,14 +257,17 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
         guard let defaultBA = getDefaultBalanceAccount() else { return }
         guard balanceAccount != defaultBA else { return }
+        let baID = balanceAccount.persistentModelID
         
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == baID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
             // Delete filtered transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
@@ -272,13 +278,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let catID = category.persistentModelID
+        let predicate = #Predicate<Transaction> {
+            $0.category?.persistentModelID == catID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected category
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.category == category }
             // Replace category in transaction with provided replacing category
-            filtered.forEach { $0.setCategory(replacingCategory) }
+            allTransactions.forEach { $0.setCategory(replacingCategory) }
             // Delete initial category
             container.mainContext.delete(category)
             try save()
@@ -289,13 +298,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteCategoryWithTransactions(_ category: Category) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let catID = category.persistentModelID
+        let predicate = #Predicate<Transaction> {
+            $0.category?.persistentModelID == catID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected category
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.category == category }
             // Delete transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
             // Delete category
             container.mainContext.delete(category)
             try save()
@@ -306,13 +318,15 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteTag(_ tag: Tag) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.tags.contains { $0.persistentModelID == tag.persistentModelID }
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected tag
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.tags.contains(tag) }
             // Remove tag from transactions
-            filtered.forEach { $0.removeTag(tag) }
+            allTransactions.forEach { $0.removeTag(tag) }
             // Delete tag
             container.mainContext.delete(tag)
             try save()
@@ -323,13 +337,15 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteTagWithTransactions(_ tag: Tag) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.tags.contains { $0.persistentModelID == tag.persistentModelID }
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected tag
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.tags.contains(tag) }
             // Delete transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
             // Delete tag
             container.mainContext.delete(tag)
             try save()
