@@ -564,6 +564,17 @@ final class TransferTransaction: @unchecked Sendable, Codable {
         toBalanceAccount = balanceAccount
     }
     
+    func balanceAccountIsGoingToBeDeleted(_ balanceAccount: BalanceAccount) {
+        switch balanceAccount {
+        case fromBalanceAccount:
+            fromBalanceAccount = nil
+        case toBalanceAccount:
+            toBalanceAccount = nil
+        default:
+            break
+        }
+    }
+    
     //MARK: Codable
     enum CodingKeys: CodingKey {
         case id
@@ -580,14 +591,11 @@ final class TransferTransaction: @unchecked Sendable, Codable {
         value = try container.decode(Float.self, forKey: .value)
         date = try container.decode(Date.self, forKey: .date)
         comment = try container.decode(String.self, forKey: .comment)
-        fromBalanceAccount = try container.decode(BalanceAccount.self, forKey: .fromBalanceAccount)
-        toBalanceAccount = try container.decode(BalanceAccount.self, forKey: .toBalanceAccount)
+        fromBalanceAccount = try container.decode(Optional<BalanceAccount>.self, forKey: .fromBalanceAccount)
+        toBalanceAccount = try container.decode(Optional<BalanceAccount>.self, forKey: .toBalanceAccount)
     }
     
     func encode(to encoder: any Encoder) throws {
-        guard let fromBalanceAccount, let toBalanceAccount else {
-            throw EncodingError.invalidValue(self, EncodingError.Context(codingPath: [], debugDescription: "Missing required properties: fromBalanceAccount, toBalanceAccount"))
-        }
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(value, forKey: .value)

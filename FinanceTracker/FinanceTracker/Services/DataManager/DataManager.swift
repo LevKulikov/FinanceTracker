@@ -236,15 +236,22 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         guard balanceAccount != defaultBA else { return }
         let baID = balanceAccount.persistentModelID
         
-        let predicate = #Predicate<Transaction> {
+        let transactionsPredicate = #Predicate<Transaction> {
             $0.balanceAccount?.persistentModelID == baID
         }
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: transactionsPredicate)
+        
+        let transfersPredicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == baID || $0.toBalanceAccount?.persistentModelID == baID
+        }
+        let fetchTransferTransactionDescriptor = FetchDescriptor<TransferTransaction>(predicate: transfersPredicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
+            let allTransferTransactions = try fetch(fetchTransferTransactionDescriptor)
             // Replace selected balance account to default one for each transaction
             allTransactions.forEach { $0.setBalanceAccount(defaultBA) }
+            allTransferTransactions.forEach { $0.balanceAccountIsGoingToBeDeleted(balanceAccount) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
@@ -263,11 +270,18 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             $0.balanceAccount?.persistentModelID == baID
         }
         let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        
+        let transfersPredicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == baID || $0.toBalanceAccount?.persistentModelID == baID
+        }
+        let fetchTransferTransactionDescriptor = FetchDescriptor<TransferTransaction>(predicate: transfersPredicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
+            let allTransferTransactions = try fetch(fetchTransferTransactionDescriptor)
             // Delete filtered transactions
             allTransactions.forEach { deleteTransaction($0) }
+            allTransferTransactions.forEach { $0.balanceAccountIsGoingToBeDeleted(balanceAccount) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
