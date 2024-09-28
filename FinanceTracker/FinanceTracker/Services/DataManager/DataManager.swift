@@ -26,6 +26,11 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func deleteTransactionFromBackground(_ transaction: Transaction) async throws
     
+    @MainActor
+    func deleteTransferTransaction(_ transferTransaction: TransferTransaction)
+    
+    func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws
+    
     /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
     @MainActor
@@ -211,6 +216,21 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
+    func deleteTransferTransaction(_ transferTransaction: TransferTransaction) {
+        container.mainContext.delete(transferTransaction)
+    }
+    
+    func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws {
+        if let backgroundActor {
+            await backgroundActor.delete(transferTransaction)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.delete(transferTransaction)
+            try await backgroundActor!.save()
+        }
+    }
+    
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
         guard let defaultBA = getDefaultBalanceAccount() else { return }
         guard balanceAccount != defaultBA else { return }
@@ -352,6 +372,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
                 container.mainContext.delete(transaction)
             }
             try container.mainContext.delete(model: Budget.self)
+            try container.mainContext.delete(model: TransferTransaction.self)
             try container.mainContext.delete(model: BalanceAccount.self)
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
