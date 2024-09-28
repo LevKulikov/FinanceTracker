@@ -532,6 +532,72 @@ final class Budget: @unchecked Sendable, Codable {
     }
 }
 
+@Model
+final class TransferTransaction: @unchecked Sendable, Codable {
+    @Attribute(.unique) var id: String
+    var value: Float
+    var date: Date
+    var comment: String
+    private(set) var fromBalanceAccount: BalanceAccount?
+    private(set) var toBalanceAccount: BalanceAccount?
+    
+    init(id: String, value: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+        self.id = id
+        self.value = value
+        self.date = date
+        self.comment = comment
+        setFromBalanceAccount(fromBalanceAccount)
+        setToBalanceAccount(toBalanceAccount)
+    }
+    
+    convenience init(value: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+        let id = UUID().uuidString
+        self.init(id: id, value: value, date: date, comment: comment, fromBalanceAccount: fromBalanceAccount, toBalanceAccount: toBalanceAccount)
+    }
+    
+    //MARK: Methods
+    func setFromBalanceAccount(_ balanceAccount: BalanceAccount) {
+        fromBalanceAccount = balanceAccount
+    }
+    
+    func setToBalanceAccount(_ balanceAccount: BalanceAccount) {
+        toBalanceAccount = balanceAccount
+    }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case value
+        case date
+        case comment
+        case fromBalanceAccount
+        case toBalanceAccount
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        value = try container.decode(Float.self, forKey: .value)
+        date = try container.decode(Date.self, forKey: .date)
+        comment = try container.decode(String.self, forKey: .comment)
+        fromBalanceAccount = try container.decode(BalanceAccount.self, forKey: .fromBalanceAccount)
+        toBalanceAccount = try container.decode(BalanceAccount.self, forKey: .toBalanceAccount)
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        guard let fromBalanceAccount, let toBalanceAccount else {
+            throw EncodingError.invalidValue(self, EncodingError.Context(codingPath: [], debugDescription: "Missing required properties: fromBalanceAccount, toBalanceAccount"))
+        }
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(value, forKey: .value)
+        try container.encode(date, forKey: .date)
+        try container.encode(comment, forKey: .comment)
+        try container.encode(fromBalanceAccount, forKey: .fromBalanceAccount)
+        try container.encode(toBalanceAccount, forKey: .toBalanceAccount)
+    }
+}
+
 //MARK: - UIColor ValueTransformer
 @objc(UIColorValueTransformer)
 final class UIColorValueTransformer: ValueTransformer {
