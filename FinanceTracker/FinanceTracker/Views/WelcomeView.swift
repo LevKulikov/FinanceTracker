@@ -33,10 +33,6 @@ struct WelcomeView: View {
                             .tag(index)
                             .containerRelativeFrame(.horizontal)
                             .id(index)
-                            .overlay(alignment: .bottom) {
-                                nextCompeteButton(for: index, proxy: proxy)
-                                    .padding(.bottom, 25)
-                            }
                             .scrollTransition(axis: .horizontal) { conent, phase in
                                 let maxDegree: Double = 25
                                 let rotDegrees: Double = phase == .topLeading ? maxDegree : (phase == .bottomTrailing ? -maxDegree : 0)
@@ -45,6 +41,10 @@ struct WelcomeView: View {
                                     .scaleEffect(phase == .identity ? 1 : 0.8)
                                     .blur(radius: phase == .identity ? 0 : 2)
                                     .rotation3DEffect(.degrees(rotDegrees), axis: (x: 0, y: 1, z: 0))
+                            }
+                            .overlay(alignment: .bottom) {
+                                nextCompeteButton(for: index, proxy: proxy)
+                                    .padding(.bottom, 25)
                             }
                     }
                 }
