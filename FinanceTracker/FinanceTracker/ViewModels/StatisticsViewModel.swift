@@ -131,6 +131,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private var availableYearMonthDayDates: [Date] = []
     /// All transactions
     private var transactions: [Transaction] = []
+    /// All transfer transactions
+    private var transferTransactions: [TransferTransaction] = []
     /// All tags
     private(set) var allTags: [Tag] = []
     
@@ -403,10 +405,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             self?.totalIsCalculating = true
         }
         
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let self else { return }
+        DispatchQueue.global(qos: .utility).async { [weak self, transactions, transferTransactions, balanceAccountToFilter] in
             print("calculateTotalForBalanceAccount, started to calculate totalValue")
-            let totalValue = self.transactions
+            let totalTransactionValue = transactions
                 .map {
                     guard let transType = $0.type else { return Float(0)}
                     switch transType {
@@ -418,10 +419,25 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 }
                 .reduce(balanceAccountToFilter.balance, +)
             
+            let totalTransferValue = transferTransactions
+                .map {
+                    switch balanceAccountToFilter.id {
+                    case $0.fromBalanceAccount?.id:
+                        return -$0.value
+                    case $0.toBalanceAccount?.id:
+                        return $0.value
+                    default:
+                        return 0
+                    }
+                }
+                .reduce(0, +)
+            
+            let totalValue = totalTransactionValue + totalTransferValue
+            
             DispatchQueue.main.async {
                 print("calculateTotalForBalanceAccount, provided data")
-                self.totalIsCalculating = false
-                self.totalForBalanceAccount = totalValue
+                self?.totalIsCalculating = false
+                self?.totalForBalanceAccount = totalValue
                 print("calculateTotalForBalanceAccount, ended")
             }
         }
@@ -703,9 +719,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 print("fetchAllData, ended to fetch tags")
                 print("fetchAllData, started to fetch transactions")
                 if let self, self.lightWeightStatistics {
-                    await self.fetchTransactionszForDate()
+                    await self.fetchTransactionsForDate()
                 } else {
                     await self?.fetchTransactions()
+                    await self?.fetchTransferTransactions()
                 }
                 print("fetchAllData, ended to fetch transactions")
                 localCompletion()
@@ -735,7 +752,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     ///Fetches transactions with date filter and sets to transactions, uses background fetching. Used for light weigh statistics
-    private func fetchTransactionszForDate() async {
+    private func fetchTransactionsForDate() async {
         let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
         let lowerBound = lightWeightDateFilterRange.lowerBound
         let upperBound = lightWeightDateFilterRange.upperBound
@@ -758,6 +775,22 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    private func fetchTransferTransactions() async {
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        
+        let predicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == copyBalanceAccountId || $0.toBalanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        var descriptor = FetchDescriptor<TransferTransaction>(predicate: predicate)
+        descriptor.sortBy = [SortDescriptor(\.date, order: .reverse)]
+        
+        do {
+            let fetchedTransferTransactions = try await dataManager.fetchFromBackground(descriptor)
+            transferTransactions = fetchedTransferTransactions
+        } catch {
+            print("StatisticsViewModel: fetchTransferTransactions: Unable to fetch transfer transactions, error: \(error)")
+        }
+    }
     
     /// Fetches all saved tags, uses background
     private func fetchTags() async {
