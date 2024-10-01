@@ -1939,6 +1939,9 @@
         }
       }
     },
+    "No transfers" : {
+
+    },
     "No, cancel" : {
       "localizations" : {
         "ru" : {
@@ -2914,6 +2917,9 @@
           }
         }
       }
+    },
+    "Transfers" : {
+
     },
     "Transport" : {
       "localizations" : {

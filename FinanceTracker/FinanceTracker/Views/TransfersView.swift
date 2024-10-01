@@ -8,11 +8,53 @@
 import SwiftUI
 
 struct TransfersView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    //MARK: - Properties
+    @StateObject private var viewModel: TransfersViewModel
+    
+    //MARK: - Initializer
+    init(viewModel: TransfersViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
+    
+    //MARK: - Body
+    var body: some View {
+        NavigationStack {
+            List {
+                if viewModel.allTransfersAreFetched, !viewModel.isLoading, viewModel.transfers.isEmpty {
+                    ContentUnavailableView("No transfers", systemImage: "tray.fill", description: Text("Nothing here yet"))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
+                
+                ForEach(viewModel.transfers) { transfer in
+                    Text(transfer.date.formatted(.dateTime))
+                }
+                
+                if !viewModel.allTransfersAreFetched {
+                    ProgressView()
+                        .controlSize(.large)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .onAppear {
+                            Task {
+                                viewModel.loadData()
+                            }
+                        }
+                }
+            }
+            .navigationTitle("Transfers")
+        }
+    }
+    
+    //MARK: - Computed View properties
+    
+    //MARK: - Methods
 }
 
 #Preview {
-    TransfersView()
+    let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
+    let viewModel = TransfersViewModel(dataManager: dataManager)
+    
+    TransfersView(viewModel: viewModel)
 }
