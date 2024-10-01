@@ -45,6 +45,7 @@
 		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
 		73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90462C499571002267F4 /* BudgetCardViewModel.swift */; };
 		73AE90492C499B05002267F4 /* BudgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90482C499B05002267F4 /* BudgetCard.swift */; };
+		73B9BECD2CAC7C6B00D9E72D /* TransfersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B9BECC2CAC7C6B00D9E72D /* TransfersViewModel.swift */; };
 		73BD9F452C1C62F40071E9EF /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */; };
 		73BD9F472C1C77BB0071E9EF /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */; };
 		73BD9F492C1D8ACE0071E9EF /* TransactionBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */; };
@@ -152,6 +153,7 @@
 		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
 		73AE90462C499571002267F4 /* BudgetCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCardViewModel.swift; sourceTree = "<group>"; };
 		73AE90482C499B05002267F4 /* BudgetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCard.swift; sourceTree = "<group>"; };
+		73B9BECC2CAC7C6B00D9E72D /* TransfersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersViewModel.swift; sourceTree = "<group>"; };
 		73BD9F442C1C62F40071E9EF /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
 		73BD9F462C1C77BB0071E9EF /* DateRangePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		73BD9F482C1D8ACE0071E9EF /* TransactionBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionBarChart.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 				73633E512C55696800E3B9CF /* TabsSettingsViewModel.swift */,
 				73DFF0AA2C5E9A8900BFDBAF /* ProvidedStatisticsViewModel.swift */,
 				73EC8DC12C7276DB00DC5899 /* DeveloperToolViewModel.swift */,
+				73B9BECC2CAC7C6B00D9E72D /* TransfersViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -555,6 +558,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				736821CD2C07CA6500FFD5FD /* AddingSpendIcomeViewModel.swift in Sources */,
+				73B9BECD2CAC7C6B00D9E72D /* TransfersViewModel.swift in Sources */,
 				7305BACA2C1A4C1900F712BC /* StatisticsView.swift in Sources */,
 				73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */,
 				73D000DE2C31DC4700AACFCE /* WelcomeViewModel.swift in Sources */,
