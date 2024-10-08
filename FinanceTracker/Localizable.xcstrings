@@ -1940,7 +1940,14 @@
       }
     },
     "No transfers" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет переводов"
+          }
+        }
+      }
     },
     "No, cancel" : {
       "localizations" : {
@@ -2919,7 +2926,14 @@
       }
     },
     "Transfers" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переводы"
+          }
+        }
+      }
     },
     "Transport" : {
       "localizations" : {

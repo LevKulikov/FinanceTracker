@@ -37,9 +37,7 @@ struct TransfersView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                         .onAppear {
-                            Task {
-                                viewModel.loadData()
-                            }
+                            viewModel.loadData()
                         }
                 }
             }
