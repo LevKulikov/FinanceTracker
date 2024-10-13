@@ -535,24 +535,26 @@ final class Budget: @unchecked Sendable, Codable {
 @Model
 final class TransferTransaction: @unchecked Sendable, Codable {
     @Attribute(.unique) var id: String
-    var value: Float
+    var valueFrom: Float
+    var valueTo: Float
     var date: Date
     var comment: String
     private(set) var fromBalanceAccount: BalanceAccount?
     private(set) var toBalanceAccount: BalanceAccount?
     
-    init(id: String, value: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+    init(id: String, valueFrom: Float, valueTo: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
         self.id = id
-        self.value = value
+        self.valueFrom = valueFrom
+        self.valueTo = valueTo
         self.date = date
         self.comment = comment
         setFromBalanceAccount(fromBalanceAccount)
         setToBalanceAccount(toBalanceAccount)
     }
     
-    convenience init(value: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+    convenience init(valueFrom: Float, valueTo: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
         let id = UUID().uuidString
-        self.init(id: id, value: value, date: date, comment: comment, fromBalanceAccount: fromBalanceAccount, toBalanceAccount: toBalanceAccount)
+        self.init(id: id, valueFrom: valueFrom, valueTo: valueTo, date: date, comment: comment, fromBalanceAccount: fromBalanceAccount, toBalanceAccount: toBalanceAccount)
     }
     
     //MARK: Methods
@@ -578,7 +580,8 @@ final class TransferTransaction: @unchecked Sendable, Codable {
     //MARK: Codable
     enum CodingKeys: CodingKey {
         case id
-        case value
+        case valueFrom
+        case valueTo
         case date
         case comment
         case fromBalanceAccount
@@ -588,7 +591,8 @@ final class TransferTransaction: @unchecked Sendable, Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
-        value = try container.decode(Float.self, forKey: .value)
+        valueFrom = try container.decode(Float.self, forKey: .valueFrom)
+        valueTo = try container.decode(Float.self, forKey: .valueTo)
         date = try container.decode(Date.self, forKey: .date)
         comment = try container.decode(String.self, forKey: .comment)
         fromBalanceAccount = try container.decode(Optional<BalanceAccount>.self, forKey: .fromBalanceAccount)
@@ -598,7 +602,8 @@ final class TransferTransaction: @unchecked Sendable, Codable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(value, forKey: .value)
+        try container.encode(valueFrom, forKey: .valueFrom)
+        try container.encode(valueTo, forKey: .valueTo)
         try container.encode(date, forKey: .date)
         try container.encode(comment, forKey: .comment)
         try container.encode(fromBalanceAccount, forKey: .fromBalanceAccount)
