@@ -186,9 +186,9 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
         let transfersChanges = transfersWithBalanceAccount.map {
             switch balanceAccountToUpdate?.id {
             case $0.fromBalanceAccount?.id:
-                return -$0.value
+                return -$0.valueFrom
             case $0.toBalanceAccount?.id:
-                return $0.value
+                return $0.valueTo
             default:
                 return 0
             }
