@@ -9,6 +9,12 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+protocol AddingTransferViewModelDelegate: AnyObject {
+    func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
+    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction)
+    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction)
+}
+
 enum ActionWithTransferTransaction: Equatable, Hashable {
     case add(template: TransferTransaction? = nil)
     case update(TransferTransaction)
@@ -23,9 +29,19 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         case multiply
     }
     
+    enum SaveTransferTransactionError: Error {
+        case invalidValue
+        case invalidFromBalanceAccount
+        case invalidToBalanceAccount
+        case invalidCurrencyRate
+        case saveDataError
+        case unknown
+    }
+    
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
     private let action: ActionWithTransferTransaction
+    weak var delegate: (any AddingTransferViewModelDelegate)?
     
     //MARK: Published properties
     @MainActor var valueFrom: Float = 0
@@ -58,12 +74,105 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Methods
+    func saveTransferTransaction(resultHandler: @escaping @MainActor (Result<Void, SaveTransferTransactionError>) -> Void) {
+        let localErrorHandler: @MainActor (SaveTransferTransactionError) -> Void = { error in
+            resultHandler(.failure(error))
+        }
+        
+        Task { @MainActor in
+            switch action {
+            case .add:
+                addTransferTransaction(errorHandler: localErrorHandler)
+            case .update:
+                updateTransferTransaction(errorHandler: localErrorHandler)
+            }
+            
+            resultHandler(.success(()))
+        }
+    }
     
     //MARK: Private methods
     private func initing() {
         Task { @MainActor in
             setActionData()
             await fetchBalanceAccounts()
+        }
+    }
+    
+    @MainActor
+    private func updateTransferTransaction(errorHandler: (SaveTransferTransactionError) -> Void) {
+        guard case .update(let transferTransaction) = action else {
+            print("AddingTransferViewModel, updateTransferTransaction: Action is not update")
+            return
+        }
+        
+        do {
+            try checkValidity()
+        } catch let error as SaveTransferTransactionError {
+            errorHandler(error)
+            return
+        } catch {
+            errorHandler(.unknown)
+            return
+        }
+        
+        transferTransaction.valueFrom = valueFrom
+        transferTransaction.valueTo = valueToConverted
+        transferTransaction.date = date
+        transferTransaction.comment = comment
+        transferTransaction.setFromBalanceAccount(fromBalanceAccount!)
+        transferTransaction.setToBalanceAccount(toBalanceAccount!)
+        
+        do {
+            try dataManager.save()
+            delegate?.didUpdateTransferTransaction(transferTransaction)
+        } catch {
+            errorHandler(.saveDataError)
+        }
+    }
+    
+    @MainActor
+    private func addTransferTransaction(errorHandler: (SaveTransferTransactionError) -> Void) {
+        do {
+            try checkValidity()
+        } catch let error as SaveTransferTransactionError {
+            errorHandler(error)
+            return
+        } catch {
+            errorHandler(.unknown)
+            return
+        }
+        
+        // because checkValidity() checks properties, we can safely force unwrap values
+        let transferTransaction = TransferTransaction(
+            valueFrom: valueFrom,
+            valueTo: valueToConverted,
+            date: date,
+            comment: comment,
+            fromBalanceAccount: fromBalanceAccount!,
+            toBalanceAccount: toBalanceAccount!
+        )
+        
+        dataManager.insert(transferTransaction)
+        delegate?.didAddTransferTransaction(transferTransaction)
+    }
+    
+    @MainActor
+    private func checkValidity() throws {
+        guard let fromBalanceAccount else {
+            throw SaveTransferTransactionError.invalidFromBalanceAccount
+        }
+        
+        guard let toBalanceAccount else {
+            throw SaveTransferTransactionError.invalidToBalanceAccount
+        }
+        
+        guard valueFrom > 0 else {
+            throw SaveTransferTransactionError.invalidValue
+        }
+        
+        guard currencyRateValue > 0 else {
+            throw SaveTransferTransactionError.invalidCurrencyRate
         }
     }
     
