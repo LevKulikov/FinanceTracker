@@ -524,6 +524,9 @@ struct AddingSpendIcomeView: View {
         var copyString = viewModel.valueString
         guard !copyString.isEmpty else {
             calculatedValueString = ""
+            if viewModel.value != 0 {
+                viewModel.value = 0
+            }
             return
         }
         
@@ -542,6 +545,9 @@ struct AddingSpendIcomeView: View {
         // check if value starts with math sing, which is not allowed
         if let first = copyString.first, signsArray.contains(String(first)) {
             viewModel.valueString = ""
+            if viewModel.value != 0 {
+                viewModel.value = 0
+            }
             return
         }
         
@@ -573,6 +579,7 @@ struct AddingSpendIcomeView: View {
         } else {
             guard let floatValue = Float(copyString) else {
                 viewModel.valueString = ""
+                viewModel.value = 0
                 return
             }
             
