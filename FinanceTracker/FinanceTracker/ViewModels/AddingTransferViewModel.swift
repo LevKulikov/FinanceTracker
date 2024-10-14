@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol AddingTransferTransactionViewModelDelegate: AnyObject {
+protocol AddingTransferViewModelDelegate: AnyObject {
     func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
     func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction)
     func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction)
@@ -41,7 +41,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
     private let action: ActionWithTransferTransaction
-    weak var delegate: (any AddingTransferTransactionViewModelDelegate)?
+    weak var delegate: (any AddingTransferViewModelDelegate)?
     
     //MARK: Published properties
     @MainActor var valueFrom: Float = 0
