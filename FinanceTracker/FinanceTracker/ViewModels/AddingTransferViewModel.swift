@@ -40,7 +40,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
-    private let action: ActionWithTransferTransaction
+    let action: ActionWithTransferTransaction
     weak var delegate: (any AddingTransferViewModelDelegate)?
     
     //MARK: Published properties
@@ -159,11 +159,11 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     private func checkValidity() throws {
-        guard let fromBalanceAccount else {
+        guard fromBalanceAccount != nil else {
             throw SaveTransferTransactionError.invalidFromBalanceAccount
         }
         
-        guard let toBalanceAccount else {
+        guard toBalanceAccount != nil else {
             throw SaveTransferTransactionError.invalidToBalanceAccount
         }
         
