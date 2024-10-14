@@ -44,13 +44,14 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     weak var delegate: (any AddingTransferViewModelDelegate)?
     
     //MARK: Published properties
-    @MainActor var valueFrom: Float = 0
+    @MainActor @Published var valueFrom: Float = 0
     @MainActor @Published var valueFromString: String = ""
     @MainActor @Published var date: Date = .now
     @MainActor @Published var fromBalanceAccount: BalanceAccount?
     @MainActor @Published var toBalanceAccount: BalanceAccount?
     @MainActor @Published var comment: String = ""
     
+    @MainActor @Published var currencyRateString: String = "1"
     @MainActor @Published var currencyRateValue: Float = 1
     @MainActor @Published var currencyRateWay: CurrencyRateWay = .divide
     @MainActor var valueToConverted: Float {
