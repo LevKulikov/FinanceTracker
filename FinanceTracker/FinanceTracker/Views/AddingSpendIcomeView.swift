@@ -579,8 +579,13 @@ struct AddingSpendIcomeView: View {
             viewModel.value = floatValue
             calculatedValueString = ""
             
-            if let firstChar = copyString.first, firstChar == "0" {
-                viewModel.valueString.removeFirst()
+            if copyString.count > 1 {
+                let firstTwoChars = copyString.prefix(2)
+                if firstTwoChars == "0." || firstTwoChars == "0," {
+                    return
+                } else if firstTwoChars.first == "0" {
+                    viewModel.valueString.removeFirst()
+                }
             }
         }
     }
