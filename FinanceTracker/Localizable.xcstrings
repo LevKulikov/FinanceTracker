@@ -31,6 +31,9 @@
         }
       }
     },
+    "/" : {
+
+    },
     "#" : {
       "localizations" : {
         "ru" : {
@@ -1829,6 +1832,9 @@
         }
       }
     },
+    "New transfer" : {
+
+    },
     "Next" : {
       "localizations" : {
         "ru" : {
@@ -2924,6 +2930,9 @@
           }
         }
       }
+    },
+    "Transfer" : {
+
     },
     "Transfers" : {
       "localizations" : {
