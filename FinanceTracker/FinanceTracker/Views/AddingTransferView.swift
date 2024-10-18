@@ -9,9 +9,12 @@ import SwiftUI
 
 struct AddingTransferView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: AddingTransferViewModel
     @FocusState private var isValueFromFieldFocused
     @FocusState private var isCurrencyRateFieldFocused
+    @FocusState private var commentTextFieldFocus
+    @State private var saveError: AddingTransferViewModel.SaveTransferTransactionError?
     private var navigationTitle: Text {
         switch viewModel.action {
         case .add:
@@ -20,6 +23,15 @@ struct AddingTransferView: View {
             return Text("Transfer")
         }
     }
+    private var buttonTitleAndIcon: (String, String) {
+        switch viewModel.action {
+        case .add:
+            return (String(localized: "Transfer"), "plus")
+        case .update:
+            return (String(localized: "Update"), "pencil.and.outline")
+        }
+    }
+    
     private var differentCurrencies: Bool {
         guard let fromBalanceAccount = viewModel.fromBalanceAccount else { return false }
         guard let toBalanceAccount = viewModel.toBalanceAccount else { return false }
@@ -39,8 +51,44 @@ struct AddingTransferView: View {
         NavigationStack {
             ScrollView {
                 valueFromField
+                    .padding(.bottom)
+                
+                balanceAccountsSelectionView
+                    .padding(.bottom)
+                
+                dateSectionView
+                    .padding(.bottom)
+                
+                commentSection
+                
+                Rectangle()
+                    .fill(.clear)
+                    .frame(height: 50)
             }
             .navigationTitle(navigationTitle)
+            .background {
+                Rectangle()
+                    .fill(.background)
+                    .ignoresSafeArea()
+            }
+            .overlay(alignment: .bottom) {
+                if !commentTextFieldFocus {
+                    addUpdateButton
+                }
+            }
+            .onTapGesture(perform: dismissKeyboardFocus)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    
+                    Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
+                        .labelsHidden()
+                }
+            }
+            .alert(Text(saveError?.saveErrorLocalizedDescription ?? "Error"),
+                   isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil })) {
+                Button("Ok") {}
+            }
         }
     }
     
@@ -64,8 +112,11 @@ struct AddingTransferView: View {
                     .font(.title2)
                     .foregroundStyle(.secondary)
             }
+            .onTapGesture {
+                isValueFromFieldFocused = true
+            }
             
-            if true {
+            if differentCurrencies {
                 Divider()
                     .padding(.top, 10)
                 
@@ -118,11 +169,152 @@ struct AddingTransferView: View {
         .background {
             RoundedRectangle(cornerRadius: 15.0)
                 .fill(.ultraThinMaterial)
-                .onTapGesture {
-                    isValueFromFieldFocused = true
-                }
         }
         .padding(.horizontal, 10)
+    }
+    
+    private var balanceAccountsSelectionView: some View {
+        HStack {
+            VStack {
+                Text("From")
+                    .bold()
+                
+                Menu(viewModel.fromBalanceAccount?.name ?? String(localized: "Empty")) {
+                    Picker("From Balance Accounts", selection: $viewModel.fromBalanceAccount) {
+                        ForEach(viewModel.balanceAccounts) { balanceAcc in
+                            HStack {
+                                Text(balanceAcc.name)
+                                
+                                if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
+                                    Image(uiImage: uiImage)
+                                } else {
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .tag(Optional(balanceAcc))
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+                .lineLimit(1)
+                .foregroundStyle(.primary)
+                .hoverEffect(.highlight)
+            }
+            
+            Image(systemName: "arrowshape.right")
+                .font(.system(size: 45))
+                .padding(.horizontal)
+                .foregroundStyle(.secondary)
+            
+            VStack {
+                Text("To")
+                    .bold()
+                
+                Menu(viewModel.toBalanceAccount?.name ?? String(localized: "Empty")) {
+                    Picker("To Balance Accounts", selection: $viewModel.toBalanceAccount) {
+                        ForEach(viewModel.balanceAccounts) { balanceAcc in
+                            HStack {
+                                Text(balanceAcc.name)
+                                
+                                if let uiImage = FTAppAssets.iconUIImage(name: balanceAcc.iconName) {
+                                    Image(uiImage: uiImage)
+                                } else {
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .tag(Optional(balanceAcc))
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+                .lineLimit(1)
+                .foregroundStyle(.primary)
+                .hoverEffect(.highlight)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15.0)
+                .fill(.ultraThinMaterial)
+        }
+        .padding(.horizontal, 10)
+    }
+    
+    private var dateSectionView: some View {
+        VStack(alignment: .leading) {
+            Text("Date")
+                .font(.title2)
+                .fontWeight(.medium)
+            
+            HStack {
+                Picker("", selection: $viewModel.date) {
+                    ForEach(viewModel.threeDatesArray, id: \.self) { dateToSet in
+                        Text("\(dateToSet.get(.day)) \(dateToSet.month.prefix(3)).")
+                            .tag(dateToSet)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .scaleEffect(y: 1.1)
+                
+                Spacer()
+                
+                DatePicker("", selection: $viewModel.date, in: viewModel.availableDateRange, displayedComponents: .date)
+                    .labelsHidden()
+            }
+            .onTapGesture(count: 20) {
+                // overrides tap gesture to fix ios 17.1 bug
+            }
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15.0)
+                .fill(.ultraThinMaterial)
+        }
+        .padding(.horizontal, 10)
+    }
+    
+    private var commentSection: some View {
+        VStack(alignment: .leading) {
+            Text("Comment")
+                .font(.title2)
+                .fontWeight(.medium)
+            
+            TextField("Comment", text: $viewModel.comment, prompt: Text("Enter comment"), axis: .vertical)
+                .lineLimit(3...5)
+                .focused($commentTextFieldFocus)
+                .padding(10)
+                .background(.gray.opacity(0.1))
+                .cornerRadius(10)
+        }
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 15.0)
+                .fill(.ultraThinMaterial)
+        }
+        .padding(.horizontal, 10)
+    }
+    
+    private var addUpdateButton: some View {
+        Button {
+            viewModel.saveTransferTransaction { result in
+                switch result {
+                case .success:
+                    dismiss()
+                case .failure(let error):
+                    saveError = error
+                }
+            }
+        } label: {
+            Label(buttonTitleAndIcon.0, systemImage: buttonTitleAndIcon.1)
+                .frame(width: 170, height: 50)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .stroke(.blue)
+                }
+        }
+        .offset(y: -5)
     }
     
     //MARK: - Methods
@@ -198,6 +390,12 @@ struct AddingTransferView: View {
                 viewModel.currencyRateString.removeFirst()
             }
         }
+    }
+    
+    private func dismissKeyboardFocus() {
+        isValueFromFieldFocused = false
+        isCurrencyRateFieldFocused = false
+        commentTextFieldFocus = false
     }
 }
 

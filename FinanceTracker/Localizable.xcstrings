@@ -462,6 +462,12 @@
         }
       }
     },
+    "Balance account to transfer from is not selected" : {
+
+    },
+    "Balance account to transfer to is not selected" : {
+
+    },
     "Balance Accounts" : {
       "localizations" : {
         "ru" : {
@@ -471,6 +477,9 @@
           }
         }
       }
+    },
+    "Balance accounts to transfer from and to cannot be equal" : {
+
     },
     "Bar chart" : {
       "localizations" : {
@@ -841,6 +850,9 @@
           }
         }
       }
+    },
+    "Currency rate cannot be zero, negative or empy" : {
+
     },
     "Current balance" : {
       "localizations" : {
@@ -1332,6 +1344,9 @@
         }
       }
     },
+    "Error" : {
+
+    },
     "Excel (csv) file creation error" : {
       "localizations" : {
         "ru" : {
@@ -1501,6 +1516,9 @@
           }
         }
       }
+    },
+    "From Balance Accounts" : {
+
     },
     "Gifts" : {
       "localizations" : {
@@ -2851,6 +2869,9 @@
         }
       }
     },
+    "To Balance Accounts" : {
+
+    },
     "Total" : {
       "localizations" : {
         "ru" : {
@@ -3014,6 +3035,9 @@
         }
       }
     },
+    "Unknown error occured, please try again" : {
+
+    },
     "Update" : {
       "localizations" : {
         "ru" : {
@@ -3083,6 +3107,9 @@
           }
         }
       }
+    },
+    "Value cannot be zero, negative or empy" : {
+
     },
     "Value of each transaction will be equal to the number entered" : {
       "localizations" : {
