@@ -33,20 +33,53 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         case invalidValue
         case invalidFromBalanceAccount
         case invalidToBalanceAccount
+        case fromAndToBalanceAccountsEqual
         case invalidCurrencyRate
         case saveDataError
         case unknown
+        
+        var saveErrorLocalizedDescription: LocalizedStringResource {
+            switch self {
+            case .invalidValue:
+                return "Value cannot be zero, negative or empy"
+            case .invalidFromBalanceAccount:
+                return "Balance account to transfer from is not selected"
+            case .invalidToBalanceAccount:
+                return "Balance account to transfer to is not selected"
+            case .fromAndToBalanceAccountsEqual:
+                return "Balance accounts to transfer from and to cannot be equal"
+            case .invalidCurrencyRate:
+                return "Currency rate cannot be zero, negative or empy"
+            case .saveDataError:
+                return "Some save error occured"
+            case .unknown:
+                return "Unknown error occured, please try again"
+            }
+        }
     }
     
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
+    private var dateArrayWorkItem: DispatchWorkItem?
     let action: ActionWithTransferTransaction
+    let availableDateRange = FTAppAssets.availableDateRange
     weak var delegate: (any AddingTransferViewModelDelegate)?
     
     //MARK: Published properties
     @MainActor @Published var valueFrom: Float = 0
     @MainActor @Published var valueFromString: String = ""
-    @MainActor @Published var date: Date = .now
+    @MainActor @Published var date: Date = .now {
+        didSet {
+            dateArrayWorkItem?.cancel()
+            dateArrayWorkItem = DispatchWorkItem { [weak self] in
+                Task { @MainActor in
+                    self?.setDateArray()
+                }
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dateArrayWorkItem!)
+        }
+    }
     @MainActor @Published var fromBalanceAccount: BalanceAccount?
     @MainActor @Published var toBalanceAccount: BalanceAccount?
     @MainActor @Published var comment: String = ""
@@ -66,6 +99,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor @Published private(set) var isFetchingBalanceAccounts: Bool = false
     @MainActor @Published private(set) var balanceAccounts: [BalanceAccount] = []
+    @MainActor @Published private(set) var threeDatesArray: [Date] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol, action: ActionWithTransferTransaction) {
@@ -96,6 +130,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     private func initing() {
         Task { @MainActor in
             setActionData()
+            setDateArray()
             await fetchBalanceAccounts()
         }
     }
@@ -160,6 +195,14 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     private func checkValidity() throws {
+        guard valueFrom > 0 else {
+            throw SaveTransferTransactionError.invalidValue
+        }
+        
+        guard currencyRateValue > 0 else {
+            throw SaveTransferTransactionError.invalidCurrencyRate
+        }
+        
         guard fromBalanceAccount != nil else {
             throw SaveTransferTransactionError.invalidFromBalanceAccount
         }
@@ -168,12 +211,8 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
             throw SaveTransferTransactionError.invalidToBalanceAccount
         }
         
-        guard valueFrom > 0 else {
-            throw SaveTransferTransactionError.invalidValue
-        }
-        
-        guard currencyRateValue > 0 else {
-            throw SaveTransferTransactionError.invalidCurrencyRate
+        guard fromBalanceAccount != toBalanceAccount else {
+            throw SaveTransferTransactionError.fromAndToBalanceAccountsEqual
         }
     }
     
@@ -223,6 +262,38 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
                 // currencyRateWay is divide by default
                 currencyRateValue = transaction.valueFrom / transaction.valueTo
             }
+        }
+    }
+    
+    @MainActor
+    private func setDateArray() {
+        let calendar = Calendar.current
+        var array: [Date] = []
+        if calendar.startOfDay(for: date) == calendar.startOfDay(for: .now) {
+            guard let prepreviousDay = calendar.date(byAdding: .day, value: -2, to: date),
+                  let previousDay = calendar.date(byAdding: .day, value: -1, to: date) else {
+                return
+            }
+            
+            array = [prepreviousDay, previousDay, date]
+        } else if calendar.startOfDay(for: date) == calendar.startOfDay(for: availableDateRange.lowerBound) {
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: date),
+                  let nextnextDay = calendar.date(byAdding: .day, value: 2, to: date) else {
+                return
+            }
+            
+            array = [date, nextDay, nextnextDay]
+        } else {
+            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: date),
+                  let nextDay = calendar.date(byAdding: .day, value: 1, to: date) else {
+                return
+            }
+            
+            array = [previousDay, date, nextDay]
+        }
+        
+        withAnimation {
+            threeDatesArray = array
         }
     }
 }
