@@ -10,11 +10,13 @@ import SwiftUI
 struct AddingTransferView: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
+    @Namespace private var namespace
     @StateObject private var viewModel: AddingTransferViewModel
     @FocusState private var isValueFromFieldFocused
     @FocusState private var isCurrencyRateFieldFocused
     @FocusState private var commentTextFieldFocus
     @State private var saveError: AddingTransferViewModel.SaveTransferTransactionError?
+    @State private var rotateSwitchArrow = false
     private var navigationTitle: Text {
         switch viewModel.action {
         case .add:
@@ -125,7 +127,7 @@ struct AddingTransferView: View {
                         .focused($isCurrencyRateFieldFocused)
                         .keyboardType(.decimalPad)
                         .autocorrectionDisabled()
-                        .onChange(of: viewModel.currencyRateString, onChangeOfValueString)
+                        .onChange(of: viewModel.currencyRateString, onChangeOfCurrencyRateString)
                         .font(.title)
                     
                     if let fromBalanceAccount = viewModel.fromBalanceAccount, let toBalanceAccount = viewModel.toBalanceAccount {
@@ -142,9 +144,20 @@ struct AddingTransferView: View {
                             }
                         } label: {
                             HStack(spacing: 0) {
-                                Text(toBalanceAccount.currency)
-                                Text("/")
-                                Text(fromBalanceAccount.currency)
+                                switch viewModel.currencyRateWay {
+                                case .divide:
+                                    Text(toBalanceAccount.currency)
+                                        .matchedGeometryEffect(id: "leftCurrency", in: namespace)
+                                    Text("/")
+                                    Text(fromBalanceAccount.currency)
+                                        .matchedGeometryEffect(id: "rightCurrency", in: namespace)
+                                case .multiply:
+                                    Text(fromBalanceAccount.currency)
+                                        .matchedGeometryEffect(id: "rightCurrency", in: namespace)
+                                    Text("/")
+                                    Text(toBalanceAccount.currency)
+                                        .matchedGeometryEffect(id: "leftCurrency", in: namespace)
+                                }
                             }
                             .font(.title3)
                         }
@@ -156,6 +169,7 @@ struct AddingTransferView: View {
                 HStack {
                     Text("= " + convertedValueString)
                         .font(.title)
+                        .lineLimit(1)
                     
                     Text(viewModel.toBalanceAccount?.currency ?? "")
                         .font(.title2)
@@ -200,11 +214,19 @@ struct AddingTransferView: View {
                 .foregroundStyle(.primary)
                 .hoverEffect(.highlight)
             }
+            .frame(width: 110)
             
             Image(systemName: "arrowshape.right")
                 .font(.system(size: 45))
                 .padding(.horizontal)
                 .foregroundStyle(.secondary)
+                .rotationEffect(.degrees(rotateSwitchArrow ? 360 : 0))
+                .onTapGesture {
+                    withAnimation {
+                        rotateSwitchArrow.toggle()
+                        viewModel.switchBalanceAccounts()
+                    }
+                }
             
             VStack {
                 Text("To")
@@ -231,6 +253,7 @@ struct AddingTransferView: View {
                 .foregroundStyle(.primary)
                 .hoverEffect(.highlight)
             }
+            .frame(width: 110)
         }
         .frame(maxWidth: .infinity)
         .padding()

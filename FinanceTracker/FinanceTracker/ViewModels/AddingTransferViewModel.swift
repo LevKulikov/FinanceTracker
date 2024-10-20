@@ -80,8 +80,20 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dateArrayWorkItem!)
         }
     }
-    @MainActor @Published var fromBalanceAccount: BalanceAccount?
-    @MainActor @Published var toBalanceAccount: BalanceAccount?
+    @MainActor @Published var fromBalanceAccount: BalanceAccount? {
+        didSet {
+            if let fromBalanceAccount, fromBalanceAccount.id != oldValue?.id, fromBalanceAccount.id == toBalanceAccount?.id {
+                toBalanceAccount = nil
+            }
+        }
+    }
+    @MainActor @Published var toBalanceAccount: BalanceAccount? {
+        didSet {
+            if let toBalanceAccount, toBalanceAccount.id != oldValue?.id, toBalanceAccount.id == fromBalanceAccount?.id {
+                fromBalanceAccount = nil
+            }
+        }
+    }
     @MainActor @Published var comment: String = ""
     
     @MainActor @Published var currencyRateString: String = "1"
@@ -110,11 +122,13 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Methods
     func saveTransferTransaction(resultHandler: @escaping @MainActor (Result<Void, SaveTransferTransactionError>) -> Void) {
-        let localErrorHandler: @MainActor (SaveTransferTransactionError) -> Void = { error in
-            resultHandler(.failure(error))
-        }
-        
         Task { @MainActor in
+            var errorHappend: Bool = false
+            let localErrorHandler: (SaveTransferTransactionError) -> Void = { error in
+                errorHappend = true
+                resultHandler(.failure(error))
+            }
+            
             switch action {
             case .add:
                 addTransferTransaction(errorHandler: localErrorHandler)
@@ -122,8 +136,16 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
                 updateTransferTransaction(errorHandler: localErrorHandler)
             }
             
+            guard !errorHappend else { return }
             resultHandler(.success(()))
         }
+    }
+    
+    @MainActor
+    func switchBalanceAccounts() {
+        let bufferFrom = fromBalanceAccount
+        fromBalanceAccount = toBalanceAccount
+        toBalanceAccount = bufferFrom
     }
     
     //MARK: Private methods
