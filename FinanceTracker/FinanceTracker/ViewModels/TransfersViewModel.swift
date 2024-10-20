@@ -9,8 +9,13 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+protocol TransfersViewModelDelegate: AnyObject {
+    
+}
+
 final class TransfersViewModel: @unchecked Sendable, ObservableObject {
     //MARK: - Properties
+    weak var delegate: (any TransfersViewModelDelegate)?
     private let dataManager: any DataManagerProtocol
     /// The maximum number of transfers to be fetched per one fetch request
     private let maxFetchTransfersCount = 50
