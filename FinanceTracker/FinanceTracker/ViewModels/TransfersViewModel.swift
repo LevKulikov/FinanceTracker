@@ -56,11 +56,12 @@ final class TransfersViewModel: @unchecked Sendable, ObservableObject {
         do {
             let result = try await dataManager.fetch(descriptor)
             await MainActor.run {
-                if !result.isEmpty {
-                    transfers.append(contentsOf: result)
-                    currentFetchOffset += maxFetchTransfersCount
-                } else {
+                transfers.append(contentsOf: result)
+                
+                if result.count < maxFetchTransfersCount {
                     allTransfersAreFetched = true
+                } else {
+                    currentFetchOffset += maxFetchTransfersCount
                 }
                 
                 isLoading = false
