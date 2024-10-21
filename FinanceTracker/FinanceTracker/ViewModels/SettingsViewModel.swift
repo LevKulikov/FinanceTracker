@@ -63,6 +63,11 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Methods
     @MainActor
+    func getTestTransfersView() -> some View {
+        return FTFactory.shared.createTransfersView(dataManager: dataManager, delegate: nil)
+    }
+    
+    @MainActor
     func getBalanceAccountsView() -> some View {
         return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
     }
