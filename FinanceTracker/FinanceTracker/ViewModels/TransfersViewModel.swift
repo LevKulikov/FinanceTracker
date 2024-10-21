@@ -48,6 +48,11 @@ final class TransfersViewModel: @unchecked Sendable, ObservableObject {
         }
     }
     
+    @MainActor
+    func getAddingTransferView(for action: ActionWithTransferTransaction) -> some View {
+        FTFactory.shared.createAddingTransferView(dataManager: dataManager, action: action, delegate: self)
+    }
+    
     //MARK: Private methods
     private func fetchTransfers(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
         guard await !allTransfersAreFetched, await !isLoading else { return }
@@ -125,9 +130,6 @@ extension TransfersViewModel: AddingTransferViewModelDelegate {
     
     func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
         delegate?.didUpdateTransferTransaction(transfer)
-        Task {
-            await refetchTransfers()
-        }
     }
     
     func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
