@@ -26,6 +26,7 @@
 		733397CC2C4EF3CD00BAE878 /* UIApplication+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */; };
 		73356E462C3881C300CC0D90 /* BackgroundDataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */; };
 		73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */; };
+		7347E3DC2CC6B7FF004EB3AD /* TransferRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7347E3DB2CC6B7FF004EB3AD /* TransferRow.swift */; };
 		735FF6592C1713FA0041CBAC /* AddingBalanceAccauntView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */; };
 		735FF65B2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */; };
 		73633E522C55696800E3B9CF /* TabsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73633E512C55696800E3B9CF /* TabsSettingsViewModel.swift */; };
@@ -137,6 +138,7 @@
 		733397CB2C4EF3CD00BAE878 /* UIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extension.swift"; sourceTree = "<group>"; };
 		73356E452C3881C300CC0D90 /* BackgroundDataActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDataActor.swift; sourceTree = "<group>"; };
 		73356E472C3E9CF400CC0D90 /* TagsLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsLineChart.swift; sourceTree = "<group>"; };
+		7347E3DB2CC6B7FF004EB3AD /* TransferRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferRow.swift; sourceTree = "<group>"; };
 		735FF6582C1713FA0041CBAC /* AddingBalanceAccauntView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccauntView.swift; sourceTree = "<group>"; };
 		735FF65A2C1714F70041CBAC /* AddingBalanceAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingBalanceAccountViewModel.swift; sourceTree = "<group>"; };
 		73633E512C55696800E3B9CF /* TabsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 				73EF650D2C5A883300E50221 /* CurrencyWidePickerView.swift */,
 				73DFF0B02C6547D800BFDBAF /* ActivityView.swift */,
 				73EC8DE22C73B3B000DC5899 /* ToastPopsViews.swift */,
+				7347E3DB2CC6B7FF004EB3AD /* TransferRow.swift */,
 			);
 			path = SupportingViews;
 			sourceTree = "<group>";
@@ -570,6 +573,7 @@
 				73B9BECD2CAC7C6B00D9E72D /* TransfersViewModel.swift in Sources */,
 				7305BACA2C1A4C1900F712BC /* StatisticsView.swift in Sources */,
 				73EC38662C18CEF2004A7BA9 /* CustomTabViewModel.swift in Sources */,
+				7347E3DC2CC6B7FF004EB3AD /* TransferRow.swift in Sources */,
 				73D000DE2C31DC4700AACFCE /* WelcomeViewModel.swift in Sources */,
 				73F629262C0201CC00E9FEB9 /* DataManager.swift in Sources */,
 				73F628FB2C01057000E9FEB9 /* DataModels.swift in Sources */,
