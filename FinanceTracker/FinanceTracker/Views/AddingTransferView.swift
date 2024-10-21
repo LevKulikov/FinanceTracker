@@ -28,7 +28,7 @@ struct AddingTransferView: View {
     private var buttonTitleAndIcon: (String, String) {
         switch viewModel.action {
         case .add:
-            return (String(localized: "Transfer"), "plus")
+            return (String(localized: "Transfer"), "arrow.right.arrow.left")
         case .update:
             return (String(localized: "Update"), "pencil.and.outline")
         }
