@@ -35,6 +35,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         case invalidToBalanceAccount
         case fromAndToBalanceAccountsEqual
         case invalidCurrencyRate
+        case actionIsNotUpdate
         case saveDataError
         case unknown
         
@@ -50,6 +51,8 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
                 return "Balance accounts to transfer from and to cannot be equal"
             case .invalidCurrencyRate:
                 return "Currency rate cannot be zero, negative or empy"
+            case .actionIsNotUpdate:
+                return "Selected action is not data update"
             case .saveDataError:
                 return "Some save error occured"
             case .unknown:
@@ -100,6 +103,10 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published var currencyRateValue: Float = 1
     @MainActor @Published var currencyRateWay: CurrencyRateWay = .divide
     @MainActor var valueToConverted: Float {
+        if fromBalanceAccount?.currency == toBalanceAccount?.currency {
+            return valueFrom
+        }
+        
         switch currencyRateWay {
         case .divide:
             guard currencyRateValue != 0 else { return 0 }
@@ -141,17 +148,18 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    @MainActor
     func deleteTransfer(result: (@MainActor @Sendable (Result<Void, Error>) -> Void)? = nil) {
         if case .update(let transfer) = action {
-            Task { @MainActor in
-                do {
-                    try dataManager.deleteTransferTransaction(transfer)
-                    delegate?.didDeleteTransferTransaction(transfer)
-                    result?(.success(()))
-                } catch {
-                    result?(.failure(error))
-                }
+            do {
+                try dataManager.deleteTransferTransaction(transfer)
+                delegate?.didDeleteTransferTransaction(transfer)
+                result?(.success(()))
+            } catch {
+                result?(.failure(error))
             }
+        } else {
+            result?(.failure(SaveTransferTransactionError.actionIsNotUpdate))
         }
     }
     
@@ -174,7 +182,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     private func updateTransferTransaction(errorHandler: (SaveTransferTransactionError) -> Void) {
         guard case .update(let transferTransaction) = action else {
-            print("AddingTransferViewModel, updateTransferTransaction: Action is not update")
+            errorHandler(.actionIsNotUpdate)
             return
         }
         
@@ -235,7 +243,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
             throw SaveTransferTransactionError.invalidValue
         }
         
-        guard currencyRateValue > 0 else {
+        if fromBalanceAccount?.currency != toBalanceAccount?.currency, currencyRateValue <= 0 {
             throw SaveTransferTransactionError.invalidCurrencyRate
         }
         
