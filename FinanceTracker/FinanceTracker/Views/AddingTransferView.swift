@@ -92,9 +92,11 @@ struct AddingTransferView: View {
                         .labelsHidden()
                 }
                 
-                ToolbarItem {
-                    Button("Delete", systemImage: "trash") {
-                        deleteTransferAlert = true
+                if case .update = viewModel.action {
+                    ToolbarItem {
+                        Button("Delete", systemImage: "trash") {
+                            deleteTransferAlert = true
+                        }
                     }
                 }
             }
@@ -177,7 +179,6 @@ struct AddingTransferView: View {
             
             if differentCurrencies {
                 Divider()
-                    .padding(.top, 10)
                 
                 HStack {
                     TextField("0", text: $viewModel.currencyRateString)
@@ -250,8 +251,8 @@ struct AddingTransferView: View {
                 Text("From")
                     .bold()
                 
-                Menu(viewModel.fromBalanceAccount?.name ?? String(localized: "Empty")) {
-                    Picker("From Balance Accounts", selection: $viewModel.fromBalanceAccount) {
+                Menu(viewModel.fromBalanceAccount?.name ?? String(localized: "Select")) {
+                    Picker("From Balance Accounts", selection: $viewModel.fromBalanceAccount.animation()) {
                         ForEach(viewModel.balanceAccounts) { balanceAcc in
                             HStack {
                                 Text(balanceAcc.name)
@@ -273,7 +274,7 @@ struct AddingTransferView: View {
             }
             .frame(width: 110)
             
-            Image(systemName: "arrowshape.right")
+            Image(systemName: "arrow.right")
                 .font(.system(size: 45))
                 .padding(.horizontal)
                 .foregroundStyle(.secondary)
@@ -289,8 +290,8 @@ struct AddingTransferView: View {
                 Text("To")
                     .bold()
                 
-                Menu(viewModel.toBalanceAccount?.name ?? String(localized: "Empty")) {
-                    Picker("To Balance Accounts", selection: $viewModel.toBalanceAccount) {
+                Menu(viewModel.toBalanceAccount?.name ?? String(localized: "Select")) {
+                    Picker("To Balance Accounts", selection: $viewModel.toBalanceAccount.animation()) {
                         ForEach(viewModel.balanceAccounts) { balanceAcc in
                             HStack {
                                 Text(balanceAcc.name)
