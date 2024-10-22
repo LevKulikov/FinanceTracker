@@ -126,7 +126,9 @@ struct TransfersView: View {
             selectedAction = .add(template: nil)
         } label: {
             Label("Make transfer", systemImage: "plus")
-                .frame(width: 170, height: 50)
+                .frame(height: 50)
+                .frame(minWidth: 170)
+                .padding(.horizontal, 16)
                 .background {
                     Capsule()
                         .fill(.ultraThinMaterial)
