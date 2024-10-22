@@ -9,27 +9,34 @@ import SwiftUI
 
 struct TransferRow: View {
     let transfer: TransferTransaction
+    let showDate: Bool
     @State private var currencyFrom: Currency?
     @State private var currencyTo: Currency?
     private var differentCurrecny: Bool {
         transfer.fromBalanceAccount?.currency != transfer.toBalanceAccount?.currency
     }
     
+    init(transfer: TransferTransaction, showDate: Bool = true) {
+        self.transfer = transfer
+        self.showDate = showDate
+    }
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
+        VStack(alignment: .leading) {
+            if showDate {
                 Text(transfer.date.formatted(date: .numeric, time: .omitted))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                
-                balanceAccountView
             }
             
-            Spacer()
-            
-            valueView
-                .layoutPriority(1)
+            HStack {
+                balanceAccountView
+                
+                Spacer()
+                
+                valueView
+                    .layoutPriority(1)
+            }
         }
         .contentShape(Rectangle())
         .task {
@@ -75,22 +82,32 @@ struct TransferRow: View {
     }
     
     private var balanceAccountView: some View {
-        HStack(spacing: 2) {
-            getImage(name: transfer.fromBalanceAccount?.iconName)
-                .foregroundStyle(transfer.fromBalanceAccount?.color ?? .primary)
-            
-            Text(transfer.fromBalanceAccount?.name ?? "Err")
-            
-            Image(systemName: "arrow.right")
+        HStack(spacing: 0) {
+            Image(systemName: "arrow.uturn.up")
                 .foregroundStyle(.secondary)
+                .rotationEffect(.degrees(90))
+                .font(.title3)
+                .offset(y: 4)
+                
             
-            getImage(name: transfer.toBalanceAccount?.iconName)
-                .foregroundStyle(transfer.toBalanceAccount?.color ?? .secondary)
-            
-            Text(transfer.toBalanceAccount?.name ?? "Err")
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 2) {
+                    getImage(name: transfer.fromBalanceAccount?.iconName)
+                        .foregroundStyle(transfer.fromBalanceAccount?.color ?? .primary)
+                    
+                    Text(transfer.fromBalanceAccount?.name ?? "Err")
+                }
+                
+                HStack(spacing: 2) {
+                    getImage(name: transfer.toBalanceAccount?.iconName)
+                        .foregroundStyle(transfer.toBalanceAccount?.color ?? .secondary)
+                    
+                    Text(transfer.toBalanceAccount?.name ?? "Err")
+                }
+            }
+            .font(.footnote)
+            .lineLimit(2)
         }
-        .font(.footnote)
-        .lineLimit(1)
     }
     
     @ViewBuilder
