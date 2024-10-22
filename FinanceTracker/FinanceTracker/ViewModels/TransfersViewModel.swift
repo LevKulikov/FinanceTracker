@@ -48,6 +48,20 @@ final class TransfersViewModel: @unchecked Sendable, ObservableObject {
         }
     }
     
+    func deleteTransfer(_ transfer: TransferTransaction, errorHandler: (@MainActor @Sendable (Error) -> Void)? = nil) {
+        Task { @MainActor in
+            do {
+                try dataManager.deleteTransferTransaction(transfer)
+                delegate?.didDeleteTransferTransaction(transfer)
+                withAnimation {
+                    transfers.removeAll { $0.id == transfer.id }
+                }
+            } catch {
+                errorHandler?(error)
+            }
+        }
+    }
+    
     @MainActor
     func getAddingTransferView(for action: ActionWithTransferTransaction) -> some View {
         FTFactory.shared.createAddingTransferView(dataManager: dataManager, action: action, delegate: self)
@@ -130,12 +144,17 @@ extension TransfersViewModel: AddingTransferViewModelDelegate {
     
     func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
         delegate?.didUpdateTransferTransaction(transfer)
+        Task { @MainActor in
+            transfers.sort { $0.date > $1.date }
+        }
     }
     
     func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
         delegate?.didDeleteTransferTransaction(transfer)
-        Task {
-            await refetchTransfers()
+        Task { @MainActor in
+            withAnimation {
+                transfers.removeAll { $0.id == transfer.id }
+            }
         }
     }
 }

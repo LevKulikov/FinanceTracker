@@ -12,6 +12,11 @@ struct TransfersView: View {
     @StateObject private var viewModel: TransfersViewModel
     @State private var navigationPath = NavigationPath()
     @State private var selectedAction: ActionWithTransferTransaction?
+    @State private var transferToDelete: TransferTransaction?
+    @State private var deleteError = false
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: TransfersViewModel) {
@@ -32,6 +37,20 @@ struct TransfersView: View {
                     TransferRow(transfer: transfer)
                         .onTapGesture {
                             selectedAction = .update(transfer)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                transferToDelete = transfer
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                transferToDelete = transfer
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
                 }
                 
@@ -61,6 +80,42 @@ struct TransfersView: View {
             }
             .navigationDestination(item: $selectedAction) { action in
                 viewModel.getAddingTransferView(for: action)
+            }
+            .confirmationDialog(
+                "Delete transfer?",
+                isPresented:
+                        .init(get: { isIpad ? false : transferToDelete != nil }, set: { _ in transferToDelete = nil}),
+                titleVisibility: .visible,
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transferToDelete {
+                            viewModel.deleteTransfer(transferToDelete) { _ in deleteError = true }
+                        }
+                    }
+                    
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .alert(
+                "Delete transfer?",
+                isPresented:
+                        .init(get: { isIpad ? transferToDelete != nil : false }, set: { _ in transferToDelete = nil}),
+                actions: {
+                    Button("Delete", role: .destructive) {
+                        if let transferToDelete {
+                            viewModel.deleteTransfer(transferToDelete) { _ in deleteError = true }
+                        }
+                    }
+                    
+                    Button("Cancel", role: .cancel) {}
+                }, message: {
+                    Text("This action is irretable")
+                })
+            .alert("Deletion failed", isPresented: $deleteError) {
+                Button("Ok") {}
+            } message: {
+                Text("Please, try again")
             }
         }
     }
