@@ -27,7 +27,7 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func deleteTransactionFromBackground(_ transaction: Transaction) async throws
     
     @MainActor
-    func deleteTransferTransaction(_ transferTransaction: TransferTransaction)
+    func deleteTransferTransaction(_ transferTransaction: TransferTransaction) throws
     
     func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws
     
@@ -218,6 +218,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func deleteTransferTransaction(_ transferTransaction: TransferTransaction) {
         container.mainContext.delete(transferTransaction)
+        // Because of iOS 18 Beta bug of SwiftData, it is needed to delete transfer from both main and background contexts
+        if #available(iOS 18.0, *) {
+            Task {
+                do {
+                    try await deleteTransferById(transferTransaction)
+                } catch {
+                    print(error)
+                }
+            }
+        }
     }
     
     func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws {
@@ -635,6 +645,17 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         } else {
             backgroundActor = BackgroundDataActor(modelContainer: container)
             try await backgroundActor!.deleteTransactionById(transaction)
+            try await backgroundActor!.save()
+        }
+    }
+    
+    private func deleteTransferById(_ transfer: TransferTransaction) async throws {
+        if let backgroundActor {
+            try await backgroundActor.deleteTransferById(transfer)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            try await backgroundActor!.deleteTransferById(transfer)
             try await backgroundActor!.save()
         }
     }

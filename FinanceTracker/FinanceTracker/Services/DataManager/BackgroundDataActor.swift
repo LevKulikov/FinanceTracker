@@ -35,4 +35,12 @@ actor BackgroundDataActor {
         guard let backTr = arr.first else { return }
         delete(backTr)
     }
+    
+    func deleteTransferById(_ transfer: TransferTransaction) throws {
+        let trId = transfer.id
+        let descr = FetchDescriptor<TransferTransaction>(predicate: #Predicate<TransferTransaction> { $0.id == trId })
+        let arr = try fetch(descr)
+        guard let backTr = arr.first else { return }
+        delete(backTr)
+    }
 }
