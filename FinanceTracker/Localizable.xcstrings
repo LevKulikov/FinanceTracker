@@ -1169,6 +1169,9 @@
         }
       }
     },
+    "Delete transfer?" : {
+
+    },
     "Delete with transactions" : {
       "localizations" : {
         "ru" : {
@@ -1178,6 +1181,9 @@
           }
         }
       }
+    },
+    "Deletion failed" : {
+
     },
     "Developer" : {
       "localizations" : {
@@ -2231,6 +2237,9 @@
           }
         }
       }
+    },
+    "Please, try again" : {
+
     },
     "Popular currencies" : {
       "localizations" : {

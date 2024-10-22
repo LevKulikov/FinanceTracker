@@ -141,6 +141,20 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    func deleteTransfer(result: (@MainActor @Sendable (Result<Void, Error>) -> Void)? = nil) {
+        if case .update(let transfer) = action {
+            Task { @MainActor in
+                do {
+                    try dataManager.deleteTransferTransaction(transfer)
+                    delegate?.didDeleteTransferTransaction(transfer)
+                    result?(.success(()))
+                } catch {
+                    result?(.failure(error))
+                }
+            }
+        }
+    }
+    
     @MainActor
     func switchBalanceAccounts() {
         let bufferFrom = fromBalanceAccount
@@ -283,6 +297,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
             if fromBalanceAccount?.currency != toBalanceAccount?.currency {
                 // currencyRateWay is divide by default
                 currencyRateValue = transaction.valueFrom / transaction.valueTo
+                currencyRateString = String(currencyRateValue)
             }
         }
     }

@@ -17,6 +17,8 @@ struct AddingTransferView: View {
     @FocusState private var commentTextFieldFocus
     @State private var saveError: AddingTransferViewModel.SaveTransferTransactionError?
     @State private var rotateSwitchArrow = false
+    @State private var deleteTransferAlert = false
+    @State private var deleteError = false
     private var navigationTitle: Text {
         switch viewModel.action {
         case .add:
@@ -32,6 +34,9 @@ struct AddingTransferView: View {
         case .update:
             return (String(localized: "Update"), "pencil.and.outline")
         }
+    }
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
     }
     
     private var differentCurrencies: Bool {
@@ -86,7 +91,59 @@ struct AddingTransferView: View {
                     Button("", systemImage: "keyboard.chevron.compact.down.fill", action: dismissKeyboardFocus)
                         .labelsHidden()
                 }
+                
+                ToolbarItem {
+                    Button("Delete", systemImage: "trash") {
+                        deleteTransferAlert = true
+                    }
+                }
             }
+            .alert("Deletion failed", isPresented: $deleteError) {
+                Button("Ok") {}
+            } message: {
+                Text("Please, try again")
+            }
+            .confirmationDialog(
+             "Delete transfer?",
+             isPresented:
+                     .init(get: { isIpad ? false : deleteTransferAlert }, set: { _ in deleteTransferAlert = false }),
+             titleVisibility: .visible,
+             actions: {
+                 Button("Delete", role: .destructive) {
+                     viewModel.deleteTransfer { result in
+                         switch result {
+                         case .success:
+                             dismiss()
+                         case .failure:
+                             deleteError = true
+                         }
+                     }
+                 }
+                 
+                 Button("Cancel", role: .cancel) {}
+             }, message: {
+                 Text("This action is irretable")
+             })
+            .alert(
+             "Delete transfer?",
+             isPresented:
+                     .init(get: { isIpad ? deleteTransferAlert : false }, set: { _ in deleteTransferAlert = false }),
+             actions: {
+                 Button("Delete", role: .destructive) {
+                     viewModel.deleteTransfer { result in
+                         switch result {
+                         case .success:
+                             dismiss()
+                         case .failure:
+                             deleteError = true
+                         }
+                     }
+                 }
+                 
+                 Button("Cancel", role: .cancel) {}
+             }, message: {
+                 Text("This action is irretable")
+             })
             .alert(Text(saveError?.saveErrorLocalizedDescription ?? "Error"),
                    isPresented: .init(get: { saveError != nil }, set: { _ in saveError = nil })) {
                 Button("Ok") {}
