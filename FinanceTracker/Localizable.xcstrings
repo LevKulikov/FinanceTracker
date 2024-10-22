@@ -1170,7 +1170,14 @@
       }
     },
     "Delete transfer?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить перевод?"
+          }
+        }
+      }
     },
     "Delete with transactions" : {
       "localizations" : {
@@ -1183,7 +1190,14 @@
       }
     },
     "Deletion failed" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось удалить"
+          }
+        }
+      }
     },
     "Developer" : {
       "localizations" : {
@@ -1846,7 +1860,14 @@
       }
     },
     "Make transfer" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать перевод"
+          }
+        }
+      }
     },
     "More" : {
       "localizations" : {
@@ -2239,7 +2260,14 @@
       }
     },
     "Please, try again" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
     },
     "Popular currencies" : {
       "localizations" : {
@@ -2503,6 +2531,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбранный (%1$@) и Дефолтный (%2$@) счета имеют разные валюты. Валюта будет изменена для перемещенных транзакций на %3$@. Продолжить?"
+          }
+        }
+      }
+    },
+    "Selected action is not data update" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранное действие не является обновлением данных"
           }
         }
       }
