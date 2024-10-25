@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TransfersView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: TransfersViewModel
     @State private var navigationPath = NavigationPath()
     @State private var selectedAction: ActionWithTransferTransaction?
@@ -77,6 +78,11 @@ struct TransfersView: View {
             .navigationTitle("Transfers")
             .overlay(alignment: .bottom) {
                 addButton
+            }
+            .toolbar {
+                Button("Done") {
+                    dismiss()
+                }
             }
             .navigationDestination(item: $selectedAction) { action in
                 viewModel.getAddingTransferView(for: action)
