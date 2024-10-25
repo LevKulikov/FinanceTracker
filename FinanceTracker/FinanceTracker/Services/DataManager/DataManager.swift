@@ -481,13 +481,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             .compactMap { FTDataContainer.TransactionContainer(transaction: $0) }
         async let allBudgets = nonNilBackgroundActor.fetch(FetchDescriptor<Budget>())
             .compactMap { FTDataContainer.BudgetContainer(budget: $0) }
+        async let allTransfers = nonNilBackgroundActor.fetch(FetchDescriptor<TransferTransaction>())
+            .compactMap { FTDataContainer.TransferContainer(transfer: $0) }
          
         let dataContainer = FTDataContainer(
             balanceAccounts: try await allBalanceAccounts,
             categories: try await allCategories,
             tags: try await allTags,
             transactionContainers: try await allTransactions,
-            budgetContainers: try await allBudgets
+            budgetContainers: try await allBudgets,
+            transferContainers: try await allTransfers
         )
         
         return dataContainer
@@ -557,6 +560,17 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             // otherwise (if we set those objects dirctly to imported budget) we get SwiftData error (like EXC_BAD_ACCESS and etc)
             let newBudget = Budget(name: budget.name, value: budget.value, period: budget.period, category: category, balanceAccount: balanceAccount)
             insert(newBudget)
+        }
+        
+        for transferContainer in dataContainer.transferContainers {
+            let transfer = transferContainer.transfer
+            guard let balanceAccountFrom = savedBAs?.first(where: { $0.id == transferContainer.fromBalanceAccountID }),
+                  let balanceAccountTo = savedBAs?.first(where: { $0.id == transferContainer.toBalanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance accounts for transfer")
+                continue
+            }
+            let newTransfer = TransferTransaction(valueFrom: transfer.valueFrom, valueTo: transfer.valueTo, date: transfer.date, comment: transfer.comment, fromBalanceAccount: balanceAccountFrom, toBalanceAccount: balanceAccountTo)
+            insert(newTransfer)
         }
         
         do {

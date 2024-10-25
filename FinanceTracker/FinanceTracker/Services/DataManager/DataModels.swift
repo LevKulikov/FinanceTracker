@@ -51,6 +51,21 @@ struct FTDataContainer: Codable, Identifiable {
         }
     }
     
+    struct TransferContainer: Codable, Identifiable {
+        var id = UUID().uuidString
+        let transfer: TransferTransaction
+        let fromBalanceAccountID: String
+        let toBalanceAccountID: String
+        
+        init?(transfer: TransferTransaction) {
+            self.transfer = transfer
+            guard let baID = transfer.fromBalanceAccount?.id else { return nil }
+            self.fromBalanceAccountID = baID
+            guard let toBaID = transfer.toBalanceAccount?.id else { return nil }
+            self.toBalanceAccountID = toBaID
+        }
+    }
+    
     struct BudgetContainer: Codable, Identifiable {
         var id = UUID().uuidString
         let budget: Budget
@@ -72,13 +87,15 @@ struct FTDataContainer: Codable, Identifiable {
     let tags: [Tag]
     let transactionContainers: [TransactionContainer]
     let budgetContainers: [BudgetContainer]
+    let transferContainers: [TransferContainer]
     
-    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgetContainers: [BudgetContainer]) {
+    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgetContainers: [BudgetContainer], transferContainers: [TransferContainer]) {
         self.balanceAccounts = balanceAccounts
         self.categories = categories
         self.tags = tags
         self.transactionContainers = transactionContainers
         self.budgetContainers = budgetContainers
+        self.transferContainers = transferContainers
     }
     
     enum Field: LocalizedStringResource, Codable, CaseIterable, Identifiable {
@@ -87,6 +104,7 @@ struct FTDataContainer: Codable, Identifiable {
         case categories = "Categories"
         case tags = "Tags"
         case budgets = "Budgets"
+        case transfers = "Transfers"
         
         var id: Self {
             return self
