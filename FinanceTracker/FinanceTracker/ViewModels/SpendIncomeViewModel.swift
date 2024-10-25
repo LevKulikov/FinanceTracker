@@ -325,6 +325,8 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
             break
         case .notifications:
             break
+        case .transfers:
+            break
         }
     }
 }

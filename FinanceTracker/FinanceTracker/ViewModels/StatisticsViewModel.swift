@@ -846,6 +846,8 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             isTransactionUpdatedFromAnotherView = true
         case .tags:
             isTransactionUpdatedFromAnotherView = true
+        case .transfers:
+            isTransactionUpdatedFromAnotherView = true
         case .transactions:
             isTransactionUpdatedFromAnotherView = true
             Task { @MainActor in

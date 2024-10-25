@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol BalanceAccountsViewModelDelegate: AnyObject, Sendable {
+protocol BalanceAccountsViewModelDelegate: AnyObject, Sendable, TransfersViewModelDelegate {
     func didUpdatedBalanceAccountsList()
     func didDeleteBalanceAccount()
 }
@@ -103,16 +103,17 @@ extension BalanceAccountsViewModel: AddingBalanceAccountViewModelDelegate {
     }
 }
 
+//MARK: Extension for TransfersViewModelDelegate
 extension BalanceAccountsViewModel: TransfersViewModelDelegate {
     func didAddTransferTransaction(_ transfer: TransferTransaction) {
-        
+        delegate?.didAddTransferTransaction(transfer)
     }
     
     func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
-        
+        delegate?.didUpdateTransferTransaction(transfer)
     }
     
     func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
-        
+        delegate?.didDeleteTransferTransaction(transfer)
     }
 }

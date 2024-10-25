@@ -73,6 +73,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
+            case .transfers:
+                viewModel.getTransfersView()
             case .budgets: // .budgets is used to identify additional tab to show
                 viewModel.getAdditionalTabView()
             case .notifications:
@@ -170,17 +172,8 @@ struct SettingsView: View {
             Link(destination: URL(string: viewModel.codeSource)!) {
                 Label("Code source", systemImage: "chevron.left.forwardslash.chevron.right")
             }
-            
-            Button("Transfers") {
-                openTestTransfers.toggle()
-            }
-            .sheet(isPresented: $openTestTransfers) {
-                viewModel.getTestTransfersView()
-            }
         }
     }
-    
-    @State private var openTestTransfers = false
     
     private var bottomAppVersionView: some View {
         Text("__Finance Tracker__\nVersion: \(FTAppAssets.appVersion ?? "👍")")

@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 protocol TransfersViewModelDelegate: AnyObject {
-    func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
+    func didAddTransferTransaction(_ transfer: TransferTransaction)
     func didUpdateTransferTransaction(_ transfer: TransferTransaction)
     func didDeleteTransferTransaction(_ transfer: TransferTransaction)
 }
