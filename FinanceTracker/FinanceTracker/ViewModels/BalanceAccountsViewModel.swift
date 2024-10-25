@@ -69,6 +69,11 @@ final class BalanceAccountsViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
     }
     
+    @MainActor
+    func getTransfersView() -> some View {
+        return FTFactory.shared.createTransfersView(dataManager: dataManager, delegate: self)
+    }
+    
     //MARK: Private methods
     @MainActor
     private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
@@ -95,5 +100,19 @@ extension BalanceAccountsViewModel: AddingBalanceAccountViewModelDelegate {
     func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
         fetchData()
         delegate?.didUpdatedBalanceAccountsList()
+    }
+}
+
+extension BalanceAccountsViewModel: TransfersViewModelDelegate {
+    func didAddTransferTransaction(_ transfer: TransferTransaction) {
+        
+    }
+    
+    func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
+        
+    }
+    
+    func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
+        
     }
 }
