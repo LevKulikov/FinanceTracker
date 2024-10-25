@@ -2059,6 +2059,16 @@
         }
       }
     },
+    "No transfers imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных переводов"
+          }
+        }
+      }
+    },
     "No, cancel" : {
       "localizations" : {
         "ru" : {
