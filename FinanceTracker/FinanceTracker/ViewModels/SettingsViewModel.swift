@@ -21,6 +21,7 @@ enum SettingsSectionAndDataType {
     case balanceAccounts
     case tags
     case transactions
+    case transfers
     case appearance
     case data
     case budgets
@@ -62,6 +63,11 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Methods
+    @MainActor
+    func getTransfersView() -> some View {
+        return FTFactory.shared.createTransfersView(dataManager: dataManager, delegate: self)
+    }
+    
     @MainActor
     func getBalanceAccountsView() -> some View {
         return FTFactory.shared.createBalanceAccountsView(dataManager: dataManager, delegate: self)
@@ -136,6 +142,18 @@ extension SettingsViewModel: BalanceAccountsViewModelDelegate {
     
     func didDeleteBalanceAccount() {
         delegate?.didUpdateSettingsSection(.data)
+    }
+    
+    func didAddTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didUpdateSettingsSection(.transfers)
+    }
+    
+    func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didUpdateSettingsSection(.transfers)
+    }
+    
+    func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didUpdateSettingsSection(.transfers)
     }
 }
 

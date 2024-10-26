@@ -51,6 +51,21 @@ struct FTDataContainer: Codable, Identifiable {
         }
     }
     
+    struct TransferContainer: Codable, Identifiable {
+        var id = UUID().uuidString
+        let transfer: TransferTransaction
+        let fromBalanceAccountID: String
+        let toBalanceAccountID: String
+        
+        init?(transfer: TransferTransaction) {
+            self.transfer = transfer
+            guard let baID = transfer.fromBalanceAccount?.id else { return nil }
+            self.fromBalanceAccountID = baID
+            guard let toBaID = transfer.toBalanceAccount?.id else { return nil }
+            self.toBalanceAccountID = toBaID
+        }
+    }
+    
     struct BudgetContainer: Codable, Identifiable {
         var id = UUID().uuidString
         let budget: Budget
@@ -72,13 +87,15 @@ struct FTDataContainer: Codable, Identifiable {
     let tags: [Tag]
     let transactionContainers: [TransactionContainer]
     let budgetContainers: [BudgetContainer]
+    let transferContainers: [TransferContainer]
     
-    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgetContainers: [BudgetContainer]) {
+    init(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag], transactionContainers: [TransactionContainer], budgetContainers: [BudgetContainer], transferContainers: [TransferContainer]) {
         self.balanceAccounts = balanceAccounts
         self.categories = categories
         self.tags = tags
         self.transactionContainers = transactionContainers
         self.budgetContainers = budgetContainers
+        self.transferContainers = transferContainers
     }
     
     enum Field: LocalizedStringResource, Codable, CaseIterable, Identifiable {
@@ -87,6 +104,7 @@ struct FTDataContainer: Codable, Identifiable {
         case categories = "Categories"
         case tags = "Tags"
         case budgets = "Budgets"
+        case transfers = "Transfers"
         
         var id: Self {
             return self
@@ -529,6 +547,85 @@ final class Budget: @unchecked Sendable, Codable {
         try container.encode(period, forKey: .period)
         try container.encode(category, forKey: .category)
         try container.encode(balanceAccount, forKey: .balanceAccount)
+    }
+}
+
+@Model
+final class TransferTransaction: @unchecked Sendable, Codable {
+    @Attribute(.unique) var id: String
+    var valueFrom: Float
+    var valueTo: Float
+    var date: Date
+    var comment: String
+    private(set) var fromBalanceAccount: BalanceAccount?
+    private(set) var toBalanceAccount: BalanceAccount?
+    
+    init(id: String, valueFrom: Float, valueTo: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+        self.id = id
+        self.valueFrom = valueFrom
+        self.valueTo = valueTo
+        self.date = date
+        self.comment = comment
+        setFromBalanceAccount(fromBalanceAccount)
+        setToBalanceAccount(toBalanceAccount)
+    }
+    
+    convenience init(valueFrom: Float, valueTo: Float, date: Date, comment: String, fromBalanceAccount: BalanceAccount, toBalanceAccount: BalanceAccount) {
+        let id = UUID().uuidString
+        self.init(id: id, valueFrom: valueFrom, valueTo: valueTo, date: date, comment: comment, fromBalanceAccount: fromBalanceAccount, toBalanceAccount: toBalanceAccount)
+    }
+    
+    //MARK: Methods
+    func setFromBalanceAccount(_ balanceAccount: BalanceAccount) {
+        fromBalanceAccount = balanceAccount
+    }
+    
+    func setToBalanceAccount(_ balanceAccount: BalanceAccount) {
+        toBalanceAccount = balanceAccount
+    }
+    
+    func balanceAccountIsGoingToBeDeleted(_ balanceAccount: BalanceAccount) {
+        switch balanceAccount {
+        case fromBalanceAccount:
+            fromBalanceAccount = nil
+        case toBalanceAccount:
+            toBalanceAccount = nil
+        default:
+            break
+        }
+    }
+    
+    //MARK: Codable
+    enum CodingKeys: CodingKey {
+        case id
+        case valueFrom
+        case valueTo
+        case date
+        case comment
+        case fromBalanceAccount
+        case toBalanceAccount
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        valueFrom = try container.decode(Float.self, forKey: .valueFrom)
+        valueTo = try container.decode(Float.self, forKey: .valueTo)
+        date = try container.decode(Date.self, forKey: .date)
+        comment = try container.decode(String.self, forKey: .comment)
+        fromBalanceAccount = try container.decode(Optional<BalanceAccount>.self, forKey: .fromBalanceAccount)
+        toBalanceAccount = try container.decode(Optional<BalanceAccount>.self, forKey: .toBalanceAccount)
+    }
+    
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(valueFrom, forKey: .valueFrom)
+        try container.encode(valueTo, forKey: .valueTo)
+        try container.encode(date, forKey: .date)
+        try container.encode(comment, forKey: .comment)
+        try container.encode(fromBalanceAccount, forKey: .fromBalanceAccount)
+        try container.encode(toBalanceAccount, forKey: .toBalanceAccount)
     }
 }
 

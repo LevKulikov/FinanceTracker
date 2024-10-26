@@ -304,7 +304,6 @@ struct CategoriesView: View {
                 .foregroundStyle(.secondary)
                 .rotationEffect(.degrees(rotateReplaceArrow ? 360 : 0))
                 .onTapGesture {
-//                    categoryToReplaceTo  categoryToDelete
                     let buffer = categoryToReplaceTo
                     withAnimation {
                         rotateReplaceArrow.toggle()

@@ -190,6 +190,19 @@ struct ImportDataPreview: View {
                     BudgetRow(budgetContainer: budgetContainer, container: container)
                 }
             }
+        case .transfers:
+            if container.transferContainers.isEmpty {
+                ContentUnavailableView(
+                    "No transfers imported",
+                    systemImage: "folder",
+                    description: Text("Check other items using the picker at the top")
+                )
+                .listRowBackground(Color.clear)
+            } else {
+                ForEach(container.transferContainers) { transferContainer in
+                    TransferRow(transfer: transferContainer.transfer)
+                }
+            }
         }
     }
     
@@ -375,9 +388,10 @@ struct ImportDataPreview: View {
 }
 
 #Preview {
-    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactionContainers: [], budgetContainers: [])
+    let container = FTDataContainer(balanceAccounts: [], categories: [], tags: [], transactionContainers: [], budgetContainers: [], transferContainers: [])
     let onImportAction: () -> Void = {
         print("Import action")
     }
-    return ImportDataPreview(container: container, onImportAction: onImportAction)
+    
+    ImportDataPreview(container: container, onImportAction: onImportAction)
 }

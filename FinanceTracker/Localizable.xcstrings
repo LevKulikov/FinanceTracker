@@ -31,6 +31,16 @@
         }
       }
     },
+    "/" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/"
+          }
+        }
+      }
+    },
     "#" : {
       "localizations" : {
         "ru" : {
@@ -459,12 +469,42 @@
         }
       }
     },
+    "Balance account to transfer from is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет для перевода из не выбран"
+          }
+        }
+      }
+    },
+    "Balance account to transfer to is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет для перевода в не выбран"
+          }
+        }
+      }
+    },
     "Balance Accounts" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Счета"
+          }
+        }
+      }
+    },
+    "Balance accounts to transfer from and to cannot be equal" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета для перевода из и в не могут быть одинаковыми"
           }
         }
       }
@@ -839,6 +879,16 @@
         }
       }
     },
+    "Currency rate cannot be zero, negative or empy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курс валют не может быть нулевым, отрицательным или пустым"
+          }
+        }
+      }
+    },
     "Current balance" : {
       "localizations" : {
         "ru" : {
@@ -1119,12 +1169,32 @@
         }
       }
     },
+    "Delete transfer?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить перевод?"
+          }
+        }
+      }
+    },
     "Delete with transactions" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить вместе с транзакциями"
+          }
+        }
+      }
+    },
+    "Deletion failed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось удалить"
           }
         }
       }
@@ -1329,6 +1399,16 @@
         }
       }
     },
+    "Error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка"
+          }
+        }
+      }
+    },
     "Excel (csv) file creation error" : {
       "localizations" : {
         "ru" : {
@@ -1495,6 +1575,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Из"
+          }
+        }
+      }
+    },
+    "From Balance Accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из счетов"
           }
         }
       }
@@ -1769,6 +1859,16 @@
         }
       }
     },
+    "Make transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать перевод"
+          }
+        }
+      }
+    },
     "More" : {
       "localizations" : {
         "ru" : {
@@ -1825,6 +1925,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Новая категория"
+          }
+        }
+      }
+    },
+    "New transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый перевод"
           }
         }
       }
@@ -1935,6 +2045,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет импортированных транзакций"
+          }
+        }
+      }
+    },
+    "No transfers" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет переводов"
+          }
+        }
+      }
+    },
+    "No transfers imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных переводов"
           }
         }
       }
@@ -2135,6 +2265,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пожалуйста, ожидайте"
+          }
+        }
+      }
+    },
+    "Please, try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
           }
         }
       }
@@ -2401,6 +2541,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбранный (%1$@) и Дефолтный (%2$@) счета имеют разные валюты. Валюта будет изменена для перемещенных транзакций на %3$@. Продолжить?"
+          }
+        }
+      }
+    },
+    "Selected action is not data update" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранное действие не является обновлением данных"
           }
         }
       }
@@ -2835,6 +2985,16 @@
         }
       }
     },
+    "To Balance Accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На счета"
+          }
+        }
+      }
+    },
     "Total" : {
       "localizations" : {
         "ru" : {
@@ -2915,6 +3075,26 @@
         }
       }
     },
+    "Transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевод"
+          }
+        }
+      }
+    },
+    "Transfers" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переводы"
+          }
+        }
+      }
+    },
     "Transport" : {
       "localizations" : {
         "ru" : {
@@ -2985,6 +3165,16 @@
         }
       }
     },
+    "Unknown error occured, please try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась неизвестная ошибка, пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
+    },
     "Update" : {
       "localizations" : {
         "ru" : {
@@ -3051,6 +3241,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Значение не может быть нулем или пустым"
+          }
+        }
+      }
+    },
+    "Value cannot be zero, negative or empy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть нулевым, отрицательным или пустым"
           }
         }
       }

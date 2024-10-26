@@ -247,6 +247,8 @@ extension BudgetsViewModel: CustomTabViewModelDelegate {
                     refreshIfNeeded()
                 }
             }
+        case .transfers:
+            break
         case .appearance:
             return
         case .data:

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol BalanceAccountsViewModelDelegate: AnyObject, Sendable {
+protocol BalanceAccountsViewModelDelegate: AnyObject, Sendable, TransfersViewModelDelegate {
     func didUpdatedBalanceAccountsList()
     func didDeleteBalanceAccount()
 }
@@ -69,6 +69,11 @@ final class BalanceAccountsViewModel: ObservableObject, @unchecked Sendable {
         return FTFactory.shared.createAddingBalanceAccauntView(dataManager: dataManager, action: action, delegate: self)
     }
     
+    @MainActor
+    func getTransfersView() -> some View {
+        return FTFactory.shared.createTransfersView(dataManager: dataManager, delegate: self)
+    }
+    
     //MARK: Private methods
     @MainActor
     private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
@@ -95,5 +100,20 @@ extension BalanceAccountsViewModel: AddingBalanceAccountViewModelDelegate {
     func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
         fetchData()
         delegate?.didUpdatedBalanceAccountsList()
+    }
+}
+
+//MARK: Extension for TransfersViewModelDelegate
+extension BalanceAccountsViewModel: TransfersViewModelDelegate {
+    func didAddTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didAddTransferTransaction(transfer)
+    }
+    
+    func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didUpdateTransferTransaction(transfer)
+    }
+    
+    func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
+        delegate?.didDeleteTransferTransaction(transfer)
     }
 }

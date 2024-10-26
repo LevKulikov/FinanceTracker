@@ -13,12 +13,14 @@ struct BalanceAccountsView: View {
     @State private var deleteBalanceAccountFlag: BalanceAccount?
     @State private var differentCurrencyDeleteBalanceAccount: BalanceAccount?
     @State private var navigationPath = NavigationPath()
+    @State private var showTransfersView = false
+    private let userDevice = FTAppAssets.currentUserDevise
     private var canDeleteBalanceAccount: Bool {
         guard let defaultBalanceAccount = viewModel.defaultBalanceAccount else { return false }
         return defaultBalanceAccount != deleteBalanceAccountFlag
     }
     private var isIpad: Bool {
-        FTAppAssets.currentUserDevise == .pad
+        userDevice == .pad
     }
     
     //MARK: - Initializer
@@ -33,6 +35,15 @@ struct BalanceAccountsView: View {
                 ForEach(viewModel.balanceAccounts) { balanceAccount in
                     getBalanceAccountRow(for: balanceAccount)
                 }
+                
+                Section {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: 40)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowSeparator(.hidden)
+                }
             }
             .listStyle(.inset)
             .navigationTitle("Balance Accounts")
@@ -45,6 +56,13 @@ struct BalanceAccountsView: View {
                         navigationPath.append(ActionWithBalanceAccaunt.add)
                     }
                 }
+            }
+            .overlay(alignment: .bottom) {
+                transfersButton
+                    .offset(y: userDevice == .phone ? 0 : -60)
+            }
+            .fullScreenCover(isPresented: $showTransfersView) {
+                viewModel.getTransfersView()
             }
             .alert(
                 "Different currency",
@@ -82,6 +100,22 @@ struct BalanceAccountsView: View {
     }
     
     //MARK: - Computed View Properties
+    private var transfersButton: some View {
+        Button {
+            showTransfersView.toggle()
+        } label: {
+            Label("Transfers", systemImage: "arrow.right.arrow.left")
+                .frame(height: 50)
+                .frame(minWidth: 170)
+                .padding(.horizontal, 16)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .stroke(.blue)
+                }
+        }
+        .offset(y: -5)
+    }
     
     //MARK: - Methods
     @ViewBuilder

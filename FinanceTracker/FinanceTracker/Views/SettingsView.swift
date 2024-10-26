@@ -73,6 +73,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
+            case .transfers:
+                viewModel.getTransfersView()
             case .budgets: // .budgets is used to identify additional tab to show
                 viewModel.getAdditionalTabView()
             case .notifications:

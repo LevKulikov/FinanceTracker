@@ -199,4 +199,16 @@ final class FTFactory {
         let viewModel = ProvidedStatisticsViewModel(transactions: transactions, currency: currency)
         return AnyView(ProvidedStatisticsView(viewModel: viewModel))
     }
+    
+    func createTransfersView(dataManager: some DataManagerProtocol, delegate: (any TransfersViewModelDelegate)? = nil) -> AnyView {
+        let viewModel = TransfersViewModel(dataManager: dataManager)
+        viewModel.delegate = delegate
+        return AnyView(TransfersView(viewModel: viewModel))
+    }
+    
+    func createAddingTransferView(dataManager: some DataManagerProtocol, action: ActionWithTransferTransaction, delegate: (any AddingTransferViewModelDelegate)? = nil) -> AnyView {
+        let viewModel = AddingTransferViewModel(dataManager: dataManager, action: action)
+        viewModel.delegate = delegate
+        return AnyView(AddingTransferView(viewModel: viewModel))
+    }
 }

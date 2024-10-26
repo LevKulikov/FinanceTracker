@@ -577,7 +577,8 @@ extension SearchViewModel: CustomTabViewModelDelegate {
             fetchAllData(competionHandler:  { [weak self] in
                 self?.filterAndSetTransactions()
             })
-            
+        case .transfers:
+            break
         case .budgets:
             break
         case .appearance:
