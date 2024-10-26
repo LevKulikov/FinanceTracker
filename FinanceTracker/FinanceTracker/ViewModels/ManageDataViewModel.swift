@@ -47,10 +47,15 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
     private var decodedContainerCopy: FTDataContainer?
     /// Buffer only for JSON file, to not to recreated another file if the first one is ignored
     private var jsonExportFileBuffer: URL?
+    private var csvExportFileBuffer: URL?
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+    }
+    
+    deinit {
+        deleteFiles()
     }
     
     //MARK: - Methods
@@ -127,6 +132,7 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
                 await MainActor.run {
                     isDataFetchingForCSVExport = false
                     fileToExport = csvURL
+                    csvExportFileBuffer = csvURL
                 }
             } catch {
                 await MainActor.run {
@@ -211,5 +217,28 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
         let fileURL = path.appendingPathComponent("Transactions.csv")
         try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
         return fileURL
+    }
+    
+    private func deleteFiles() {
+        let fileManager = FileManager.default
+        if let jsonExportFileBuffer {
+            do {
+                print("Deleting JSON export file...")
+                try fileManager.removeItem(at: jsonExportFileBuffer)
+                print("Successfully deleted JSON export file.")
+            } catch {
+                print("Error deleting JSON export file: \(error)")
+            }
+        }
+        
+        if let csvExportFileBuffer {
+            do {
+                print("Deleting CSV export file...")
+                try fileManager.removeItem(at: csvExportFileBuffer)
+                print("Successfully deleted CSV export file.")
+            } catch {
+                print("Error deleting CSV export file: \(error)")
+            }
+        }
     }
 }
