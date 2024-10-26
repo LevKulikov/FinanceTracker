@@ -293,7 +293,7 @@ struct StatisticsView: View {
             }
             
             HStack {
-                Menu(String(localized: viewModel.lightWeightDateType.rawValue), systemImage: "chevron.up.chevron.down") {
+                Menu(viewModel.lightWeightDateType == .customDateRange ? String(localized: "DR") : String(localized: viewModel.lightWeightDateType.rawValue), systemImage: "chevron.up.chevron.down") {
                     Picker("Select date type", selection: $viewModel.lightWeightDateType) {
                         ForEach(DateFilterType.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
@@ -318,13 +318,8 @@ struct StatisticsView: View {
                 case .year:
                     MonthYearPicker(date: $viewModel.lightWeightDate, dateRange: FTAppAssets.availableDateRange, components: .year)
                 case .customDateRange:
-                    EmptyView()
+                    DateRangePicker(startDate: $viewModel.lightWeightDateStart, endDate: $viewModel.lightWeightDateEnd, dateRange: FTAppAssets.availableDateRange)
                 }
-            }
-            
-            if case .customDateRange = viewModel.lightWeightDateType {
-                DateRangePicker(startDate: $viewModel.lightWeightDateStart, endDate: $viewModel.lightWeightDateEnd, dateRange: FTAppAssets.availableDateRange)
-                    .padding(.vertical, 5)
             }
         }
     }
