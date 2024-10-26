@@ -58,6 +58,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     /// Not grouped, only filtered by search string
     private var searchedTransactions: [Transaction] = []
     private var allCategories: [Category] = []
+    /// Flag that determines if data filetering is allowed at this moment or not
+    private var isCalculationAllowed: Bool = true
     /// For transactions predicate
     private var dateFilterRange: ClosedRange<Date> {
         switch dateFilterType {
@@ -230,6 +232,20 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         delegate?.hideTabBar(hide)
     }
     
+    /// Resets only additional filters, except date type and date range
+    @MainActor
+    func resetFilters() {
+        isCalculationAllowed = false
+        
+        filterTransactionType = .both
+        filterBalanceAccount = nil
+        filterCategory = nil
+        filterTags = []
+        
+        isCalculationAllowed = true
+        filterAndSetTransactions()
+    }
+    
     @MainActor
     func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
         return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
@@ -272,6 +288,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private props
     private func filterAndSetTransactions() {
+        guard isCalculationAllowed else { return }
+        
         Task { @MainActor in
             isFiltering = true
         }

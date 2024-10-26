@@ -1259,6 +1259,16 @@
         }
       }
     },
+    "DR" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ПД"
+          }
+        }
+      }
+    },
     "Drag and drop to reorder" : {
       "localizations" : {
         "ru" : {
@@ -2395,6 +2405,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упорядочить вкладки"
+          }
+        }
+      }
+    },
+    "Reset filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить фильтры"
           }
         }
       }
