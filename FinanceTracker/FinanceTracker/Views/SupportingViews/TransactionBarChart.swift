@@ -122,30 +122,6 @@ struct TransactionBarChart: View {
             return FTAppAssets.availableDateRange.lowerBound...endDate
         }
     }
-    private var cartMatchingAlignment: DateComponents {
-        switch perDate {
-        case .perDay:
-            return DateComponents(hour: 0)
-        case .perWeek:
-            return DateComponents(day: 1)
-        case .perMonth:
-            return DateComponents(day: 1)
-        case .perYear:
-            return DateComponents(month: 1)
-        }
-    }
-    private var chartMajorAlignment: DateComponents {
-        switch perDate {
-        case .perDay:
-            return DateComponents(day: 1)
-        case .perWeek:
-            return DateComponents(day: 1)
-        case .perMonth:
-            return DateComponents(month: 1)
-        case .perYear:
-            return DateComponents(month: 1)
-        }
-    }
     private var xScrollPositionEnd: Date {
         return xScrollPosition.addingTimeInterval(Double(maxXVisibleLenth))
     }
@@ -196,12 +172,6 @@ struct TransactionBarChart: View {
             String(localized: TransactionCalculationValueType.profit.rawValue) : .blue,
             String(localized: TransactionCalculationValueType.unknown.rawValue) : .yellow,
         ])
-        .chartScrollTargetBehavior(
-            .valueAligned(
-                matching: cartMatchingAlignment,
-                majorAlignment: .matching(cartMatchingAlignment)
-            )
-        )
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
         .chartXScale(domain: chartXScale)
