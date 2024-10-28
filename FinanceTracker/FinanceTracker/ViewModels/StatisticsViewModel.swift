@@ -10,10 +10,8 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
-protocol StatisticsViewModelDelegate: AnyObject {
+protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func showTabBar(_ show: Bool)
-    
-    func didUpdatedTransactionsListFromStatistics()
 }
 
 enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {

@@ -270,6 +270,26 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
 }
 
 //MARK: - Extensions
+extension CustomTabViewModel: TransactionManipulationDelegate {
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions(transaction), from: tabView)
+        }
+    }
+    
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .transactions(transaction), from: tabView)
+        }
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .transactions(transaction), from: tabView)
+        }
+    }
+}
+
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {
@@ -285,24 +305,6 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
         }
     }
     
-    func didUpdateTransaction(_ transaction: Transaction) {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions(transaction), from: .spendIncomeView)
-        }
-    }
-    
-    func didAddTransaction(_ transaction: Transaction) {
-        delegates.forEach {
-            $0.object?.didAddData(for: .transactions(transaction), from: .spendIncomeView)
-        }
-    }
-    
-    func didDeleteTransaction(_ transaction: Transaction?) {
-        delegates.forEach {
-            $0.object?.didDeleteData(for: .transactions(transaction), from: .spendIncomeView)
-        }
-    }
-    
     func didAddUpdateCategory(_ category: Category?) {
         delegates.forEach {
             $0.object?.didUpdateData(for: .categories(category), from: .spendIncomeView)
@@ -315,12 +317,6 @@ extension CustomTabViewModel: StatisticsViewModelDelegate {
     func showTabBar(_ show: Bool) {
         withAnimation {
             showTabBar = show
-        }
-    }
-    
-    func didUpdatedTransactionsListFromStatistics() {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .statisticsView)
         }
     }
 }

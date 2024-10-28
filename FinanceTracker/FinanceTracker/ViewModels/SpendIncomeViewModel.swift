@@ -11,11 +11,10 @@ import SwiftData
 import Algorithms
 import Combine
 
-protocol SpendIncomeViewModelDelegate: AnyObject {
+
+
+protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func didSelectAction(_ action: ActionWithTransaction)
-    func didUpdateTransaction(_ transaction: Transaction)
-    func didAddTransaction(_ transaction: Transaction)
-    func didDeleteTransaction(_ transaction: Transaction?)
     func didAddUpdateCategory(_ category: Category?)
 }
 
@@ -104,7 +103,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
         Task {
             await dataManager.deleteTransaction(transaction)
             await fetchTransactions(errorHandler: errorHandler)
-            delegate?.didDeleteTransaction(transaction)
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
             filterGroupSortTransactions(animated: true)
         }
     }
@@ -115,7 +114,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
                 await dataManager.deleteTransaction(transaction)
             }
             await fetchTransactions(errorHandler: errorHandler)
-            delegate?.didDeleteTransaction(transactions.last)
+            delegate?.didDeleteTransaction(transactions.last, from: .spendIncomeView)
             filterGroupSortTransactions(animated: true)
         }
     }
@@ -248,14 +247,14 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
-        delegate?.didAddTransaction(transaction)
+        delegate?.didAddTransaction(transaction, from: .spendIncomeView)
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }
     }
     
     func updateTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransaction(transaction)
+        delegate?.didUpdateTransaction(transaction, from: .spendIncomeView)
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }
@@ -263,7 +262,7 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func deletedTransaction(_ transaction: Transaction) {
-        delegate?.didDeleteTransaction(transaction)
+        delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }
