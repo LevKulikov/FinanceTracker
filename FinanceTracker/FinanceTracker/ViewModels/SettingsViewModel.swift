@@ -17,14 +17,14 @@ protocol SettingsViewModelDelegate: AnyObject {
 }
 
 enum SettingsSectionAndDataType {
-    case categories
-    case balanceAccounts
-    case tags
-    case transactions
-    case transfers
+    case categories(Category?)
+    case balanceAccounts(BalanceAccount?)
+    case tags(Tag?)
+    case transactions(Transaction?)
+    case transfers(TransferTransaction?)
     case appearance
     case data
-    case budgets
+    case budgets(Budget?)
     case notifications
 }
 
