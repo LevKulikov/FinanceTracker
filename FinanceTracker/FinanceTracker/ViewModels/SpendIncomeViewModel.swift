@@ -13,7 +13,10 @@ import Combine
 
 protocol SpendIncomeViewModelDelegate: AnyObject {
     func didSelectAction(_ action: ActionWithTransaction)
-    func didUpdateTransactionList()
+    func didUpdateTransaction(_ transaction: Transaction)
+    func didAddTransaction(_ transaction: Transaction)
+    func didDeleteTransaction(_ transaction: Transaction?)
+    func didAddUpdateCategory(_ category: Category?)
 }
 
 enum ActionWithTransaction: Equatable {
