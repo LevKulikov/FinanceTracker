@@ -15,6 +15,10 @@ protocol CustomTabViewModelDelegate: AnyObject {
     func addButtonPressed()
     
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
 }
 
 enum TabViewType: String, Equatable, Hashable, Identifiable {
