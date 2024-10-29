@@ -290,6 +290,26 @@ extension CustomTabViewModel: TransactionManipulationDelegate {
     }
 }
 
+extension CustomTabViewModel: BalanceAccountManipulationDelegate {
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+}
+
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {
@@ -343,7 +363,7 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
         }
     }
     
-    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
+    func didUpdateSettingsSectionData(_ section: SettingsSectionAndDataType) {
         delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
         switch section {
         case .balanceAccounts:

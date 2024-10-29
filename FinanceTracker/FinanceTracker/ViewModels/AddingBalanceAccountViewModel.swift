@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol AddingBalanceAccountViewModelDelegate: AnyObject, Sendable {
-    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount)
+protocol AddingBalanceAccountViewModelDelegate: Sendable, BalanceAccountManipulationDelegate {
+
 }
 
 enum ActionWithBalanceAccaunt: Equatable, Hashable {
@@ -76,7 +76,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             
             Task { @MainActor [dataManager, delegate] in
                 dataManager.insert(newBalanceAccount)
-                delegate?.didUpdateBalanceAccount(newBalanceAccount)
+                delegate?.didAddBalanceAccount(newBalanceAccount, from: .settingsView)
                 completionHandler()
             }
         case .update:
@@ -96,7 +96,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             Task { @MainActor [dataManager, delegate] in
                 do {
                     try dataManager.save()
-                    delegate?.didUpdateBalanceAccount(balanceAccountToUpdate)
+                    delegate?.didUpdateBalanceAccount(balanceAccountToUpdate, from: .settingsView)
                     completionHandler()
                 } catch {
                     print("Saving BalanceAccount error: \(error)")

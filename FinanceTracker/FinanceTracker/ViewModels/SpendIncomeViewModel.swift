@@ -13,7 +13,7 @@ import Combine
 
 
 
-protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate {
+protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate {
     func didSelectAction(_ action: ActionWithTransaction)
     func didAddUpdateCategory(_ category: Category?)
 }
@@ -277,6 +277,27 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
         delegate?.didAddUpdateCategory(nil)
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
         }
     }
 }

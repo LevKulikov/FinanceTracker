@@ -9,7 +9,7 @@ import Foundation
 @preconcurrency import SwiftData
 import SwiftUI
 
-protocol AddingSpendIcomeViewModelDelegate: AnyObject {
+protocol AddingSpendIcomeViewModelDelegate: AnyObject, BalanceAccountManipulationDelegate {
     func addedNewTransaction(_ transaction: Transaction)
     func updateTransaction(_ transaction: Transaction)
     func deletedTransaction(_ transaction: Transaction)
@@ -451,6 +451,21 @@ extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
 
 extension AddingSpendIcomeViewModel: AddingBalanceAccountViewModelDelegate {
     func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
+        delegate?.didUpdateBalanceAccount(balanceAccount)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount) {
+        delegate?.didAddBalanceAccount(balanceAccount)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount) {
+        delegate?.didDeleteBalanceAccount(balanceAccount)
         Task {
             await fetchBalanceAccounts()
         }
