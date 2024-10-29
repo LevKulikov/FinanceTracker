@@ -214,6 +214,8 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             await backgroundActor!.delete(transaction)
             try await backgroundActor!.save()
         }
+        
+        try await deleteTransactionByIdFromMainContext(transaction)
     }
     
     func deleteTransferTransaction(_ transferTransaction: TransferTransaction) {
