@@ -377,7 +377,7 @@ extension CustomTabViewModel: SearchViewModelDelegate {
 extension CustomTabViewModel: WelcomeViewModelDelegate {
     func didCreateBalanceAccount() {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .balanceAccounts, from: .welcomeView)
+            $0.object?.didUpdateData(for: .balanceAccounts(nil), from: .welcomeView)
         }
     }
 }
@@ -385,20 +385,20 @@ extension CustomTabViewModel: WelcomeViewModelDelegate {
 //MARK: Extension for BudgetsViewModelDelegate
 extension CustomTabViewModel: BudgetsViewModelDelegate {
     func didAddBudget(_ budget: Budget) {
-        return
+        delegates.forEach {
+            $0.object?.didAddData(for: .budgets(budget), from: .budgetsView)
+        }
     }
     
     func didUpdateBudget(_ budget: Budget) {
-        return
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .budgets(budget), from: .budgetsView)
+        }
     }
     
     func didDeleteBudget(_ budget: Budget) {
-        return
-    }
-    
-    func didUpdateTransaction() {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .budgetsView)
+            $0.object?.didDeleteData(for: .budgets(budget), from: .budgetsView)
         }
     }
 }
@@ -407,19 +407,19 @@ extension CustomTabViewModel: BudgetsViewModelDelegate {
 extension CustomTabViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didUpdateData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
     func updateTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didUpdateData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
     func deletedTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didUpdateData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
