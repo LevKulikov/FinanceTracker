@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol TransactionListViewModelDelegate: AnyObject, Sendable, TransactionManipulationDelegate {
+protocol TransactionListViewModelDelegate: AnyObject, Sendable, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     
 }
 
@@ -128,6 +128,30 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
 
 //MARK: - Extensions
 extension TransactionListViewModel: AddingSpendIcomeViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: tabView)
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: tabView)
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: tabView)
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: tabView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: tabView)
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: tabView)
+    }
+    
     func addedNewTransaction(_ transaction: Transaction) {
         delegate?.didAddTransaction(transaction, from: .addingSpendIncomeView)
         setTransactionGroups()

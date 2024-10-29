@@ -104,15 +104,15 @@ struct SettingsView: View {
     
     private var enitiesSection: some View {
         Section {
-            NavigationLink(value: SettingsSectionAndDataType.balanceAccounts) {
+            NavigationLink(value: SettingsSectionAndDataType.balanceAccounts(nil)) {
                 Label("Balance Accounts", systemImage: "person.crop.circle")
             }
             
-            NavigationLink(value: SettingsSectionAndDataType.categories) {
+            NavigationLink(value: SettingsSectionAndDataType.categories(nil)) {
                 Label("Categories", systemImage: "star.square.on.square")
             }
             
-            NavigationLink(value: SettingsSectionAndDataType.tags) {
+            NavigationLink(value: SettingsSectionAndDataType.tags(nil)) {
                 Label("Tags", systemImage: "number")
             }
         }
@@ -121,7 +121,7 @@ struct SettingsView: View {
     private var tabsSection: some View {
         Section("Additional tabs") {
             if let additionalTab = viewModel.additionalTab {
-                NavigationLink(value: SettingsSectionAndDataType.budgets) {
+                NavigationLink(value: SettingsSectionAndDataType.budgets(nil)) {
                     additionalTab.label
                 }
             }

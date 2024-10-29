@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 //MARK: - Delegate protocol
-protocol BudgetsViewModelDelegate: AnyObject, TransactionManipulationDelegate {
+protocol BudgetsViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func didAddBudget(_ budget: Budget)
     
     func didUpdateBudget(_ budget: Budget)
@@ -201,6 +201,45 @@ extension BudgetsViewModel: AddingBudgetViewModelDelegate {
 }
 
 extension BudgetsViewModel: TransactionListViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .budgetsView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .budgetsView)
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .budgetsView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .budgetsView)
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
     func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
         delegate?.didAddTransaction(transaction, from: .budgetsView)
         neededToBeRefreshed = true

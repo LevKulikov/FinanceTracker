@@ -292,7 +292,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
             isFiltering = true
         }
         
-        Task.detached(priority: .high) { [weak self] in
+        Task.detached(priority: .high) { [weak self, allTransactions] in
             guard let self else { return }
             
             let filteredData = allTransactions
@@ -583,13 +583,15 @@ extension SearchViewModel: CustomTabViewModelDelegate {
     }
     
     private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) {
+        print("SearchViewModel: action is \(action)")
         switch dataType {
         case .transactions(let transaction):
             if let transaction {
+                print("SearchViewModel: got transaction from TabView")
                 guard dateFilterRange.contains(transaction.date) else { return }
-                
                 switch action {
                 case .add:
+                    print("SearchViewModel: adding transaction")
                     allTransactions.append(transaction)
                 case .delete:
                     if let index = allTransactions.map(\.id).firstIndex(of: transaction.id) {
@@ -607,7 +609,7 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                 case .doNothing:
                     return
                 }
-                
+                print("SearchViewModel: filtering transactions")
                 filterAndSetTransactions()
             } else {
                 Task {
@@ -642,6 +644,42 @@ extension SearchViewModel: CustomTabViewModelDelegate {
 }
 
 extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
     func addedNewTransaction(_ transaction: Transaction) {
         delegate?.didAddTransaction(transaction, from: .searchView)
         allTransactions.append(transaction)
@@ -668,11 +706,5 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
     
     func transactionsTypeReselected(to newType: TransactionsType) {
         return
-    }
-    
-    func categoryUpdated() {
-        Task {
-            await fetchCategories()
-        }
     }
 }

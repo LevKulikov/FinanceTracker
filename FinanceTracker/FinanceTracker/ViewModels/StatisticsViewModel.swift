@@ -10,7 +10,7 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
-protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate {
+protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func showTabBar(_ show: Bool)
     func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
@@ -1099,6 +1099,42 @@ extension StatisticsViewModel: TagsViewModelDelegate {
 
 //MARK: - Extension for TransactionListViewModelDelegate
 extension StatisticsViewModel: TransactionListViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
     func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
         transactions.append(transaction)
         dataShouldBeRefetched = false

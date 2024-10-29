@@ -176,7 +176,7 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
                 case .global:
                     await dataManager.insertFromBackground(newTransaction)
                 }
-                delegate?.updateTransaction(newTransaction)
+                delegate?.addedNewTransaction(newTransaction)
             }
         }
         

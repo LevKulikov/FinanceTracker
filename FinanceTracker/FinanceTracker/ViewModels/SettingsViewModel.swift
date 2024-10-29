@@ -22,7 +22,7 @@ protocol SettingsViewModelDelegate: AnyObject {
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType])
 }
 
-enum SettingsSectionAndDataType {
+enum SettingsSectionAndDataType: Hashable {
     case categories(Category?)
     case balanceAccounts(BalanceAccount?)
     case tags(Tag?)
