@@ -673,4 +673,13 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             try await backgroundActor!.save()
         }
     }
+    
+    @MainActor
+    private func deleteTransactionByIdFromMainContext(_ transaction: Transaction) async throws {
+        let trId = transaction.id
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == trId })
+        let arr = try fetch(descr)
+        guard let backTr = arr.first else { return }
+        container.mainContext.delete(transaction)
+    }
 }

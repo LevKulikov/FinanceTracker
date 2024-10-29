@@ -278,7 +278,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     func deleteTransaction(_ transaction: Transaction) {
         Task {
             try await dataManager.deleteTransactionFromBackground(transaction)
-            await fetchTransactions()
+            allTransactions.removeAll(where: { $0.id == transaction.id })
             delegate?.didDeleteTransaction(transaction, from: .searchView)
             filterAndSetTransactions()
         }
@@ -583,33 +583,25 @@ extension SearchViewModel: CustomTabViewModelDelegate {
     }
     
     private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) {
-        print("SearchViewModel: action is \(action)")
         switch dataType {
         case .transactions(let transaction):
             if let transaction {
-                print("SearchViewModel: got transaction from TabView")
                 guard dateFilterRange.contains(transaction.date) else { return }
                 switch action {
                 case .add:
-                    print("SearchViewModel: adding transaction")
                     allTransactions.append(transaction)
                 case .delete:
-                    if let index = allTransactions.map(\.id).firstIndex(of: transaction.id) {
+                    if let index = allTransactions.firstIndex(where: { $0.id == transaction.id }) {
                         allTransactions.remove(at: index)
-                    } else {
-                        Task {
-                            await fetchTransactions()
-                            filterAndSetTransactions()
-                        }
-                        
-                        return
                     }
                 case .update:
-                    break
+                    if let index = allTransactions.firstIndex(where: { $0.id == transaction.id }) {
+                        allTransactions[index] = transaction
+                    }
                 case .doNothing:
                     return
                 }
-                print("SearchViewModel: filtering transactions")
+                
                 filterAndSetTransactions()
             } else {
                 Task {

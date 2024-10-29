@@ -1029,17 +1029,21 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             }
             
             if let transaction {
-                guard transaction.balanceAccount?.id == balanceAccountToFilter.id else { return }
-                
                 dataShouldBeRefetched = false
-                if action == .add {
+                
+                switch action {
+                case .add:
                     transactions.append(transaction)
-                } else if action == .delete {
-                    if let index = transactions.map(\.id).firstIndex(of: transaction.id) {
+                case .delete:
+                    if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
                         transactions.remove(at: index)
-                    } else {
-                        dataShouldBeRefetched = true
                     }
+                case .update:
+                    if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
+                        transactions[index] = transaction
+                    }
+                case .doNothing:
+                    break
                 }
             } else {
                 dataShouldBeRefetched = true
