@@ -7,7 +7,7 @@
 
 
 protocol TransferTransactionManipulationDelegate: AnyObject {
-    func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction)
+    func didAddTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType)
+    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType)
+    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType)
 }
