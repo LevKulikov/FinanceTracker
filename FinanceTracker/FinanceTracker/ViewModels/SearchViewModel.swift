@@ -9,9 +9,7 @@ import Foundation
 @preconcurrency import SwiftData
 import SwiftUI
 
-protocol SearchViewModelDelegate: AnyObject {
-    func didUpdatedTransactionsList()
-    
+protocol SearchViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func hideTabBar(_ hide: Bool)
 }
 
@@ -281,7 +279,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         Task {
             try await dataManager.deleteTransactionFromBackground(transaction)
             await fetchTransactions()
-            delegate?.didUpdatedTransactionsList()
+            delegate?.didDeleteTransaction(transaction, from: .searchView)
             filterAndSetTransactions()
         }
     }
@@ -569,7 +567,55 @@ extension SearchViewModel: CustomTabViewModelDelegate {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .searchView else { return }
         
+        getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) {
         switch dataType {
+        case .transactions(let transaction):
+            if let transaction {
+                guard dateFilterRange.contains(transaction.date) else { return }
+                
+                switch action {
+                case .add:
+                    allTransactions.append(transaction)
+                case .delete:
+                    if let index = allTransactions.map(\.id).firstIndex(of: transaction.id) {
+                        allTransactions.remove(at: index)
+                    } else {
+                        Task {
+                            await fetchTransactions()
+                            filterAndSetTransactions()
+                        }
+                        
+                        return
+                    }
+                case .update:
+                    break
+                case .doNothing:
+                    return
+                }
+                
+                filterAndSetTransactions()
+            } else {
+                Task {
+                    await fetchTransactions()
+                    filterAndSetTransactions()
+                }
+            }
+            
         case .balanceAccounts:
             Task {
                 await fetchBalanceAccounts()
@@ -585,23 +631,11 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                 await fetchTags()
             }
             
-        case .transactions:
-            Task {
-                await fetchTransactions()
-                filterAndSetTransactions()
-            }
-            
         case .data:
             fetchAllData(competionHandler:  { [weak self] in
                 self?.filterAndSetTransactions()
             })
-        case .transfers:
-            break
-        case .budgets:
-            break
-        case .appearance:
-            break
-        case .notifications:
+        case .transfers, .budgets, .appearance, .notifications:
             break
         }
     }
@@ -609,26 +643,26 @@ extension SearchViewModel: CustomTabViewModelDelegate {
 
 extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
-        delegate?.didUpdatedTransactionsList()
-        Task {
-            await fetchTransactions()
-            filterAndSetTransactions()
-        }
+        delegate?.didAddTransaction(transaction, from: .searchView)
+        allTransactions.append(transaction)
+        filterAndSetTransactions()
     }
     
     func updateTransaction(_ transaction: Transaction) {
-        delegate?.didUpdatedTransactionsList()
-        Task {
-            await fetchTransactions()
-            filterAndSetTransactions()
-        }
+        delegate?.didUpdateTransaction(transaction, from: .searchView)
+        filterAndSetTransactions()
     }
     
     func deletedTransaction(_ transaction: Transaction) {
-        delegate?.didUpdatedTransactionsList()
-        Task {
-            await fetchTransactions()
+        delegate?.didDeleteTransaction(transaction, from: .searchView)
+        if let index = allTransactions.map(\.id).firstIndex(of: transaction.id) {
+            allTransactions.remove(at: index)
             filterAndSetTransactions()
+        } else {
+            Task {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
         }
     }
     
@@ -637,7 +671,6 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func categoryUpdated() {
-        delegate?.didUpdatedTransactionsList()
         Task {
             await fetchCategories()
         }

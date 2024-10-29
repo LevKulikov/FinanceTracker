@@ -45,6 +45,7 @@
 		738D752E2C111A2D00198521 /* FTAppAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738D752D2C111A2D00198521 /* FTAppAssets.swift */; };
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
 		738E58F52CD0470E006BB9C8 /* TransactionManipulationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E58F42CD0470E006BB9C8 /* TransactionManipulationDelegate.swift */; };
+		738E58F72CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E58F62CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift */; };
 		73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */; };
 		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
 		73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90462C499571002267F4 /* BudgetCardViewModel.swift */; };
@@ -158,6 +159,7 @@
 		738D752D2C111A2D00198521 /* FTAppAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTAppAssets.swift; sourceTree = "<group>"; };
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
 		738E58F42CD0470E006BB9C8 /* TransactionManipulationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManipulationDelegate.swift; sourceTree = "<group>"; };
+		738E58F62CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferTransactionManipulationDelegate.swift; sourceTree = "<group>"; };
 		73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsViewModel.swift; sourceTree = "<group>"; };
 		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
 		73AE90462C499571002267F4 /* BudgetCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCardViewModel.swift; sourceTree = "<group>"; };
@@ -314,6 +316,7 @@
 				73CCF3DC2C29F81B009D8001 /* SettingsManager.swift */,
 				733397C52C4DA01200BAE878 /* NotificationManager.swift */,
 				738E58F42CD0470E006BB9C8 /* TransactionManipulationDelegate.swift */,
+				738E58F62CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift */,
 				73F629292C02098C00E9FEB9 /* DataManager */,
 			);
 			path = Services;
@@ -604,6 +607,7 @@
 				73CCF3E52C2B533C009D8001 /* ManageDataView.swift in Sources */,
 				73F628F72C01057000E9FEB9 /* FinanceTrackerApp.swift in Sources */,
 				733397C02C4BF5D000BAE878 /* AddingBudgetViewModel.swift in Sources */,
+				738E58F72CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift in Sources */,
 				731EE8262C0B88E9006C7B0F /* Date+Extension.swift in Sources */,
 				73633E542C556AE000E3B9CF /* TabsSettingsView.swift in Sources */,
 				73356E482C3E9CF400CC0D90 /* TagsLineChart.swift in Sources */,
