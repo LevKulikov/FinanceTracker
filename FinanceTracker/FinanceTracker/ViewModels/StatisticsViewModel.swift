@@ -10,8 +10,9 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
-protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate {
+protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate {
     func showTabBar(_ show: Bool)
+    func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
 
 enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
@@ -58,6 +59,13 @@ enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Id
     }
 }
 
+enum DataAction: Equatable {
+    case add
+    case delete
+    case update
+    case doNothing
+}
+
 final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
@@ -79,13 +87,6 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         case balanceAccount
         case allTypes
         case none
-    }
-    
-    enum DataAction: Equatable {
-        case add
-        case delete
-        case update
-        case doNothing
     }
     
     //MARK: - Properties
@@ -1001,6 +1002,8 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         case .transfers(let transfer):
             guard !lightWeightStatistics else { return }
             if let transfer {
+                guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else { return }
+                
                 dataShouldBeRefetched = false
                 Task {
                     switch action {
@@ -1026,6 +1029,8 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             }
             
             if let transaction {
+                guard transaction.balanceAccount?.id == balanceAccountToFilter.id else { return }
+                
                 dataShouldBeRefetched = false
                 if action == .add {
                     transactions.append(transaction)
@@ -1063,28 +1068,32 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
 
 //MARK: - Extension for TagsViewModelDelegate
 extension StatisticsViewModel: TagsViewModelDelegate {
-    func didDeleteTag() {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didAddTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+        }
+    }
+    
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didUpdatedTag(tag, from: .statisticsView)
         Task {
             await fetchTags()
             calculateTagsTotal()
         }
     }
     
-    func didDeleteTagWithTransactions() {
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didDeleteTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTagWithTransactions(_ tag: Tag) {
+        delegate?.didDeleteTagWithTransactions(tag, from: .statisticsView)
         refreshData()
-    }
-    
-    func didAddTag() {
-        Task {
-            await fetchTags()
-        }
-    }
-    
-    func didUpdatedTag() {
-        Task {
-            await fetchTags()
-            calculateTagsTotal()
-        }
     }
 }
 
