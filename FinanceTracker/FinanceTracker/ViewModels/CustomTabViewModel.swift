@@ -330,6 +330,26 @@ extension CustomTabViewModel: CategoryManipulationDelegate {
     }
 }
 
+extension CustomTabViewModel: TagManipulationDelegate {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .tags(tag), from: tabView)
+        }
+    }
+    
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .tags(tag), from: tabView)
+        }
+    }
+    
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .tags(tag), from: tabView)
+        }
+    }
+}
+
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {
