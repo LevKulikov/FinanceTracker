@@ -310,6 +310,26 @@ extension CustomTabViewModel: BalanceAccountManipulationDelegate {
     }
 }
 
+extension CustomTabViewModel: CategoryManipulationDelegate {
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .categories(category), from: tabView)
+        }
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .categories(category), from: tabView)
+        }
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .categories(category), from: tabView)
+        }
+    }
+}
+
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {

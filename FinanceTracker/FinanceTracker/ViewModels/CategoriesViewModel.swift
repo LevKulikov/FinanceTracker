@@ -9,10 +9,14 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol CategoriesViewModelDelegate: AnyObject, Sendable {
-    func didUpdateCategoryList()
-    
-    func didDeleteCategory()
+protocol CategoryManipulationDelegate: AnyObject {
+    func didAddCategory(_ category: Category, from tabView: TabViewType)
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType)
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType)
+}
+
+protocol CategoriesViewModelDelegate: Sendable, CategoryManipulationDelegate {
+    func didDeleteCategoryWithTransactions(_ category: Category)
 }
 
 final class CategoriesViewModel: ObservableObject, @unchecked Sendable {
@@ -59,7 +63,7 @@ final class CategoriesViewModel: ObservableObject, @unchecked Sendable {
     func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) {
         Task { @MainActor [dataManager, delegate] in
             await dataManager.deleteCategory(category, moveTransactionsTo: replacingCategory)
-            delegate?.didDeleteCategory()
+            delegate?.didDeleteCategory(category, from: .settingsView)
             await fetchCategories()
         }
     }
@@ -67,7 +71,7 @@ final class CategoriesViewModel: ObservableObject, @unchecked Sendable {
     func deleteCategoryWithTransactions(_ category: Category) {
         Task { @MainActor [dataManager, delegate] in
             await dataManager.deleteCategoryWithTransactions(category)
-            delegate?.didDeleteCategory()
+            delegate?.didDeleteCategoryWithTransactions(category)
             await fetchCategories()
         }
     }
@@ -114,8 +118,18 @@ final class CategoriesViewModel: ObservableObject, @unchecked Sendable {
 //MARK: - Extensions
 //MARK: Extension for AddingCategoryViewModelDelegate
 extension CategoriesViewModel: AddingCategoryViewModelDelegate {
-    func didUpdateCategory() {
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
         fetchData()
-        delegate?.didUpdateCategoryList()
+        delegate?.didUpdateCategory(category, from: tabView)
+    }
+    
+    func didAddCategory(_ catogory: Category, from tabView: TabViewType) {
+        fetchData()
+        delegate?.didAddCategory(catogory, from: tabView)
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        fetchData()
+        delegate?.didDeleteCategory(category, from: tabView)
     }
 }

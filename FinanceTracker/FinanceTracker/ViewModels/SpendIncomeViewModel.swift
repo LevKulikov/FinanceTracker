@@ -13,9 +13,8 @@ import Combine
 
 
 
-protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate {
+protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func didSelectAction(_ action: ActionWithTransaction)
-    func didAddUpdateCategory(_ category: Category?)
 }
 
 enum ActionWithTransaction: Equatable {
@@ -273,8 +272,17 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
         transactionsTypeSelected = newType
     }
     
-    func categoryUpdated() {
-        delegate?.didAddUpdateCategory(nil)
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .spendIncomeView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .spendIncomeView)
+        filterGroupSortTransactions()
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: tabView)
         fetchAllData { [weak self] in
             self?.filterGroupSortTransactions()
         }

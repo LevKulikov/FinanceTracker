@@ -9,12 +9,11 @@ import Foundation
 @preconcurrency import SwiftData
 import SwiftUI
 
-protocol AddingSpendIcomeViewModelDelegate: AnyObject, BalanceAccountManipulationDelegate {
+protocol AddingSpendIcomeViewModelDelegate: AnyObject, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func addedNewTransaction(_ transaction: Transaction)
     func updateTransaction(_ transaction: Transaction)
     func deletedTransaction(_ transaction: Transaction)
     func transactionsTypeReselected(to newType: TransactionsType)
-    func categoryUpdated()
 }
 
 enum FetchErrors: Error {
@@ -441,31 +440,45 @@ extension AddingSpendIcomeViewModel {
 
 //MARK: AddingCategoryViewModelProtocol extension
 extension AddingSpendIcomeViewModel: AddingCategoryViewModelDelegate {
-    func didUpdateCategory() {
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: tabView)
         Task {
             await fetchCategories()
         }
-        delegate?.categoryUpdated()
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: tabView)
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: tabView)
+        Task {
+            await fetchCategories()
+        }
     }
 }
 
 extension AddingSpendIcomeViewModel: AddingBalanceAccountViewModelDelegate {
-    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
-        delegate?.didUpdateBalanceAccount(balanceAccount)
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: tabView)
         Task {
             await fetchBalanceAccounts()
         }
     }
     
-    func didAddBalanceAccount(_ balanceAccount: BalanceAccount) {
-        delegate?.didAddBalanceAccount(balanceAccount)
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: tabView)
         Task {
             await fetchBalanceAccounts()
         }
     }
     
-    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount) {
-        delegate?.didDeleteBalanceAccount(balanceAccount)
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: tabView)
         Task {
             await fetchBalanceAccounts()
         }
