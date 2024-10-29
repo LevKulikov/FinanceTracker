@@ -10,9 +10,9 @@ import SwiftData
 import SwiftUI
 
 protocol TagManipulationDelegate: AnyObject {
-    func didAddTag(_ tag: Tag)
-    func didUpdatedTag(_ tag: Tag)
-    func didDeleteTag(_ tag: Tag)
+    func didAddTag(_ tag: Tag, from tabView: TabViewType)
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType)
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType)
 }
 
 protocol TagsViewModelDelegate: AnyObject, TagManipulationDelegate {
@@ -93,7 +93,7 @@ final class TagsViewModel: ObservableObject {
         
         Task {
             dataManager.insert(newTag)
-            delegate?.didAddTag(newTag)
+            delegate?.didAddTag(newTag, from: .settingsView)
             await fetchTags()
         }
     }
@@ -105,7 +105,7 @@ final class TagsViewModel: ObservableObject {
         Task {
             do {
                 try dataManager.save()
-                delegate?.didUpdatedTag(tagSelected)
+                delegate?.didUpdatedTag(tagSelected, from: .settingsView)
                 await fetchTags()
             } catch {
                 print(error)
@@ -117,7 +117,7 @@ final class TagsViewModel: ObservableObject {
     func deleteTag(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTag(tag)
-            delegate?.didDeleteTag(tag)
+            delegate?.didDeleteTag(tag, from: .settingsView)
             await fetchTags(withAnimation: withAnimation)
         }
     }
