@@ -9,10 +9,8 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol TransfersViewModelDelegate: AnyObject {
-    func didAddTransferTransaction(_ transfer: TransferTransaction)
-    func didUpdateTransferTransaction(_ transfer: TransferTransaction)
-    func didDeleteTransferTransaction(_ transfer: TransferTransaction)
+protocol TransfersViewModelDelegate: TransferTransactionManipulationDelegate {
+    
 }
 
 final class TransfersViewModel: @unchecked Sendable, ObservableObject {
