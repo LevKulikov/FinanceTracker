@@ -9,10 +9,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol AddingTransferViewModelDelegate: AnyObject {
-    func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction)
+
+
+protocol AddingTransferViewModelDelegate: TransferTransactionManipulationDelegate {
+    
 }
 
 enum ActionWithTransferTransaction: Equatable, Hashable {
