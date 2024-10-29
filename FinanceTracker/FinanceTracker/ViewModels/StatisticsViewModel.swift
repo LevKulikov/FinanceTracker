@@ -589,15 +589,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     }
                     return tupleArray
                 }
-                .grouped { $0.tag }
-                .map { tagDict in
+                .grouped { $0.tag.id }
+                .compactMap { tagDict -> TagChartData? in
                     var total: Float = 0
                     var transactionsToSet: [Transaction] = []
+                    guard let tagAsKey = tagDict.value.first?.tag else { return nil }
+                    
                     for tuple in tagDict.value {
                         total += tuple.transaction.value
                         transactionsToSet.append(tuple.transaction)
                     }
-                    return TagChartData(tag: tagDict.key, total: total, transactions: transactionsToSet)
+                    return TagChartData(tag: tagAsKey, total: total, transactions: transactionsToSet)
                 }
                 .sorted { $0.total > $1.total}
             
@@ -648,11 +650,12 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     }
             
             var returnData = dateAndTypeFilteredData
-                .grouped { $0.category }
-                .map { singleDict in
+                .grouped { $0.category?.id }
+                .compactMap { singleDict -> TransactionPieChartData? in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
                     let transactions = singleDict.value
-                    return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
+                    guard let categoryAsKey = singleDict.value.first?.category else { return nil}
+                    return TransactionPieChartData(category: categoryAsKey, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
             print("calculateDataForPieChart, started to sort returnData")
