@@ -246,26 +246,26 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
-        delegate?.didAddTransaction(transaction, from: .spendIncomeView)
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didAddTransaction(transaction, from: .spendIncomeView)
         }
     }
     
     func updateTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransaction(transaction, from: .spendIncomeView)
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
-        }
+        filterGroupSortTransactions()
         enableTapsWithDeadline()
+        delegate?.didUpdateTransaction(transaction, from: .spendIncomeView)
     }
     
     func deletedTransaction(_ transaction: Transaction) {
-        delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            enableTapsWithDeadline()
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
         }
-        enableTapsWithDeadline()
     }
     
     func transactionsTypeReselected(to newType: TransactionsType) {
@@ -282,9 +282,10 @@ extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
-        delegate?.didDeleteCategory(category, from: tabView)
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didDeleteCategory(category, from: .spendIncomeView)
         }
     }
     

@@ -277,9 +277,14 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     
     func deleteTransaction(_ transaction: Transaction) {
         Task {
-            try await dataManager.deleteTransactionFromBackground(transaction)
-            allTransactions.removeAll(where: { $0.id == transaction.id })
-            delegate?.didDeleteTransaction(transaction, from: .searchView)
+            do {
+                allTransactions.removeAll(where: { $0.id == transaction.id })
+                try await dataManager.deleteTransactionFromBackground(transaction)
+                delegate?.didDeleteTransaction(transaction, from: .searchView)
+            } catch {
+                print("SearchViewModel: Error deleting transaction: \(error)")
+                allTransactions.append(transaction)
+            }
             filterAndSetTransactions()
         }
     }
@@ -567,36 +572,71 @@ extension SearchViewModel: CustomTabViewModelDelegate {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .searchView else { return }
         
-        getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        }
     }
     
     func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .searchView else { return }
         
-        getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        }
     }
     
     func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .searchView else { return }
         
-        getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        }
     }
     
-    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) {
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) async {
         switch dataType {
         case .transactions(let transaction):
             if let transaction {
                 guard dateFilterRange.contains(transaction.date) else { return }
+                
                 switch action {
                 case .add:
-                    allTransactions.append(transaction)
+                    do {
+                        let transactionID = transaction.id
+                        guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR SearchViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            await fetchTransactions()
+                            break
+                        }
+                        print("SearchViewModel: Adding transaction with id: \(addedTransaction.id)")
+                        allTransactions.append(addedTransaction)
+                    } catch {
+                        print("ERROR SearchViewModel: Error fetching single transaction: \(error)")
+                        await fetchTransactions()
+                    }
                 case .delete:
-                    if let index = allTransactions.firstIndex(where: { $0.id == transaction.id }) {
+                    let transactionID = transaction.id
+                    if let index = allTransactions.firstIndex(where: { $0.id == transactionID }) {
+                        print("SearchViewModel: Deleting transaction from array")
                         allTransactions.remove(at: index)
+                    } else {
+                        print("ERROR SearchViewModel: No transaction found with such id in array for deletion")
+                        await fetchTransactions()
                     }
                 case .update:
-                    if let index = allTransactions.firstIndex(where: { $0.id == transaction.id }) {
-                        allTransactions[index] = transaction
+                    do {
+                        let transactionID = transaction.id
+                        if let index = allTransactions.firstIndex(where: { $0.id == transactionID }),
+                           let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) {
+                            print("SearchViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            allTransactions[index] = updatedTransaction
+                        } else {
+                            print("ERROR SearchViewModel: Error fetching single transaction: No transaction found with id, or there is no transaction with id in transactions array: \(transactionID)")
+                            await fetchTransactions()
+                        }
+                    } catch {
+                        print("ERROR SearchViewModel: Error fetching single transaction: \(error)")
+                        await fetchTransactions()
                     }
                 case .doNothing:
                     return
@@ -604,26 +644,19 @@ extension SearchViewModel: CustomTabViewModelDelegate {
                 
                 filterAndSetTransactions()
             } else {
-                Task {
-                    await fetchTransactions()
-                    filterAndSetTransactions()
-                }
+                print("ERROR SearchViewModel: Provided transaction for action \(action) is nil")
+                await fetchTransactions()
+                filterAndSetTransactions()
             }
             
         case .balanceAccounts:
-            Task {
-                await fetchBalanceAccounts()
-            }
+            await fetchBalanceAccounts()
             
         case .categories:
-            Task {
-                await fetchCategories()
-            }
+            await fetchCategories()
             
         case .tags:
-            Task {
-                await fetchTags()
-            }
+            await fetchTags()
             
         case .data:
             fetchAllData(competionHandler:  { [weak self] in
@@ -673,26 +706,27 @@ extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
     }
     
     func addedNewTransaction(_ transaction: Transaction) {
-        delegate?.didAddTransaction(transaction, from: .searchView)
         allTransactions.append(transaction)
         filterAndSetTransactions()
+        delegate?.didAddTransaction(transaction, from: .searchView)
     }
     
     func updateTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransaction(transaction, from: .searchView)
         filterAndSetTransactions()
+        delegate?.didUpdateTransaction(transaction, from: .searchView)
     }
     
     func deletedTransaction(_ transaction: Transaction) {
-        delegate?.didDeleteTransaction(transaction, from: .searchView)
-        if let index = allTransactions.map(\.id).firstIndex(of: transaction.id) {
-            allTransactions.remove(at: index)
-            filterAndSetTransactions()
-        } else {
-            Task {
+        Task {
+            let transactionID = transaction.id
+            if let index = allTransactions.firstIndex(where: { $0.id == transactionID }) {
+                allTransactions.remove(at: index)
+                filterAndSetTransactions()
+            } else {
                 await fetchTransactions()
                 filterAndSetTransactions()
             }
+            delegate?.didDeleteTransaction(transaction, from: .searchView)
         }
     }
     

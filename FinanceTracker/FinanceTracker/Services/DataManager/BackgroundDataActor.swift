@@ -29,8 +29,11 @@ actor BackgroundDataActor {
     }
     
     func deleteTransactionById(_ transaction: Transaction) throws {
-        let trId = transaction.id
-        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == trId })
+        try deleteTransactionById(transaction.id)
+    }
+    
+    func deleteTransactionById(_ transactionID: String) throws {
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == transactionID })
         let arr = try fetch(descr)
         guard let backTr = arr.first else { return }
         delete(backTr)

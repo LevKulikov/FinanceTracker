@@ -301,7 +301,11 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         case .transaction:
             Task {
                 if withRefetch {
-                    await fetchTransactions()
+                    if lightWeightStatistics {
+                        await fetchTransactionsForDate()
+                    } else {
+                        await fetchTransactions()
+                    }
                 }
                 if lightWeightStatistics {
                     calculateSpendIncomeValues()
@@ -925,8 +929,9 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         
         guard tabView != .statisticsView else { return }
         dataShouldBeRefetched = false
-        
-        getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        }
     }
     
     func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
@@ -938,8 +943,9 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         }
         
         guard tabView != .statisticsView else { return }
-        
-        getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        }
     }
     
     func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
@@ -952,10 +958,12 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         
         guard tabView != .statisticsView else { return }
         
-        getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        }
     }
     
-    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) {
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) async {
         switch dataType {
         case .categories:
             dataUpdatedFromAnotherView = .category
@@ -1004,51 +1012,131 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             
         case .transfers(let transfer):
             guard !lightWeightStatistics else { return }
+            
             if let transfer {
-                guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else { return }
+                guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else {
+                    if case .update = action {
+                        let transferID = transfer.id
+                        if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                            print("StatisticsViewModel: Updating transfer with id: \(transferID)")
+                            transferTransactions.remove(at: index)
+                            dataUpdatedFromAnotherView = .transfer
+                        } else {
+                            print("StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                        }
+                    } else {
+                        print("ERROR StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                    }
+                    return
+                }
                 
                 dataShouldBeRefetched = false
-                Task {
-                    switch action {
-                    case .add:
-                        transferTransactions.append(transfer)
-                    case .delete:
-                        if let index = transferTransactions.map(\.id).firstIndex(of: transfer.id) {
-                            transferTransactions.remove(at: index)
-                        }
-                    case .update, .doNothing:
-                        break
+                switch action {
+                case .add:
+                    print("StatitsicsViewModel: Adding transfer with id: \(transfer.id)")
+                    transferTransactions.append(transfer)
+                case .delete:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        print("StatitsicsViewModel: Deleting transfer from array")
+                        transferTransactions.remove(at: index)
+                    } else {
+                        print("ERROR StatitsicsViewModel: No transfer found with such id in array for deletion")
+                        dataShouldBeRefetched = true
                     }
+                case .update:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        transferTransactions[index] = transfer
+                    } else {
+                        transferTransactions.append(transfer)
+                    }
+                case .doNothing:
+                    return
                 }
             } else {
+                print("ERROR StatisticsViewModel: Provided transfer for action \(action) is nil")
                 dataShouldBeRefetched = true
             }
             
             dataUpdatedFromAnotherView = .transfer
             
         case .transactions(let transaction):
-            if lightWeightStatistics, let transaction, !lightWeightDateFilterRange.contains(transaction.date) {
-                return
-            }
-            
             if let transaction {
+                if lightWeightStatistics {
+                    guard lightWeightDateFilterRange.contains(transaction.date) else { return }
+                    
+                    switch action {
+                    case .add:
+                        guard transaction.balanceAccount?.id == balanceAccountToFilter.id else { return }
+                    case .delete:
+                        let transactionID = transaction.id
+                        guard transactions.contains(where: { $0.id == transactionID }) else { return }
+                    case .update:
+                        let transactionID = transaction.id
+                        let containsTransfer = transactions.contains(where: { $0.id == transactionID })
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        
+                        if !containsTransfer && sameBalanceAccount {
+                            transactions.append(transaction)
+                        } else if containsTransfer && !sameBalanceAccount {
+                            if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                                transactions.remove(at: index)
+                            }
+                        } else if !containsTransfer && !sameBalanceAccount {
+                            return
+                        }
+                    case .doNothing:
+                        return
+                    }
+                }
+                
                 dataShouldBeRefetched = false
                 
                 switch action {
                 case .add:
-                    transactions.append(transaction)
+                    do {
+                        let transactionID = transaction.id
+                        guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            dataShouldBeRefetched = true
+                            break
+                        }
+                        print("StatitsicsViewModel: Adding transaction with id: \(addedTransaction.id)")
+                        transactions.append(addedTransaction)
+                    } catch {
+                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
+                    }
                 case .delete:
-                    if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
+                    let transactionID = transaction.id
+                    if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                        print("StatitsicsViewModel: Deleting transaction from array")
                         transactions.remove(at: index)
+                    } else {
+                        print("ERROR StatitsicsViewModel: No transaction found with such id in array for deletion")
+                        dataShouldBeRefetched = true
                     }
                 case .update:
-                    if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
-                        transactions[index] = transaction
+                    do {
+                        let transactionID = transaction.id
+                        if let index = transactions.firstIndex(where: { $0.id == transactionID }),
+                           let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) {
+                            print("StatisticsViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            transactions[index] = updatedTransaction
+                        } else {
+                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id, or there is no transaction with id in transactions array: \(transactionID)")
+                            dataShouldBeRefetched = true
+                        }
+                    } catch {
+                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
                     }
                 case .doNothing:
                     break
                 }
             } else {
+                print("ERROR StatisticsViewModel: Provided transaction for action \(action) is nil")
                 dataShouldBeRefetched = true
             }
             
@@ -1157,7 +1245,7 @@ extension StatisticsViewModel: TransactionListViewModelDelegate {
     
     func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
         dataShouldBeRefetched = false
-        if let transaction, let index = transactions.map(\.id).firstIndex(of: transaction.id) {
+        if let transactionID = transaction?.id, let index = transactions.firstIndex(where: { $0.id == transactionID }) {
             transactions.remove(at: index)
         } else {
             dataShouldBeRefetched = true
