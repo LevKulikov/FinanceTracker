@@ -1119,6 +1119,9 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
                         print("StatitsicsViewModel: Deleting transaction from array")
                         transactions.remove(at: index)
+                    } else {
+                        print("StatisticsViewModel: Ignoring transaction, that was deleted (probably from a different balance account). Transaction id: \(transaction.id)")
+                        return
                     }
                     
                 case .update:
