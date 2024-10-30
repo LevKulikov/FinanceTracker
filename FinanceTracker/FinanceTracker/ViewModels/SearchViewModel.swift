@@ -597,7 +597,10 @@ extension SearchViewModel: CustomTabViewModelDelegate {
         switch dataType {
         case .transactions(let transaction):
             if let transaction {
-                guard dateFilterRange.contains(transaction.date) else { return }
+                guard dateFilterRange.contains(transaction.date) else {
+                    print("SearchViewModel: Ignoring transaction which is not in date filter range, transaction id: \(transaction.id)")
+                    return
+                }
                 
                 switch action {
                 case .add:

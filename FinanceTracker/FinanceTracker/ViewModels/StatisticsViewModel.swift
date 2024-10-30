@@ -1095,6 +1095,11 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                 
                 switch action {
                 case .add:
+                    guard transaction.balanceAccount?.id == balanceAccountToFilter.id else {
+                        print("StatisticsViewModel: Ignoring transaction, that was added to a different balance account. Transaction id: \(transaction.id)")
+                        return
+                    }
+                    
                     do {
                         let transactionID = transaction.id
                         guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
@@ -1108,30 +1113,43 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                         print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
                         dataShouldBeRefetched = true
                     }
+                    
                 case .delete:
                     let transactionID = transaction.id
                     if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
                         print("StatitsicsViewModel: Deleting transaction from array")
                         transactions.remove(at: index)
-                    } else {
-                        print("ERROR StatitsicsViewModel: No transaction found with such id in array for deletion")
-                        dataShouldBeRefetched = true
                     }
+                    
                 case .update:
                     do {
                         let transactionID = transaction.id
-                        if let index = transactions.firstIndex(where: { $0.id == transactionID }),
-                           let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) {
-                            print("StatisticsViewModel: Updating transaction with id: \(updatedTransaction.id)")
-                            transactions[index] = updatedTransaction
-                        } else {
-                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id, or there is no transaction with id in transactions array: \(transactionID)")
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        let index = transactions.firstIndex(where: { $0.id == transactionID })
+                        guard let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
                             dataShouldBeRefetched = true
+                            break
+                        }
+                        
+                        if (index != nil && sameBalanceAccount) {
+                            print("StatisticsViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            transactions[index!] = updatedTransaction
+                        } else if (index == nil && sameBalanceAccount) {
+                            print("StatitsicsViewModel: Adding transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.append(updatedTransaction)
+                        } else if (index != nil && !sameBalanceAccount) {
+                            print("StatitsicsViewModel: Removing transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.remove(at: index!)
+                        } else {
+                            print("StatisticsViewModel: Ignoring transaction, that was updated, with id: \(updatedTransaction.id)")
+                            return
                         }
                     } catch {
                         print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
                         dataShouldBeRefetched = true
                     }
+                    
                 case .doNothing:
                     break
                 }
