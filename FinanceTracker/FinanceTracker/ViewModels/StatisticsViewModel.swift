@@ -1015,10 +1015,10 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
             
             if let transfer {
                 guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else {
-                    if case .update = action {
+                    if action == .update || action == .delete {
                         let transferID = transfer.id
                         if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
-                            print("StatisticsViewModel: Updating transfer with id: \(transferID)")
+                            print("StatisticsViewModel: Removing transfer with id: \(transferID)")
                             transferTransactions.remove(at: index)
                             dataUpdatedFromAnotherView = .transfer
                         } else {
