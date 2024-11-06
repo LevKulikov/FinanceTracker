@@ -78,6 +78,8 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel
     
+    func fetchSingleFromBackground<T>(withPredicate: Predicate<T>) async throws -> T? where T : PersistentModel, T: Sendable 
+    
     /// Fetches all data from background and creates codable data container
     /// - Returns: codable data container with all stored data
     func createDataContainer() async throws -> FTDataContainer
@@ -197,7 +199,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         if #available(iOS 18.0, *) {
             Task {
                 do {
-                    try await deleteTransactionById(transaction)
+                    try await deleteTransactionByIdFromBackgroundActor(transaction)
                 } catch {
                     print(error)
                 }
@@ -222,7 +224,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         if #available(iOS 18.0, *) {
             Task {
                 do {
-                    try await deleteTransferById(transferTransaction)
+                    try await deleteTransferByIdFromBackgroundActor(transferTransaction)
                 } catch {
                     print(error)
                 }
@@ -471,6 +473,12 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
+    func fetchSingleFromBackground<T>(withPredicate: Predicate<T>) async throws -> T? where T : PersistentModel, T: Sendable {
+        var fetchDescriptor = FetchDescriptor<T>(predicate: withPredicate)
+        fetchDescriptor.fetchLimit = 1
+        return try await fetchFromBackground(fetchDescriptor).first
+    }
+    
     func createDataContainer() async throws -> FTDataContainer {
         let nonNilBackgroundActor = backgroundActor ?? BackgroundDataActor(modelContainer: container)
         
@@ -652,7 +660,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
-    private func deleteTransactionById(_ transaction: Transaction) async throws {
+    private func deleteTransactionByIdFromBackgroundActor(_ transaction: Transaction) async throws {
         if let backgroundActor {
             try await backgroundActor.deleteTransactionById(transaction)
             try await backgroundActor.save()
@@ -663,7 +671,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
-    private func deleteTransferById(_ transfer: TransferTransaction) async throws {
+    private func deleteTransferByIdFromBackgroundActor(_ transfer: TransferTransaction) async throws {
         if let backgroundActor {
             try await backgroundActor.deleteTransferById(transfer)
             try await backgroundActor.save()
@@ -672,5 +680,19 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             try await backgroundActor!.deleteTransferById(transfer)
             try await backgroundActor!.save()
         }
+    }
+    
+    @MainActor
+    private func deleteTransactionByIdFromMainContext(_ transaction: Transaction) async throws {
+        let trId = transaction.id
+        try await deleteTransactionByIdFromMainContext(trId)
+    }
+    
+    @MainActor
+    private func deleteTransactionByIdFromMainContext(_ transactionID: String) async throws {
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == transactionID })
+        let arr = try fetch(descr)
+        guard let trans = arr.first else { return }
+        container.mainContext.delete(trans)
     }
 }

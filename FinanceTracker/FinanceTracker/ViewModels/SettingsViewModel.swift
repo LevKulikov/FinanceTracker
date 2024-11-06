@@ -11,20 +11,26 @@ import SwiftUI
 protocol SettingsViewModelDelegate: AnyObject {
     func didSelectSetting(_ setting: SettingsSectionAndDataType?)
     
-    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType)
+    func didUpdateSettingsSectionData(_ section: SettingsSectionAndDataType)
+    
+    func didAddSettingsSectionData(_ section: SettingsSectionAndDataType)
+    
+    func didDeleteSettingsSectionData(_ section: SettingsSectionAndDataType)
+    
+    func didDeleteSettingsSectionDataWithTransactions(_ section: SettingsSectionAndDataType)
     
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType])
 }
 
-enum SettingsSectionAndDataType {
-    case categories
-    case balanceAccounts
-    case tags
-    case transactions
-    case transfers
+enum SettingsSectionAndDataType: Hashable {
+    case categories(Category?)
+    case balanceAccounts(BalanceAccount?)
+    case tags(Tag?)
+    case transactions(Transaction?)
+    case transfers(TransferTransaction?)
     case appearance
     case data
-    case budgets
+    case budgets(Budget?)
     case notifications
 }
 
@@ -136,106 +142,142 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
 //MARK: - Extensions
 //MARK: Extension for BalanceAccountsViewModelDelegate
 extension SettingsViewModel: BalanceAccountsViewModelDelegate {
-    func didUpdatedBalanceAccountsList() {
-        delegate?.didUpdateSettingsSection(.balanceAccounts)
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddSettingsSectionData(.balanceAccounts(balanceAccount))
     }
     
-    func didDeleteBalanceAccount() {
-        delegate?.didUpdateSettingsSection(.data)
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateSettingsSectionData(.balanceAccounts(balanceAccount))
     }
     
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionData(.balanceAccounts(balanceAccount))
+    }
+    
+    func didDeleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
+        delegate?.didDeleteSettingsSectionDataWithTransactions(.balanceAccounts(balanceAccount))
+    }
+    
+    func didAddTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didAddSettingsSectionData(.transfers(transferTransaction))
+    }
+    
+    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didUpdateSettingsSectionData(.transfers(transferTransaction))
+    }
+    
+    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionData(.transfers(transferTransaction))
+    }
+}
+
+extension SettingsViewModel: TransfersViewModelDelegate {
     func didAddTransferTransaction(_ transfer: TransferTransaction) {
-        delegate?.didUpdateSettingsSection(.transfers)
+        delegate?.didAddSettingsSectionData(.transfers(transfer))
     }
     
     func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
-        delegate?.didUpdateSettingsSection(.transfers)
+        delegate?.didUpdateSettingsSectionData(.transfers(transfer))
     }
     
     func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
-        delegate?.didUpdateSettingsSection(.transfers)
+        delegate?.didDeleteSettingsSectionData(.transfers(transfer))
     }
 }
 
 //MARK: Extension for CategoriesViewModelDelegate
 extension SettingsViewModel: CategoriesViewModelDelegate {
-    func didUpdateCategoryList() {
-        delegate?.didUpdateSettingsSection(.categories)
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddSettingsSectionData(.categories(category))
     }
     
-    func didDeleteCategory() {
-        delegate?.didUpdateSettingsSection(.data)
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateSettingsSectionData(.categories(category))
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionData(.categories(category))
+    }
+    
+    func didDeleteCategoryWithTransactions(_ category: Category) {
+        delegate?.didDeleteSettingsSectionDataWithTransactions(.categories(category))
     }
 }
 
 //MARK: Extension for TagsViewModelDelegate
 extension SettingsViewModel: TagsViewModelDelegate {
-    func didDeleteTag() {
-        delegate?.didUpdateSettingsSection(.tags)
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didAddSettingsSectionData(.tags(tag))
     }
     
-    func didDeleteTagWithTransactions() {
-        delegate?.didUpdateSettingsSection(.data)
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didUpdateSettingsSectionData(.tags(tag))
     }
     
-    func didAddTag() {
-        delegate?.didUpdateSettingsSection(.tags)
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionData(.tags(tag))
     }
     
-    func didUpdatedTag() {
-        delegate?.didUpdateSettingsSection(.tags)
+    func didDeleteTagWithTransactions(_ tag: Tag) {
+        delegate?.didDeleteSettingsSectionDataWithTransactions(.tags(tag))
     }
 }
 
 //MARK: Extension for ManageDataViewModelDelegate
 extension SettingsViewModel: ManageDataViewModelDelegate {
     func didDeleteAllTransactions() {
-        delegate?.didUpdateSettingsSection(.data)
+        delegate?.didUpdateSettingsSectionData(.data)
     }
     
     func didDeleteAllData() {
-        delegate?.didUpdateSettingsSection(.data)
+        delegate?.didUpdateSettingsSectionData(.data)
     }
     
     func didDeleteAndImportNewData() {
-        delegate?.didUpdateSettingsSection(.data)
+        delegate?.didUpdateSettingsSectionData(.data)
     }
 }
 
 //MARK: Extensions for BudgetsViewModelDelegate
 extension SettingsViewModel: BudgetsViewModelDelegate {
-    func didUpdateTransaction() {
-        delegate?.didUpdateSettingsSection(.transactions)
-    }
-    
     func didAddBudget(_ budget: Budget) {
-        
+        delegate?.didAddSettingsSectionData(.budgets(budget))
     }
     
     func didUpdateBudget(_ budget: Budget) {
-        
+        delegate?.didUpdateSettingsSectionData(.budgets(budget))
     }
     
     func didDeleteBudget(_ budget: Budget) {
-        
+        delegate?.didDeleteSettingsSectionData(.budgets(budget))
+    }
+}
+
+extension SettingsViewModel: TransactionManipulationDelegate {
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegate?.didAddSettingsSectionData(.transactions(transaction))
+    }
+    
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegate?.didUpdateSettingsSectionData(.transactions(transaction))
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionData(.transactions(transaction))
     }
 }
 
 extension SettingsViewModel: StatisticsViewModelDelegate {
-    func showTabBar(_ show: Bool) {
-        return
+    func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didDeleteSettingsSectionDataWithTransactions(.tags(tag))
     }
     
-    func didUpdatedTransactionsListFromStatistics() {
-        delegate?.didUpdateSettingsSection(.transactions)
+    func showTabBar(_ show: Bool) {
+        return
     }
 }
 
 extension SettingsViewModel: SearchViewModelDelegate {
-    func didUpdatedTransactionsList() {
-        delegate?.didUpdateSettingsSection(.transactions)
-    }
-    
     func hideTabBar(_ hide: Bool) {
         return
     }
@@ -255,7 +297,7 @@ extension SettingsViewModel: TabsSettingsViewModelDelegate {
 //MARK: Extensions for AppearanceViewModelDelegate
 extension SettingsViewModel: AppearanceViewModelDelegate {
     func didSetShowAddButtonFromEvetyTab(_ show: Bool) {
-        delegate?.didUpdateSettingsSection(.appearance)
+        delegate?.didUpdateSettingsSectionData(.appearance)
     }
 }
 

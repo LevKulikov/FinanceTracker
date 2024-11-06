@@ -9,10 +9,8 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol TransfersViewModelDelegate: AnyObject {
-    func didAddTransferTransaction(_ transfer: TransferTransaction)
-    func didUpdateTransferTransaction(_ transfer: TransferTransaction)
-    func didDeleteTransferTransaction(_ transfer: TransferTransaction)
+protocol TransfersViewModelDelegate: TransferTransactionManipulationDelegate {
+    
 }
 
 final class TransfersViewModel: @unchecked Sendable, ObservableObject {
@@ -52,7 +50,7 @@ final class TransfersViewModel: @unchecked Sendable, ObservableObject {
         Task { @MainActor in
             do {
                 try dataManager.deleteTransferTransaction(transfer)
-                delegate?.didDeleteTransferTransaction(transfer)
+                delegate?.didDeleteTransferTransaction(transfer, from: .settingsView)
                 withAnimation {
                     transfers.removeAll { $0.id == transfer.id }
                 }
@@ -135,22 +133,22 @@ final class TransfersViewModel: @unchecked Sendable, ObservableObject {
 }
 
 extension TransfersViewModel: AddingTransferViewModelDelegate {
-    func didAddTransferTransaction(_ transferTransaction: TransferTransaction) {
-        delegate?.didAddTransferTransaction(transferTransaction)
+    func didAddTransferTransaction(_ transferTransaction: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didAddTransferTransaction(transferTransaction, from: tabView)
         Task {
             await refetchTransfers()
         }
     }
     
-    func didUpdateTransferTransaction(_ transfer: TransferTransaction) {
-        delegate?.didUpdateTransferTransaction(transfer)
+    func didUpdateTransferTransaction(_ transfer: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didUpdateTransferTransaction(transfer, from: tabView)
         Task { @MainActor in
             transfers.sort { $0.date > $1.date }
         }
     }
     
-    func didDeleteTransferTransaction(_ transfer: TransferTransaction) {
-        delegate?.didDeleteTransferTransaction(transfer)
+    func didDeleteTransferTransaction(_ transfer: TransferTransaction, from tabView: TabViewType) {
+        delegate?.didDeleteTransferTransaction(transfer, from: tabView)
         Task { @MainActor in
             withAnimation {
                 transfers.removeAll { $0.id == transfer.id }

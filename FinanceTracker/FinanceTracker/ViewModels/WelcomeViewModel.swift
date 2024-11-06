@@ -74,8 +74,18 @@ final class WelcomeViewModel: ObservableObject, @unchecked Sendable {
 
 //MARK: - Extensions
 extension WelcomeViewModel: AddingBalanceAccountViewModelDelegate {
-    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount) {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
         dataManager.setDefaultBalanceAccount(balanceAccount)
         delegate?.didCreateBalanceAccount()
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        /// Welcome can't updated balance accounts
+        return
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        /// Welcome can't delete balance accounts
+        return
     }
 }

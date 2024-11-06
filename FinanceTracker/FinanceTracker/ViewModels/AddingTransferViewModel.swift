@@ -9,10 +9,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol AddingTransferViewModelDelegate: AnyObject {
-    func didAddTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didUpdateTransferTransaction(_ transferTransaction: TransferTransaction)
-    func didDeleteTransferTransaction(_ transferTransaction: TransferTransaction)
+
+
+protocol AddingTransferViewModelDelegate: TransferTransactionManipulationDelegate {
+    
 }
 
 enum ActionWithTransferTransaction: Equatable, Hashable {
@@ -153,7 +153,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         if case .update(let transfer) = action {
             do {
                 try dataManager.deleteTransferTransaction(transfer)
-                delegate?.didDeleteTransferTransaction(transfer)
+                delegate?.didDeleteTransferTransaction(transfer, from: .settingsView)
                 result?(.success(()))
             } catch {
                 result?(.failure(error))
@@ -205,7 +205,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         
         do {
             try dataManager.save()
-            delegate?.didUpdateTransferTransaction(transferTransaction)
+            delegate?.didUpdateTransferTransaction(transferTransaction, from: .settingsView)
         } catch {
             errorHandler(.saveDataError)
         }
@@ -234,7 +234,7 @@ final class AddingTransferViewModel: ObservableObject, @unchecked Sendable {
         )
         
         dataManager.insert(transferTransaction)
-        delegate?.didAddTransferTransaction(transferTransaction)
+        delegate?.didAddTransferTransaction(transferTransaction, from: .settingsView)
     }
     
     @MainActor

@@ -10,10 +10,9 @@ import SwiftUI
 import Algorithms
 import SwiftData
 
-protocol StatisticsViewModelDelegate: AnyObject {
+protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func showTabBar(_ show: Bool)
-    
-    func didUpdatedTransactionsListFromStatistics()
+    func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
 
 enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
@@ -60,6 +59,13 @@ enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Id
     }
 }
 
+enum DataAction: Equatable {
+    case add
+    case delete
+    case update
+    case doNothing
+}
+
 final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Data types which are calculated for different type of entities
     private enum CalculatingDataType: Equatable {
@@ -71,6 +77,16 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     enum NavigationDestination: Hashable {
         case tagsView
+    }
+    
+    enum StatisticsSensitiveDataUpdateType: Equatable {
+        case transaction
+        case transfer
+        case tag
+        case category
+        case balanceAccount
+        case allTypes
+        case none
     }
     
     //MARK: - Properties
@@ -119,8 +135,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private let dataManager: any DataManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
-    /// Flag to determine if any transaction was updated from another view. Prevents multiple recalculations if several transactions were updated
-    private var isTransactionUpdatedFromAnotherView = false
+    /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
+    private var dataUpdatedFromAnotherView: StatisticsSensitiveDataUpdateType? = nil
+    /// Flag determines if data should be refetched
+    private var dataShouldBeRefetched: Bool = false
     /// Array of years those are available
     private var availableYearDates: [Date] = []
     /// Array of years with months those are available
@@ -273,34 +291,102 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard !isFetchingData else {
             print("refreshData, data is already being refetched")
             return
         }
         print("refreshData, started")
-        fetchAllData { [weak self] in
-            if let self, self.lightWeightStatistics {
-                self.calculateSpendIncomeValues()
+        switch dataType {
+        case .transaction:
+            Task {
+                if withRefetch {
+                    if lightWeightStatistics {
+                        await fetchTransactionsForDate()
+                    } else {
+                        await fetchTransactions()
+                    }
+                }
+                if lightWeightStatistics {
+                    calculateSpendIncomeValues()
+                } else {
+                    calculateTotalForBalanceAccount()
+                }
+                calculateTagsTotal(animated: true)
+                calculateDataForPieChart(animated: true)
+                calculateDataForBarChart()
+                print("refreshData, ended")
+                Task { @MainActor in
+                    compeletionHandler?()
+                }
+            }
+        case .transfer:
+            if !lightWeightStatistics {
+                Task {
+                    if withRefetch {
+                        await fetchTransferTransactions()
+                    }
+                    calculateTotalForBalanceAccount()
+                }
+            }
+        case .tag:
+            Task {
+                if withRefetch {
+                    await fetchTags()
+                }
+                calculateTagsTotal(animated: true)
+            }
+        case .category:
+            calculateDataForPieChart(animated: true)
+        case .balanceAccount:
+            if withRefetch {
+                Task {
+                    await fetchBalanceAccounts()
+                }
+            }
+        case .allTypes:
+            if withRefetch {
+                fetchAllData { [weak self] in
+                    if let self, self.lightWeightStatistics {
+                        self.calculateSpendIncomeValues()
+                    } else {
+                        self?.calculateTotalForBalanceAccount()
+                    }
+                    self?.calculateTagsTotal(animated: true)
+                    self?.calculateDataForPieChart(animated: true)
+                    self?.calculateDataForBarChart()
+                    print("refreshData, ended")
+                    Task { @MainActor in
+                        compeletionHandler?()
+                    }
+                }
             } else {
-                self?.calculateTotalForBalanceAccount()
+                if lightWeightStatistics {
+                    calculateSpendIncomeValues()
+                } else {
+                    calculateTotalForBalanceAccount()
+                }
+                calculateTagsTotal(animated: true)
+                calculateDataForPieChart(animated: true)
+                calculateDataForBarChart()
+                print("refreshData, ended")
+                Task { @MainActor in
+                    compeletionHandler?()
+                }
             }
-            self?.calculateTagsTotal(animated: true)
-            self?.calculateDataForPieChart(animated: true)
-            self?.calculateDataForBarChart()
-            print("refreshData, ended")
-            Task { @MainActor in
-                compeletionHandler?()
-            }
+        case .none:
+            break
         }
     }
     
     /// Refreshes data if some changes occured, otherwise do nothing
     /// - Parameter compeletionHandler: closure that is called at the end of refreshing
     func refreshDataIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
-        guard isTransactionUpdatedFromAnotherView else { return }
-        isTransactionUpdatedFromAnotherView = false
-        refreshData(compeletionHandler: compeletionHandler)
+        guard let dataUpdatedFromAnotherView else { return }
+        self.dataUpdatedFromAnotherView = nil
+        let refetchBuffer = dataShouldBeRefetched
+        dataShouldBeRefetched = false
+        refreshData(dataType: dataUpdatedFromAnotherView, withRefetch: refetchBuffer, compeletionHandler: compeletionHandler)
     }
     
     /// Moves date range consiquentely its size to back or forward
@@ -507,15 +593,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     }
                     return tupleArray
                 }
-                .grouped { $0.tag }
-                .map { tagDict in
+                .grouped { $0.tag.id }
+                .compactMap { tagDict -> TagChartData? in
                     var total: Float = 0
                     var transactionsToSet: [Transaction] = []
+                    guard let tagAsKey = tagDict.value.first?.tag else { return nil }
+                    
                     for tuple in tagDict.value {
                         total += tuple.transaction.value
                         transactionsToSet.append(tuple.transaction)
                     }
-                    return TagChartData(tag: tagDict.key, total: total, transactions: transactionsToSet)
+                    return TagChartData(tag: tagAsKey, total: total, transactions: transactionsToSet)
                 }
                 .sorted { $0.total > $1.total}
             
@@ -566,11 +654,12 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     }
             
             var returnData = dateAndTypeFilteredData
-                .grouped { $0.category }
-                .map { singleDict in
+                .grouped { $0.category?.id }
+                .compactMap { singleDict -> TransactionPieChartData? in
                     let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
                     let transactions = singleDict.value
-                    return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
+                    guard let categoryAsKey = singleDict.value.first?.category else { return nil}
+                    return TransactionPieChartData(category: categoryAsKey, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
             print("calculateDataForPieChart, started to sort returnData")
@@ -839,71 +928,350 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
         }
         
         guard tabView != .statisticsView else { return }
+        dataShouldBeRefetched = false
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        }
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        if tabView == .welcomeView {
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        }
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        if tabView == .welcomeView {
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        }
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) async {
         switch dataType {
         case .categories:
-            isTransactionUpdatedFromAnotherView = true
-        case .balanceAccounts:
-            isTransactionUpdatedFromAnotherView = true
-        case .tags:
-            isTransactionUpdatedFromAnotherView = true
-        case .transfers:
-            isTransactionUpdatedFromAnotherView = true
-        case .transactions:
-            isTransactionUpdatedFromAnotherView = true
+            dataUpdatedFromAnotherView = .category
+            
+        case .balanceAccounts(let balanceAccount):
+            if let balanceAccount {
+                dataShouldBeRefetched = false
+                Task { @MainActor in
+                    switch action {
+                    case .add:
+                        balanceAccounts.append(balanceAccount)
+                    case .delete:
+                        if let index = balanceAccounts.map(\.id).firstIndex(of: balanceAccount.id) {
+                            balanceAccounts.remove(at: index)
+                        }
+                    case .update, .doNothing:
+                        break
+                    }
+                }
+            } else {
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .balanceAccount
+            
+        case .tags(let tag):
+            if let tag {
+                dataShouldBeRefetched = false
+                Task { @MainActor in
+                    switch action {
+                    case .add:
+                        allTags.append(tag)
+                    case .delete:
+                        if let index = allTags.map(\.id).firstIndex(of: tag.id) {
+                            allTags.remove(at: index)
+                        }
+                    case .update, .doNothing:
+                        break
+                    }
+                }
+            } else {
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .tag
+            
+        case .transfers(let transfer):
+            guard !lightWeightStatistics else { return }
+            
+            if let transfer {
+                guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else {
+                    if action == .update || action == .delete {
+                        let transferID = transfer.id
+                        if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                            print("StatisticsViewModel: Removing transfer with id: \(transferID)")
+                            transferTransactions.remove(at: index)
+                            dataUpdatedFromAnotherView = .transfer
+                        } else {
+                            print("StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                        }
+                    } else {
+                        print("ERROR StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                    }
+                    return
+                }
+                
+                dataShouldBeRefetched = false
+                switch action {
+                case .add:
+                    print("StatitsicsViewModel: Adding transfer with id: \(transfer.id)")
+                    transferTransactions.append(transfer)
+                case .delete:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        print("StatitsicsViewModel: Deleting transfer from array")
+                        transferTransactions.remove(at: index)
+                    } else {
+                        print("ERROR StatitsicsViewModel: No transfer found with such id in array for deletion")
+                        dataShouldBeRefetched = true
+                    }
+                case .update:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        transferTransactions[index] = transfer
+                    } else {
+                        transferTransactions.append(transfer)
+                    }
+                case .doNothing:
+                    return
+                }
+            } else {
+                print("ERROR StatisticsViewModel: Provided transfer for action \(action) is nil")
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .transfer
+            
+        case .transactions(let transaction):
+            if let transaction {
+                if lightWeightStatistics {
+                    guard lightWeightDateFilterRange.contains(transaction.date) else { return }
+                    
+                    switch action {
+                    case .add:
+                        guard transaction.balanceAccount?.id == balanceAccountToFilter.id else { return }
+                    case .delete:
+                        let transactionID = transaction.id
+                        guard transactions.contains(where: { $0.id == transactionID }) else { return }
+                    case .update:
+                        let transactionID = transaction.id
+                        let containsTransfer = transactions.contains(where: { $0.id == transactionID })
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        
+                        if !containsTransfer && sameBalanceAccount {
+                            transactions.append(transaction)
+                        } else if containsTransfer && !sameBalanceAccount {
+                            if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                                transactions.remove(at: index)
+                            }
+                        } else if !containsTransfer && !sameBalanceAccount {
+                            return
+                        }
+                    case .doNothing:
+                        return
+                    }
+                }
+                
+                dataShouldBeRefetched = false
+                
+                switch action {
+                case .add:
+                    guard transaction.balanceAccount?.id == balanceAccountToFilter.id else {
+                        print("StatisticsViewModel: Ignoring transaction, that was added to a different balance account. Transaction id: \(transaction.id)")
+                        return
+                    }
+                    
+                    do {
+                        let transactionID = transaction.id
+                        guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            dataShouldBeRefetched = true
+                            break
+                        }
+                        print("StatitsicsViewModel: Adding transaction with id: \(addedTransaction.id)")
+                        transactions.append(addedTransaction)
+                    } catch {
+                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
+                    }
+                    
+                case .delete:
+                    let transactionID = transaction.id
+                    if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                        print("StatitsicsViewModel: Deleting transaction from array")
+                        transactions.remove(at: index)
+                    } else {
+                        print("StatisticsViewModel: Ignoring transaction, that was deleted (probably from a different balance account). Transaction id: \(transaction.id)")
+                        return
+                    }
+                    
+                case .update:
+                    do {
+                        let transactionID = transaction.id
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        let index = transactions.firstIndex(where: { $0.id == transactionID })
+                        guard let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            dataShouldBeRefetched = true
+                            break
+                        }
+                        
+                        if (index != nil && sameBalanceAccount) {
+                            print("StatisticsViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            transactions[index!] = updatedTransaction
+                        } else if (index == nil && sameBalanceAccount) {
+                            print("StatitsicsViewModel: Adding transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.append(updatedTransaction)
+                        } else if (index != nil && !sameBalanceAccount) {
+                            print("StatitsicsViewModel: Removing transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.remove(at: index!)
+                        } else {
+                            print("StatisticsViewModel: Ignoring transaction, that was updated, with id: \(updatedTransaction.id)")
+                            return
+                        }
+                    } catch {
+                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
+                    }
+                    
+                case .doNothing:
+                    break
+                }
+            } else {
+                print("ERROR StatisticsViewModel: Provided transaction for action \(action) is nil")
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .transaction
             Task { @MainActor in
                 if isViewDisplayed {
                     try await Task.sleep(for: .seconds(0.3))
                     refreshDataIfNeeded()
                 }
             }
-        case .appearance:
-            return
+            
         case .data:
-            isTransactionUpdatedFromAnotherView = true
+            dataUpdatedFromAnotherView = .allTypes
             if tabView == .settingsView {
                 Task { @MainActor in
                     cleanData()
                 }
             }
-        case .budgets:
+        case .budgets, .appearance, .notifications:
             return
-        case .notifications:
-            break
         }
     }
 }
 
 //MARK: - Extension for TagsViewModelDelegate
 extension StatisticsViewModel: TagsViewModelDelegate {
-    func didDeleteTag() {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didAddTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+        }
+    }
+    
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didUpdatedTag(tag, from: .statisticsView)
         Task {
             await fetchTags()
             calculateTagsTotal()
         }
     }
     
-    func didDeleteTagWithTransactions() {
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didDeleteTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTagWithTransactions(_ tag: Tag) {
+        delegate?.didDeleteTagWithTransactions(tag, from: .statisticsView)
         refreshData()
-    }
-    
-    func didAddTag() {
-        Task {
-            await fetchTags()
-        }
-    }
-    
-    func didUpdatedTag() {
-        Task {
-            await fetchTags()
-            calculateTagsTotal()
-        }
     }
 }
 
 //MARK: - Extension for TransactionListViewModelDelegate
 extension StatisticsViewModel: TransactionListViewModelDelegate {
-    func didUpdatedTransaction() {
-        isTransactionUpdatedFromAnotherView = true
-        delegate?.didUpdatedTransactionsListFromStatistics()
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        transactions.append(transaction)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didAddTransaction(transaction, from: .statisticsView)
+    }
+    
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didUpdateTransaction(transaction, from: .statisticsView)
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        dataShouldBeRefetched = false
+        if let transactionID = transaction?.id, let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+            transactions.remove(at: index)
+        } else {
+            dataShouldBeRefetched = true
+        }
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didDeleteTransaction(transaction, from: .statisticsView)
     }
 }

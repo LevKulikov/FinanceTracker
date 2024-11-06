@@ -10,14 +10,12 @@ import SwiftData
 import SwiftUI
 
 //MARK: - Delegate protocol
-protocol BudgetsViewModelDelegate: AnyObject {
+protocol BudgetsViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func didAddBudget(_ budget: Budget)
     
     func didUpdateBudget(_ budget: Budget)
     
     func didDeleteBudget(_ budget: Budget)
-    
-    func didUpdateTransaction()
     
     func showTabBar(_ show: Bool)
 }
@@ -203,8 +201,67 @@ extension BudgetsViewModel: AddingBudgetViewModelDelegate {
 }
 
 extension BudgetsViewModel: TransactionListViewModelDelegate {
-    func didUpdatedTransaction() {
-        delegate?.didUpdateTransaction()
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .budgetsView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .budgetsView)
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .budgetsView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .budgetsView)
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegate?.didAddTransaction(transaction, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegate?.didUpdateTransaction(transaction, from: .budgetsView)
+        neededToBeRefreshed = true
+        Task { @MainActor in
+            withAnimation {
+                budgets = []
+            }
+        }
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        delegate?.didDeleteTransaction(transaction, from: .budgetsView)
         neededToBeRefreshed = true
         Task { @MainActor in
             withAnimation {
@@ -226,6 +283,22 @@ extension BudgetsViewModel: CustomTabViewModelDelegate {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .budgetsView else { return }
         
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .budgetsView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .budgetsView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         switch dataType {
         case .categories:
             neededToBeRefreshed = true
