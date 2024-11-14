@@ -209,6 +209,16 @@
         }
       }
     },
+    "Add transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить транзакцию"
+          }
+        }
+      }
+    },
     "Additional tabs" : {
       "localizations" : {
         "ru" : {
