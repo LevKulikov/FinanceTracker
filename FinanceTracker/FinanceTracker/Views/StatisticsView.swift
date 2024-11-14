@@ -16,6 +16,7 @@ struct StatisticsView: View {
     @State private var showStatitsticsSettings = false
     @State private var showTransactionListWithData: TransactionListUIData?
     @State private var currency: Currency?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     private var currencyString: String {
         if let currency {
             return currency.symbol
@@ -24,7 +25,7 @@ struct StatisticsView: View {
         }
     }
     private var windowWidth: CGFloat {
-        FTAppAssets.getWindowSize().width
+        windowSize.width
     }
     private var pieChartHeight: CGFloat {
         return viewModel.lightWeightStatistics ? 290 : 350
@@ -115,6 +116,11 @@ struct StatisticsView: View {
             .background(content: { backgroundColor.ignoresSafeArea() })
             .onChange(of: viewModel.balanceAccountToFilter) {
                 setCurrency()
+            }
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                windowSize = newValue
             }
             .task {
                 guard currency == nil else { return }

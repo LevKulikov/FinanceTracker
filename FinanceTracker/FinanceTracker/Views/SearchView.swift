@@ -19,8 +19,9 @@ struct SearchView: View {
     @State private var transactionToDelete: Transaction?
     @State private var showRefreshAlert = false
     @State private var currencyForStatistics: Currency?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     private var maxFiltersWidth: CGFloat {
-        if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
+        if windowSize.width > FTAppAssets.maxCustomSheetWidth {
             return 370
         }
         return .infinity
@@ -87,6 +88,11 @@ struct SearchView: View {
             }
             .refreshable {
                 showRefreshAlert = true
+            }
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                windowSize = newValue
             }
             .confirmationDialog(
                 "Delete transaction?",
