@@ -43,6 +43,18 @@ struct TransactionBarChart: View {
     @Binding private var transactionType: TransactionFilterTypes
     private let xScaleEndDate: Date
     
+    private var transactionsDataVisible: [[TransactionBarChartData]] {
+        switch perDate {
+        case .perDay:
+            return Array(transactionsData.suffix(transactionType == .both ? 31 : 61))
+        case .perWeek:
+            return Array(transactionsData.suffix(transactionType == .both ? 26 : 52))
+        case .perMonth:
+            return Array(transactionsData.suffix(transactionType == .both ? 36 : 60))
+        case .perYear:
+            return transactionsData
+        }
+    }
     private var maxVisibleBars: Int {
         let isBothTypesShown = transactionType == .both
         if FTAppAssets.currentUserDevise == .phone {
@@ -100,17 +112,18 @@ struct TransactionBarChart: View {
         }
         return components
     }
+    /// Bounds chart x scale available range. Do not delete, can be useful in future
     private var chartXScale: ClosedRange<Date> {
         let calendar = Calendar.current
         switch perDate {
         case .perDay:
-            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -2 : -3, to: xScaleEndDate) ?? xScaleEndDate
+            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -1 : -2, to: xScaleEndDate) ?? xScaleEndDate
             if let day = calendar.dateComponents([.day], from: xScaleEndDate).day, day < 11 {
                 startDate = startDate.startOfMonth() ?? xScaleEndDate
             }
             return startDate...(xScaleEndDate.endOfDay() ?? xScaleEndDate)
         case .perWeek:
-            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -1 : -2, to: xScaleEndDate) ?? xScaleEndDate
+            let startDate = calendar.date(byAdding: .year, value: -1, to: xScaleEndDate) ?? xScaleEndDate
             let endDate = xScaleEndDate.endOfWeek() ?? xScaleEndDate
             return startDate...endDate
         case .perMonth:
@@ -147,7 +160,7 @@ struct TransactionBarChart: View {
     //MARK: - Body
     var body: some View {
         Chart {
-            ForEach(transactionsData, id: \.first?.id) { transactionArray in
+            ForEach(transactionsDataVisible, id: \.first?.id) { transactionArray in
                 ForEach(transactionArray) { transaction in
                     BarMark(
                         x: .value("Date", transaction.date, unit: unit),
@@ -174,7 +187,7 @@ struct TransactionBarChart: View {
         ])
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
-        .chartXScale(domain: chartXScale)
+//        .chartXScale(domain: chartXScale)
         .chartYScale(domain: yScale)
         .chartScrollPosition(x: $xScrollPosition)
         .chartXSelection(value: $selection)
@@ -304,10 +317,12 @@ struct TransactionBarChart: View {
     }
     
     private func selectTransactionData() {
-        guard let selection else { return }
-        let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
-        if let data {
-            setSelected(data, date: selection, withCancelation: true)
+        Task { @MainActor in
+            guard let selection else { return }
+            let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
+            if let data {
+                setSelected(data, date: selection, withCancelation: true)
+            }
         }
     }
     

@@ -757,6 +757,20 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     
                     return arrayOfBarData
                 }
+                .sorted {
+                    let fristTrasactionDate = $0.first?.date
+                    let secondTrasactionDate = $1.first?.date
+                    
+                    if fristTrasactionDate == nil {
+                        return true
+                    }
+                    
+                    if secondTrasactionDate == nil {
+                        return false
+                    }
+                    
+                    return $0.first!.date < $1.first!.date
+                }
             
             DispatchQueue.main.async {
                 print("calculateDataForBarChart, providing data for bar chart")
