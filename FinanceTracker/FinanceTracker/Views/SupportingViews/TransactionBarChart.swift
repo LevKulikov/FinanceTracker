@@ -60,7 +60,7 @@ struct TransactionBarChart: View {
         if FTAppAssets.currentUserDevise == .phone {
             return isBothTypesShown ? 5 : 10
         }
-        let windowWidth = FTAppAssets.getWindowSize().width
+        let windowWidth = windowSize.width
         
         switch windowWidth {
         case ...430:
@@ -147,6 +147,7 @@ struct TransactionBarChart: View {
     @State private var transactionDataSelected: [TransactionBarChartData]?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
     @State private var yScaleDispatchWorkItem: DispatchWorkItem?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     
     //MARK: - Init
     init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>, xScaleEndDate: Date = .now) {
@@ -257,6 +258,11 @@ struct TransactionBarChart: View {
                     xScrollPosition = xScaleEndDate
                 }
             }
+        })
+        .onGeometryChange(for: CGSize.self, of: { proxy in
+            proxy.size
+        }, action: { newValue in
+            windowSize = newValue
         })
         .onAppear {
             if xScrollPosition.startOfDay() == xScaleEndDate.startOfDay() {
