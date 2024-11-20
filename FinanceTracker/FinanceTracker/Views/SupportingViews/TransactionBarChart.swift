@@ -43,12 +43,24 @@ struct TransactionBarChart: View {
     @Binding private var transactionType: TransactionFilterTypes
     private let xScaleEndDate: Date
     
+    private var transactionsDataVisible: [[TransactionBarChartData]] {
+        switch perDate {
+        case .perDay:
+            return Array(transactionsData.suffix(transactionType == .both ? 31 : 61))
+        case .perWeek:
+            return Array(transactionsData.suffix(transactionType == .both ? 26 : 52))
+        case .perMonth:
+            return Array(transactionsData.suffix(transactionType == .both ? 36 : 60))
+        case .perYear:
+            return transactionsData
+        }
+    }
     private var maxVisibleBars: Int {
         let isBothTypesShown = transactionType == .both
         if FTAppAssets.currentUserDevise == .phone {
             return isBothTypesShown ? 5 : 10
         }
-        let windowWidth = FTAppAssets.getWindowSize().width
+        let windowWidth = windowSize.width
         
         switch windowWidth {
         case ...430:
@@ -100,17 +112,18 @@ struct TransactionBarChart: View {
         }
         return components
     }
+    /// Bounds chart x scale available range. Do not delete, can be useful in future
     private var chartXScale: ClosedRange<Date> {
         let calendar = Calendar.current
         switch perDate {
         case .perDay:
-            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -2 : -3, to: xScaleEndDate) ?? xScaleEndDate
+            var startDate = calendar.date(byAdding: .month, value: transactionType == .both ? -1 : -2, to: xScaleEndDate) ?? xScaleEndDate
             if let day = calendar.dateComponents([.day], from: xScaleEndDate).day, day < 11 {
                 startDate = startDate.startOfMonth() ?? xScaleEndDate
             }
             return startDate...(xScaleEndDate.endOfDay() ?? xScaleEndDate)
         case .perWeek:
-            let startDate = calendar.date(byAdding: .year, value: transactionType == .both ? -1 : -2, to: xScaleEndDate) ?? xScaleEndDate
+            let startDate = calendar.date(byAdding: .year, value: -1, to: xScaleEndDate) ?? xScaleEndDate
             let endDate = xScaleEndDate.endOfWeek() ?? xScaleEndDate
             return startDate...endDate
         case .perMonth:
@@ -120,30 +133,6 @@ struct TransactionBarChart: View {
         case .perYear:
             let endDate = xScaleEndDate.endOfYear() ?? xScaleEndDate
             return FTAppAssets.availableDateRange.lowerBound...endDate
-        }
-    }
-    private var cartMatchingAlignment: DateComponents {
-        switch perDate {
-        case .perDay:
-            return DateComponents(hour: 0)
-        case .perWeek:
-            return DateComponents(day: 1)
-        case .perMonth:
-            return DateComponents(day: 1)
-        case .perYear:
-            return DateComponents(month: 1)
-        }
-    }
-    private var chartMajorAlignment: DateComponents {
-        switch perDate {
-        case .perDay:
-            return DateComponents(day: 1)
-        case .perWeek:
-            return DateComponents(day: 1)
-        case .perMonth:
-            return DateComponents(month: 1)
-        case .perYear:
-            return DateComponents(month: 1)
         }
     }
     private var xScrollPositionEnd: Date {
@@ -158,6 +147,7 @@ struct TransactionBarChart: View {
     @State private var transactionDataSelected: [TransactionBarChartData]?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
     @State private var yScaleDispatchWorkItem: DispatchWorkItem?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     
     //MARK: - Init
     init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>, xScaleEndDate: Date = .now) {
@@ -171,7 +161,7 @@ struct TransactionBarChart: View {
     //MARK: - Body
     var body: some View {
         Chart {
-            ForEach(transactionsData, id: \.first?.id) { transactionArray in
+            ForEach(transactionsDataVisible, id: \.first?.id) { transactionArray in
                 ForEach(transactionArray) { transaction in
                     BarMark(
                         x: .value("Date", transaction.date, unit: unit),
@@ -196,15 +186,9 @@ struct TransactionBarChart: View {
             String(localized: TransactionCalculationValueType.profit.rawValue) : .blue,
             String(localized: TransactionCalculationValueType.unknown.rawValue) : .yellow,
         ])
-        .chartScrollTargetBehavior(
-            .valueAligned(
-                matching: cartMatchingAlignment,
-                majorAlignment: .matching(cartMatchingAlignment)
-            )
-        )
         .chartScrollableAxes(.horizontal)
         .chartXVisibleDomain(length: maxXVisibleLenth)
-        .chartXScale(domain: chartXScale)
+//        .chartXScale(domain: chartXScale)
         .chartYScale(domain: yScale)
         .chartScrollPosition(x: $xScrollPosition)
         .chartXSelection(value: $selection)
@@ -275,6 +259,11 @@ struct TransactionBarChart: View {
                 }
             }
         })
+        .onGeometryChange(for: CGSize.self, of: { proxy in
+            proxy.size
+        }, action: { newValue in
+            windowSize = newValue
+        })
         .onAppear {
             if xScrollPosition.startOfDay() == xScaleEndDate.startOfDay() {
                 adaptYAxisScaleToVisibleData(isInitial: true) {
@@ -334,10 +323,12 @@ struct TransactionBarChart: View {
     }
     
     private func selectTransactionData() {
-        guard let selection else { return }
-        let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
-        if let data {
-            setSelected(data, date: selection, withCancelation: true)
+        Task { @MainActor in
+            guard let selection else { return }
+            let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
+            if let data {
+                setSelected(data, date: selection, withCancelation: true)
+            }
         }
     }
     

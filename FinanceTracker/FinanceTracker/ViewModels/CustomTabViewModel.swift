@@ -15,6 +15,10 @@ protocol CustomTabViewModelDelegate: AnyObject {
     func addButtonPressed()
     
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType)
 }
 
 enum TabViewType: String, Equatable, Hashable, Identifiable {
@@ -266,6 +270,86 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
 }
 
 //MARK: - Extensions
+extension CustomTabViewModel: TransactionManipulationDelegate {
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .transactions(transaction), from: tabView)
+        }
+    }
+    
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .transactions(transaction), from: tabView)
+        }
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .transactions(transaction), from: tabView)
+        }
+    }
+}
+
+extension CustomTabViewModel: BalanceAccountManipulationDelegate {
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .balanceAccounts(balanceAccount), from: tabView)
+        }
+    }
+}
+
+extension CustomTabViewModel: CategoryManipulationDelegate {
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .categories(category), from: tabView)
+        }
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .categories(category), from: tabView)
+        }
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .categories(category), from: tabView)
+        }
+    }
+}
+
+extension CustomTabViewModel: TagManipulationDelegate {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .tags(tag), from: tabView)
+        }
+    }
+    
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .tags(tag), from: tabView)
+        }
+    }
+    
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .tags(tag), from: tabView)
+        }
+    }
+}
+
 //MARK: Extension for SpendIncomeViewModelDelegate
 extension CustomTabViewModel: SpendIncomeViewModelDelegate {
     func didSelectAction(_ action: ActionWithTransaction) {
@@ -280,31 +364,57 @@ extension CustomTabViewModel: SpendIncomeViewModelDelegate {
             }
         }
     }
-    
-    func didUpdateTransactionList() {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .data, from: .spendIncomeView)
-        }
-    }
 }
 
 //MARK: Extension for StatisticsViewModelDelegate
 extension CustomTabViewModel: StatisticsViewModelDelegate {
-    func showTabBar(_ show: Bool) {
-        withAnimation {
-            showTabBar = show
+    func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: .data, from: tabView)
         }
     }
     
-    func didUpdatedTransactionsListFromStatistics() {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .statisticsView)
+    func showTabBar(_ show: Bool) {
+        withAnimation {
+            showTabBar = show
         }
     }
 }
 
 //MARK: Extension for SettingsViewModelDelegate
 extension CustomTabViewModel: SettingsViewModelDelegate {
+    func didAddSettingsSectionData(_ section: SettingsSectionAndDataType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: section, from: .settingsView)
+        }
+    }
+    
+    func didUpdateSettingsSectionData(_ section: SettingsSectionAndDataType) {
+        delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
+        switch section {
+        case .balanceAccounts:
+            defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
+        case .appearance:
+            Task { @MainActor in
+                showAddButtonFromEvetyTab = dataManager.showAddButtonFromEvetyTab()
+            }
+        default:
+            break
+        }
+    }
+    
+    func didDeleteSettingsSectionData(_ section: SettingsSectionAndDataType) {
+        delegates.forEach {
+            $0.object?.didDeleteData(for: section, from: .settingsView)
+        }
+    }
+    
+    func didDeleteSettingsSectionDataWithTransactions(_ section: SettingsSectionAndDataType) {
+        delegates.forEach {
+            $0.object?.didAddData(for: .data, from: .settingsView)
+        }
+    }
+    
     func didSetSecondThirdTabsPosition(for tabsPositions: [TabViewType]) {
         Task { @MainActor in
             firstThreeTabs = tabsPositions
@@ -324,30 +434,10 @@ extension CustomTabViewModel: SettingsViewModelDelegate {
             }
         }
     }
-    
-    func didUpdateSettingsSection(_ section: SettingsSectionAndDataType) {
-        delegates.forEach { $0.object?.didUpdateData(for: section, from: .settingsView) }
-        switch section {
-        case .balanceAccounts:
-            defaultBalanceAccount = dataManager.getDefaultBalanceAccount()
-        case .appearance:
-            Task { @MainActor in
-                showAddButtonFromEvetyTab = dataManager.showAddButtonFromEvetyTab()
-            }
-        default:
-            break
-        }
-    }
 }
 
 //MARK: Extension for SearchViewModelDelegate
 extension CustomTabViewModel: SearchViewModelDelegate {
-    func didUpdatedTransactionsList() {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .data, from: .searchView)
-        }
-    }
-    
     func hideTabBar(_ hide: Bool) {
         withAnimation {
             showTabBar = !hide
@@ -359,7 +449,7 @@ extension CustomTabViewModel: SearchViewModelDelegate {
 extension CustomTabViewModel: WelcomeViewModelDelegate {
     func didCreateBalanceAccount() {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .balanceAccounts, from: .welcomeView)
+            $0.object?.didUpdateData(for: .balanceAccounts(nil), from: .welcomeView)
         }
     }
 }
@@ -367,20 +457,20 @@ extension CustomTabViewModel: WelcomeViewModelDelegate {
 //MARK: Extension for BudgetsViewModelDelegate
 extension CustomTabViewModel: BudgetsViewModelDelegate {
     func didAddBudget(_ budget: Budget) {
-        return
+        delegates.forEach {
+            $0.object?.didAddData(for: .budgets(budget), from: .budgetsView)
+        }
     }
     
     func didUpdateBudget(_ budget: Budget) {
-        return
+        delegates.forEach {
+            $0.object?.didUpdateData(for: .budgets(budget), from: .budgetsView)
+        }
     }
     
     func didDeleteBudget(_ budget: Budget) {
-        return
-    }
-    
-    func didUpdateTransaction() {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .budgetsView)
+            $0.object?.didDeleteData(for: .budgets(budget), from: .budgetsView)
         }
     }
 }
@@ -389,29 +479,23 @@ extension CustomTabViewModel: BudgetsViewModelDelegate {
 extension CustomTabViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didAddData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
     func updateTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didUpdateData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
     func deletedTransaction(_ transaction: Transaction) {
         delegates.forEach {
-            $0.object?.didUpdateData(for: .transactions, from: .addingSpendIncomeView)
+            $0.object?.didDeleteData(for: .transactions(transaction), from: .addingSpendIncomeView)
         }
     }
     
     func transactionsTypeReselected(to newType: TransactionsType) {
         return
-    }
-    
-    func categoryUpdated() {
-        delegates.forEach {
-            $0.object?.didUpdateData(for: .data, from: .addingSpendIncomeView)
-        }
     }
 }

@@ -73,6 +73,8 @@ struct SettingsView: View {
                 viewModel.getManageDataView()
             case .transactions:
                 EmptyView()
+            case .transfers:
+                viewModel.getTransfersView()
             case .budgets: // .budgets is used to identify additional tab to show
                 viewModel.getAdditionalTabView()
             case .notifications:
@@ -102,15 +104,15 @@ struct SettingsView: View {
     
     private var enitiesSection: some View {
         Section {
-            NavigationLink(value: SettingsSectionAndDataType.balanceAccounts) {
+            NavigationLink(value: SettingsSectionAndDataType.balanceAccounts(nil)) {
                 Label("Balance Accounts", systemImage: "person.crop.circle")
             }
             
-            NavigationLink(value: SettingsSectionAndDataType.categories) {
+            NavigationLink(value: SettingsSectionAndDataType.categories(nil)) {
                 Label("Categories", systemImage: "star.square.on.square")
             }
             
-            NavigationLink(value: SettingsSectionAndDataType.tags) {
+            NavigationLink(value: SettingsSectionAndDataType.tags(nil)) {
                 Label("Tags", systemImage: "number")
             }
         }
@@ -119,7 +121,7 @@ struct SettingsView: View {
     private var tabsSection: some View {
         Section("Additional tabs") {
             if let additionalTab = viewModel.additionalTab {
-                NavigationLink(value: SettingsSectionAndDataType.budgets) {
+                NavigationLink(value: SettingsSectionAndDataType.budgets(nil)) {
                     additionalTab.label
                 }
             }

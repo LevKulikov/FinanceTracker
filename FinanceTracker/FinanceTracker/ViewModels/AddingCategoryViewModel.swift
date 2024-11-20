@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol AddingCategoryViewModelDelegate: AnyObject {
-    func didUpdateCategory()
+protocol AddingCategoryViewModelDelegate: AnyObject, CategoryManipulationDelegate {
+    
 }
 
 enum ActionWithCategory: Equatable, Hashable {
@@ -86,7 +86,7 @@ final class AddingCategoryViewModel: ObservableObject {
             )
             Task {
                 dataManager.insert(newCategory)
-                delegate?.didUpdateCategory()
+                delegate?.didAddCategory(newCategory, from: .settingsView)
                 completionHandler()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     self?.removeAndRefetch()
@@ -105,7 +105,7 @@ final class AddingCategoryViewModel: ObservableObject {
             Task {
                 do {
                     try dataManager.save()
-                    delegate?.didUpdateCategory()
+                    delegate?.didDeleteCategory(categoryToUpdate, from: .settingsView)
                     completionHandler()
                 } catch {
                     print("Caterory cannot be updated, error: \(error)")

@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-protocol AddingBalanceAccountViewModelDelegate: AnyObject, Sendable {
-    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount)
+protocol AddingBalanceAccountViewModelDelegate: Sendable, BalanceAccountManipulationDelegate {
+
 }
 
 enum ActionWithBalanceAccaunt: Equatable, Hashable {
@@ -24,6 +24,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
     private let dataManager: any DataManagerProtocol
     private var balanceAccountToUpdate: BalanceAccount?
     private var transactionWithBalanceAccount: [Transaction] = []
+    private var transfersWithBalanceAccount: [TransferTransaction] = []
     private var transactionsChanges: Float = 0
     weak var delegate: (any AddingBalanceAccountViewModelDelegate)?
     
@@ -75,7 +76,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             
             Task { @MainActor [dataManager, delegate] in
                 dataManager.insert(newBalanceAccount)
-                delegate?.didUpdateBalanceAccount(newBalanceAccount)
+                delegate?.didAddBalanceAccount(newBalanceAccount, from: .settingsView)
                 completionHandler()
             }
         case .update:
@@ -95,7 +96,7 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
             Task { @MainActor [dataManager, delegate] in
                 do {
                     try dataManager.save()
-                    delegate?.didUpdateBalanceAccount(balanceAccountToUpdate)
+                    delegate?.didUpdateBalanceAccount(balanceAccountToUpdate, from: .settingsView)
                     completionHandler()
                 } catch {
                     print("Saving BalanceAccount error: \(error)")
@@ -135,20 +136,9 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
         }
     }
     
-    @MainActor
-    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)?) {
-        let descriptor = FetchDescriptor<BalanceAccount>()
-        
-        do {
-            let fetchedBAs = try dataManager.fetch(descriptor)
-            availableBalanceAccounts = fetchedBAs
-        } catch {
-            errorHandler?(error)
-        }
-    }
-    
     private func setTransactionsChanges() async {
         await fetchTransactionsWithBalanceAccount(errorHandler: nil)
+        await fetchTransferTransactionsWithBalanceAccount(errorHandler: nil)
         let changes = calulateTransactionsChanges()
         transactionsChanges = changes
     }
@@ -170,12 +160,42 @@ final class AddingBalanceAccountViewModel: ObservableObject, @unchecked Sendable
         }
     }
     
+    private func fetchTransferTransactionsWithBalanceAccount(errorHandler: (@Sendable (Error) -> Void)?) async {
+        guard let balanceAccountToUpdate else { return }
+        
+        let copyBalanceAccountId = balanceAccountToUpdate.persistentModelID
+        let predicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == copyBalanceAccountId || $0.toBalanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        let descriptor = FetchDescriptor<TransferTransaction>(predicate: predicate)
+        
+        do {
+            let fetchedTransfers = try await dataManager.fetchFromBackground(descriptor)
+            transfersWithBalanceAccount = fetchedTransfers
+        } catch {
+            errorHandler?(error)
+        }
+    }
+    
     private func calulateTransactionsChanges() -> Float {
-        let changes = transactionWithBalanceAccount.map { trans in
+        let transactionsChanges = transactionWithBalanceAccount.map { trans in
             let value = trans.type == .income ? trans.value : -trans.value
             return value
         }.reduce(0, +)
-        return changes
+        
+        let transfersChanges = transfersWithBalanceAccount.map {
+            switch balanceAccountToUpdate?.id {
+            case $0.fromBalanceAccount?.id:
+                return -$0.valueFrom
+            case $0.toBalanceAccount?.id:
+                return $0.valueTo
+            default:
+                return 0
+            }
+        }
+        .reduce(0, +)
+        
+        return transactionsChanges + transfersChanges
     }
     
     private func calculateNeededBalance() -> Float {

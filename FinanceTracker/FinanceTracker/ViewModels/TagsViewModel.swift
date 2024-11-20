@@ -9,11 +9,14 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-protocol TagsViewModelDelegate: AnyObject {
-    func didDeleteTag()
-    func didDeleteTagWithTransactions()
-    func didAddTag()
-    func didUpdatedTag()
+protocol TagManipulationDelegate: AnyObject {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType)
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType)
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType)
+}
+
+protocol TagsViewModelDelegate: AnyObject, TagManipulationDelegate {
+    func didDeleteTagWithTransactions(_ tag: Tag)
 }
 
 @MainActor
@@ -90,7 +93,7 @@ final class TagsViewModel: ObservableObject {
         
         Task {
             dataManager.insert(newTag)
-            delegate?.didAddTag()
+            delegate?.didAddTag(newTag, from: .settingsView)
             await fetchTags()
         }
     }
@@ -102,7 +105,7 @@ final class TagsViewModel: ObservableObject {
         Task {
             do {
                 try dataManager.save()
-                delegate?.didUpdatedTag()
+                delegate?.didUpdatedTag(tagSelected, from: .settingsView)
                 await fetchTags()
             } catch {
                 print(error)
@@ -114,7 +117,7 @@ final class TagsViewModel: ObservableObject {
     func deleteTag(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTag(tag)
-            delegate?.didDeleteTag()
+            delegate?.didDeleteTag(tag, from: .settingsView)
             await fetchTags(withAnimation: withAnimation)
         }
     }
@@ -122,7 +125,7 @@ final class TagsViewModel: ObservableObject {
     func deleteTagWithTransactions(_ tag: Tag, withAnimation: Bool = false) {
         Task {
             await dataManager.deleteTagWithTransactions(tag)
-            delegate?.didDeleteTagWithTransactions()
+            delegate?.didDeleteTagWithTransactions(tag)
             await fetchTags(withAnimation: withAnimation)
         }
     }

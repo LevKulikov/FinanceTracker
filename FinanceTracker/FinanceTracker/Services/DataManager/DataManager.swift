@@ -26,6 +26,11 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func deleteTransactionFromBackground(_ transaction: Transaction) async throws
     
+    @MainActor
+    func deleteTransferTransaction(_ transferTransaction: TransferTransaction) throws
+    
+    func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws
+    
     /// Moves transaction with selected balance account to default one and then deletes selected balance account (BA). If provided BA is default, then methods returns and does not anything. If default BA is not set, method will return
     /// - Parameter balanceAccount: balance account to delete, should not be the same as default one, otherwise nothing will be done
     @MainActor
@@ -72,6 +77,8 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel
     
     func fetchFromBackground<T>(_ descriptor: FetchDescriptor<T>) async throws -> [T] where T : PersistentModel
+    
+    func fetchSingleFromBackground<T>(withPredicate: Predicate<T>) async throws -> T? where T : PersistentModel, T: Sendable 
     
     /// Fetches all data from background and creates codable data container
     /// - Returns: codable data container with all stored data
@@ -192,7 +199,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         if #available(iOS 18.0, *) {
             Task {
                 do {
-                    try await deleteTransactionById(transaction)
+                    try await deleteTransactionByIdFromBackgroundActor(transaction)
                 } catch {
                     print(error)
                 }
@@ -211,17 +218,52 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
+    func deleteTransferTransaction(_ transferTransaction: TransferTransaction) {
+        container.mainContext.delete(transferTransaction)
+        // Because of iOS 18 Beta bug of SwiftData, it is needed to delete transfer from both main and background contexts
+        if #available(iOS 18.0, *) {
+            Task {
+                do {
+                    try await deleteTransferByIdFromBackgroundActor(transferTransaction)
+                } catch {
+                    print(error)
+                }
+            }
+        }
+    }
+    
+    func deleteTransferTransactionFromBachground(_ transferTransaction: TransferTransaction) async throws {
+        if let backgroundActor {
+            await backgroundActor.delete(transferTransaction)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            await backgroundActor!.delete(transferTransaction)
+            try await backgroundActor!.save()
+        }
+    }
+    
     func deleteBalanceAccount(_ balanceAccount: BalanceAccount) {
         guard let defaultBA = getDefaultBalanceAccount() else { return }
         guard balanceAccount != defaultBA else { return }
+        let baID = balanceAccount.persistentModelID
         
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let transactionsPredicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == baID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: transactionsPredicate)
+        
+        let transfersPredicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == baID || $0.toBalanceAccount?.persistentModelID == baID
+        }
+        let fetchTransferTransactionDescriptor = FetchDescriptor<TransferTransaction>(predicate: transfersPredicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            let allTransferTransactions = try fetch(fetchTransferTransactionDescriptor)
             // Replace selected balance account to default one for each transaction
-            filtered.forEach { $0.setBalanceAccount(defaultBA) }
+            allTransactions.forEach { $0.setBalanceAccount(defaultBA) }
+            allTransferTransactions.forEach { $0.balanceAccountIsGoingToBeDeleted(balanceAccount) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
@@ -234,14 +276,24 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     func deleteBalanceAccountWithTransactions(_ balanceAccount: BalanceAccount) {
         guard let defaultBA = getDefaultBalanceAccount() else { return }
         guard balanceAccount != defaultBA else { return }
+        let baID = balanceAccount.persistentModelID
         
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == baID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        
+        let transfersPredicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == baID || $0.toBalanceAccount?.persistentModelID == baID
+        }
+        let fetchTransferTransactionDescriptor = FetchDescriptor<TransferTransaction>(predicate: transfersPredicate)
         do {
             // Get transactions with selected balance account
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.balanceAccount == balanceAccount }
+            let allTransferTransactions = try fetch(fetchTransferTransactionDescriptor)
             // Delete filtered transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
+            allTransferTransactions.forEach { $0.balanceAccountIsGoingToBeDeleted(balanceAccount) }
             // Delete selected balance account and save changes
             container.mainContext.delete(balanceAccount)
             try save()
@@ -252,13 +304,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteCategory(_ category: Category, moveTransactionsTo replacingCategory: Category) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let catID = category.persistentModelID
+        let predicate = #Predicate<Transaction> {
+            $0.category?.persistentModelID == catID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected category
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.category == category }
             // Replace category in transaction with provided replacing category
-            filtered.forEach { $0.setCategory(replacingCategory) }
+            allTransactions.forEach { $0.setCategory(replacingCategory) }
             // Delete initial category
             container.mainContext.delete(category)
             try save()
@@ -269,13 +324,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteCategoryWithTransactions(_ category: Category) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let catID = category.persistentModelID
+        let predicate = #Predicate<Transaction> {
+            $0.category?.persistentModelID == catID
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected category
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.category == category }
             // Delete transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
             // Delete category
             container.mainContext.delete(category)
             try save()
@@ -286,13 +344,15 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteTag(_ tag: Tag) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.tags.contains { $0.persistentModelID == tag.persistentModelID }
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected tag
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.tags.contains(tag) }
             // Remove tag from transactions
-            filtered.forEach { $0.removeTag(tag) }
+            allTransactions.forEach { $0.removeTag(tag) }
             // Delete tag
             container.mainContext.delete(tag)
             try save()
@@ -303,13 +363,15 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     }
     
     func deleteTagWithTransactions(_ tag: Tag) async {
-        let fetchTransactionDescriptor = FetchDescriptor<Transaction>()
+        let predicate = #Predicate<Transaction> {
+            $0.tags.contains { $0.persistentModelID == tag.persistentModelID }
+        }
+        let fetchTransactionDescriptor = FetchDescriptor<Transaction>(predicate: predicate)
         do {
             // Get transactions with selected tag
             let allTransactions = try fetch(fetchTransactionDescriptor)
-            let filtered = allTransactions.filter { $0.tags.contains(tag) }
             // Delete transactions
-            filtered.forEach { deleteTransaction($0) }
+            allTransactions.forEach { deleteTransaction($0) }
             // Delete tag
             container.mainContext.delete(tag)
             try save()
@@ -352,6 +414,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
                 container.mainContext.delete(transaction)
             }
             try container.mainContext.delete(model: Budget.self)
+            try container.mainContext.delete(model: TransferTransaction.self)
             try container.mainContext.delete(model: BalanceAccount.self)
             UserDefaults.standard.set(nil, forKey: defaultBalanceAccountIdKey)
             try container.mainContext.delete(model: Category.self)
@@ -410,6 +473,12 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
+    func fetchSingleFromBackground<T>(withPredicate: Predicate<T>) async throws -> T? where T : PersistentModel, T: Sendable {
+        var fetchDescriptor = FetchDescriptor<T>(predicate: withPredicate)
+        fetchDescriptor.fetchLimit = 1
+        return try await fetchFromBackground(fetchDescriptor).first
+    }
+    
     func createDataContainer() async throws -> FTDataContainer {
         let nonNilBackgroundActor = backgroundActor ?? BackgroundDataActor(modelContainer: container)
         
@@ -420,13 +489,16 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             .compactMap { FTDataContainer.TransactionContainer(transaction: $0) }
         async let allBudgets = nonNilBackgroundActor.fetch(FetchDescriptor<Budget>())
             .compactMap { FTDataContainer.BudgetContainer(budget: $0) }
+        async let allTransfers = nonNilBackgroundActor.fetch(FetchDescriptor<TransferTransaction>())
+            .compactMap { FTDataContainer.TransferContainer(transfer: $0) }
          
         let dataContainer = FTDataContainer(
             balanceAccounts: try await allBalanceAccounts,
             categories: try await allCategories,
             tags: try await allTags,
             transactionContainers: try await allTransactions,
-            budgetContainers: try await allBudgets
+            budgetContainers: try await allBudgets,
+            transferContainers: try await allTransfers
         )
         
         return dataContainer
@@ -496,6 +568,17 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             // otherwise (if we set those objects dirctly to imported budget) we get SwiftData error (like EXC_BAD_ACCESS and etc)
             let newBudget = Budget(name: budget.name, value: budget.value, period: budget.period, category: category, balanceAccount: balanceAccount)
             insert(newBudget)
+        }
+        
+        for transferContainer in dataContainer.transferContainers {
+            let transfer = transferContainer.transfer
+            guard let balanceAccountFrom = savedBAs?.first(where: { $0.id == transferContainer.fromBalanceAccountID }),
+                  let balanceAccountTo = savedBAs?.first(where: { $0.id == transferContainer.toBalanceAccountID }) else {
+                print("DataManager.importDataFromContainer: did not find balance accounts for transfer")
+                continue
+            }
+            let newTransfer = TransferTransaction(valueFrom: transfer.valueFrom, valueTo: transfer.valueTo, date: transfer.date, comment: transfer.comment, fromBalanceAccount: balanceAccountFrom, toBalanceAccount: balanceAccountTo)
+            insert(newTransfer)
         }
         
         do {
@@ -577,7 +660,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         }
     }
     
-    private func deleteTransactionById(_ transaction: Transaction) async throws {
+    private func deleteTransactionByIdFromBackgroundActor(_ transaction: Transaction) async throws {
         if let backgroundActor {
             try await backgroundActor.deleteTransactionById(transaction)
             try await backgroundActor.save()
@@ -586,5 +669,30 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
             try await backgroundActor!.deleteTransactionById(transaction)
             try await backgroundActor!.save()
         }
+    }
+    
+    private func deleteTransferByIdFromBackgroundActor(_ transfer: TransferTransaction) async throws {
+        if let backgroundActor {
+            try await backgroundActor.deleteTransferById(transfer)
+            try await backgroundActor.save()
+        } else {
+            backgroundActor = BackgroundDataActor(modelContainer: container)
+            try await backgroundActor!.deleteTransferById(transfer)
+            try await backgroundActor!.save()
+        }
+    }
+    
+    @MainActor
+    private func deleteTransactionByIdFromMainContext(_ transaction: Transaction) async throws {
+        let trId = transaction.id
+        try await deleteTransactionByIdFromMainContext(trId)
+    }
+    
+    @MainActor
+    private func deleteTransactionByIdFromMainContext(_ transactionID: String) async throws {
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == transactionID })
+        let arr = try fetch(descr)
+        guard let trans = arr.first else { return }
+        container.mainContext.delete(trans)
     }
 }

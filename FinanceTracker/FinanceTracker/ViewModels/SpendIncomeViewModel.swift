@@ -11,9 +11,10 @@ import SwiftData
 import Algorithms
 import Combine
 
-protocol SpendIncomeViewModelDelegate: AnyObject {
+
+
+protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
     func didSelectAction(_ action: ActionWithTransaction)
-    func didUpdateTransactionList()
 }
 
 enum ActionWithTransaction: Equatable {
@@ -101,7 +102,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
         Task {
             await dataManager.deleteTransaction(transaction)
             await fetchTransactions(errorHandler: errorHandler)
-            delegate?.didUpdateTransactionList()
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
             filterGroupSortTransactions(animated: true)
         }
     }
@@ -112,7 +113,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
                 await dataManager.deleteTransaction(transaction)
             }
             await fetchTransactions(errorHandler: errorHandler)
-            delegate?.didUpdateTransactionList()
+            delegate?.didDeleteTransaction(transactions.last, from: .spendIncomeView)
             filterGroupSortTransactions(animated: true)
         }
     }
@@ -245,36 +246,67 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
 //MARK: Extension for AddingSpendIcomeViewModelDelegate
 extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
     func addedNewTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransactionList()
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didAddTransaction(transaction, from: .spendIncomeView)
         }
     }
     
     func updateTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransactionList()
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
-        }
+        filterGroupSortTransactions()
         enableTapsWithDeadline()
+        delegate?.didUpdateTransaction(transaction, from: .spendIncomeView)
     }
     
     func deletedTransaction(_ transaction: Transaction) {
-        delegate?.didUpdateTransactionList()
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            enableTapsWithDeadline()
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
         }
-        enableTapsWithDeadline()
     }
     
     func transactionsTypeReselected(to newType: TransactionsType) {
         transactionsTypeSelected = newType
     }
     
-    func categoryUpdated() {
-        delegate?.didUpdateTransactionList()
-        fetchAllData { [weak self] in
-            self?.filterGroupSortTransactions()
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .spendIncomeView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .spendIncomeView)
+        filterGroupSortTransactions()
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didDeleteCategory(category, from: .spendIncomeView)
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
         }
     }
 }
@@ -292,6 +324,22 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
     func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         guard tabView != .spendIncomeView else { return }
         
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
         switch dataType {
         case .balanceAccounts:
             Task { @MainActor in
@@ -312,10 +360,12 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
                     self.balanceAccountToFilter = self.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
                 }
             }
-        case .transactions:
-            Task {
-                await fetchTransactions()
-                filterGroupSortTransactions()
+        case .transactions(let transaction):
+            if transaction == nil || transaction?.date.startOfDay() == dateSelected.startOfDay() {
+                Task {
+                    await fetchTransactions()
+                    filterGroupSortTransactions()
+                }
             }
         case .tags:
             break
@@ -324,6 +374,8 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         case .appearance:
             break
         case .notifications:
+            break
+        case .transfers:
             break
         }
     }

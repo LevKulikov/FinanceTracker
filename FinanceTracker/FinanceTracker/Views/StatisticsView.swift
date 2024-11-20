@@ -16,6 +16,7 @@ struct StatisticsView: View {
     @State private var showStatitsticsSettings = false
     @State private var showTransactionListWithData: TransactionListUIData?
     @State private var currency: Currency?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     private var currencyString: String {
         if let currency {
             return currency.symbol
@@ -24,7 +25,7 @@ struct StatisticsView: View {
         }
     }
     private var windowWidth: CGFloat {
-        FTAppAssets.getWindowSize().width
+        windowSize.width
     }
     private var pieChartHeight: CGFloat {
         return viewModel.lightWeightStatistics ? 290 : 350
@@ -115,6 +116,11 @@ struct StatisticsView: View {
             .background(content: { backgroundColor.ignoresSafeArea() })
             .onChange(of: viewModel.balanceAccountToFilter) {
                 setCurrency()
+            }
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                windowSize = newValue
             }
             .task {
                 guard currency == nil else { return }
@@ -293,7 +299,7 @@ struct StatisticsView: View {
             }
             
             HStack {
-                Menu(String(localized: viewModel.lightWeightDateType.rawValue), systemImage: "chevron.up.chevron.down") {
+                Menu(viewModel.lightWeightDateType == .customDateRange ? String(localized: "DR") : String(localized: viewModel.lightWeightDateType.rawValue), systemImage: "chevron.up.chevron.down") {
                     Picker("Select date type", selection: $viewModel.lightWeightDateType) {
                         ForEach(DateFilterType.allCases) { dateFilterType in
                             Text(dateFilterType.rawValue)
@@ -318,13 +324,8 @@ struct StatisticsView: View {
                 case .year:
                     MonthYearPicker(date: $viewModel.lightWeightDate, dateRange: FTAppAssets.availableDateRange, components: .year)
                 case .customDateRange:
-                    EmptyView()
+                    DateRangePicker(startDate: $viewModel.lightWeightDateStart, endDate: $viewModel.lightWeightDateEnd, dateRange: FTAppAssets.availableDateRange)
                 }
-            }
-            
-            if case .customDateRange = viewModel.lightWeightDateType {
-                DateRangePicker(startDate: $viewModel.lightWeightDateStart, endDate: $viewModel.lightWeightDateEnd, dateRange: FTAppAssets.availableDateRange)
-                    .padding(.vertical, 5)
             }
         }
     }

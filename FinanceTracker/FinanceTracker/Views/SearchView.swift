@@ -19,14 +19,18 @@ struct SearchView: View {
     @State private var transactionToDelete: Transaction?
     @State private var showRefreshAlert = false
     @State private var currencyForStatistics: Currency?
+    @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     private var maxFiltersWidth: CGFloat {
-        if FTAppAssets.getWindowSize().width > FTAppAssets.maxCustomSheetWidth {
+        if windowSize.width > FTAppAssets.maxCustomSheetWidth {
             return 370
         }
         return .infinity
     }
     private var isIpad: Bool {
         FTAppAssets.currentUserDevise == .pad
+    }
+    private var showResetButton: Bool {
+        viewModel.filterTransactionType != .both || viewModel.filterBalanceAccount != nil || viewModel.filterCategory != nil || !viewModel.filterTags.isEmpty
     }
     
     //MARK: - Initializer
@@ -85,6 +89,11 @@ struct SearchView: View {
             .refreshable {
                 showRefreshAlert = true
             }
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                windowSize = newValue
+            }
             .confirmationDialog(
                 "Delete transaction?",
                 isPresented: 
@@ -141,7 +150,7 @@ struct SearchView: View {
             
             VStack {
                 HStack {
-                    Menu(viewModel.dateFilterType == .customDateRange ? "DR" : String(localized: viewModel.dateFilterType.rawValue), systemImage: "chevron.up.chevron.down") {
+                    Menu(viewModel.dateFilterType == .customDateRange ? String(localized: "DR") : String(localized: viewModel.dateFilterType.rawValue), systemImage: "chevron.up.chevron.down") {
                         Picker("Date type", selection: $viewModel.dateFilterType) {
                             ForEach(DateFilterType.allCases) { dateType in
                                 Text(dateType.rawValue)
@@ -267,6 +276,22 @@ struct SearchView: View {
                     .transition(.blurReplace)
                     
                     filtersView
+                    
+                    if showResetButton {
+                        Button {
+                            viewModel.resetFilters()
+                        } label: {
+                            Text("Reset filters")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 8)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(.secondarySystemFill))
+                                }
+                                .hoverEffect(.lift)
+                        }
+                        .transition(.blurReplace)
+                    }
                 }
             }
             .frame(maxWidth: maxFiltersWidth)

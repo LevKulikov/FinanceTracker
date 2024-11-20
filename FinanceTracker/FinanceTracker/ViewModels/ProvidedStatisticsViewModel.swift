@@ -197,11 +197,12 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         let groupedData = filteredTransactions
-            .grouped { $0.category }
-            .map { singleDict in
+            .grouped { $0.category?.id }
+            .compactMap { singleDict -> TransactionPieChartData? in
                 let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
                 let transactions = singleDict.value
-                return TransactionPieChartData(category: singleDict.key ?? .emptyCategory, sumValue: totalValueForCategory, transactions: transactions)
+                guard let categoryAsKey = singleDict.value.first?.category else { return nil}
+                return TransactionPieChartData(category: categoryAsKey, sumValue: totalValueForCategory, transactions: transactions)
             }
         
         let sortedData = groupedData.sorted(by: { $0.sumValue > $1.sumValue })
@@ -306,6 +307,20 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
                 }
                 
                 return arrayOfBarData
+            }
+            .sorted {
+                let fristTrasactionDate = $0.first?.date
+                let secondTrasactionDate = $1.first?.date
+                
+                if fristTrasactionDate == nil {
+                    return true
+                }
+                
+                if secondTrasactionDate == nil {
+                    return false
+                }
+                
+                return $0.first!.date < $1.first!.date
             }
         
         await MainActor.run {
