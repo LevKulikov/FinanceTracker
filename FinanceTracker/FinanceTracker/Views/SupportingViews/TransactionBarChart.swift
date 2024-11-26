@@ -325,7 +325,7 @@ struct TransactionBarChart: View {
     private func selectTransactionData() {
         Task { @MainActor in
             guard let selection else { return }
-            let data = transactionsData.first { isBarDateEqual(left: $0.first?.date, right: selection) }
+            let data = transactionsDataVisible.first { isBarDateEqual(left: $0.first?.date, right: selection) }
             if let data {
                 setSelected(data, date: selection, withCancelation: true)
             }
@@ -375,7 +375,7 @@ struct TransactionBarChart: View {
     }
     
     private func setYScaleRange(withAnimation animated: Bool = false, scrollStart: Date? = nil) {
-        let values = transactionsData.flatMap { $0 }.filter {
+        let values = transactionsDataVisible.flatMap { $0 }.filter {
             ((scrollStart ?? xScrollPosition).addingTimeInterval(-3600)...(scrollStart?.addingTimeInterval(Double(maxXVisibleLenth)) ?? xScrollPositionEnd).addingTimeInterval(-3600)).contains($0.date)
         }.map { $0.value }
         guard var minValue = values.min(), var maxValue = values.max() else { return }
