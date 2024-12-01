@@ -31,18 +31,18 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
+struct SearchConfiguration {
+    var filterTransactionType: TransactionFilterTypes = .both
+    var filterBalanceAccount: BalanceAccount?
+    var filterCategory: Category?
+    var filterTags: [Tag] = []
+    var dateFilterType: DateFilterType = .month
+    var filterDate: Date = .now
+    var filterDateStart: Date = .now
+    var filterDateEnd: Date = .now
+}
+
 final class SearchViewModel: ObservableObject, @unchecked Sendable {
-    struct Configuration {
-        var filterTransactionType: TransactionFilterTypes = .both
-        var filterBalanceAccount: BalanceAccount?
-        var filterCategory: Category?
-        var filterTags: [Tag] = []
-        var dateFilterType: DateFilterType = .month
-        var filterDate: Date = .now
-        var filterDateStart: Date = .now
-        var filterDateEnd: Date = .now
-    }
-    
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
     
@@ -196,7 +196,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         })
     }
     
-    init(dataManager: some DataManagerProtocol, configuration: Configuration) {
+    init(dataManager: some DataManagerProtocol, configuration: SearchConfiguration) {
         self.dataManager = dataManager
         self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
         self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)
@@ -327,7 +327,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                     
                     var containsNeededTag = true
                     if !self.filterTags.isEmpty {
-                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(self.filterTags.sorted { $0.name < $1.name }.map { $0.id })
+                        let sortedFilterTags = self.filterTags.sorted { $0.name < $1.name }.map(\.id)
+                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(sortedFilterTags)
                     }
                     
                     return (sameBA && sameCategory && containsNeededTag)
