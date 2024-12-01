@@ -353,8 +353,8 @@
 				73EC8DC32C727FAB00DC5899 /* DeveloperToolView.swift */,
 				73B9BECE2CAC84C200D9E72D /* TransfersView.swift */,
 				732F48BD2CBDA59E00EA5E02 /* AddingTransferView.swift */,
-				73F629312C039CE800E9FEB9 /* SupportingViews */,
 				73A645E22CFD1218004ECA8E /* AdvancedAnalyticsView.swift */,
+				73F629312C039CE800E9FEB9 /* SupportingViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
