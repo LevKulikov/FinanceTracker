@@ -31,7 +31,9 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-struct SearchConfiguration {
+struct SearchConfiguration: Identifiable {
+    let id: UUID
+    
     var filterTransactionType: TransactionFilterTypes = .both
     var filterBalanceAccount: BalanceAccount?
     var filterCategory: Category?
@@ -40,6 +42,18 @@ struct SearchConfiguration {
     var filterDate: Date = .now
     var filterDateStart: Date = .now
     var filterDateEnd: Date = .now
+    
+    init(id: UUID = UUID(), filterTransactionType: TransactionFilterTypes = .both, filterBalanceAccount: BalanceAccount? = nil, filterCategory: Category? = nil, filterTags: [Tag] = [], dateFilterType: DateFilterType = .month, filterDate: Date = .now, filterDateStart: Date = .now, filterDateEnd: Date = .now) {
+        self.id = id
+        self.filterTransactionType = filterTransactionType
+        self.filterBalanceAccount = filterBalanceAccount
+        self.filterCategory = filterCategory
+        self.filterTags = filterTags
+        self.dateFilterType = dateFilterType
+        self.filterDate = filterDate
+        self.filterDateStart = filterDateStart
+        self.filterDateEnd = filterDateEnd
+    }
 }
 
 final class SearchViewModel: ObservableObject, @unchecked Sendable {
