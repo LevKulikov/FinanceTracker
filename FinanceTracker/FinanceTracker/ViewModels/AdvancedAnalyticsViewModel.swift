@@ -14,9 +14,6 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     }
     //MARK: - Properties
     private let dataManager: any DataManagerProtocol
-    private var allCategories: [Category] = []
-    private var allTags: [Tag] = []
-    private var allBalanceAccounts: [BalanceAccount] = []
     private var loadingTransactionsTaskGroup: ThrowingTaskGroup<[Transaction], any Error>?
     private var transactions: [Transaction] = []
     
@@ -24,11 +21,14 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published var showAnalytics: Bool = false
     @MainActor @Published var showCurrencySelection: Bool = false
     @MainActor @Published var noTransactions: Bool = false
-    @MainActor @Published var searchConfigurations: [SearchConfiguration] = []
+    @MainActor @Published private(set) var searchConfigurations: [SearchConfiguration] = []
     @MainActor @Published private(set) var isLoadingTransactions: Bool = false
     @MainActor @Published private(set) var isLoadingOtherData: Bool = false
     @MainActor @Published private(set) var currencies: [String] = []
     @MainActor @Published private(set) var selectedCurrency: String = ""
+    @MainActor @Published private(set) var allCategories: [Category] = []
+    @MainActor @Published private(set) var allTags: [Tag] = []
+    @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
     
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
@@ -100,6 +100,20 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     
     func cancelFetching() {
         loadingTransactionsTaskGroup?.cancelAll()
+    }
+    
+    @MainActor
+    func addConfiguration(_ configuration: SearchConfiguration) {
+        searchConfigurations.append(configuration)
+    }
+    
+    @MainActor
+    func updateConfiguration(_ configuration: SearchConfiguration) {
+        guard let index = searchConfigurations.firstIndex(where: { $0.id == configuration.id }) else {
+            print("AdvancedAnalyticsViewModel: updateConfiguration: configuration not found")
+            return
+        }
+        searchConfigurations[index] = configuration
     }
     
     @MainActor
@@ -207,7 +221,9 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        self.allCategories = fetchedCategories
+        await MainActor.run {
+            self.allCategories = fetchedCategories
+        }
     }
     
     private func fetchTags(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
@@ -216,7 +232,9 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        self.allTags = fetchedTags
+        await MainActor.run {
+            self.allTags = fetchedTags
+        }
     }
     
     private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
@@ -225,7 +243,9 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
-        self.allBalanceAccounts = fetchedBalanceAccounts
+        await MainActor.run {
+            self.allBalanceAccounts = fetchedBalanceAccounts
+        }
     }
     
     private func fetch<T>(withPredicate: Predicate<T>? = nil, sortBy: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel, T: Sendable {
