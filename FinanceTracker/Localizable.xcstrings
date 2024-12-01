@@ -179,6 +179,9 @@
         }
       }
     },
+    "Add any number of filters to search for transactions of interest and get analytics on them. Analytics will reflect unique transactions" : {
+
+    },
     "Add budget" : {
       "localizations" : {
         "ru" : {
@@ -188,6 +191,9 @@
           }
         }
       }
+    },
+    "Add filter" : {
+
     },
     "Add new" : {
       "localizations" : {
@@ -228,6 +234,9 @@
           }
         }
       }
+    },
+    "Advanced Analytics" : {
+
     },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
@@ -2028,6 +2037,9 @@
           }
         }
       }
+    },
+    "No filters added" : {
+
     },
     "No results for \"%@\"" : {
       "localizations" : {
