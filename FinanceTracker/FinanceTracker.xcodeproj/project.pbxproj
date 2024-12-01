@@ -46,6 +46,7 @@
 		738D75412C11D6A400198521 /* IconImages.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 738D75402C11D6A400198521 /* IconImages.bundle */; };
 		738E58F52CD0470E006BB9C8 /* TransactionManipulationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E58F42CD0470E006BB9C8 /* TransactionManipulationDelegate.swift */; };
 		738E58F72CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E58F62CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift */; };
+		73A645E12CF91614004ECA8E /* AdvancedAnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A645E02CF91614004ECA8E /* AdvancedAnalyticsViewModel.swift */; };
 		73AE90432C4980BB002267F4 /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */; };
 		73AE90452C499092002267F4 /* BudgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90442C499092002267F4 /* BudgetsView.swift */; };
 		73AE90472C499571002267F4 /* BudgetCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AE90462C499571002267F4 /* BudgetCardViewModel.swift */; };
@@ -160,6 +161,7 @@
 		738D75402C11D6A400198521 /* IconImages.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = IconImages.bundle; sourceTree = "<group>"; };
 		738E58F42CD0470E006BB9C8 /* TransactionManipulationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManipulationDelegate.swift; sourceTree = "<group>"; };
 		738E58F62CD0FBC0006BB9C8 /* TransferTransactionManipulationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferTransactionManipulationDelegate.swift; sourceTree = "<group>"; };
+		73A645E02CF91614004ECA8E /* AdvancedAnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedAnalyticsViewModel.swift; sourceTree = "<group>"; };
 		73AE90422C4980BB002267F4 /* BudgetsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsViewModel.swift; sourceTree = "<group>"; };
 		73AE90442C499092002267F4 /* BudgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetsView.swift; sourceTree = "<group>"; };
 		73AE90462C499571002267F4 /* BudgetCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCardViewModel.swift; sourceTree = "<group>"; };
@@ -381,6 +383,7 @@
 				73EC8DC12C7276DB00DC5899 /* DeveloperToolViewModel.swift */,
 				73B9BECC2CAC7C6B00D9E72D /* TransfersViewModel.swift */,
 				732F48BB2CB5632100EA5E02 /* AddingTransferViewModel.swift */,
+				73A645E02CF91614004ECA8E /* AdvancedAnalyticsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -633,6 +636,7 @@
 				73CCF3D92C29C419009D8001 /* TagsViewModel.swift in Sources */,
 				73CCF3E12C2B2D25009D8001 /* AppearanceView.swift in Sources */,
 				73AE90492C499B05002267F4 /* BudgetCard.swift in Sources */,
+				73A645E12CF91614004ECA8E /* AdvancedAnalyticsViewModel.swift in Sources */,
 				733397C22C4C05CA00BAE878 /* AddingBudgetView.swift in Sources */,
 				7305BAC82C1A495100F712BC /* TransactionPieChart.swift in Sources */,
 				732EF8BA2C66B4B20072B11C /* URL+Extension.swift in Sources */,
