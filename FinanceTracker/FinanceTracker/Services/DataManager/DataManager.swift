@@ -112,6 +112,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func stayAtAddingViewAfterAdd() -> Bool
     
     func stayAtAddingViewAfterAdd(_ stay: Bool)
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration]
 }
 
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
@@ -649,6 +653,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func stayAtAddingViewAfterAdd(_ stay: Bool) {
         settingsManager.stayAtAddingViewAfterAdd(stay)
+    }
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws {
+        try settingsManager.setSearchConfigurations(configurations)
+    }
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration] {
+        try settingsManager.getSearchConfigurations()
     }
     
     //MARK: Private methods
