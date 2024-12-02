@@ -33,6 +33,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
+        getConfigurations()
     }
     
     //MARK: - Methods
@@ -186,6 +187,16 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor
     func getAnalyticsPage() -> some View {
         return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: selectedCurrency)
+    }
+    
+    @MainActor
+    func saveConfiguration(resultHandler: (@MainActor @Sendable (Result<Void, Error>) -> Void)? = nil) {
+        do {
+            try dataManager.setSearchConfigurations(searchConfigurations)
+            resultHandler?(.success(()))
+        } catch {
+            resultHandler?(.failure(error))
+        }
     }
     
     //MARK: Private methods
@@ -380,6 +391,17 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
         let uniqueCurrencies = Set(transactions.compactMap(\.balanceAccount?.currency))
         await MainActor.run {
             currencies = Array(uniqueCurrencies)
+        }
+    }
+    
+    private func getConfigurations() {
+        Task { @MainActor in
+            do {
+                let savedConfigs = try dataManager.getSearchConfigurations()
+                searchConfigurations = savedConfigs
+            } catch {
+                print("AdvancedAnalyticsViewModel: getConfigurations: Error getting saved search configurations: \(error)")
+            }
         }
     }
 }
