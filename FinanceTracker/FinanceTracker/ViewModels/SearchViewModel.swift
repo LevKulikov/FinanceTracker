@@ -680,7 +680,7 @@ extension SearchViewModel: CustomTabViewModelDelegate {
             fetchAllData(competionHandler:  { [weak self] in
                 self?.filterAndSetTransactions()
             })
-        case .transfers, .budgets, .appearance, .notifications:
+        case .transfers, .budgets, .appearance, .notifications, .advancedAnalytics:
             break
         }
     }

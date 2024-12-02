@@ -1190,7 +1190,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     cleanData()
                 }
             }
-        case .budgets, .appearance, .notifications:
+        case .budgets, .appearance, .notifications, .advancedAnalytics:
             return
         }
     }

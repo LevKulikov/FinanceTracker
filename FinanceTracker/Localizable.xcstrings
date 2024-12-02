@@ -169,6 +169,9 @@
         }
       }
     },
+    "Adavanced analytics" : {
+
+    },
     "Add" : {
       "localizations" : {
         "ru" : {
@@ -1890,6 +1893,9 @@
           }
         }
       }
+    },
+    "Loading..." : {
+
     },
     "Make transfer" : {
       "localizations" : {

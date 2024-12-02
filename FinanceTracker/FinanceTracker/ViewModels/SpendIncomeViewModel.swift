@@ -377,6 +377,8 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
             break
         case .transfers:
             break
+        case .advancedAnalytics:
+            break
         }
     }
 }

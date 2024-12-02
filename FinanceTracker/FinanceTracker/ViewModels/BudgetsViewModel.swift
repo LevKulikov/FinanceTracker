@@ -337,6 +337,8 @@ extension BudgetsViewModel: CustomTabViewModelDelegate {
             }
         case .notifications:
             return
+        case .advancedAnalytics:
+            return
         }
     }
 }
