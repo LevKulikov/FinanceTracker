@@ -34,6 +34,17 @@ enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, I
             return .income
         }
     }
+    
+    var color: Color {
+        switch self {
+        case .both:
+            return .blue
+        case .spending:
+            return .red
+        case .income:
+            return .green
+        }
+    }
 }
 
 enum PieChartDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
