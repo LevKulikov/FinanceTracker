@@ -12,7 +12,14 @@
       }
     },
     " + %lld" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " + %lld"
+          }
+        }
+      }
     },
     " and currency" : {
       "localizations" : {
@@ -163,7 +170,14 @@
       }
     },
     "0 tags" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 тегов"
+          }
+        }
+      }
     },
     "404" : {
       "localizations" : {
@@ -176,7 +190,14 @@
       }
     },
     "Adavanced analytics" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая аналитика"
+          }
+        }
+      }
     },
     "Add" : {
       "localizations" : {
@@ -189,7 +210,14 @@
       }
     },
     "Add any number of filters to search for transactions of interest and get analytics on them. Analytics will reflect unique transactions" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте любое количество фильтров для поиска интересующих транзакций, чтобы получить по ним аналитику. В аналитике будут отображены только уникальные транзакции"
+          }
+        }
+      }
     },
     "Add budget" : {
       "localizations" : {
@@ -202,7 +230,14 @@
       }
     },
     "Add filter" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить фильтр"
+          }
+        }
+      }
     },
     "Add new" : {
       "localizations" : {
@@ -245,7 +280,14 @@
       }
     },
     "Advanced Analytics" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая Аналитика"
+          }
+        }
+      }
     },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
@@ -273,6 +315,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Все"
+          }
+        }
+      }
+    },
+    "All accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все счета"
           }
         }
       }
@@ -1068,7 +1120,14 @@
       }
     },
     "Delete all filters" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все фильтры"
+          }
+        }
+      }
     },
     "Delete all stored data" : {
       "localizations" : {
@@ -1321,7 +1380,14 @@
       }
     },
     "Duplicate" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дублировать"
+          }
+        }
+      }
     },
     "Easily add your expenses and income" : {
       "localizations" : {
@@ -1634,7 +1700,14 @@
       }
     },
     "Get analytics" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
     },
     "Gifts" : {
       "localizations" : {
@@ -1907,7 +1980,14 @@
       }
     },
     "Loading..." : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка…"
+          }
+        }
+      }
     },
     "Make transfer" : {
       "localizations" : {
@@ -2000,7 +2080,14 @@
       }
     },
     "No" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
     },
     "No %@ for this date" : {
       "localizations" : {
@@ -2063,7 +2150,14 @@
       }
     },
     "No filters added" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры не добавлены"
+          }
+        }
+      }
     },
     "No results for \"%@\"" : {
       "localizations" : {
@@ -2096,7 +2190,14 @@
       }
     },
     "No transactions found" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции не найдены"
+          }
+        }
+      }
     },
     "No transactions imported" : {
       "localizations" : {
@@ -2439,7 +2540,14 @@
       }
     },
     "Remove all filters?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать все фильтры?"
+          }
+        }
+      }
     },
     "Reorder" : {
       "localizations" : {
@@ -2562,7 +2670,14 @@
       }
     },
     "Select currency" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать валюту"
+          }
+        }
+      }
     },
     "Select date for bars" : {
       "localizations" : {
@@ -3181,7 +3296,14 @@
       }
     },
     "Try to change filters to get more transactions" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте поменять фильтры, чтобы получить больше транзакций"
+          }
+        }
+      }
     },
     "Type" : {
       "localizations" : {
@@ -3404,7 +3526,14 @@
       }
     },
     "Yes" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
+          }
+        }
+      }
     },
     "Yes, cancel" : {
       "localizations" : {
