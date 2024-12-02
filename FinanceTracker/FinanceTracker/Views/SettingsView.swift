@@ -129,7 +129,7 @@ struct SettingsView: View {
             }
             
             NavigationLink(value: SettingsSectionAndDataType.advancedAnalytics) {
-                Label("Adavanced analytics", systemImage: "chart.line.text.clipboard")
+                Label("Adavanced analytics", systemImage: "chart.bar.xaxis")
             }
             
             Button("Reorder tabs", systemImage: "ellipsis.rectangle") {

@@ -138,7 +138,7 @@ struct AdvancedAnalyticsView: View {
         Button {
             viewModel.getAnalytics()
         } label: {
-            Label("Get analytics", systemImage: "chart.line.text.clipboard")
+            Label("Get analytics", systemImage: "chart.bar.xaxis")
                 .frame(width: 170, height: 50)
                 .background {
                     Capsule()
