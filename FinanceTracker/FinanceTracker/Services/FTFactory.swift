@@ -211,4 +211,9 @@ final class FTFactory {
         viewModel.delegate = delegate
         return AnyView(AddingTransferView(viewModel: viewModel))
     }
+    
+    func createAdvancedAnalyticsView(dataManager: some DataManagerProtocol) -> AnyView {
+        let viewModel = AdvancedAnalyticsViewModel(dataManager: dataManager)
+        return AnyView(AdvancedAnalyticsView(viewModel: viewModel))
+    }
 }
