@@ -10,8 +10,13 @@ import SwiftUI
 struct AdvancedAnalyticsView: View {
     //MARK: - Properties
     @StateObject private var viewModel: AdvancedAnalyticsViewModel
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showAddingFilterView: Bool = false
     @State private var updatedConfiguration: SearchConfiguration?
+    private let userDevice = FTAppAssets.currentUserDevise
+    private var isIpad: Bool {
+        FTAppAssets.currentUserDevise == .pad
+    }
     
     //MARK: - Initializer
     init(viewModel: AdvancedAnalyticsViewModel) {
@@ -32,13 +37,37 @@ struct AdvancedAnalyticsView: View {
                     }
                 }
                 .padding(.horizontal, 10)
+                
+                Rectangle()
+                    .fill(.clear)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
             .navigationTitle("Advanced Analytics")
             .toolbar {
-                Button("Add filter", systemImage: "plus") {
-                    showAddingFilterView.toggle()
+                if viewModel.isLoadingOtherData {
+                    ProgressView()
+                } else {
+                    Button("Add filter", systemImage: "plus") {
+                        showAddingFilterView.toggle()
+                    }
+                    .labelStyle(.iconOnly)
+                    .disabled(viewModel.isLoadingTransactions)
                 }
-                .labelStyle(.iconOnly)
+            }
+            .overlay(alignment: .bottom) {
+                if !viewModel.searchConfigurations.isEmpty {
+                    analyticsButton
+                        .offset(y: userDevice == .phone ? 0 : -60)
+                }
+            }
+            .overlay {
+                if viewModel.isLoadingTransactions {
+                    transactionsLoadingView
+                }
+            }
+            .onAppear {
+                viewModel.fetchOtherData()
             }
             .sheet(isPresented: $showAddingFilterView) {
                 AddUpdateSearchConfigurationView(configuration: nil, balanceAccounts: viewModel.allBalanceAccounts, categories: viewModel.allCategories, tags: viewModel.allTags) { config in
@@ -51,6 +80,9 @@ struct AdvancedAnalyticsView: View {
                     viewModel.updateConfiguration(configuration)
                     updatedConfiguration = nil
                 }
+            }
+            .sheet(isPresented: $viewModel.showAnalytics) {
+                viewModel.getAnalyticsPage()
             }
         }
     }
@@ -66,6 +98,51 @@ struct AdvancedAnalyticsView: View {
             }
             .buttonStyle(.bordered)
         }
+    }
+    
+    private var analyticsButton: some View {
+        Button {
+            viewModel.getAnalytics()
+        } label: {
+            Label("Get analytics", systemImage: "chart.bar")
+                .frame(width: 170, height: 50)
+                .background {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .stroke(.blue)
+                }
+        }
+        .offset(y: -5)
+    }
+    
+    private var transactionsLoadingView: some View {
+        VStack {
+            ProgressView()
+                .controlSize(.large)
+            Text("Loading...")
+                .foregroundStyle(.secondary)
+                .padding(.bottom)
+                .padding(.bottom)
+            
+            Button("Cancel") {
+                viewModel.cancelFetching()
+            }
+            .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: 200, maxHeight: 200)
+        .padding()
+        .background {
+            RoundedRectangle(cornerRadius: 24)
+                .fill(colorScheme == .light ? Color(.systemBackground) : Color(.systemGray6))
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea()
+        }
+        .animation(.default, value: viewModel.isLoadingTransactions)
     }
     
     //MARK: - Methods
