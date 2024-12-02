@@ -78,6 +78,9 @@ struct AdvancedAnalyticsView: View {
             .onAppear {
                 viewModel.fetchOtherData()
             }
+            .onDisappear {
+                viewModel.cancelFetching()
+            }
             .sheet(isPresented: $showAddingFilterView) {
                 AddUpdateSearchConfigurationView(configuration: nil, balanceAccounts: viewModel.allBalanceAccounts, categories: viewModel.allCategories, tags: viewModel.allTags) { config in
                     viewModel.addConfiguration(config)
