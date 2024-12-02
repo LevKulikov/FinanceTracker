@@ -18,6 +18,7 @@ final class FTFactory {
     private var searchViewModel: SearchViewModel?
     private var statisticsViewModel: StatisticsViewModel?
     private var budgetsViewModel: BudgetsViewModel?
+    private var advancedAnalyticsViewModel: AdvancedAnalyticsViewModel?
     
     private init() {}
     
@@ -213,7 +214,11 @@ final class FTFactory {
     }
     
     func createAdvancedAnalyticsView(dataManager: some DataManagerProtocol) -> AnyView {
-        let viewModel = AdvancedAnalyticsViewModel(dataManager: dataManager)
-        return AnyView(AdvancedAnalyticsView(viewModel: viewModel))
+        var viewModel = advancedAnalyticsViewModel
+        if advancedAnalyticsViewModel == nil {
+            viewModel = AdvancedAnalyticsViewModel(dataManager: dataManager)
+            advancedAnalyticsViewModel = viewModel
+        }
+        return AnyView(AdvancedAnalyticsView(viewModel: viewModel!))
     }
 }
