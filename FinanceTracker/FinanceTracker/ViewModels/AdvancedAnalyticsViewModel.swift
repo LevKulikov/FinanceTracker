@@ -78,15 +78,21 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
             await withTaskGroup(of: Void.self) { taskGroup in
                 // Fetch categories
                 taskGroup.addTask { [weak self] in
+                    print("AdvancedAnalyticsViewModel: start fetching categories")
                     await self?.fetchCategories(errorHandler: localErrorHandler)
+                    print("AdvancedAnalyticsViewModel: end fetching categories")
                 }
                 // Fetch tags
                 taskGroup.addTask { [weak self] in
+                    print("AdvancedAnalyticsViewModel: start fetching tags")
                     await self?.fetchTags(errorHandler: localErrorHandler)
+                    print("AdvancedAnalyticsViewModel: end fetching tags")
                 }
                 // Fetch balance accounts
                 taskGroup.addTask { [weak self] in
+                    print("AdvancedAnalyticsViewModel: start fetching balance accounts")
                     await self?.fetchBalanceAccounts(errorHandler: localErrorHandler)
+                    print("AdvancedAnalyticsViewModel: end fetching balance accounts")
                 }
                 // Wait until all data is fetched
                 await taskGroup.waitForAll()
@@ -180,6 +186,8 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     
     private func fetchTransactions(configuration: SearchConfiguration, errorHandler: (@Sendable (Error) -> Void)? = nil) async -> [Transaction] {
         let dateRange = getDateFilterRange(configuration: configuration)
+        let lowerBound = dateRange.lowerBound
+        let upperBound = dateRange.upperBound
         
         let isBalanceAccountFilterEnabled: Bool = configuration.filterBalanceAccount != nil
         let copyBalanceAccountId = configuration.filterBalanceAccount?.persistentModelID
@@ -189,7 +197,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
         
         // Method's predicate does not filter by tags (beacause of difficult logic, not for predicate) and transaction type (because of error of predicate)
         let predicate = #Predicate<Transaction> { transaction in
-            if dateRange.contains(transaction.date) {
+            if (lowerBound...upperBound).contains(transaction.date) {
                 if !isBalanceAccountFilterEnabled || transaction.balanceAccount?.persistentModelID == copyBalanceAccountId {
                     if !isCategoryFilterEnabled || transaction.category?.persistentModelID == copyCategoryId {
                         return true
