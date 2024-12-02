@@ -154,13 +154,28 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func selectCurrency(_ currencyString: String) {
+        guard !isLoadingTransactions else { return }
+        
         selectedCurrency = currencyString
-        showAnalytics = true
+        Task.detached(priority: .high) { [weak self, transactions, currencies] in
+            await MainActor.run { [weak self] in
+                self?.isLoadingOtherData = true
+            }
+            
+            if currencies.count > 1 {
+                self?.transactions = transactions.filter { $0.balanceAccount?.currency == currencyString }
+            }
+            
+            await MainActor.run { [weak self] in
+                self?.isLoadingOtherData = false
+                self?.showAnalytics = true
+            }
+        }
     }
     
     @MainActor
     func getAnalyticsPage() -> some View {
-        FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: selectedCurrency)
+        return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: selectedCurrency)
     }
     
     //MARK: Private methods

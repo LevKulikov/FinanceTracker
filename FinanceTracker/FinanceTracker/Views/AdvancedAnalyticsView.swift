@@ -104,6 +104,15 @@ struct AdvancedAnalyticsView: View {
                     viewModel.removeAllConfigurations()
                 }
             }
+            .alert("Select currency", isPresented: $viewModel.showCurrencySelection) {
+                ForEach(viewModel.currencies, id: \.self) { currency in
+                    Button(currency) {
+                        viewModel.selectCurrency(currency)
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {}
+            }
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
             } action: { newValue in
@@ -137,6 +146,7 @@ struct AdvancedAnalyticsView: View {
                         .stroke(.blue)
                 }
         }
+        .disabled(viewModel.isLoadingTransactions || viewModel.isLoadingOtherData)
         .hoverEffect(.lift)
         .offset(y: -5)
     }
