@@ -11,6 +11,9 @@
         }
       }
     },
+    " + %lld" : {
+
+    },
     " and currency" : {
       "localizations" : {
         "ru" : {
@@ -158,6 +161,9 @@
           }
         }
       }
+    },
+    "0 tags" : {
+
     },
     "404" : {
       "localizations" : {
@@ -1061,6 +1067,9 @@
         }
       }
     },
+    "Delete all filters" : {
+
+    },
     "Delete all stored data" : {
       "localizations" : {
         "ru" : {
@@ -1310,6 +1319,9 @@
           }
         }
       }
+    },
+    "Duplicate" : {
+
     },
     "Easily add your expenses and income" : {
       "localizations" : {
@@ -1987,6 +1999,9 @@
         }
       }
     },
+    "No" : {
+
+    },
     "No %@ for this date" : {
       "localizations" : {
         "ru" : {
@@ -2079,6 +2094,9 @@
           }
         }
       }
+    },
+    "No transactions found" : {
+
     },
     "No transactions imported" : {
       "localizations" : {
@@ -2419,6 +2437,9 @@
           }
         }
       }
+    },
+    "Remove all filters?" : {
+
     },
     "Reorder" : {
       "localizations" : {
@@ -3156,6 +3177,9 @@
         }
       }
     },
+    "Try to change filters to get more transactions" : {
+
+    },
     "Type" : {
       "localizations" : {
         "ru" : {
@@ -3375,6 +3399,9 @@
           }
         }
       }
+    },
+    "Yes" : {
+
     },
     "Yes, cancel" : {
       "localizations" : {
