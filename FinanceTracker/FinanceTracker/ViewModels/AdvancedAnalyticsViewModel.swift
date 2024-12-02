@@ -38,6 +38,11 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Methods
     func getAnalytics() {
         Task {
+            guard await !isLoadingTransactions else {
+                print("AdvancedAnalyticsViewModel: getAnalytics: already fetching transactions")
+                return
+            }
+            
             do {
                 try await fetchAllTransactions()
                 await extractCurrencies()
@@ -71,6 +76,11 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         Task {
+            guard await !isLoadingOtherData else {
+                print("AdvancedAnalyticsViewModel: fetchOtherData: already fetching other data")
+                return
+            }
+            
             await MainActor.run {
                 isLoadingOtherData = true
             }
