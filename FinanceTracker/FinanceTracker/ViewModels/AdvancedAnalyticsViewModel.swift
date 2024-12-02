@@ -123,6 +123,36 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     @MainActor
+    func removeConfiguration(_ configuration: SearchConfiguration) {
+        guard let index = searchConfigurations.firstIndex(where: {$0.id == configuration.id }) else {
+            print("AdvancedAnalyticsViewModel: removeConfiguration: configuration not found")
+            return
+        }
+        searchConfigurations.remove(at: index)
+    }
+    
+    @MainActor
+    func removeAllConfigurations() {
+        searchConfigurations = []
+    }
+    
+    @MainActor
+    func duplicateConfiguration(_ configuration: SearchConfiguration) {
+        let copyConfiguration = SearchConfiguration(
+            filterTransactionType: configuration.filterTransactionType,
+            filterBalanceAccount: configuration.filterBalanceAccount,
+            filterCategory: configuration.filterCategory,
+            filterTags: configuration.filterTags,
+            dateFilterType: configuration.dateFilterType,
+            filterDate: configuration.filterDate,
+            filterDateStart: configuration.filterDateStart,
+            filterDateEnd: configuration.filterDateEnd
+        )
+        
+        addConfiguration(copyConfiguration)
+    }
+    
+    @MainActor
     func selectCurrency(_ currencyString: String) {
         selectedCurrency = currencyString
         showAnalytics = true
