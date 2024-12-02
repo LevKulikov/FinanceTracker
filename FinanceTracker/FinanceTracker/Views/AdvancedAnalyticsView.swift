@@ -55,6 +55,7 @@ struct AdvancedAnalyticsView: View {
                             removeAllAlert.toggle()
                         }
                         .labelStyle(.iconOnly)
+                        .disabled(viewModel.isLoadingTransactions)
                     }
                     
                     Button("Add filter", systemImage: "plus") {
