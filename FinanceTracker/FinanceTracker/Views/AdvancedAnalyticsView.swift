@@ -192,11 +192,11 @@ struct AdvancedAnalyticsView: View {
             Text(configuration.filterTransactionType.rawValue)
                 .foregroundStyle(configuration.filterTransactionType.color)
             
-            Text(configuration.filterBalanceAccount?.name ?? "All accounts")
-                .foregroundStyle(configuration.filterBalanceAccount?.color ?? .primary)
+            Text(configuration.filterBalanceAccount?.name ?? String(localized: "All accounts"))
+                .foregroundStyle(configuration.filterBalanceAccount?.color ?? .secondary)
             
-            Text(configuration.filterCategory?.name ?? "All categories")
-                .foregroundStyle(configuration.filterCategory?.color ?? .primary)
+            Text(configuration.filterCategory?.name ?? String(localized: "All categories"))
+                .foregroundStyle(configuration.filterCategory?.color ?? .secondary)
             
             if configuration.filterTags.isEmpty {
                 Text("0 tags")

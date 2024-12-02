@@ -310,7 +310,7 @@ struct AddUpdateSearchConfigurationView: View {
 #Preview {
     let config = SearchConfiguration()
     
-    AddUpdateSearchConfigurationView(configuration: nil, balanceAccounts: [], categories: [], tags: []) { _ in
+    AddUpdateSearchConfigurationView(configuration: config, balanceAccounts: [], categories: [], tags: []) { _ in
         
     }
 }
