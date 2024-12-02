@@ -7,38 +7,13 @@
 
 import SwiftUI
 
-/*
- struct SearchConfiguration {
-     let id = UUID()
-     
-     var filterTransactionType: TransactionFilterTypes = .both
-     var filterBalanceAccount: BalanceAccount?
-     var filterCategory: Category?
-     var filterTags: [Tag] = []
-     var dateFilterType: DateFilterType = .month
-     var filterDate: Date = .now
-     var filterDateStart: Date = .now
-     var filterDateEnd: Date = .now
- }
- */
-
 struct AddUpdateSearchConfigurationView: View {
     private let configuration: SearchConfiguration?
     private let balanceAccounts: [BalanceAccount]
     private let categories: [Category]
     private let tags: [Tag]
     private let saveButtonAction: (SearchConfiguration) -> Void
-    @State private var filterTransactionType: TransactionFilterTypes = .both {
-        didSet {
-            guard filterTransactionType != oldValue else { return }
-            if let filterCategoryType = filterCategory?.type, let selectedType = filterTransactionType.binaryTransactionType {
-                if filterCategoryType != selectedType {
-                    filterCategory = nil
-                    return
-                }
-            }
-        }
-    }
+    @State private var filterTransactionType: TransactionFilterTypes = .both
     @State private var filterBalanceAccount: BalanceAccount?
     @State private var filterCategory: Category?
     @State private var filterTags: [Tag] = []
@@ -98,13 +73,23 @@ struct AddUpdateSearchConfigurationView: View {
             
             tagsFilterRow
             
-            Rectangle()
-                .fill(.clear)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
+            Section {
+                Rectangle()
+                    .fill(.clear)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
         }
         .overlay(alignment: .bottom) {
             addUpdateButton
+        }
+        .onChange(of: filterTransactionType) { oldValue, newValue in
+            guard newValue != oldValue else { return }
+            if let filterCategoryType = filterCategory?.type, let selectedType = newValue.binaryTransactionType {
+                if filterCategoryType != selectedType {
+                    filterCategory = nil
+                }
+            }
         }
     }
     
