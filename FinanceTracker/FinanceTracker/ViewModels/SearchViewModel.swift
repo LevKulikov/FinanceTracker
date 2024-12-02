@@ -13,7 +13,7 @@ protocol SearchViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func hideTabBar(_ hide: Bool)
 }
 
-enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable {
+enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable, Codable {
     case day = "For a day"
     case week = "For a week"
     case month = "For a month"
@@ -31,7 +31,7 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-struct SearchConfiguration: Identifiable {
+struct SearchConfiguration: Identifiable, Codable {
     let id: UUID
     
     var filterTransactionType: TransactionFilterTypes = .both
