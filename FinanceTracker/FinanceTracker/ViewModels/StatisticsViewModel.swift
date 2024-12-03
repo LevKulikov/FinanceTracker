@@ -165,7 +165,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
         didSet {
             guard balanceAccountToFilter.id != oldValue.id else { return }
-            refreshData()
+            refreshData(pieChartAnimation: false)
         }
     }
     /// Flag to determine if data is currently fetching, works in fetchAllData method
@@ -285,13 +285,14 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         self.dataManager = dataManager
         self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
         DispatchQueue.main.async { [weak self] in
+            // fetching data is preccessed in didSet of balanceAccountToFilter
             self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
         }
     }
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, tagsTotalAnimation: Bool = true, pieChartAnimation: Bool = true, barChartAnimation: Bool = false, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard !isFetchingData else {
             print("refreshData, data is already being refetched")
             return
@@ -312,9 +313,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 } else {
                     calculateTotalForBalanceAccount()
                 }
-                calculateTagsTotal(animated: true)
-                calculateDataForPieChart(animated: true)
-                calculateDataForBarChart()
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
                 print("refreshData, ended")
                 Task { @MainActor in
                     compeletionHandler?()
@@ -334,10 +335,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 if withRefetch {
                     await fetchTags()
                 }
-                calculateTagsTotal(animated: true)
+                calculateTagsTotal(animated: tagsTotalAnimation)
             }
         case .category:
-            calculateDataForPieChart(animated: true)
+            calculateDataForPieChart(animated: pieChartAnimation)
         case .balanceAccount:
             if withRefetch {
                 Task {
@@ -352,9 +353,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     } else {
                         self?.calculateTotalForBalanceAccount()
                     }
-                    self?.calculateTagsTotal(animated: true)
-                    self?.calculateDataForPieChart(animated: true)
-                    self?.calculateDataForBarChart()
+                    self?.calculateTagsTotal(animated: tagsTotalAnimation)
+                    self?.calculateDataForPieChart(animated: pieChartAnimation)
+                    self?.calculateDataForBarChart(animated: barChartAnimation)
                     print("refreshData, ended")
                     Task { @MainActor in
                         compeletionHandler?()
@@ -366,9 +367,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 } else {
                     calculateTotalForBalanceAccount()
                 }
-                calculateTagsTotal(animated: true)
-                calculateDataForPieChart(animated: true)
-                calculateDataForBarChart()
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
                 print("refreshData, ended")
                 Task { @MainActor in
                     compeletionHandler?()
