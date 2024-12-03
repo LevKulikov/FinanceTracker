@@ -690,7 +690,14 @@
       }
     },
     "Can't save filters" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получается сохранить фильтры"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -2603,13 +2610,34 @@
       }
     },
     "Save filters" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры"
+          }
+        }
+      }
     },
     "Save filters?" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры?"
+          }
+        }
+      }
     },
     "Saving empty filters deletes previously saved filters" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение пустых фильтров удаляет сохраненные в прошлом фильтры "
+          }
+        }
+      }
     },
     "Scroll to get more info" : {
       "localizations" : {
@@ -2917,8 +2945,15 @@
         }
       }
     },
-    "something went wrong during saving the filters. Please try again later" : {
-
+    "Something went wrong during saving the filters. Please try again later" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так в процессе сохранения фильтров. Попробуйте еще раз позже"
+          }
+        }
+      }
     },
     "Sorry, some error occured. This page doesn't exist" : {
       "localizations" : {
@@ -3171,7 +3206,14 @@
       }
     },
     "This will not affect saved filters" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это не повлияет на сохраненные фильтры"
+          }
+        }
+      }
     },
     "This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App" : {
       "localizations" : {

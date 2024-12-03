@@ -150,7 +150,7 @@ struct AdvancedAnalyticsView: View {
             .alert("Can't save filters", isPresented: $saveConfigsError) {
                 Button("Ok") {}
             } message: {
-                Text("something went wrong during saving the filters. Please try again later")
+                Text("Something went wrong during saving the filters. Please try again later")
             }
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
