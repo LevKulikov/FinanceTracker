@@ -16,6 +16,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     private let dataManager: any DataManagerProtocol
     private var loadingTransactionsTaskGroup: ThrowingTaskGroup<[Transaction], any Error>?
     private var transactions: [Transaction] = []
+    private var firstOtherDataLoadCompleted: Bool = false
     
     //MARK: Published properties
     @MainActor @Published var showAnalytics: Bool = false
@@ -33,7 +34,6 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Initializer
     init(dataManager: some DataManagerProtocol) {
         self.dataManager = dataManager
-        getConfigurations()
     }
     
     //MARK: - Methods
@@ -69,6 +69,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func fetchOtherData(errorHandler: (@MainActor @Sendable (Error) -> Void)? = nil) {
+        print("AdvancedAnalyticsViewModel: fetchOtherData: starting")
         // create local error handler to convert MainActro error handler to universal
         let localErrorHandler: (@Sendable (Error) -> Void) = { error in
             Task { @MainActor in
@@ -107,11 +108,19 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
                 }
                 // Wait until all data is fetched
                 await taskGroup.waitForAll()
+                print("AdvancedAnalyticsViewModel: all data fetched, taskGroup completed")
+            }
+            
+            if !firstOtherDataLoadCompleted {
+                print("AdvancedAnalyticsViewModel: getting saved configurations")
+                await getSavedConfigurations()
+                firstOtherDataLoadCompleted = true
             }
             
             await MainActor.run {
                 isLoadingOtherData = false
             }
+            print("AdvancedAnalyticsViewModel: fetchOtherData: end")
         }
     }
     
@@ -394,14 +403,16 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func getConfigurations() {
-        Task { @MainActor in
-            do {
-                let savedConfigs = try dataManager.getSearchConfigurations()
-                searchConfigurations = savedConfigs
-            } catch {
-                print("AdvancedAnalyticsViewModel: getConfigurations: Error getting saved search configurations: \(error)")
-            }
+    @MainActor
+    private func getSavedConfigurations() async {
+        print("AdvancedAnalyticsViewModel: getConfigurations: Getting saved search configurations...")
+        do {
+            let savedStorageConfigs = try dataManager.getSearchConfigurations()
+            let configs = savedStorageConfigs.compactMap { $0.getConfiguration(balanceAccounts: allBalanceAccounts, categories: allCategories, tags: allTags) }
+            searchConfigurations = configs
+            print("AdvancedAnalyticsViewModel: getConfigurations: Successfully retrieved saved search configurations")
+        } catch {
+            print("AdvancedAnalyticsViewModel: getConfigurations: Error getting saved search configurations: \(error)")
         }
     }
 }
