@@ -15,6 +15,8 @@ struct AdvancedAnalyticsView: View {
     @State private var updatedConfiguration: SearchConfiguration?
     @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     @State private var removeAllAlert: Bool = false
+    @State private var saveConfigsAlert: Bool = false
+    @State private var saveConfigsError: Bool = false
     private let userDevice = FTAppAssets.currentUserDevise
     private var isIpad: Bool {
         FTAppAssets.currentUserDevise == .pad
@@ -50,6 +52,12 @@ struct AdvancedAnalyticsView: View {
                 if viewModel.isLoadingOtherData {
                     ProgressView()
                 } else {
+                    Button("Save filters", systemImage: "square.and.arrow.down.on.square") {
+                        saveConfigsAlert.toggle()
+                    }
+                    .labelStyle(.iconOnly)
+                    .disabled(viewModel.isLoadingTransactions)
+                    
                     if !viewModel.searchConfigurations.isEmpty {
                         Button("Delete all filters", systemImage: "trash") {
                             removeAllAlert.toggle()
@@ -107,6 +115,8 @@ struct AdvancedAnalyticsView: View {
                 Button("Yes", role: .destructive) {
                     viewModel.removeAllConfigurations()
                 }
+            } message: {
+                Text("This will not affect saved filters")
             }
             .alert("Select currency", isPresented: $viewModel.showCurrencySelection) {
                 ForEach(viewModel.currencies, id: \.self) { currency in
@@ -116,6 +126,31 @@ struct AdvancedAnalyticsView: View {
                 }
                 
                 Button("Cancel", role: .cancel) {}
+            }
+            .alert("Save filters?", isPresented: $saveConfigsAlert) {
+                Button("Save") {
+                    viewModel.saveConfiguration { result in
+                        switch result {
+                        case .failure:
+                            saveConfigsError.toggle()
+                        case .success:
+                            break
+                        }
+                    }
+                }
+                
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                if viewModel.searchConfigurations.isEmpty {
+                    Text("Saving empty filters deletes previously saved filters")
+                } else {
+                    Text("The next time you start the application, the filters will be loaded from memory")
+                }
+            }
+            .alert("Can't save filters", isPresented: $saveConfigsError) {
+                Button("Ok") {}
+            } message: {
+                Text("Something went wrong during saving the filters. Please try again later")
             }
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size

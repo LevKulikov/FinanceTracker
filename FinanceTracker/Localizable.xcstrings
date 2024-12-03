@@ -689,6 +689,16 @@
         }
       }
     },
+    "Can't save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получается сохранить фильтры"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "ru" : {
@@ -2599,6 +2609,36 @@
         }
       }
     },
+    "Save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры"
+          }
+        }
+      }
+    },
+    "Save filters?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры?"
+          }
+        }
+      }
+    },
+    "Saving empty filters deletes previously saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение пустых фильтров удаляет сохраненные в прошлом фильтры "
+          }
+        }
+      }
+    },
     "Scroll to get more info" : {
       "localizations" : {
         "ru" : {
@@ -2905,6 +2945,16 @@
         }
       }
     },
+    "Something went wrong during saving the filters. Please try again later" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так в процессе сохранения фильтров. Попробуйте еще раз позже"
+          }
+        }
+      }
+    },
     "Sorry, some error occured. This page doesn't exist" : {
       "localizations" : {
         "ru" : {
@@ -3075,6 +3125,16 @@
         }
       }
     },
+    "The next time you start the application, the filters will be loaded from memory" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При следующем запуске приложения фильтры будут загружены из памяти"
+          }
+        }
+      }
+    },
     "There are no saved transactions for this date" : {
       "localizations" : {
         "ru" : {
@@ -3141,6 +3201,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Данный экран обновляется автоматически, так что нет необходимости делать это вручную. Но, если вы не видите нужных изменений, нажмите кнопку ниже чтобы обновить"
+          }
+        }
+      }
+    },
+    "This will not affect saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это не повлияет на сохраненные фильтры"
           }
         }
       }

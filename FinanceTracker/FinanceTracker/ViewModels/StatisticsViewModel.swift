@@ -15,7 +15,7 @@ protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate
     func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
 
-enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
+enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable, Codable {
     case both = "Both types"
     case spending = "Spending"
     case income = "Income"

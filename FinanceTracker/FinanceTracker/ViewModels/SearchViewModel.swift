@@ -13,7 +13,7 @@ protocol SearchViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func hideTabBar(_ hide: Bool)
 }
 
-enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable {
+enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable, Codable {
     case day = "For a day"
     case week = "For a week"
     case month = "For a month"
@@ -31,9 +31,68 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-struct SearchConfiguration: Identifiable {
-    let id: UUID
+struct SearchConfiguration: Identifiable, Codable {
+    struct StorageConvertedConfiguration: Codable {
+        let id: UUID
+        let filterTransactionType: TransactionFilterTypes
+        let filterBalanceAccountId: String?
+        let filterCategoryId: String?
+        let filterTagsIds: [String]
+        let dateFilterType: DateFilterType
+        let filterDate: Date
+        let filterDateStart: Date
+        let filterDateEnd: Date
+        
+        init(configuration: SearchConfiguration) {
+            self.id = configuration.id
+            self.filterTransactionType = configuration.filterTransactionType
+            self.filterBalanceAccountId = configuration.filterBalanceAccount?.id
+            self.filterCategoryId = configuration.filterCategory?.id
+            self.filterTagsIds = configuration.filterTags.map(\.id)
+            self.dateFilterType = configuration.dateFilterType
+            self.filterDate = configuration.filterDate
+            self.filterDateStart = configuration.filterDateStart
+            self.filterDateEnd = configuration.filterDateEnd
+        }
+        
+        func getConfiguration(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag]) -> SearchConfiguration? {
+            var filterBalanceAccount: BalanceAccount? = nil
+            if let balanceAccountId = filterBalanceAccountId {
+                guard let balanceAccount = balanceAccounts.first(where: { $0.id == balanceAccountId }) else { return nil }
+                filterBalanceAccount = balanceAccount
+            }
+            
+            var filterCategory: Category? = nil
+            if let categoryId = filterCategoryId {
+                guard let category = categories.first(where: { $0.id == categoryId }) else { return nil }
+                filterCategory = category
+            }
+            
+            var filterTags: [Tag] = []
+            if !filterTagsIds.isEmpty {
+                for tagId in filterTagsIds {
+                    guard let tag = tags.first(where: { $0.id == tagId }) else { continue }
+                    filterTags.append(tag)
+                }
+            }
+            
+            let configuration = SearchConfiguration(
+                id: id,
+                filterTransactionType: filterTransactionType,
+                filterBalanceAccount: filterBalanceAccount,
+                filterCategory: filterCategory,
+                filterTags: filterTags,
+                dateFilterType: dateFilterType,
+                filterDate: filterDate,
+                filterDateStart: filterDateStart,
+                filterDateEnd: filterDateEnd
+            )
+            
+            return configuration
+        }
+    }
     
+    let id: UUID
     var filterTransactionType: TransactionFilterTypes = .both
     var filterBalanceAccount: BalanceAccount?
     var filterCategory: Category?
