@@ -13,7 +13,7 @@ protocol SearchViewModelDelegate: AnyObject, TransactionManipulationDelegate {
     func hideTabBar(_ hide: Bool)
 }
 
-enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable {
+enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable, Codable {
     case day = "For a day"
     case week = "For a week"
     case month = "For a month"
@@ -31,18 +31,91 @@ struct TransactionGroupedData: Identifiable {
     let transactions: [Transaction]
 }
 
-final class SearchViewModel: ObservableObject, @unchecked Sendable {
-    struct Configuration {
-        var filterTransactionType: TransactionFilterTypes = .both
-        var filterBalanceAccount: BalanceAccount?
-        var filterCategory: Category?
-        var filterTags: [Tag] = []
-        var dateFilterType: DateFilterType = .month
-        var filterDate: Date = .now
-        var filterDateStart: Date = .now
-        var filterDateEnd: Date = .now
+struct SearchConfiguration: Identifiable, Codable {
+    struct StorageConvertedConfiguration: Codable {
+        let id: UUID
+        let filterTransactionType: TransactionFilterTypes
+        let filterBalanceAccountId: String?
+        let filterCategoryId: String?
+        let filterTagsIds: [String]
+        let dateFilterType: DateFilterType
+        let filterDate: Date
+        let filterDateStart: Date
+        let filterDateEnd: Date
+        
+        init(configuration: SearchConfiguration) {
+            self.id = configuration.id
+            self.filterTransactionType = configuration.filterTransactionType
+            self.filterBalanceAccountId = configuration.filterBalanceAccount?.id
+            self.filterCategoryId = configuration.filterCategory?.id
+            self.filterTagsIds = configuration.filterTags.map(\.id)
+            self.dateFilterType = configuration.dateFilterType
+            self.filterDate = configuration.filterDate
+            self.filterDateStart = configuration.filterDateStart
+            self.filterDateEnd = configuration.filterDateEnd
+        }
+        
+        func getConfiguration(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag]) -> SearchConfiguration? {
+            var filterBalanceAccount: BalanceAccount? = nil
+            if let balanceAccountId = filterBalanceAccountId {
+                guard let balanceAccount = balanceAccounts.first(where: { $0.id == balanceAccountId }) else { return nil }
+                filterBalanceAccount = balanceAccount
+            }
+            
+            var filterCategory: Category? = nil
+            if let categoryId = filterCategoryId {
+                guard let category = categories.first(where: { $0.id == categoryId }) else { return nil }
+                filterCategory = category
+            }
+            
+            var filterTags: [Tag] = []
+            if !filterTagsIds.isEmpty {
+                for tagId in filterTagsIds {
+                    guard let tag = tags.first(where: { $0.id == tagId }) else { continue }
+                    filterTags.append(tag)
+                }
+            }
+            
+            let configuration = SearchConfiguration(
+                id: id,
+                filterTransactionType: filterTransactionType,
+                filterBalanceAccount: filterBalanceAccount,
+                filterCategory: filterCategory,
+                filterTags: filterTags,
+                dateFilterType: dateFilterType,
+                filterDate: filterDate,
+                filterDateStart: filterDateStart,
+                filterDateEnd: filterDateEnd
+            )
+            
+            return configuration
+        }
     }
     
+    let id: UUID
+    var filterTransactionType: TransactionFilterTypes = .both
+    var filterBalanceAccount: BalanceAccount?
+    var filterCategory: Category?
+    var filterTags: [Tag] = []
+    var dateFilterType: DateFilterType = .month
+    var filterDate: Date = .now
+    var filterDateStart: Date = .now
+    var filterDateEnd: Date = .now
+    
+    init(id: UUID = UUID(), filterTransactionType: TransactionFilterTypes = .both, filterBalanceAccount: BalanceAccount? = nil, filterCategory: Category? = nil, filterTags: [Tag] = [], dateFilterType: DateFilterType = .month, filterDate: Date = .now, filterDateStart: Date = .now, filterDateEnd: Date = .now) {
+        self.id = id
+        self.filterTransactionType = filterTransactionType
+        self.filterBalanceAccount = filterBalanceAccount
+        self.filterCategory = filterCategory
+        self.filterTags = filterTags
+        self.dateFilterType = dateFilterType
+        self.filterDate = filterDate
+        self.filterDateStart = filterDateStart
+        self.filterDateEnd = filterDateEnd
+    }
+}
+
+final class SearchViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     weak var delegate: (any SearchViewModelDelegate)?
     
@@ -196,7 +269,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
         })
     }
     
-    init(dataManager: some DataManagerProtocol, configuration: Configuration) {
+    init(dataManager: some DataManagerProtocol, configuration: SearchConfiguration) {
         self.dataManager = dataManager
         self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
         self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)
@@ -327,7 +400,8 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                     
                     var containsNeededTag = true
                     if !self.filterTags.isEmpty {
-                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(self.filterTags.sorted { $0.name < $1.name }.map { $0.id })
+                        let sortedFilterTags = self.filterTags.sorted { $0.name < $1.name }.map(\.id)
+                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(sortedFilterTags)
                     }
                     
                     return (sameBA && sameCategory && containsNeededTag)
@@ -665,7 +739,7 @@ extension SearchViewModel: CustomTabViewModelDelegate {
             fetchAllData(competionHandler:  { [weak self] in
                 self?.filterAndSetTransactions()
             })
-        case .transfers, .budgets, .appearance, .notifications:
+        case .transfers, .budgets, .appearance, .notifications, .advancedAnalytics:
             break
         }
     }

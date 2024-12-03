@@ -28,6 +28,7 @@ enum SettingsSectionAndDataType: Hashable {
     case tags(Tag?)
     case transactions(Transaction?)
     case transfers(TransferTransaction?)
+    case advancedAnalytics
     case appearance
     case data
     case budgets(Budget?)
@@ -119,6 +120,11 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
         default:
             return AnyView(EmptyView())
         }
+    }
+    
+    @MainActor
+    func getAdvancedAnalyticsView() -> some View {
+        return FTFactory.shared.createAdvancedAnalyticsView(dataManager: dataManager)
     }
     
     @MainActor

@@ -38,6 +38,10 @@ protocol SettingsManagerProtocol: AnyObject {
     func stayAtAddingViewAfterAdd() -> Bool
     
     func stayAtAddingViewAfterAdd(_ stay: Bool)
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -49,6 +53,7 @@ final class SettingsManager: SettingsManagerProtocol {
     private let lightWeightStatisticsKey = "lightWeightStatisticsKey"
     private let showAddButtonFromEvetyTabKey = "showAddButtonFromEvetyTabKey"
     private let stayAtAddingViewAfterAddKey = "doNotCloseAddingViewAfterAddKey"
+    private let searchConfigurationsKey = "searchConfigurationsKey"
     
     //MARK: - Initializer
     init() {
@@ -150,5 +155,19 @@ final class SettingsManager: SettingsManagerProtocol {
     
     func stayAtAddingViewAfterAdd(_ stay: Bool) {
         UserDefaults.standard.set(stay, forKey: stayAtAddingViewAfterAddKey)
+    }
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws {
+        let convertedConfigs = configurations.map { SearchConfiguration.StorageConvertedConfiguration(configuration: $0) }
+        let data = try JSONEncoder().encode(convertedConfigs)
+        UserDefaults.standard.set(data, forKey: searchConfigurationsKey)
+    }
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration] {
+        guard let data = UserDefaults.standard.data(forKey: searchConfigurationsKey) else {
+            return []
+        }
+        let configurations = try JSONDecoder().decode([SearchConfiguration.StorageConvertedConfiguration].self, from: data)
+        return configurations
     }
 }
