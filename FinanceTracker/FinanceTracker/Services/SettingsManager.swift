@@ -41,7 +41,7 @@ protocol SettingsManagerProtocol: AnyObject {
     
     func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws
     
-    func getSearchConfigurations() throws -> [SearchConfiguration]
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
 }
 
 final class SettingsManager: SettingsManagerProtocol {
@@ -158,15 +158,16 @@ final class SettingsManager: SettingsManagerProtocol {
     }
     
     func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws {
-        let data = try JSONEncoder().encode(configurations)
+        let convertedConfigs = configurations.map { SearchConfiguration.StorageConvertedConfiguration(configuration: $0) }
+        let data = try JSONEncoder().encode(convertedConfigs)
         UserDefaults.standard.set(data, forKey: searchConfigurationsKey)
     }
     
-    func getSearchConfigurations() throws -> [SearchConfiguration] {
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration] {
         guard let data = UserDefaults.standard.data(forKey: searchConfigurationsKey) else {
             return []
         }
-        let configurations = try JSONDecoder().decode([SearchConfiguration].self, from: data)
+        let configurations = try JSONDecoder().decode([SearchConfiguration.StorageConvertedConfiguration].self, from: data)
         return configurations
     }
 }
