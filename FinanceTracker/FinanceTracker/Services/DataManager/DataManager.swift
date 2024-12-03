@@ -115,7 +115,7 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     
     func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws
     
-    func getSearchConfigurations() throws -> [SearchConfiguration]
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
 }
 
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
@@ -659,7 +659,7 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
         try settingsManager.setSearchConfigurations(configurations)
     }
     
-    func getSearchConfigurations() throws -> [SearchConfiguration] {
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration] {
         try settingsManager.getSearchConfigurations()
     }
     
