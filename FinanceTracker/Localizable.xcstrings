@@ -689,6 +689,9 @@
         }
       }
     },
+    "Can't save filters" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "ru" : {
@@ -2599,6 +2602,15 @@
         }
       }
     },
+    "Save filters" : {
+
+    },
+    "Save filters?" : {
+
+    },
+    "Saving empty filters deletes previously saved filters" : {
+
+    },
     "Scroll to get more info" : {
       "localizations" : {
         "ru" : {
@@ -2905,6 +2917,9 @@
         }
       }
     },
+    "something went wrong during saving the filters. Please try again later" : {
+
+    },
     "Sorry, some error occured. This page doesn't exist" : {
       "localizations" : {
         "ru" : {
@@ -3075,6 +3090,16 @@
         }
       }
     },
+    "The next time you start the application, the filters will be loaded from memory" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При следующем запуске приложения фильтры будут загружены из памяти"
+          }
+        }
+      }
+    },
     "There are no saved transactions for this date" : {
       "localizations" : {
         "ru" : {
@@ -3144,6 +3169,9 @@
           }
         }
       }
+    },
+    "This will not affect saved filters" : {
+
     },
     "This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App" : {
       "localizations" : {
