@@ -44,6 +44,42 @@ protocol SettingsManagerProtocol: AnyObject {
     func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
 }
 
+protocol SettingsAdapterProtocol: AnyObject, Sendable {
+    var tagDefaultColor: Color? { get set }
+    var isFirstLaunch: Bool { get set }
+    
+    @MainActor
+    func saveDefaultCategories()
+    
+    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
+    
+    func getDefaultBalanceAccount() -> BalanceAccount?
+    
+    func setPreferredColorScheme(_ colorScheme: ColorScheme?)
+    
+    func getPreferredColorScheme() -> ColorScheme?
+    
+    func setThreeTabsArray(_ tabsArray: [TabViewType])
+    
+    func getThreeTabsArray() -> [TabViewType]
+    
+    func isLightWeightStatistics() -> Bool
+    
+    func setLightWeightStatistics(_ isLight: Bool)
+    
+    func showAddButtonFromEvetyTab() -> Bool
+    
+    func showAddButtonFromEvetyTab(_ show: Bool)
+    
+    func stayAtAddingViewAfterAdd() -> Bool
+    
+    func stayAtAddingViewAfterAdd(_ stay: Bool)
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
+}
+
 final class SettingsManager: SettingsManagerProtocol {
     //MARK: - Properties
     private let tagDefaultColorKey = "tagDefaultColorKey"
