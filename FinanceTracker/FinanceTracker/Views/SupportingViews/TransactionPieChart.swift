@@ -22,7 +22,7 @@ struct TransactionPieChart: View {
     private let onCategoryDataTap: (TransactionPieChartData) -> Void
     private let showTransactions: Bool
     private var sumOfValue: Float = 0
-    @State private var selectedValue: Int?
+    @State private var selectedValue: Float?
     @State private var selectedCategoryId: String?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
     private var selectedCategoryPersentage: Int? {
@@ -177,11 +177,11 @@ struct TransactionPieChart: View {
     }
     
     private func calculatePercentage(for value: Float) -> Int {
-        guard !sumOfValue.isNaN, sumOfValue != .infinity, sumOfValue > 0 else {
+        guard !sumOfValue.isNaN, !sumOfValue.isSignalingNaN, sumOfValue.isFinite, sumOfValue > 0 else {
             return sumOfValue > 0 ? 100 : 0
         }
         
-        guard !value.isNaN, value != .infinity else {
+        guard !value.isNaN, !value.isSignalingNaN, value.isFinite else {
             return value == .infinity ? 100 : 0
         }
         
@@ -199,12 +199,12 @@ struct TransactionPieChart: View {
     
     private func setSelectedCategoryId() {
         Task { @MainActor in
-            guard let selectedValue else { return }
+            guard let selectedValue, selectedValue.isFinite, !selectedValue.isSignalingNaN, !selectedValue.isNaN else { return }
             var total: Float = 0
             
             for element in transactionsChartData {
                 total += element.sumValue
-                if Float(selectedValue) <= total {
+                if selectedValue <= total {
                     setSelectedCategory(element.category)
                     return
                 }
