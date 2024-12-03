@@ -118,6 +118,10 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration]
 }
 
+protocol DataAndSettingsManagerProtocol: DataManagerProtocol, SettingsAdapterProtocol {
+    
+}
+
 final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
     enum DataThread: Equatable {
         case main
