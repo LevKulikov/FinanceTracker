@@ -42,7 +42,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     let codeSource = "https://github.com/LevKulikov/FinanceTracker.git"
     
     //MARK: Private props
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     
     //MARK: Published props
     @MainActor @Published var selectedSettings: SettingsSectionAndDataType? {
@@ -62,7 +62,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: - Initializer
     
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         let savedTabs = dataManager.getThreeTabsArray()
         let notSaved = TabViewType.changableTabs.filter { !savedTabs.contains($0) }
@@ -92,7 +92,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getAppearanceView() -> some View {
-        return FTFactory.shared.createAppearanceView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createAppearanceView(settingsManager: dataManager, delegate: self)
     }
     
     @MainActor
@@ -135,7 +135,7 @@ final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     
     @MainActor
     func getTabsSettingsView() -> some View {
-        return FTFactory.shared.createTabsSettingsView(dataManager: dataManager, delegate: self)
+        return FTFactory.shared.createTabsSettingsView(settingsManager: dataManager, delegate: self)
     }
     
     @MainActor

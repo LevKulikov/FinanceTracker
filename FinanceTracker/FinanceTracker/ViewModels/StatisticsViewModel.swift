@@ -143,7 +143,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
     /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
@@ -292,7 +292,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     @Published private(set) var barDataIsCalculating: Bool = false
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
         DispatchQueue.main.async { [weak self] in

@@ -10,7 +10,7 @@ import SwiftData
 
 final class DeveloperToolViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     
     @MainActor @Published private(set) var isProcessing = false
     @MainActor @Published private(set) var balanceAccounts: [BalanceAccount] = []
@@ -20,7 +20,7 @@ final class DeveloperToolViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published var transactionsCountString: String = "5000"
     
     //MARK: - Initializer
-    init(dataManager: any DataManagerProtocol) {
+    init(dataManager: any DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         self._selectedBalanceAccount = Published(wrappedValue: dataManager.getDefaultBalanceAccount())
         fetchAllData()

@@ -25,7 +25,7 @@ final class TagsViewModel: ObservableObject {
     weak var delegate: (any TagsViewModelDelegate)?
     
     //MARK: Pivate properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     
     //MARK: Published properties
     @Published private(set) var tags: [Tag] = []
@@ -46,7 +46,7 @@ final class TagsViewModel: ObservableObject {
     }
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         if let defaultColor = dataManager.tagDefaultColor {
             randomColorToggle = false

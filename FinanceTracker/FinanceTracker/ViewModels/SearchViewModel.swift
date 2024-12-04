@@ -120,7 +120,7 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     weak var delegate: (any SearchViewModelDelegate)?
     
     //MARK: Private props
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private let calendar = Calendar.current
     private var searchDispatchWorkItem: DispatchWorkItem?
     private var allTransactions: [Transaction] = []
@@ -262,14 +262,14 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published private(set) var filteredTransactionsCurrencies: [String] = []
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         fetchAllData(competionHandler:  { [weak self] in
             self?.filterAndSetTransactions()
         })
     }
     
-    init(dataManager: some DataManagerProtocol, configuration: SearchConfiguration) {
+    init(dataManager: some DataAndSettingsManagerProtocol, configuration: SearchConfiguration) {
         self.dataManager = dataManager
         self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
         self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)

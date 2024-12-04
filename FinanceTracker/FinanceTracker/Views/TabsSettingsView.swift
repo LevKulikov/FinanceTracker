@@ -91,7 +91,7 @@ struct TabsSettingsView: View {
 
 #Preview {
     let dataManager = DataManager(container: FinanceTrackerApp.createModelContainer())
-    let viewModel = TabsSettingsViewModel(dataManager: dataManager)
+    let viewModel = TabsSettingsViewModel(settingsManager: dataManager)
     
     return TabsSettingsView(viewModel: viewModel)
 }

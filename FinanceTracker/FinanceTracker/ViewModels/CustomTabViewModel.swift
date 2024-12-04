@@ -105,7 +105,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private var delegates: [WeakReferenceDelegate] = []
     private var defaultBalanceAccount: BalanceAccount?
     
@@ -154,7 +154,7 @@ final class CustomTabViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         self.isFirstLaunch = dataManager.isFirstLaunch
         self._firstThreeTabs = Published(wrappedValue: dataManager.getThreeTabsArray())

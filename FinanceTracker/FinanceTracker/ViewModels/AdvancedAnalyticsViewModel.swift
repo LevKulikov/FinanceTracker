@@ -13,7 +13,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
         case taskCancelled
     }
     //MARK: - Properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private var loadingTransactionsTaskGroup: ThrowingTaskGroup<[Transaction], any Error>?
     private var transactions: [Transaction] = []
     private var firstOtherDataLoadCompleted: Bool = false
@@ -32,7 +32,7 @@ final class AdvancedAnalyticsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
     }
     
