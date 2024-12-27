@@ -24,14 +24,14 @@ final class BalanceAccountsViewModel: ObservableObject, @unchecked Sendable {
     weak var delegate: (any BalanceAccountsViewModelDelegate)?
     
     //MARK: Private props
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     
     //MARK: Published
     @Published private(set) var balanceAccounts: [BalanceAccount] = []
     @Published private(set) var defaultBalanceAccount: BalanceAccount?
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         fetchData()
     }

@@ -186,7 +186,7 @@ final class ManageDataViewModel: ObservableObject, @unchecked Sendable {
             await dataManager.importDataFromContainer(decodedContainerCopy)
             
             if let balanceAccount = decodedContainerCopy.balanceAccounts.first {
-                dataManager.setDefaultBalanceAccount(balanceAccount)
+                (dataManager as? SettingsAdapterProtocol)?.setDefaultBalanceAccount(balanceAccount)
             }
             delegate?.didDeleteAndImportNewData()
             

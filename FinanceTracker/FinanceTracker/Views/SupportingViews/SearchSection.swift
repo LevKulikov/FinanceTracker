@@ -29,7 +29,7 @@ struct SearchSection: View, @unchecked Sendable {
     var body: some View {
         Section {
             ForEach(transactionGroupData.transactions.reversed()) { transaction in
-                SearchTransactionRow(transaction: transaction)
+                SearchTransactionRow(transaction: transaction, onDeleteAction: onDeleteSwipe)
                     .onTapGesture {
                         onTapAction(transaction)
                     }

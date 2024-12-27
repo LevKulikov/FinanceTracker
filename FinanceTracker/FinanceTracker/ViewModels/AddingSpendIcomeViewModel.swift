@@ -48,7 +48,7 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: Properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private let dataThread: DataManager.DataThread
     weak var delegate: (any AddingSpendIcomeViewModelDelegate)?
     var action: ActionWithTransaction = .none {
@@ -104,7 +104,7 @@ final class AddingSpendIcomeViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: Initializer
-    init(dataManager: some DataManagerProtocol, use dataThread: DataManager.DataThread, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
+    init(dataManager: some DataAndSettingsManagerProtocol, use dataThread: DataManager.DataThread, transactionsTypeSelected: TransactionsType, balanceAccount: BalanceAccount) {
         self.dataManager = dataManager
         self.dataThread = dataThread
         self._transactionsTypeSelected = Published(wrappedValue: transactionsTypeSelected)

@@ -44,12 +44,12 @@ final class WelcomeViewModel: ObservableObject, @unchecked Sendable {
     ]
     
     //MARK: Private props
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     
     //MARK: Published
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
     }
     

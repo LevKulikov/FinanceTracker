@@ -22,7 +22,7 @@ struct TransactionPieChart: View {
     private let onCategoryDataTap: (TransactionPieChartData) -> Void
     private let showTransactions: Bool
     private var sumOfValue: Float = 0
-    @State private var selectedValue: Int?
+    @State private var selectedValue: Float?
     @State private var selectedCategoryId: String?
     @State private var cancleDispatchWorkItem: DispatchWorkItem?
     private var selectedCategoryPersentage: Int? {
@@ -149,7 +149,7 @@ struct TransactionPieChart: View {
     
     private var chartOverlay: some View {
         VStack(spacing: 0) {
-            let sumValueDisplay = selectedCategoryId == nil ? sumOfValue : selectedCategoryValue ?? 0
+            let sumValueDisplay = selectedCategoryId == nil ? sumOfValue : (selectedCategoryValue ?? 0)
             
             Text(FTFormatters.numberFormatterWithDecimals.string(for: sumValueDisplay) ?? "Err")
                 .foregroundStyle(.secondary)
@@ -169,19 +169,22 @@ struct TransactionPieChart: View {
     //MARK: - Methods
     private func calculateTotalValue() -> Float {
         let value = transactionsChartData
-            .map { $0.sumValue }
-            .reduce(0, +)
+            .reduce(Float(0), { partialResult, nextData in
+                partialResult + nextData.sumValue
+            })
         
         return value
     }
     
     private func calculatePercentage(for value: Float) -> Int {
-        guard !sumOfValue.isNaN, sumOfValue != .infinity else {
+        guard !sumOfValue.isNaN, !sumOfValue.isSignalingNaN, sumOfValue.isFinite, sumOfValue > 0 else {
             return sumOfValue > 0 ? 100 : 0
         }
-        guard !sumOfValue.isNaN, value != .infinity else {
+        
+        guard !value.isNaN, !value.isSignalingNaN, value.isFinite else {
             return value == .infinity ? 100 : 0
         }
+        
         return Int(value/sumOfValue * 100)
     }
     
@@ -195,14 +198,16 @@ struct TransactionPieChart: View {
     }
     
     private func setSelectedCategoryId() {
-        guard let selectedValue else { return }
-        var total: Float = 0
-        
-        for element in transactionsChartData {
-            total += element.sumValue
-            if Float(selectedValue) <= total {
-                setSelectedCategory(element.category)
-                return
+        Task { @MainActor in
+            guard let selectedValue, selectedValue.isFinite, !selectedValue.isSignalingNaN, !selectedValue.isNaN else { return }
+            var total: Float = 0
+            
+            for element in transactionsChartData {
+                total += element.sumValue
+                if selectedValue <= total {
+                    setSelectedCategory(element.category)
+                    return
+                }
             }
         }
     }

@@ -15,7 +15,7 @@ protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate
     func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
 
-enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
+enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable, Codable {
     case both = "Both types"
     case spending = "Spending"
     case income = "Income"
@@ -32,6 +32,17 @@ enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, I
             return .spending
         case .income:
             return .income
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .both:
+            return .blue
+        case .spending:
+            return .red
+        case .income:
+            return .green
         }
     }
 }
@@ -132,7 +143,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
     /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
@@ -281,17 +292,18 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     @Published private(set) var barDataIsCalculating: Bool = false
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
         DispatchQueue.main.async { [weak self] in
+            // fetching data is preccessed in didSet of balanceAccountToFilter
             self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
         }
     }
     
     //MARK: - Methods
     /// Refreshes all data
-    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, tagsTotalAnimation: Bool = true, pieChartAnimation: Bool = true, barChartAnimation: Bool = false, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard !isFetchingData else {
             print("refreshData, data is already being refetched")
             return
@@ -312,9 +324,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 } else {
                     calculateTotalForBalanceAccount()
                 }
-                calculateTagsTotal(animated: true)
-                calculateDataForPieChart(animated: true)
-                calculateDataForBarChart()
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
                 print("refreshData, ended")
                 Task { @MainActor in
                     compeletionHandler?()
@@ -334,10 +346,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 if withRefetch {
                     await fetchTags()
                 }
-                calculateTagsTotal(animated: true)
+                calculateTagsTotal(animated: tagsTotalAnimation)
             }
         case .category:
-            calculateDataForPieChart(animated: true)
+            calculateDataForPieChart(animated: pieChartAnimation)
         case .balanceAccount:
             if withRefetch {
                 Task {
@@ -352,9 +364,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     } else {
                         self?.calculateTotalForBalanceAccount()
                     }
-                    self?.calculateTagsTotal(animated: true)
-                    self?.calculateDataForPieChart(animated: true)
-                    self?.calculateDataForBarChart()
+                    self?.calculateTagsTotal(animated: tagsTotalAnimation)
+                    self?.calculateDataForPieChart(animated: pieChartAnimation)
+                    self?.calculateDataForBarChart(animated: barChartAnimation)
                     print("refreshData, ended")
                     Task { @MainActor in
                         compeletionHandler?()
@@ -366,9 +378,9 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 } else {
                     calculateTotalForBalanceAccount()
                 }
-                calculateTagsTotal(animated: true)
-                calculateDataForPieChart(animated: true)
-                calculateDataForBarChart()
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
                 print("refreshData, ended")
                 Task { @MainActor in
                     compeletionHandler?()
@@ -665,7 +677,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [returnData] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [returnData] in
                 print("calculateDataForPieChart, started to provide data for pie chart")
                 self.pieDataIsCalculating = false
                 if animated {
@@ -1190,7 +1202,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     cleanData()
                 }
             }
-        case .budgets, .appearance, .notifications:
+        case .budgets, .appearance, .notifications, .advancedAnalytics:
             return
         }
     }

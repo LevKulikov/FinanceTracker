@@ -77,6 +77,8 @@ struct SettingsView: View {
                 viewModel.getTransfersView()
             case .budgets: // .budgets is used to identify additional tab to show
                 viewModel.getAdditionalTabView()
+            case .advancedAnalytics:
+                viewModel.getAdvancedAnalyticsView()
             case .notifications:
                 viewModel.getNotificationsView()
             }
@@ -124,6 +126,10 @@ struct SettingsView: View {
                 NavigationLink(value: SettingsSectionAndDataType.budgets(nil)) {
                     additionalTab.label
                 }
+            }
+            
+            NavigationLink(value: SettingsSectionAndDataType.advancedAnalytics) {
+                Label("Adavanced analytics", systemImage: "chart.bar.xaxis")
             }
             
             Button("Reorder tabs", systemImage: "ellipsis.rectangle") {

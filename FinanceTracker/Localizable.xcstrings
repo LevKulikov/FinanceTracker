@@ -11,6 +11,16 @@
         }
       }
     },
+    " + %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " + %lld"
+          }
+        }
+      }
+    },
     " and currency" : {
       "localizations" : {
         "ru" : {
@@ -159,12 +169,32 @@
         }
       }
     },
+    "0 tags" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 тегов"
+          }
+        }
+      }
+    },
     "404" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "404"
+          }
+        }
+      }
+    },
+    "Adavanced analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая аналитика"
           }
         }
       }
@@ -179,12 +209,32 @@
         }
       }
     },
+    "Add any number of filters to search for transactions of interest and get analytics on them. Analytics will reflect unique transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте любое количество фильтров для поиска интересующих транзакций, чтобы получить по ним аналитику. В аналитике будут отображены только уникальные транзакции"
+          }
+        }
+      }
+    },
     "Add budget" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить бюджет"
+          }
+        }
+      }
+    },
+    "Add filter" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить фильтр"
           }
         }
       }
@@ -229,6 +279,16 @@
         }
       }
     },
+    "Advanced Analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая Аналитика"
+          }
+        }
+      }
+    },
     "Again, this action is irretable. Do you want to delete all transactions?" : {
       "localizations" : {
         "ru" : {
@@ -255,6 +315,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Все"
+          }
+        }
+      }
+    },
+    "All accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все счета"
           }
         }
       }
@@ -615,6 +685,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Бюджеты"
+          }
+        }
+      }
+    },
+    "Can't save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получается сохранить фильтры"
           }
         }
       }
@@ -1049,6 +1129,16 @@
         }
       }
     },
+    "Delete all filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все фильтры"
+          }
+        }
+      }
+    },
     "Delete all stored data" : {
       "localizations" : {
         "ru" : {
@@ -1295,6 +1385,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удерживайте чтобы упорядочить"
+          }
+        }
+      }
+    },
+    "Duplicate" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дублировать"
           }
         }
       }
@@ -1609,6 +1709,16 @@
         }
       }
     },
+    "Get analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
+    },
     "Gifts" : {
       "localizations" : {
         "ru" : {
@@ -1879,6 +1989,16 @@
         }
       }
     },
+    "Loading..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка…"
+          }
+        }
+      }
+    },
     "Make transfer" : {
       "localizations" : {
         "ru" : {
@@ -1969,6 +2089,16 @@
         }
       }
     },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
     "No %@ for this date" : {
       "localizations" : {
         "ru" : {
@@ -2029,6 +2159,16 @@
         }
       }
     },
+    "No filters added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры не добавлены"
+          }
+        }
+      }
+    },
     "No results for \"%@\"" : {
       "localizations" : {
         "ru" : {
@@ -2055,6 +2195,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет транзакций"
+          }
+        }
+      }
+    },
+    "No transactions found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции не найдены"
           }
         }
       }
@@ -2399,6 +2549,16 @@
         }
       }
     },
+    "Remove all filters?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать все фильтры?"
+          }
+        }
+      }
+    },
     "Reorder" : {
       "localizations" : {
         "ru" : {
@@ -2445,6 +2605,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры"
+          }
+        }
+      }
+    },
+    "Save filters?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры?"
+          }
+        }
+      }
+    },
+    "Saving empty filters deletes previously saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение пустых фильтров удаляет сохраненные в прошлом фильтры "
           }
         }
       }
@@ -2515,6 +2705,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите цвет"
+          }
+        }
+      }
+    },
+    "Select currency" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать валюту"
           }
         }
       }
@@ -2745,6 +2945,16 @@
         }
       }
     },
+    "Something went wrong during saving the filters. Please try again later" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так в процессе сохранения фильтров. Попробуйте еще раз позже"
+          }
+        }
+      }
+    },
     "Sorry, some error occured. This page doesn't exist" : {
       "localizations" : {
         "ru" : {
@@ -2915,6 +3125,16 @@
         }
       }
     },
+    "The next time you start the application, the filters will be loaded from memory" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При следующем запуске приложения фильтры будут загружены из памяти"
+          }
+        }
+      }
+    },
     "There are no saved transactions for this date" : {
       "localizations" : {
         "ru" : {
@@ -2981,6 +3201,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Данный экран обновляется автоматически, так что нет необходимости делать это вручную. Но, если вы не видите нужных изменений, нажмите кнопку ниже чтобы обновить"
+          }
+        }
+      }
+    },
+    "This will not affect saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это не повлияет на сохраненные фильтры"
           }
         }
       }
@@ -3131,6 +3361,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Транспорт"
+          }
+        }
+      }
+    },
+    "Try to change filters to get more transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте поменять фильтры, чтобы получить больше транзакций"
           }
         }
       }
@@ -3351,6 +3591,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "www.flaticon.com"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
           }
         }
       }
