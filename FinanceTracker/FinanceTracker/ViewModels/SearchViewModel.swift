@@ -400,8 +400,9 @@ final class SearchViewModel: ObservableObject, @unchecked Sendable {
                     
                     var containsNeededTag = true
                     if !self.filterTags.isEmpty {
-                        let sortedFilterTags = self.filterTags.sorted { $0.name < $1.name }.map(\.id)
-                        containsNeededTag = trans.tags.sorted { $0.name < $1.name }.map { $0.id }.contains(sortedFilterTags)
+                        let sortedFilterTags = Set(self.filterTags.map(\.id))
+                        let sortedTransTags = Set(trans.tags.map(\.id))
+                        containsNeededTag = sortedFilterTags.isSubset(of: sortedTransTags)
                     }
                     
                     return (sameBA && sameCategory && containsNeededTag)
