@@ -33,13 +33,13 @@ final class TransactionListViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: Private properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private var transactions: [Transaction]
     private let threadToUse: DataManager.DataThread
     private let calendar = Calendar.current
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol, transactions: [Transaction], title: String, threadToUse: DataManager.DataThread) {
+    init(dataManager: some DataAndSettingsManagerProtocol, transactions: [Transaction], title: String, threadToUse: DataManager.DataThread) {
         self.dataManager = dataManager
         self.transactions = transactions
         self.title = title

@@ -93,7 +93,7 @@ struct AppearanceView: View {
 
 #Preview {
     let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
-    let viewModel = AppearanceViewModel(dataManager: dataManger)
+    let viewModel = AppearanceViewModel(settingsManager: dataManger)
     
     return AppearanceView(viewModel: viewModel)
 }

@@ -31,7 +31,7 @@ enum DateSettingDestination: Equatable {
 final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
     //MARK: Private props
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private var transactions: [Transaction] = []
     private let calendar = Calendar.current
     
@@ -88,7 +88,7 @@ final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
     }
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         fetchAllData {
             Task { @MainActor in
@@ -376,6 +376,8 @@ extension SpendIncomeViewModel: CustomTabViewModelDelegate {
         case .notifications:
             break
         case .transfers:
+            break
+        case .advancedAnalytics:
             break
         }
     }

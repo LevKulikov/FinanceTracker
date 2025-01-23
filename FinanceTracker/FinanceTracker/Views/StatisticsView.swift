@@ -253,6 +253,7 @@ struct StatisticsView: View {
                 .lineLimit(1)
                 .buttonStyle(.bordered)
                 .hoverEffect(.highlight)
+                .disabled(viewModel.isFetchingData)
             }
             
             HStack(alignment: .bottom) {
@@ -296,6 +297,7 @@ struct StatisticsView: View {
                 .lineLimit(1)
                 .buttonStyle(.bordered)
                 .hoverEffect(.highlight)
+                .disabled(viewModel.isFetchingData)
             }
             
             HStack {

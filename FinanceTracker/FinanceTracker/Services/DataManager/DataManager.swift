@@ -10,9 +10,6 @@ import Foundation
 import SwiftUI
 
 protocol DataManagerProtocol: AnyObject, Sendable {
-    var tagDefaultColor: Color? { get set }
-    var isFirstLaunch: Bool { get set }
-    
     @MainActor
     func getContext() -> ModelContext
     
@@ -85,36 +82,13 @@ protocol DataManagerProtocol: AnyObject, Sendable {
     func createDataContainer() async throws -> FTDataContainer
     
     func importDataFromContainer(_ container: FTDataContainer) async
-    
-    @MainActor
-    func saveDefaultCategories()
-    
-    func setDefaultBalanceAccount(_ balanceAccount: BalanceAccount)
-    
-    func getDefaultBalanceAccount() -> BalanceAccount?
-    
-    func setPreferredColorScheme(_ colorScheme: ColorScheme?)
-    
-    func getPreferredColorScheme() -> ColorScheme?
-    
-    func setThreeTabsArray(_ tabsArray: [TabViewType])
-    
-    func getThreeTabsArray() -> [TabViewType]
-    
-    func isLightWeightStatistics() -> Bool
-    
-    func setLightWeightStatistics(_ isLight: Bool)
-    
-    func showAddButtonFromEvetyTab() -> Bool
-    
-    func showAddButtonFromEvetyTab(_ show: Bool)
-    
-    func stayAtAddingViewAfterAdd() -> Bool
-    
-    func stayAtAddingViewAfterAdd(_ stay: Bool)
 }
 
-final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObject {
+protocol DataAndSettingsManagerProtocol: DataManagerProtocol, SettingsAdapterProtocol {
+    
+}
+
+final class DataManager: DataAndSettingsManagerProtocol, @unchecked Sendable, ObservableObject {
     enum DataThread: Equatable {
         case main
         case global
@@ -649,6 +623,14 @@ final class DataManager: DataManagerProtocol, @unchecked Sendable, ObservableObj
     
     func stayAtAddingViewAfterAdd(_ stay: Bool) {
         settingsManager.stayAtAddingViewAfterAdd(stay)
+    }
+    
+    func setSearchConfigurations(_ configurations: [SearchConfiguration]) throws {
+        try settingsManager.setSearchConfigurations(configurations)
+    }
+    
+    func getSearchConfigurations() throws -> [SearchConfiguration.StorageConvertedConfiguration] {
+        try settingsManager.getSearchConfigurations()
     }
     
     //MARK: Private methods

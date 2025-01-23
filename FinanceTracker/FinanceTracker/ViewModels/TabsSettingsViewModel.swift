@@ -23,12 +23,12 @@ final class TabsSettingsViewModel: ObservableObject {
     @MainActor @Published var changedSettingsPosition = false
     
     //MARK: Private properites
-    private let dataManager: any DataManagerProtocol
+    private let settingsManager: any SettingsAdapterProtocol
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
-        self.dataManager = dataManager
-        let savedTabs = dataManager.getThreeTabsArray()
+    init(settingsManager: some SettingsAdapterProtocol) {
+        self.settingsManager = settingsManager
+        let savedTabs = settingsManager.getThreeTabsArray()
         let canBeSet = Array(TabViewType.changableTabs.filter { !savedTabs.contains($0) })
         self._changableTabs = Published(wrappedValue: savedTabs + canBeSet)
         self._settingsPosition =  Published(wrappedValue: savedTabs.firstIndex(of: .settingsView) ?? 3) // 3 is default position of settings tab in tab bar
@@ -62,7 +62,7 @@ final class TabsSettingsViewModel: ObservableObject {
     @MainActor
     func saveTabs() {
         let toSave = Array(changableTabs.prefix(numberOfTabsThatCanBeSet))
-        dataManager.setThreeTabsArray(toSave)
+        settingsManager.setThreeTabsArray(toSave)
         delegate?.didSetSecondThirdTabsPosition(for: toSave)
     }
 }

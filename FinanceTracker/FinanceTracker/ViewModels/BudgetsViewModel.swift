@@ -32,7 +32,7 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     weak var delegate: (any BudgetsViewModelDelegate)?
     
     //MARK: Private properties
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     private var neededToBeRefreshed = false
     
     //MARK: Published props
@@ -63,7 +63,7 @@ final class BudgetsViewModel: ObservableObject, @unchecked Sendable {
     @MainActor var isViewDisplayed = false
     
     //MARK: - Initializer
-    init(dataManager: any DataManagerProtocol) {
+    init(dataManager: any DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         initialFetchData()
     }
@@ -336,6 +336,8 @@ extension BudgetsViewModel: CustomTabViewModelDelegate {
                 budgets = []
             }
         case .notifications:
+            return
+        case .advancedAnalytics:
             return
         }
     }

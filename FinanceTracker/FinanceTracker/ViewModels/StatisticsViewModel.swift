@@ -15,7 +15,7 @@ protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate
     func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
 }
 
-enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
+enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable, Codable {
     case both = "Both types"
     case spending = "Spending"
     case income = "Income"
@@ -32,6 +32,17 @@ enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, I
             return .spending
         case .income:
             return .income
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .both:
+            return .blue
+        case .spending:
+            return .red
+        case .income:
+            return .green
         }
     }
 }
@@ -132,7 +143,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
-    private let dataManager: any DataManagerProtocol
+    private let dataManager: any DataAndSettingsManagerProtocol
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
     /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
@@ -281,7 +292,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     @Published private(set) var barDataIsCalculating: Bool = false
     
     //MARK: - Initializer
-    init(dataManager: some DataManagerProtocol) {
+    init(dataManager: some DataAndSettingsManagerProtocol) {
         self.dataManager = dataManager
         self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
         DispatchQueue.main.async { [weak self] in
@@ -1191,7 +1202,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     cleanData()
                 }
             }
-        case .budgets, .appearance, .notifications:
+        case .budgets, .appearance, .notifications, .advancedAnalytics:
             return
         }
     }
