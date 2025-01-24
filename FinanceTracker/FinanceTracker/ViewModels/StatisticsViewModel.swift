@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Algorithms
 import SwiftData
 
 protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
@@ -164,6 +163,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private var transferTransactions: [TransferTransaction] = []
     /// All tags
     private(set) var allTags: [Tag] = []
+    /// Flag to determine if view model is launched at first time
+    private var isFirstLaunch = true
     
     //MARK: Published
     /// All balance accounts
@@ -677,15 +678,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [returnData] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self, returnData] in
                 print("calculateDataForPieChart, started to provide data for pie chart")
-                self.pieDataIsCalculating = false
+                self?.pieDataIsCalculating = false
                 if animated {
+                    print("calculateDataForPieChart, provided data for pie chart with animation")
                     withAnimation {
-                        self.pieChartTransactionData = returnData
+                        self?.pieChartTransactionData = returnData
                     }
                 } else {
-                    self.pieChartTransactionData = returnData
+                    print("calculateDataForPieChart, provided data for pie chart without animation")
+                    self?.pieChartTransactionData = returnData
                 }
                 print("calculateDataForPieChart, ended")
             }
@@ -825,6 +828,16 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         Task {
+            if isFirstLaunch {
+                print("fetchAllData, isFirstLaunch is true, task sleep for 0.2 seconds")
+                do {
+                    try await Task.sleep(for: .seconds(0.2))
+                    isFirstLaunch = false
+                } catch {
+                    print("fetchAllData, task sleep error: \(error)")
+                }
+            }
+            
             print("fetchAllData, started to fetch BAs")
             await fetchBalanceAccounts()
             print("fetchAllData, ended to fetch BAs")

@@ -74,7 +74,7 @@ struct TransactionPieChart: View {
                     }
                 } else {
                     SectorMark(
-                        angle: .value("Empty", Float(100)),
+                        angle: .value("Empty", Float(1)),
                         innerRadius: .ratio(0.65),
                         outerRadius: .ratio(0.95)
                     )
