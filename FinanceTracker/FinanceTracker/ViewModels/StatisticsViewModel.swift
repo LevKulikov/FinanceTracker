@@ -677,15 +677,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             print("calculateDataForPieChart, started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [returnData] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self, returnData] in
                 print("calculateDataForPieChart, started to provide data for pie chart")
-                self.pieDataIsCalculating = false
+                self?.pieDataIsCalculating = false
                 if animated {
+                    print("calculateDataForPieChart, provided data for pie chart with animation")
                     withAnimation {
-                        self.pieChartTransactionData = returnData
+                        self?.pieChartTransactionData = returnData
                     }
                 } else {
-                    self.pieChartTransactionData = returnData
+                    print("calculateDataForPieChart, provided data for pie chart without animation")
+                    self?.pieChartTransactionData = returnData
                 }
                 print("calculateDataForPieChart, ended")
             }
