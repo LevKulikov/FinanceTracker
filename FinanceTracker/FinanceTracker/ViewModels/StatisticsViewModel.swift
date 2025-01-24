@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Algorithms
 import SwiftData
 
 protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
@@ -164,6 +163,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private var transferTransactions: [TransferTransaction] = []
     /// All tags
     private(set) var allTags: [Tag] = []
+    /// Flag to determine if view model is launched at first time
+    private var isFirstLaunch = true
     
     //MARK: Published
     /// All balance accounts
@@ -827,6 +828,16 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         Task {
+            if isFirstLaunch {
+                print("fetchAllData, isFirstLaunch is true, task sleep for 0.2 seconds")
+                do {
+                    try await Task.sleep(for: .seconds(0.2))
+                    isFirstLaunch = false
+                } catch {
+                    print("fetchAllData, task sleep error: \(error)")
+                }
+            }
+            
             print("fetchAllData, started to fetch BAs")
             await fetchBalanceAccounts()
             print("fetchAllData, ended to fetch BAs")
