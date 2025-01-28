@@ -223,7 +223,7 @@ final class FTFactory {
         return AnyView(AdvancedAnalyticsView(viewModel: viewModel!))
     }
     
-    func createLogger(for category: String) -> Logger {
+    static nonisolated func createLogger(for category: String) -> Logger {
         Logger(subsystem: "finance.FinanceTracker", category: category)
     }
 }
