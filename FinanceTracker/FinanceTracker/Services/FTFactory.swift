@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import OSLog
 
 @MainActor
 final class FTFactory {
@@ -220,5 +221,9 @@ final class FTFactory {
             advancedAnalyticsViewModel = viewModel
         }
         return AnyView(AdvancedAnalyticsView(viewModel: viewModel!))
+    }
+    
+    static nonisolated func createLogger(for category: String) -> Logger {
+        Logger(subsystem: "finance.FinanceTracker", category: category)
     }
 }

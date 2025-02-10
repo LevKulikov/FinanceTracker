@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Algorithms
 import SwiftData
 
 protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
@@ -144,6 +143,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: Private
     /// DataManager to manipulate with ModelContainer of SwiftData
     private let dataManager: any DataAndSettingsManagerProtocol
+    private let logger = FTFactory.createLogger(for: "StatisticsViewModel")
     /// Flag for allowing data calculation for all data types (enitites)
     private var isCalculationAllowed = true
     /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
@@ -164,6 +164,8 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     private var transferTransactions: [TransferTransaction] = []
     /// All tags
     private(set) var allTags: [Tag] = []
+    /// Flag to determine if view model is launched at first time
+    private var isFirstLaunch = true
     
     //MARK: Published
     /// All balance accounts
@@ -305,10 +307,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Refreshes all data
     func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, tagsTotalAnimation: Bool = true, pieChartAnimation: Bool = true, barChartAnimation: Bool = false, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
         guard !isFetchingData else {
-            print("refreshData, data is already being refetched")
+            logger.info("refreshData: data is already being refetched")
             return
         }
-        print("refreshData, started")
+        logger.info("refreshData: started")
         switch dataType {
         case .transaction:
             Task {
@@ -327,7 +329,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 calculateTagsTotal(animated: tagsTotalAnimation)
                 calculateDataForPieChart(animated: pieChartAnimation)
                 calculateDataForBarChart(animated: barChartAnimation)
-                print("refreshData, ended")
+                logger.info("refreshData: ended")
                 Task { @MainActor in
                     compeletionHandler?()
                 }
@@ -367,7 +369,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     self?.calculateTagsTotal(animated: tagsTotalAnimation)
                     self?.calculateDataForPieChart(animated: pieChartAnimation)
                     self?.calculateDataForBarChart(animated: barChartAnimation)
-                    print("refreshData, ended")
+                    self?.logger.info("refreshData: ended")
                     Task { @MainActor in
                         compeletionHandler?()
                     }
@@ -381,7 +383,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 calculateTagsTotal(animated: tagsTotalAnimation)
                 calculateDataForPieChart(animated: pieChartAnimation)
                 calculateDataForBarChart(animated: barChartAnimation)
-                print("refreshData, ended")
+                logger.info("refreshData: ended")
                 Task { @MainActor in
                     compeletionHandler?()
                 }
@@ -405,7 +407,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// - Parameter direction: direction to move date range
     func moveDateRange(direction: DateSettingDestination) {
         guard var numberOfDays = calendar.dateComponents([.day], from: pieChartDateStart, to: pieChartDateEnd).day else {
-            print("StatisticsViewModel: moveDateRange(direction:): Unable to get number of dayes between start and end dates")
+            logger.warning("moveDateRange(direction:): Unable to get number of dayes between start and end dates")
             return
         }
         
@@ -498,13 +500,13 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Calculates total value (initial balance + income - spendings) for Balance Account and sets value to totalForBalanceAccount
     private func calculateTotalForBalanceAccount() {
         guard isCalculationAllowed else { return }
-        print("calculateTotalForBalanceAccount, started")
+        logger.info("calculateTotalForBalanceAccount: started")
         DispatchQueue.main.async { [weak self] in
             self?.totalIsCalculating = true
         }
         
         DispatchQueue.global(qos: .utility).async { [weak self, transactions, transferTransactions, balanceAccountToFilter] in
-            print("calculateTotalForBalanceAccount, started to calculate totalValue")
+            self?.logger.debug("calculateTotalForBalanceAccount: started to calculate totalValue")
             let totalTransactionValue = transactions
                 .map {
                     guard let transType = $0.type else { return Float(0)}
@@ -533,10 +535,10 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let totalValue = totalTransactionValue + totalTransferValue
             
             DispatchQueue.main.async {
-                print("calculateTotalForBalanceAccount, provided data")
+                self?.logger.debug("calculateTotalForBalanceAccount: provided data")
                 self?.totalIsCalculating = false
                 self?.totalForBalanceAccount = totalValue
-                print("calculateTotalForBalanceAccount, ended")
+                self?.logger.info("calculateTotalForBalanceAccount: ended")
             }
         }
     }
@@ -569,34 +571,34 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Calculate total value for all time tags spending or income
     private func calculateTagsTotal(animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        print("calculateTagsTotal, started to calculate data for tags chart")
+        logger.info("calculateTagsTotal: started to calculate data for tags chart")
         DispatchQueue.main.async { [weak self] in
             self?.tagsDataIsCalculating = true
         }
         
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
-            print("calculateTagsTotal, started to calculate data for transactionsWithTags")
+            logger.debug("calculateTagsTotal: started to calculate data for transactionsWithTags")
             let transactionsWithTags = self.transactions
                 .filter { !$0.tags.isEmpty && $0.type == self.transactionTypeForTags  }
             
             guard !transactionsWithTags.isEmpty else {
-                print("calculateTagsTotal, started to providing data due guard statement")
-                DispatchQueue.main.async {
-                    self.tagsDataIsCalculating = false
+                logger.debug("calculateTagsTotal: started to providing data due guard statement")
+                DispatchQueue.main.async { [weak self] in
+                    self?.tagsDataIsCalculating = false
                     if animated {
                         withAnimation {
-                            self.tagsTotalData = []
+                            self?.tagsTotalData = []
                         }
                     } else {
-                        self.tagsTotalData = []
+                        self?.tagsTotalData = []
                     }
-                    print("calculateTagsTotal, ended due guard statement")
+                    self?.logger.info("calculateTagsTotal: ended due guard statement")
                 }
                 return
             }
             
-            print("calculateTagsTotal, started to calcuate tagsData")
+            logger.debug("calculateTagsTotal: started to calcuate tagsData")
             let tagsData = transactionsWithTags
                 .flatMap { transaction in
                     var tupleArray: [(tag: Tag, transaction: Transaction)] = []
@@ -619,13 +621,13 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                 }
                 .sorted { $0.total > $1.total}
             
-            print("calculateTagsTotal, started to providing data to tags chart")
-            DispatchQueue.main.async {
-                self.tagsDataIsCalculating = false
+            logger.debug("calculateTagsTotal: started to providing data to tags chart")
+            DispatchQueue.main.async { [weak self] in
+                self?.tagsDataIsCalculating = false
                 withAnimation {
-                    self.tagsTotalData = tagsData
+                    self?.tagsTotalData = tagsData
                 }
-                print("calculateTagsTotal, ended")
+                self?.logger.info("calculateTagsTotal: ended")
             }
         }
     }
@@ -633,14 +635,14 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Calculates data for pie chart and sets it with animation
     private func calculateDataForPieChart(animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        print("calculateDataForPieChart, started to calculate data for pie chart")
+        logger.info("calculateDataForPieChart: started to calculate data for pie chart")
         DispatchQueue.main.async { [weak self] in
             self?.pieDataIsCalculating = true
         }
         
         DispatchQueue.global(qos: .utility).async { [weak self, lightWeightStatistics, transactions] in
             guard let self else { return }
-            print("calculateDataForPieChart, started to calculate returnData")
+            logger.debug("calculateDataForPieChart: started to calculate returnData")
             let dateAndTypeFilteredData = transactions
                     .filter { singleTransaction in
                         guard !lightWeightStatistics else {
@@ -674,20 +676,22 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     return TransactionPieChartData(category: categoryAsKey, sumValue: totalValueForCategory, transactions: transactions)
                 }
             
-            print("calculateDataForPieChart, started to sort returnData")
+            logger.debug("calculateDataForPieChart: started to sort returnData")
             returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [returnData] in
-                print("calculateDataForPieChart, started to provide data for pie chart")
-                self.pieDataIsCalculating = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self, returnData] in
+                self?.logger.debug("calculateDataForPieChart: started to provide data for pie chart")
+                self?.pieDataIsCalculating = false
                 if animated {
+                    self?.logger.debug("calculateDataForPieChart: provided data for pie chart with animation")
                     withAnimation {
-                        self.pieChartTransactionData = returnData
+                        self?.pieChartTransactionData = returnData
                     }
                 } else {
-                    self.pieChartTransactionData = returnData
+                    self?.logger.debug("calculateDataForPieChart: provided data for pie chart without animation")
+                    self?.pieChartTransactionData = returnData
                 }
-                print("calculateDataForPieChart, ended")
+                self?.logger.info("calculateDataForPieChart: ended")
             }
         }
     }
@@ -695,7 +699,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// Calculates data for bar chart and sets it with animation
     private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility), animated: Bool = false) {
         guard isCalculationAllowed else { return }
-        print("calculateDataForBarChart, started to calculate data for bar chart")
+        logger.info("calculateDataForBarChart: started to calculate data for bar chart")
         DispatchQueue.main.async { [weak self] in
             self?.barDataIsCalculating = true
         }
@@ -703,7 +707,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
         // This is utility because of high calculation compexity
         thread.async { [weak self] in
             guard let self else { return }
-            print("calculateDataForBarChart, started to calculate availableBarData")
+            logger.debug("calculateDataForBarChart: started to calculate availableBarData")
             let availableBarData = self.transactions
                 .filter { singleTransaction in
                     switch self.barChartTransactionTypeFilter {
@@ -784,17 +788,17 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
                     return $0.first!.date < $1.first!.date
                 }
             
-            DispatchQueue.main.async {
-                print("calculateDataForBarChart, providing data for bar chart")
-                self.barDataIsCalculating = false
+            DispatchQueue.main.async { [weak self] in
+                self?.logger.debug("calculateDataForBarChart: providing data for bar chart")
+                self?.barDataIsCalculating = false
                 if animated {
                     withAnimation {
-                        self.barChartTransactionData = availableBarData
+                        self?.barChartTransactionData = availableBarData
                     }
                 } else {
-                    self.barChartTransactionData = availableBarData
+                    self?.barChartTransactionData = availableBarData
                 }
-                print("calculateDataForBarChart, ended")
+                self?.logger.info("calculateDataForBarChart: ended")
             }
         }
     }
@@ -813,33 +817,45 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
     /// - Parameter completionHandler: completion handler that is executed at the end of fetching
     private func fetchAllData(completionHandler: @Sendable @escaping () -> Void) {
         isFetchingData = true
-        print("fetchAllData, started")
-        let localCompletion: @Sendable () -> Void = {
-            print("fetchAllData, started to provide data on main thread")
+        logger.info("fetchAllData: started")
+        let localCompletion: @Sendable () -> Void = { [weak self, logger] in
+            logger.debug("fetchAllData: started to provide data on main thread")
             Task { @MainActor in
-                self.isFetchingData = false
+                self?.isFetchingData = false
             }
-            print("fetchAllData, ended")
+            logger.info("fetchAllData: ended")
             completionHandler()
-            print("fetchAllData, ended competion handler")
+            logger.debug("fetchAllData: ended competion handler")
         }
         
         Task {
-            print("fetchAllData, started to fetch BAs")
+            if isFirstLaunch {
+                logger.debug("fetchAllDataЖ isFirstLaunch is true, task sleep for 0.2 seconds")
+                do {
+                    try await Task.sleep(for: .seconds(0.2))
+                    isFirstLaunch = false
+                } catch {
+                    logger.error("fetchAllData: task sleep error: \(error)")
+                }
+            }
+            
+            logger.debug("fetchAllData: started to fetch BAs")
             await fetchBalanceAccounts()
-            print("fetchAllData, ended to fetch BAs")
-            Task.detached(priority: .background) { [weak self] in
-                print("fetchAllData, started to fetch tags")
+            logger.debug("fetchAllData: ended to fetch BAs")
+            Task.detached(priority: .background) { [weak self, logger] in
+                logger.info("fetchAllData: started to fetch tags")
                 await self?.fetchTags()
-                print("fetchAllData, ended to fetch tags")
-                print("fetchAllData, started to fetch transactions")
+                logger.debug("fetchAllData: ended to fetch tags")
+                logger.debug("fetchAllData: started to fetch transactions")
                 if let self, self.lightWeightStatistics {
+                    logger.debug("fetchAllData: for light weight statistics")
                     await self.fetchTransactionsForDate()
                 } else {
+                    logger.debug("fetchAllData: for complete statistics")
                     await self?.fetchTransactions()
                     await self?.fetchTransferTransactions()
                 }
-                print("fetchAllData, ended to fetch transactions")
+                logger.debug("fetchAllData: ended to fetch transactions")
                 localCompletion()
             }
         }
@@ -862,7 +878,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
             transactions = fetchedTranses
         } catch {
-            print("StatisticsViewModel: Unable to fetch transactions, error: \(error)")
+            logger.error("fetchTransactions: Unable to fetch transactions, error: \(error)")
         }
     }
     
@@ -886,7 +902,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
             transactions = fetchedTranses
         } catch {
-            print("StatisticsViewModel, fetchTransactionsForDate() : Unable to fetch transactions, error: \(error)")
+            logger.error("fetchTransactionsForDate: Unable to fetch transactions, error: \(error)")
         }
     }
     
@@ -903,7 +919,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let fetchedTransferTransactions = try await dataManager.fetchFromBackground(descriptor)
             transferTransactions = fetchedTransferTransactions
         } catch {
-            print("StatisticsViewModel: fetchTransferTransactions: Unable to fetch transfer transactions, error: \(error)")
+            logger.error("fetchTransferTransactions: Unable to fetch transfer transactions, error: \(error)")
         }
     }
     
@@ -914,7 +930,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let fetchedTags = try await dataManager.fetchFromBackground(descriptor)
             allTags = fetchedTags
         } catch {
-            print("StatisticsViewModel: Unable to fetch tags, error: \(error)")
+            logger.error("fetchTags: Unable to fetch tags, error: \(error)")
         }
     }
     
@@ -930,7 +946,7 @@ final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
             let fetchedBalanceAccounts = try dataManager.fetch(descriptor)
             balanceAccounts = fetchedBalanceAccounts
         } catch {
-            print("StatisticsViewModel: Unable to fetch Balance Accounts, error: \(error)")
+            logger.error("fetchBalanceAccounts: Unable to fetch Balance Accounts, error: \(error)")
         }
     }
 }
@@ -1044,14 +1060,14 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     if action == .update || action == .delete {
                         let transferID = transfer.id
                         if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
-                            print("StatisticsViewModel: Removing transfer with id: \(transferID)")
+                            logger.debug("getUpdateFromTabView: Removing transfer with id: \(transferID)")
                             transferTransactions.remove(at: index)
                             dataUpdatedFromAnotherView = .transfer
                         } else {
-                            print("StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                            logger.debug("getUpdateFromTabView: Transfer does not belong to balance account to filter")
                         }
                     } else {
-                        print("ERROR StatitsicsViewModel: Transfer does not belong to balance account to filter")
+                        logger.error("getUpdateFromTabView: Transfer does not belong to balance account to filter")
                     }
                     return
                 }
@@ -1059,15 +1075,15 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                 dataShouldBeRefetched = false
                 switch action {
                 case .add:
-                    print("StatitsicsViewModel: Adding transfer with id: \(transfer.id)")
+                    logger.debug("getUpdateFromTabView: Adding transfer with id: \(transfer.id)")
                     transferTransactions.append(transfer)
                 case .delete:
                     let transferID = transfer.id
                     if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
-                        print("StatitsicsViewModel: Deleting transfer from array")
+                        logger.debug("getUpdateFromTabView: Deleting transfer from array")
                         transferTransactions.remove(at: index)
                     } else {
-                        print("ERROR StatitsicsViewModel: No transfer found with such id in array for deletion")
+                        logger.error("getUpdateFromTabView: No transfer found with such id in array for deletion")
                         dataShouldBeRefetched = true
                     }
                 case .update:
@@ -1081,7 +1097,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     return
                 }
             } else {
-                print("ERROR StatisticsViewModel: Provided transfer for action \(action) is nil")
+                logger.error("getUpdateFromTabView: Provided transfer is nil")
                 dataShouldBeRefetched = true
             }
             
@@ -1122,31 +1138,31 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                 switch action {
                 case .add:
                     guard transaction.balanceAccount?.id == balanceAccountToFilter.id else {
-                        print("StatisticsViewModel: Ignoring transaction, that was added to a different balance account. Transaction id: \(transaction.id)")
+                        logger.debug("getUpdateFromTabView: Ignoring transaction, that was added to a different balance account. Transaction id: \(transaction.id)")
                         return
                     }
                     
                     do {
                         let transactionID = transaction.id
                         guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
-                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            logger.error("getUpdateFromTabView: Error fetching single transaction: No transaction found with id: \(transactionID)")
                             dataShouldBeRefetched = true
                             break
                         }
-                        print("StatitsicsViewModel: Adding transaction with id: \(addedTransaction.id)")
+                        logger.debug("getUpdateFromTabView: Adding transaction with id: \(addedTransaction.id)")
                         transactions.append(addedTransaction)
                     } catch {
-                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        logger.error("getUpdateFromTabView: Error fetching single transaction: \(error)")
                         dataShouldBeRefetched = true
                     }
                     
                 case .delete:
                     let transactionID = transaction.id
                     if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
-                        print("StatitsicsViewModel: Deleting transaction from array")
+                        logger.debug("getUpdateFromTabView: Deleting transaction from array")
                         transactions.remove(at: index)
                     } else {
-                        print("StatisticsViewModel: Ignoring transaction, that was deleted (probably from a different balance account). Transaction id: \(transaction.id)")
+                        logger.debug("getUpdateFromTabView: Ignoring transaction, that was deleted (probably from a different balance account). Transaction id: \(transaction.id)")
                         return
                     }
                     
@@ -1156,26 +1172,26 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                         let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
                         let index = transactions.firstIndex(where: { $0.id == transactionID })
                         guard let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
-                            print("ERROR StatisticsViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            logger.error("getUpdateFromTabView: Error fetching single transaction: No transaction found with id: \(transactionID)")
                             dataShouldBeRefetched = true
                             break
                         }
                         
                         if (index != nil && sameBalanceAccount) {
-                            print("StatisticsViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            logger.debug("getUpdateFromTabView: Updating transaction with id: \(updatedTransaction.id)")
                             transactions[index!] = updatedTransaction
                         } else if (index == nil && sameBalanceAccount) {
-                            print("StatitsicsViewModel: Adding transaction, that was updated with id: \(updatedTransaction.id)")
+                            logger.debug("getUpdateFromTabView: Adding transaction, that was updated with id: \(updatedTransaction.id)")
                             transactions.append(updatedTransaction)
                         } else if (index != nil && !sameBalanceAccount) {
-                            print("StatitsicsViewModel: Removing transaction, that was updated with id: \(updatedTransaction.id)")
+                            logger.debug("getUpdateFromTabView: Removing transaction, that was updated with id: \(updatedTransaction.id)")
                             transactions.remove(at: index!)
                         } else {
-                            print("StatisticsViewModel: Ignoring transaction, that was updated, with id: \(updatedTransaction.id)")
+                            logger.debug("getUpdateFromTabView: Ignoring transaction, that was updated, with id: \(updatedTransaction.id)")
                             return
                         }
                     } catch {
-                        print("ERROR StatisticsViewModel: Error fetching single transaction: \(error)")
+                        logger.error("getUpdateFromTabView: Error fetching single transaction: \(error)")
                         dataShouldBeRefetched = true
                     }
                     
@@ -1183,7 +1199,7 @@ extension StatisticsViewModel: CustomTabViewModelDelegate {
                     break
                 }
             } else {
-                print("ERROR StatisticsViewModel: Provided transaction for action \(action) is nil")
+                logger.error("getUpdateFromTabView: Provided transaction is nil")
                 dataShouldBeRefetched = true
             }
             
