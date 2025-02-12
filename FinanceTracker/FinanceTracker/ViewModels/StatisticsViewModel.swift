@@ -1,0 +1,1319 @@
+//
+//  StatisticsViewModel.swift
+//  FinanceTracker
+//
+//  Created by Лев Куликов on 13.06.2024.
+//
+
+import Foundation
+import SwiftUI
+import SwiftData
+
+protocol StatisticsViewModelDelegate: AnyObject, TransactionManipulationDelegate, TagManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
+    func showTabBar(_ show: Bool)
+    func didDeleteTagWithTransactions(_ tag: Tag, from tabView: TabViewType)
+}
+
+enum TransactionFilterTypes: LocalizedStringResource, Equatable, CaseIterable, Identifiable, Codable {
+    case both = "Both types"
+    case spending = "Spending"
+    case income = "Income"
+    
+    var id: Self {
+        return self
+    }
+    
+    var binaryTransactionType: TransactionsType? {
+        switch self {
+        case .both:
+            return nil
+        case .spending:
+            return .spending
+        case .income:
+            return .income
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .both:
+            return .blue
+        case .spending:
+            return .red
+        case .income:
+            return .green
+        }
+    }
+}
+
+enum PieChartDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
+    case day = "For a day"
+    case month = "For a month"
+    case year = "For a year"
+    case dateRange = "Date range"
+    case allTime = "All time"
+    
+    var id: Self {
+        return self
+    }
+}
+
+enum BarChartPerDateFilter: LocalizedStringResource, Equatable, CaseIterable, Identifiable {
+    case perDay = "Per day"
+    case perWeek = "Per week"
+    case perMonth = "Per month"
+    case perYear = "Per year"
+    
+    var id: Self {
+        return self
+    }
+}
+
+enum DataAction: Equatable {
+    case add
+    case delete
+    case update
+    case doNothing
+}
+
+final class StatisticsViewModel: ObservableObject, @unchecked Sendable {
+    /// Data types which are calculated for different type of entities
+    private enum CalculatingDataType: Equatable {
+        case totalValue
+        case tagsValue
+        case pieChart
+        case barChart
+    }
+    
+    enum NavigationDestination: Hashable {
+        case tagsView
+    }
+    
+    enum StatisticsSensitiveDataUpdateType: Equatable {
+        case transaction
+        case transfer
+        case tag
+        case category
+        case balanceAccount
+        case allTypes
+        case none
+    }
+    
+    //MARK: - Properties
+    /// Delegate for StatisticsViewModel
+    weak var delegate: (any StatisticsViewModelDelegate)?
+    /// Current calendar
+    let calendar = Calendar.current
+    /// Defines if Pie Chart Date range can be moved backward
+    var pieDateRangeCanBeMovedBack: Bool {
+        return calendar.startOfDay(for: pieChartDateStart) != calendar.startOfDay(for: FTAppAssets.availableDateRange.lowerBound)
+    }
+    /// Defines if Pie Chart Date range can be moved forward
+    var pieDateRangeCanBeMovedForward: Bool {
+        return calendar.startOfDay(for: pieChartDateEnd) != calendar.startOfDay(for: FTAppAssets.availableDateRange.upperBound)
+    }
+    /// Date range for selected date (period) type for light weight statistics
+    var lightWeightDateFilterRange: ClosedRange<Date> {
+        switch lightWeightDateType {
+        case .day:
+            let startDate = lightWeightDate.startOfDay()
+            let endDate = lightWeightDate.endOfDay() ?? lightWeightDate
+            return startDate...endDate
+        case .week:
+            let startDate = lightWeightDate.startOfWeek() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfWeek() ?? lightWeightDate
+            return startDate...endDate
+        case .month:
+            let startDate = lightWeightDate.startOfMonth() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfMonth() ?? lightWeightDate
+            return startDate...endDate
+        case .year:
+            let startDate = lightWeightDate.startOfYear() ?? lightWeightDate
+            let endDate = lightWeightDate.endOfYear() ?? lightWeightDate
+            return startDate...endDate
+        case .customDateRange:
+            let startDate = lightWeightDateStart.startOfDay()
+            let endDate = lightWeightDateEnd.endOfDay() ?? lightWeightDate
+            return startDate...endDate
+        }
+    }
+    /// Flag that indicates if statistics view is currently displayed
+    @MainActor var isViewDisplayed = false
+    
+    //MARK: Private
+    /// DataManager to manipulate with ModelContainer of SwiftData
+    private let dataManager: any DataAndSettingsManagerProtocol
+    private let logger = FTFactory.createLogger(for: "StatisticsViewModel")
+    /// Flag for allowing data calculation for all data types (enitites)
+    private var isCalculationAllowed = true
+    /// Flag to determine which data type was updated from another view. Prevents multiple recalculations if several update action were conducted
+    private var dataUpdatedFromAnotherView: StatisticsSensitiveDataUpdateType? = nil
+    /// Flag determines if data should be refetched
+    private var dataShouldBeRefetched: Bool = false
+    /// Array of years those are available
+    private var availableYearDates: [Date] = []
+    /// Array of years with months those are available
+    private var availableYearMonthDates: [Date] = []
+    /// Array of years with months and week number those are available
+    private var availableYearMonthWeekDates: [Date] = []
+    /// Array of years with months and days those are available
+    private var availableYearMonthDayDates: [Date] = []
+    /// All transactions
+    private var transactions: [Transaction] = []
+    /// All transfer transactions
+    private var transferTransactions: [TransferTransaction] = []
+    /// All tags
+    private(set) var allTags: [Tag] = []
+    /// Flag to determine if view model is launched at first time
+    private var isFirstLaunch = true
+    
+    //MARK: Published
+    /// All balance accounts
+    @Published private(set) var balanceAccounts: [BalanceAccount] = []
+    /// Total value of balance of set account (initial balance + income - spendings)
+    @Published private(set) var totalForBalanceAccount: Float = 0
+    /// Flag to identify total for balance account value is currently being calculate
+    @Published private(set) var totalIsCalculating = false
+    /// Balance Account to filter all data
+    @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
+        didSet {
+            guard balanceAccountToFilter.id != oldValue.id else { return }
+            refreshData()
+        }
+    }
+    /// Flag to determine if data is currently fetching, works in fetchAllData method
+    @Published private(set) var isFetchingData = false
+    /// Flag to determine if statistics is complete or light weighted
+    @Published var lightWeightStatistics = false {
+        didSet {
+            dataManager.setLightWeightStatistics(lightWeightStatistics)
+            refreshData()
+        }
+    }
+    /// For which period of time light weight statistics are displayed
+    @Published var lightWeightDateType: DateFilterType = .month {
+        didSet {
+            refreshData()
+        }
+    }
+    /// For which date light weight statistics are displayed
+    @Published var lightWeightDate: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
+    /// For custom date range of light weight statistics
+    @Published var lightWeightDateStart: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
+    /// For custom date range of light weight statistics
+    @Published var lightWeightDateEnd: Date = .now {
+        didSet {
+            refreshData()
+        }
+    }
+    /// Total value of spending for a selected balance account. Used for light weight statistics
+    @Published private(set) var balanceAccountTotalSpending: Float = 0
+    /// Total value of spending for a selected balance account. Used for light weight statistics
+    @Published private(set) var balanceAccountTotalIncome: Float = 0
+    
+    //MARK: For tags statistics
+    /// Data array to be provided in tags statistics
+    @Published private(set) var tagsTotalData: [TagChartData] = []
+    /// Transaction type to select of which transactins should be shown as total for tags data
+    @Published var transactionTypeForTags: TransactionsType = .spending {
+        didSet {
+            guard transactionTypeForTags != oldValue else { return }
+            calculateTagsTotal(animated: true)
+        }
+    }
+    /// Flag to identify if tags statistics data is currently being calculate
+    @Published private(set) var tagsDataIsCalculating: Bool = false
+    
+    //MARK: For pie chart
+    /// Data Array to be provided in pie chart
+    @Published private(set) var pieChartTransactionData: [TransactionPieChartData] = []
+    /// Filter by type of transactions to display in pie chart
+    @Published var pieChartTransactionType: TransactionsType = .spending {
+        didSet {
+            guard pieChartTransactionType != oldValue else { return }
+            calculateDataForPieChart(animated: true)
+        }
+    }
+    /// Which type of date filtering is selected for pie chart
+    @Published var pieChartMenuDateFilterSelected: PieChartDateFilter = .month {
+        didSet {
+            guard pieChartMenuDateFilterSelected != oldValue else { return }
+            calculateDataForPieChart(animated: true)
+        }
+    }
+    /// For pie chart DatePicker (for a single day, month or year )
+    @Published var pieChartDate: Date = .now {
+        didSet {
+            guard pieChartDate != oldValue else { return }
+            calculateDataForPieChart(animated: true)
+        }
+    }
+    /// For pie chart date range, start date
+    @Published var pieChartDateStart: Date = .now {
+        didSet {
+            guard pieChartDateStart != oldValue else { return }
+            calculateDataForPieChart(animated: true)
+        }
+    }
+    /// For pie chart date range, end date
+    @Published var pieChartDateEnd: Date = .now {
+        didSet {
+            guard pieChartDateEnd != oldValue else { return }
+            calculateDataForPieChart(animated: true)
+        }
+    }
+    /// Flag to identify if pie chart data is currently being calculate
+    @Published private(set) var pieDataIsCalculating: Bool = false
+    
+    //MARK: For bar chart
+    /// Data Array to be provided to bar chart
+    @Published private(set) var barChartTransactionData: [[TransactionBarChartData]] = []
+    /// Filter by transactions type (adding both case) to display in bar chart
+    @Published var barChartTransactionTypeFilter: TransactionFilterTypes = .spending {
+        didSet {
+            guard barChartTransactionTypeFilter != oldValue else { return }
+            calculateDataForBarChart(animated: true)
+        }
+    }
+    /// Filter to select per which type of date to be diplayed in bar chart
+    @Published var barChartPerDateFilter: BarChartPerDateFilter = .perDay {
+        didSet {
+            guard barChartPerDateFilter != oldValue else { return }
+            calculateDataForBarChart(animated: true)
+        }
+    }
+    /// Flag to identify if bar chart data is currently being calculate
+    @Published private(set) var barDataIsCalculating: Bool = false
+    
+    //MARK: - Initializer
+    init(dataManager: some DataAndSettingsManagerProtocol) {
+        self.dataManager = dataManager
+        self._lightWeightStatistics = Published(wrappedValue: dataManager.isLightWeightStatistics())
+        DispatchQueue.main.async { [weak self] in
+            // fetching data is preccessed in didSet of balanceAccountToFilter
+            self?.balanceAccountToFilter = self?.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+        }
+    }
+    
+    //MARK: - Methods
+    /// Refreshes all data
+    func refreshData(dataType: StatisticsSensitiveDataUpdateType = .allTypes, withRefetch: Bool = true, tagsTotalAnimation: Bool = true, pieChartAnimation: Bool = true, barChartAnimation: Bool = false, compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+        guard !isFetchingData else {
+            logger.info("refreshData: data is already being refetched")
+            return
+        }
+        logger.info("refreshData: started")
+        switch dataType {
+        case .transaction:
+            Task {
+                if withRefetch {
+                    if lightWeightStatistics {
+                        await fetchTransactionsForDate()
+                    } else {
+                        await fetchTransactions()
+                    }
+                }
+                if lightWeightStatistics {
+                    calculateSpendIncomeValues()
+                } else {
+                    calculateTotalForBalanceAccount()
+                }
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
+                logger.info("refreshData: ended")
+                Task { @MainActor in
+                    compeletionHandler?()
+                }
+            }
+        case .transfer:
+            if !lightWeightStatistics {
+                Task {
+                    if withRefetch {
+                        await fetchTransferTransactions()
+                    }
+                    calculateTotalForBalanceAccount()
+                }
+            }
+        case .tag:
+            Task {
+                if withRefetch {
+                    await fetchTags()
+                }
+                calculateTagsTotal(animated: tagsTotalAnimation)
+            }
+        case .category:
+            calculateDataForPieChart(animated: pieChartAnimation)
+        case .balanceAccount:
+            if withRefetch {
+                Task {
+                    await fetchBalanceAccounts()
+                }
+            }
+        case .allTypes:
+            if withRefetch {
+                fetchAllData { [weak self] in
+                    if let self, self.lightWeightStatistics {
+                        self.calculateSpendIncomeValues()
+                    } else {
+                        self?.calculateTotalForBalanceAccount()
+                    }
+                    self?.calculateTagsTotal(animated: tagsTotalAnimation)
+                    self?.calculateDataForPieChart(animated: pieChartAnimation)
+                    self?.calculateDataForBarChart(animated: barChartAnimation)
+                    self?.logger.info("refreshData: ended")
+                    Task { @MainActor in
+                        compeletionHandler?()
+                    }
+                }
+            } else {
+                if lightWeightStatistics {
+                    calculateSpendIncomeValues()
+                } else {
+                    calculateTotalForBalanceAccount()
+                }
+                calculateTagsTotal(animated: tagsTotalAnimation)
+                calculateDataForPieChart(animated: pieChartAnimation)
+                calculateDataForBarChart(animated: barChartAnimation)
+                logger.info("refreshData: ended")
+                Task { @MainActor in
+                    compeletionHandler?()
+                }
+            }
+        case .none:
+            break
+        }
+    }
+    
+    /// Refreshes data if some changes occured, otherwise do nothing
+    /// - Parameter compeletionHandler: closure that is called at the end of refreshing
+    func refreshDataIfNeeded(compeletionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+        guard let dataUpdatedFromAnotherView else { return }
+        self.dataUpdatedFromAnotherView = nil
+        let refetchBuffer = dataShouldBeRefetched
+        dataShouldBeRefetched = false
+        refreshData(dataType: dataUpdatedFromAnotherView, withRefetch: refetchBuffer, compeletionHandler: compeletionHandler)
+    }
+    
+    /// Moves date range consiquentely its size to back or forward
+    /// - Parameter direction: direction to move date range
+    func moveDateRange(direction: DateSettingDestination) {
+        guard var numberOfDays = calendar.dateComponents([.day], from: pieChartDateStart, to: pieChartDateEnd).day else {
+            logger.warning("moveDateRange(direction:): Unable to get number of dayes between start and end dates")
+            return
+        }
+        
+        switch direction {
+        case .back:
+            guard pieDateRangeCanBeMovedBack else { return }
+            numberOfDays = -numberOfDays - 2
+        case .forward:
+            guard pieDateRangeCanBeMovedForward else { return }
+            numberOfDays += 2
+        }
+        
+        guard var newStartDate = calendar.date(byAdding: .day, value: numberOfDays, to: pieChartDateStart),
+              var newEndDate = calendar.date(byAdding: .day, value: numberOfDays, to: pieChartDateEnd) else { return }
+        
+        if !FTAppAssets.availableDateRange.contains(newStartDate) {
+            newStartDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
+        }
+        
+        if !FTAppAssets.availableDateRange.contains(newEndDate) {
+            newEndDate = numberOfDays > 0 ? FTAppAssets.availableDateRange.upperBound : FTAppAssets.availableDateRange.lowerBound
+        }
+        
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
+            pieChartDateStart = newStartDate
+            pieChartDateEnd = newEndDate
+        }
+    }
+    
+    /// Sets pie chart date filter to default values
+    func setPieChartDateFiltersToDefault() {
+        doNotCalculateDataUntilBlockIsFinished(for: .pieChart) {
+            pieChartDate = .now
+            pieChartDateStart = .now
+            pieChartDateEnd = .now
+        }
+    }
+    
+    /// Provides View for Tags settings
+    /// - Returns: View for tags settings
+    @MainActor
+    func getTagsView() -> some View {
+        return FTFactory.shared.createTagsView(dataManager: dataManager, delegate: self)
+    }
+    
+    /// Provides View for list of transactions
+    /// - Parameters:
+    ///   - transactions: transactions to be displayed in list
+    ///   - title: title to be set in the returned view
+    /// - Returns: TransactionListView with view model
+    @MainActor
+    func getTransactionListView(transactions: [Transaction], title: String) -> some View {
+        return FTFactory.shared.createTransactionListView(dataManager: dataManager, transactions: transactions, title: title, threadToUse: .global, delegate: self)
+    }
+    
+    //MARK: Private methods
+    /// Prevents recalculation of different data types until provided block of code is executed. This method is needed because of data calculation is caused by didSet observer
+    /// - Parameters:
+    ///   - block: code to execute before data recalculation
+    ///   - calculationData: which data should be calculated after block will be executed. Provide nil if calculation is need for all data types
+    private func doNotCalculateDataUntilBlockIsFinished(for calculationData: CalculatingDataType?, _ block: () -> Void) {
+        isCalculationAllowed = false
+        block()
+        isCalculationAllowed = true
+        switch calculationData {
+        case .totalValue:
+            if lightWeightStatistics {
+                calculateSpendIncomeValues()
+            } else {
+                calculateTotalForBalanceAccount()
+            }
+        case .tagsValue:
+            calculateTagsTotal()
+        case .pieChart:
+            calculateDataForPieChart()
+        case .barChart:
+            calculateDataForBarChart()
+        case .none:
+            if lightWeightStatistics {
+                calculateSpendIncomeValues()
+            } else {
+                calculateTotalForBalanceAccount()
+            }
+            calculateTagsTotal()
+            calculateDataForPieChart()
+            calculateDataForBarChart()
+        }
+    }
+    
+    /// Calculates total value (initial balance + income - spendings) for Balance Account and sets value to totalForBalanceAccount
+    private func calculateTotalForBalanceAccount() {
+        guard isCalculationAllowed else { return }
+        logger.info("calculateTotalForBalanceAccount: started")
+        DispatchQueue.main.async { [weak self] in
+            self?.totalIsCalculating = true
+        }
+        
+        DispatchQueue.global(qos: .utility).async { [weak self, transactions, transferTransactions, balanceAccountToFilter] in
+            self?.logger.debug("calculateTotalForBalanceAccount: started to calculate totalValue")
+            let totalTransactionValue = transactions
+                .map {
+                    guard let transType = $0.type else { return Float(0)}
+                    switch transType {
+                    case .spending:
+                        return -$0.value
+                    case .income:
+                        return $0.value
+                    }
+                }
+                .reduce(balanceAccountToFilter.balance, +)
+            
+            let totalTransferValue = transferTransactions
+                .map {
+                    switch balanceAccountToFilter.id {
+                    case $0.fromBalanceAccount?.id:
+                        return -$0.valueFrom
+                    case $0.toBalanceAccount?.id:
+                        return $0.valueTo
+                    default:
+                        return 0
+                    }
+                }
+                .reduce(0, +)
+            
+            let totalValue = totalTransactionValue + totalTransferValue
+            
+            DispatchQueue.main.async {
+                self?.logger.debug("calculateTotalForBalanceAccount: provided data")
+                self?.totalIsCalculating = false
+                self?.totalForBalanceAccount = totalValue
+                self?.logger.info("calculateTotalForBalanceAccount: ended")
+            }
+        }
+    }
+    
+    /// Calculates total spendings and total incomes values for a selected balance account. Used for light weight statistics
+    private func calculateSpendIncomeValues() {
+        guard isCalculationAllowed else { return }
+        
+        Task.detached(priority: .high) { [transactions] in
+            var totalSpendings: Float = 0
+            var totalIncome: Float = 0
+            for transaction in transactions {
+                switch transaction.type {
+                case .spending:
+                    totalSpendings += transaction.value
+                case .income:
+                    totalIncome += transaction.value
+                case .none:
+                    continue
+                }
+            }
+            
+            await MainActor.run { [totalSpendings, totalIncome] in
+                self.balanceAccountTotalSpending = totalSpendings
+                self.balanceAccountTotalIncome = totalIncome
+            }
+        }
+    }
+    
+    /// Calculate total value for all time tags spending or income
+    private func calculateTagsTotal(animated: Bool = false) {
+        guard isCalculationAllowed else { return }
+        logger.info("calculateTagsTotal: started to calculate data for tags chart")
+        DispatchQueue.main.async { [weak self] in
+            self?.tagsDataIsCalculating = true
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+            logger.debug("calculateTagsTotal: started to calculate data for transactionsWithTags")
+            let transactionsWithTags = self.transactions
+                .filter { !$0.tags.isEmpty && $0.type == self.transactionTypeForTags  }
+            
+            guard !transactionsWithTags.isEmpty else {
+                logger.debug("calculateTagsTotal: started to providing data due guard statement")
+                DispatchQueue.main.async { [weak self] in
+                    self?.tagsDataIsCalculating = false
+                    if animated {
+                        withAnimation {
+                            self?.tagsTotalData = []
+                        }
+                    } else {
+                        self?.tagsTotalData = []
+                    }
+                    self?.logger.info("calculateTagsTotal: ended due guard statement")
+                }
+                return
+            }
+            
+            logger.debug("calculateTagsTotal: started to calcuate tagsData")
+            let tagsData = transactionsWithTags
+                .flatMap { transaction in
+                    var tupleArray: [(tag: Tag, transaction: Transaction)] = []
+                    for tag in transaction.tags {
+                        tupleArray.append((tag: tag, transaction: transaction))
+                    }
+                    return tupleArray
+                }
+                .grouped { $0.tag.id }
+                .compactMap { tagDict -> TagChartData? in
+                    var total: Float = 0
+                    var transactionsToSet: [Transaction] = []
+                    guard let tagAsKey = tagDict.value.first?.tag else { return nil }
+                    
+                    for tuple in tagDict.value {
+                        total += tuple.transaction.value
+                        transactionsToSet.append(tuple.transaction)
+                    }
+                    return TagChartData(tag: tagAsKey, total: total, transactions: transactionsToSet)
+                }
+                .sorted { $0.total > $1.total}
+            
+            logger.debug("calculateTagsTotal: started to providing data to tags chart")
+            DispatchQueue.main.async { [weak self] in
+                self?.tagsDataIsCalculating = false
+                withAnimation {
+                    self?.tagsTotalData = tagsData
+                }
+                self?.logger.info("calculateTagsTotal: ended")
+            }
+        }
+    }
+    
+    /// Calculates data for pie chart and sets it with animation
+    private func calculateDataForPieChart(animated: Bool = false) {
+        guard isCalculationAllowed else { return }
+        logger.info("calculateDataForPieChart: started to calculate data for pie chart")
+        DispatchQueue.main.async { [weak self] in
+            self?.pieDataIsCalculating = true
+        }
+        
+        DispatchQueue.global(qos: .utility).async { [weak self, lightWeightStatistics, transactions] in
+            guard let self else { return }
+            logger.debug("calculateDataForPieChart: started to calculate returnData")
+            let dateAndTypeFilteredData = transactions
+                    .filter { singleTransaction in
+                        guard !lightWeightStatistics else {
+                            return singleTransaction.type == self.pieChartTransactionType
+                        }
+                        guard singleTransaction.type == self.pieChartTransactionType else { return false }
+                        
+                        
+                        switch self.pieChartMenuDateFilterSelected {
+                        case .day:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .day)
+                        case .month:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .month)
+                        case .year:
+                            return self.calendar.isDate(singleTransaction.date, equalTo: self.pieChartDate, toGranularity: .year)
+                        case .dateRange:
+                            let lowerBound = self.calendar.startOfDay(for: self.pieChartDateStart)
+                            let higherBound = self.calendar.startOfDay(for: self.calendar.date(byAdding: .day, value: 1, to: self.pieChartDateEnd) ?? self.pieChartDateEnd)
+                            return (lowerBound...higherBound).contains(singleTransaction.date)
+                        case .allTime:
+                            return true
+                        }
+                    }
+            
+            var returnData = dateAndTypeFilteredData
+                .grouped { $0.category?.id }
+                .compactMap { singleDict -> TransactionPieChartData? in
+                    let totalValueForCategory = singleDict.value.map{ $0.value }.reduce(0, +)
+                    let transactions = singleDict.value
+                    guard let categoryAsKey = singleDict.value.first?.category else { return nil}
+                    return TransactionPieChartData(category: categoryAsKey, sumValue: totalValueForCategory, transactions: transactions)
+                }
+            
+            logger.debug("calculateDataForPieChart: started to sort returnData")
+            returnData = returnData.sorted(by: { $0.sumValue > $1.sumValue })
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self, returnData] in
+                self?.logger.debug("calculateDataForPieChart: started to provide data for pie chart")
+                self?.pieDataIsCalculating = false
+                if animated {
+                    self?.logger.debug("calculateDataForPieChart: provided data for pie chart with animation")
+                    withAnimation {
+                        self?.pieChartTransactionData = returnData
+                    }
+                } else {
+                    self?.logger.debug("calculateDataForPieChart: provided data for pie chart without animation")
+                    self?.pieChartTransactionData = returnData
+                }
+                self?.logger.info("calculateDataForPieChart: ended")
+            }
+        }
+    }
+    
+    /// Calculates data for bar chart and sets it with animation
+    private func calculateDataForBarChart(on thread: DispatchQueue = .global(qos: .utility), animated: Bool = false) {
+        guard isCalculationAllowed else { return }
+        logger.info("calculateDataForBarChart: started to calculate data for bar chart")
+        DispatchQueue.main.async { [weak self] in
+            self?.barDataIsCalculating = true
+        }
+        
+        // This is utility because of high calculation compexity
+        thread.async { [weak self] in
+            guard let self else { return }
+            logger.debug("calculateDataForBarChart: started to calculate availableBarData")
+            let availableBarData = self.transactions
+                .filter { singleTransaction in
+                    switch self.barChartTransactionTypeFilter {
+                    case .both:
+                        return true
+                    case .spending:
+                        return (singleTransaction.type == .spending)
+                    case .income:
+                        return (singleTransaction.type == .income)
+                    }
+                }
+                .grouped { singleTransaction in
+                    let year = self.calendar.component(.year, from: singleTransaction.date)
+                    let month = self.calendar.component(.month, from: singleTransaction.date)
+                    
+                    switch self.barChartPerDateFilter {
+                    case .perDay:
+                        let day = self.calendar.component(.day, from: singleTransaction.date)
+                        return DateComponents(year: year, month: month, day: day)
+                    case .perWeek:
+                        let dateComp = self.calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: singleTransaction.date)
+                        return dateComp
+                    case .perMonth:
+                        return DateComponents(year: year, month: month)
+                    case .perYear:
+                        return DateComponents(year: year)
+                    }
+                }
+                .map { singleGroup in
+                    let dateToSet = self.calendar.date(from: singleGroup.key) ?? .now
+                    let groupedByTransTypeDict = singleGroup.value.grouped { $0.type }
+                    
+                    var arrayOfBarData =  groupedByTransTypeDict.map {
+                        let sumValue = $0.value.map { $0.value }.reduce(0, +)
+                        
+                        switch $0.key {
+                        case .spending:
+                            return TransactionBarChartData(type: .spending, value: sumValue, date: dateToSet)
+                        case .income:
+                            return TransactionBarChartData(type: .income, value: sumValue, date: dateToSet)
+                        case .none:
+                            return TransactionBarChartData(type: .unknown, value: sumValue, date: dateToSet)
+                        }
+                    }
+                    
+                    if self.barChartTransactionTypeFilter == .both {
+                        var incomeTransData = arrayOfBarData.first { $0.type == .income }
+                        if incomeTransData == nil {
+                            incomeTransData = TransactionBarChartData(type: .income, value: 0, date: dateToSet)
+                            arrayOfBarData.append(incomeTransData!)
+                        }
+                        
+                        var spendTransData = arrayOfBarData.first { $0.type == .spending }
+                        if spendTransData == nil {
+                            spendTransData = TransactionBarChartData(type: .spending, value: 0, date: dateToSet)
+                            arrayOfBarData.append(spendTransData!)
+                        }
+                        
+                        let profitValue = incomeTransData!.value - spendTransData!.value
+                        let profitData = TransactionBarChartData(type: .profit, value: profitValue, date: dateToSet)
+                        arrayOfBarData.append(profitData)
+                    }
+                    
+                    return arrayOfBarData
+                }
+                .sorted {
+                    let fristTrasactionDate = $0.first?.date
+                    let secondTrasactionDate = $1.first?.date
+                    
+                    if fristTrasactionDate == nil {
+                        return true
+                    }
+                    
+                    if secondTrasactionDate == nil {
+                        return false
+                    }
+                    
+                    return $0.first!.date < $1.first!.date
+                }
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.logger.debug("calculateDataForBarChart: providing data for bar chart")
+                self?.barDataIsCalculating = false
+                if animated {
+                    withAnimation {
+                        self?.barChartTransactionData = availableBarData
+                    }
+                } else {
+                    self?.barChartTransactionData = availableBarData
+                }
+                self?.logger.info("calculateDataForBarChart: ended")
+            }
+        }
+    }
+    
+    /// Cleans properties with data for UI by setting empty values
+    @MainActor
+    private func cleanData() {
+        balanceAccounts = []
+        totalForBalanceAccount = 0
+        tagsTotalData = []
+        pieChartTransactionData = []
+        barChartTransactionData = []
+    }
+    
+    /// Fetches all data and executes completion handler
+    /// - Parameter completionHandler: completion handler that is executed at the end of fetching
+    private func fetchAllData(completionHandler: @Sendable @escaping () -> Void) {
+        isFetchingData = true
+        logger.info("fetchAllData: started")
+        let localCompletion: @Sendable () -> Void = { [weak self, logger] in
+            logger.debug("fetchAllData: started to provide data on main thread")
+            Task { @MainActor in
+                self?.isFetchingData = false
+            }
+            logger.info("fetchAllData: ended")
+            completionHandler()
+            logger.debug("fetchAllData: ended competion handler")
+        }
+        
+        Task {
+            if isFirstLaunch {
+                logger.debug("fetchAllDataЖ isFirstLaunch is true, task sleep for 0.2 seconds")
+                do {
+                    try await Task.sleep(for: .seconds(0.2))
+                    isFirstLaunch = false
+                } catch {
+                    logger.error("fetchAllData: task sleep error: \(error)")
+                }
+            }
+            
+            logger.debug("fetchAllData: started to fetch BAs")
+            await fetchBalanceAccounts()
+            logger.debug("fetchAllData: ended to fetch BAs")
+            Task.detached(priority: .background) { [weak self, logger] in
+                logger.info("fetchAllData: started to fetch tags")
+                await self?.fetchTags()
+                logger.debug("fetchAllData: ended to fetch tags")
+                logger.debug("fetchAllData: started to fetch transactions")
+                if let self, self.lightWeightStatistics {
+                    logger.debug("fetchAllData: for light weight statistics")
+                    await self.fetchTransactionsForDate()
+                } else {
+                    logger.debug("fetchAllData: for complete statistics")
+                    await self?.fetchTransactions()
+                    await self?.fetchTransferTransactions()
+                }
+                logger.debug("fetchAllData: ended to fetch transactions")
+                localCompletion()
+            }
+        }
+    }
+    
+    ///Fetches all transactions and sets to transactions, uses background fetching
+    private func fetchTransactions() async {
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        let predicate = #Predicate<Transaction> { trans in
+            trans.balanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
+        )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
+        
+        do {
+            let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
+            transactions = fetchedTranses
+        } catch {
+            logger.error("fetchTransactions: Unable to fetch transactions, error: \(error)")
+        }
+    }
+    
+    ///Fetches transactions with date filter and sets to transactions, uses background fetching. Used for light weigh statistics
+    private func fetchTransactionsForDate() async {
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        let lowerBound = lightWeightDateFilterRange.lowerBound
+        let upperBound = lightWeightDateFilterRange.upperBound
+        
+        let predicate = #Predicate<Transaction> {
+            $0.balanceAccount?.persistentModelID == copyBalanceAccountId && (lowerBound...upperBound).contains($0.date)
+        }
+        
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
+        )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
+        
+        do {
+            let fetchedTranses = try await dataManager.fetchFromBackground(descriptor)
+            transactions = fetchedTranses
+        } catch {
+            logger.error("fetchTransactionsForDate: Unable to fetch transactions, error: \(error)")
+        }
+    }
+    
+    private func fetchTransferTransactions() async {
+        let copyBalanceAccountId = balanceAccountToFilter.persistentModelID
+        
+        let predicate = #Predicate<TransferTransaction> {
+            $0.fromBalanceAccount?.persistentModelID == copyBalanceAccountId || $0.toBalanceAccount?.persistentModelID == copyBalanceAccountId
+        }
+        var descriptor = FetchDescriptor<TransferTransaction>(predicate: predicate)
+        descriptor.sortBy = [SortDescriptor(\.date, order: .reverse)]
+        
+        do {
+            let fetchedTransferTransactions = try await dataManager.fetchFromBackground(descriptor)
+            transferTransactions = fetchedTransferTransactions
+        } catch {
+            logger.error("fetchTransferTransactions: Unable to fetch transfer transactions, error: \(error)")
+        }
+    }
+    
+    /// Fetches all saved tags, uses background
+    private func fetchTags() async {
+        let descriptor = FetchDescriptor<Tag>()
+        do {
+            let fetchedTags = try await dataManager.fetchFromBackground(descriptor)
+            allTags = fetchedTags
+        } catch {
+            logger.error("fetchTags: Unable to fetch tags, error: \(error)")
+        }
+    }
+    
+    ///Fetches all balance accounts and sets to balanceAccounts
+    @MainActor
+    private func fetchBalanceAccounts() async {
+        let descriptor = FetchDescriptor<BalanceAccount>(
+            predicate: nil,
+            sortBy: [SortDescriptor<BalanceAccount>(\.name, order: .reverse)]
+        )
+        
+        do {
+            let fetchedBalanceAccounts = try dataManager.fetch(descriptor)
+            balanceAccounts = fetchedBalanceAccounts
+        } catch {
+            logger.error("fetchBalanceAccounts: Unable to fetch Balance Accounts, error: \(error)")
+        }
+    }
+}
+
+//MARK: - Extensions for CustomTabViewModelDelegate
+extension StatisticsViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        "StatisticsViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        if tabView == .welcomeView {
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        dataShouldBeRefetched = false
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        }
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        if tabView == .welcomeView {
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        }
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        if tabView == .welcomeView {
+            Task { @MainActor in
+                balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+            return
+        }
+        
+        guard tabView != .statisticsView else { return }
+        
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        }
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) async {
+        switch dataType {
+        case .categories:
+            dataUpdatedFromAnotherView = .category
+            
+        case .balanceAccounts(let balanceAccount):
+            if let balanceAccount {
+                dataShouldBeRefetched = false
+                Task { @MainActor in
+                    switch action {
+                    case .add:
+                        balanceAccounts.append(balanceAccount)
+                    case .delete:
+                        if let index = balanceAccounts.map(\.id).firstIndex(of: balanceAccount.id) {
+                            balanceAccounts.remove(at: index)
+                        }
+                    case .update, .doNothing:
+                        break
+                    }
+                }
+            } else {
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .balanceAccount
+            
+        case .tags(let tag):
+            if let tag {
+                dataShouldBeRefetched = false
+                Task { @MainActor in
+                    switch action {
+                    case .add:
+                        allTags.append(tag)
+                    case .delete:
+                        if let index = allTags.map(\.id).firstIndex(of: tag.id) {
+                            allTags.remove(at: index)
+                        }
+                    case .update, .doNothing:
+                        break
+                    }
+                }
+            } else {
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .tag
+            
+        case .transfers(let transfer):
+            guard !lightWeightStatistics else { return }
+            
+            if let transfer {
+                guard transfer.fromBalanceAccount?.id == balanceAccountToFilter.id || transfer.toBalanceAccount?.id == balanceAccountToFilter.id else {
+                    if action == .update || action == .delete {
+                        let transferID = transfer.id
+                        if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                            logger.debug("getUpdateFromTabView: Removing transfer with id: \(transferID)")
+                            transferTransactions.remove(at: index)
+                            dataUpdatedFromAnotherView = .transfer
+                        } else {
+                            logger.debug("getUpdateFromTabView: Transfer does not belong to balance account to filter")
+                        }
+                    } else {
+                        logger.error("getUpdateFromTabView: Transfer does not belong to balance account to filter")
+                    }
+                    return
+                }
+                
+                dataShouldBeRefetched = false
+                switch action {
+                case .add:
+                    logger.debug("getUpdateFromTabView: Adding transfer with id: \(transfer.id)")
+                    transferTransactions.append(transfer)
+                case .delete:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        logger.debug("getUpdateFromTabView: Deleting transfer from array")
+                        transferTransactions.remove(at: index)
+                    } else {
+                        logger.error("getUpdateFromTabView: No transfer found with such id in array for deletion")
+                        dataShouldBeRefetched = true
+                    }
+                case .update:
+                    let transferID = transfer.id
+                    if let index = transferTransactions.firstIndex(where: { $0.id == transferID }) {
+                        transferTransactions[index] = transfer
+                    } else {
+                        transferTransactions.append(transfer)
+                    }
+                case .doNothing:
+                    return
+                }
+            } else {
+                logger.error("getUpdateFromTabView: Provided transfer is nil")
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .transfer
+            
+        case .transactions(let transaction):
+            if let transaction {
+                if lightWeightStatistics {
+                    guard lightWeightDateFilterRange.contains(transaction.date) else { return }
+                    
+                    switch action {
+                    case .add:
+                        guard transaction.balanceAccount?.id == balanceAccountToFilter.id else { return }
+                    case .delete:
+                        let transactionID = transaction.id
+                        guard transactions.contains(where: { $0.id == transactionID }) else { return }
+                    case .update:
+                        let transactionID = transaction.id
+                        let containsTransfer = transactions.contains(where: { $0.id == transactionID })
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        
+                        if !containsTransfer && sameBalanceAccount {
+                            transactions.append(transaction)
+                        } else if containsTransfer && !sameBalanceAccount {
+                            if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                                transactions.remove(at: index)
+                            }
+                        } else if !containsTransfer && !sameBalanceAccount {
+                            return
+                        }
+                    case .doNothing:
+                        return
+                    }
+                }
+                
+                dataShouldBeRefetched = false
+                
+                switch action {
+                case .add:
+                    guard transaction.balanceAccount?.id == balanceAccountToFilter.id else {
+                        logger.debug("getUpdateFromTabView: Ignoring transaction, that was added to a different balance account. Transaction id: \(transaction.id)")
+                        return
+                    }
+                    
+                    do {
+                        let transactionID = transaction.id
+                        guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            logger.error("getUpdateFromTabView: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            dataShouldBeRefetched = true
+                            break
+                        }
+                        logger.debug("getUpdateFromTabView: Adding transaction with id: \(addedTransaction.id)")
+                        transactions.append(addedTransaction)
+                    } catch {
+                        logger.error("getUpdateFromTabView: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
+                    }
+                    
+                case .delete:
+                    let transactionID = transaction.id
+                    if let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+                        logger.debug("getUpdateFromTabView: Deleting transaction from array")
+                        transactions.remove(at: index)
+                    } else {
+                        logger.debug("getUpdateFromTabView: Ignoring transaction, that was deleted (probably from a different balance account). Transaction id: \(transaction.id)")
+                        return
+                    }
+                    
+                case .update:
+                    do {
+                        let transactionID = transaction.id
+                        let sameBalanceAccount = transaction.balanceAccount?.id == balanceAccountToFilter.id
+                        let index = transactions.firstIndex(where: { $0.id == transactionID })
+                        guard let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            logger.error("getUpdateFromTabView: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            dataShouldBeRefetched = true
+                            break
+                        }
+                        
+                        if (index != nil && sameBalanceAccount) {
+                            logger.debug("getUpdateFromTabView: Updating transaction with id: \(updatedTransaction.id)")
+                            transactions[index!] = updatedTransaction
+                        } else if (index == nil && sameBalanceAccount) {
+                            logger.debug("getUpdateFromTabView: Adding transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.append(updatedTransaction)
+                        } else if (index != nil && !sameBalanceAccount) {
+                            logger.debug("getUpdateFromTabView: Removing transaction, that was updated with id: \(updatedTransaction.id)")
+                            transactions.remove(at: index!)
+                        } else {
+                            logger.debug("getUpdateFromTabView: Ignoring transaction, that was updated, with id: \(updatedTransaction.id)")
+                            return
+                        }
+                    } catch {
+                        logger.error("getUpdateFromTabView: Error fetching single transaction: \(error)")
+                        dataShouldBeRefetched = true
+                    }
+                    
+                case .doNothing:
+                    break
+                }
+            } else {
+                logger.error("getUpdateFromTabView: Provided transaction is nil")
+                dataShouldBeRefetched = true
+            }
+            
+            dataUpdatedFromAnotherView = .transaction
+            Task { @MainActor in
+                if isViewDisplayed {
+                    try await Task.sleep(for: .seconds(0.3))
+                    refreshDataIfNeeded()
+                }
+            }
+            
+        case .data:
+            dataUpdatedFromAnotherView = .allTypes
+            if tabView == .settingsView {
+                Task { @MainActor in
+                    cleanData()
+                }
+            }
+        case .budgets, .appearance, .notifications, .advancedAnalytics:
+            return
+        }
+    }
+}
+
+//MARK: - Extension for TagsViewModelDelegate
+extension StatisticsViewModel: TagsViewModelDelegate {
+    func didAddTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didAddTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+        }
+    }
+    
+    func didUpdatedTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didUpdatedTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTag(_ tag: Tag, from tabView: TabViewType) {
+        delegate?.didDeleteTag(tag, from: .statisticsView)
+        Task {
+            await fetchTags()
+            calculateTagsTotal()
+        }
+    }
+    
+    func didDeleteTagWithTransactions(_ tag: Tag) {
+        delegate?.didDeleteTagWithTransactions(tag, from: .statisticsView)
+        refreshData()
+    }
+}
+
+//MARK: - Extension for TransactionListViewModelDelegate
+extension StatisticsViewModel: TransactionListViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .balanceAccount
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .category
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didDeleteCategory(category, from: .statisticsView)
+        dataShouldBeRefetched = true
+        dataUpdatedFromAnotherView = .allTypes
+    }
+    
+    func didAddTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        transactions.append(transaction)
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didAddTransaction(transaction, from: .statisticsView)
+    }
+    
+    func didUpdateTransaction(_ transaction: Transaction, from tabView: TabViewType) {
+        dataShouldBeRefetched = false
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didUpdateTransaction(transaction, from: .statisticsView)
+    }
+    
+    func didDeleteTransaction(_ transaction: Transaction?, from tabView: TabViewType) {
+        dataShouldBeRefetched = false
+        if let transactionID = transaction?.id, let index = transactions.firstIndex(where: { $0.id == transactionID }) {
+            transactions.remove(at: index)
+        } else {
+            dataShouldBeRefetched = true
+        }
+        dataUpdatedFromAnotherView = .transaction
+        delegate?.didDeleteTransaction(transaction, from: .statisticsView)
+    }
+}

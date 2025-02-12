@@ -1,0 +1,49 @@
+//
+//  BackgroundDataActor.swift
+//  FinanceTracker
+//
+//  Created by Лев Куликов on 05.07.2024.
+//
+
+import Foundation
+import SwiftData
+
+@ModelActor
+actor BackgroundDataActor {
+    //MARK: - Methods
+    func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
+        let fetchedData = try modelContext.fetch(descriptor)
+        return fetchedData
+    }
+    
+    func insert<T>(_ model: T) where T : PersistentModel {
+        modelContext.insert(model)
+    }
+    
+    func save() throws {
+        try modelContext.save()
+    }
+    
+    func delete<T>(_ model: T) where T : PersistentModel {
+        modelContext.delete(model)
+    }
+    
+    func deleteTransactionById(_ transaction: Transaction) throws {
+        try deleteTransactionById(transaction.id)
+    }
+    
+    func deleteTransactionById(_ transactionID: String) throws {
+        let descr = FetchDescriptor<Transaction>(predicate: #Predicate<Transaction> { $0.id == transactionID })
+        let arr = try fetch(descr)
+        guard let backTr = arr.first else { return }
+        delete(backTr)
+    }
+    
+    func deleteTransferById(_ transfer: TransferTransaction) throws {
+        let trId = transfer.id
+        let descr = FetchDescriptor<TransferTransaction>(predicate: #Predicate<TransferTransaction> { $0.id == trId })
+        let arr = try fetch(descr)
+        guard let backTr = arr.first else { return }
+        delete(backTr)
+    }
+}

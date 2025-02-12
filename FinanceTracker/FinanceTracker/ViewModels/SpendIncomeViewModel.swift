@@ -1,0 +1,384 @@
+//
+//  SpendIncomeViewModel.swift
+//  FinanceTracker
+//
+//  Created by Лев Куликов on 25.05.2024.
+//
+
+import Foundation
+import SwiftUI
+import SwiftData
+import Algorithms
+import Combine
+
+
+
+protocol SpendIncomeViewModelDelegate: AnyObject, TransactionManipulationDelegate, BalanceAccountManipulationDelegate, CategoryManipulationDelegate {
+    func didSelectAction(_ action: ActionWithTransaction)
+}
+
+enum ActionWithTransaction: Equatable {
+    case none
+    case add(Date)
+    case update(Transaction)
+}
+
+enum DateSettingDestination: Equatable {
+    case back
+    case forward
+}
+
+final class SpendIncomeViewModel: ObservableObject, @unchecked Sendable {
+    //MARK: - Properties
+    //MARK: Private props
+    private let dataManager: any DataAndSettingsManagerProtocol
+    private var transactions: [Transaction] = []
+    private let calendar = Calendar.current
+    
+    //MARK: Internal props
+    weak var delegate: (any SpendIncomeViewModelDelegate)?
+    
+    var availableDateRange: ClosedRange<Date> {
+        FTAppAssets.availableDateRange
+    }
+    var movingBackwardDateAvailable: Bool {
+        guard let backDate = calendar.date(byAdding: .day, value: -1, to: dateSelected) else {
+            return false
+        }
+        return availableDateRange.contains(backDate)
+    }
+    var movingForwardDateAvailable: Bool {
+        guard let forwardDate = calendar.date(byAdding: .day, value: 1, to: dateSelected) else {
+            return false
+        }
+        return availableDateRange.contains(forwardDate)
+    }
+    
+    //MARK: Published props
+    @Published private(set) var transactionsValueSum: Float = 0
+    @Published private(set) var filteredGroupedTranactions: [[Transaction]] = []
+    @Published var tapEnabled = true
+    @Published var actionSelected: ActionWithTransaction = .none {
+        didSet {
+            didSelectAction(action: actionSelected)
+            if actionSelected == .none {
+                enableTapsWithDeadline()
+            }
+        }
+    }
+    @Published var transactionsTypeSelected: TransactionsType = .spending {
+        didSet {
+            filterGroupSortTransactions(animated: true)
+        }
+    }
+    @Published private(set) var availableBalanceAccounts: [BalanceAccount] = []
+    @Published var dateSelected: Date = .now {
+        didSet {
+            guard dateSelected.startOfDay() != oldValue.startOfDay() else { return }
+            Task {
+                await fetchTransactions()
+                filterGroupSortTransactions()
+            }
+        }
+    }
+    @Published var balanceAccountToFilter: BalanceAccount = .emptyBalanceAccount {
+        didSet {
+            filterGroupSortTransactions()
+        }
+    }
+    
+    //MARK: - Initializer
+    init(dataManager: some DataAndSettingsManagerProtocol) {
+        self.dataManager = dataManager
+        fetchAllData {
+            Task { @MainActor in
+                self.balanceAccountToFilter = self.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+            }
+        }
+    }
+    
+    //MARK: - Methods
+    func deleteTransaction(_ transaction: Transaction, errorHandler: (@Sendable (Error) -> Void)? = nil) {
+        Task {
+            await dataManager.deleteTransaction(transaction)
+            await fetchTransactions(errorHandler: errorHandler)
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
+            filterGroupSortTransactions(animated: true)
+        }
+    }
+    
+    func deleteTransactions(_ transactions: [Transaction], errorHandler: (@Sendable (Error) -> Void)? = nil) {
+        Task {
+            for transaction in transactions {
+                await dataManager.deleteTransaction(transaction)
+            }
+            await fetchTransactions(errorHandler: errorHandler)
+            delegate?.didDeleteTransaction(transactions.last, from: .spendIncomeView)
+            filterGroupSortTransactions(animated: true)
+        }
+    }
+    
+    func setDate(destination: DateSettingDestination, withAnimation animated: Bool = true) {
+        guard let newDate = calendar.date(byAdding: .day, value: destination == .back ? -1 : 1, to: dateSelected),
+              availableDateRange.contains(newDate) else { return }
+        if animated {
+            withAnimation(.snappy(duration: 0.3)) {
+                dateSelected = newDate
+            }
+        } else {
+            dateSelected = newDate
+        }
+    }
+    
+    @MainActor
+    func getAddUpdateView(forAction: Binding<ActionWithTransaction>, namespace: Namespace.ID) -> some View {
+        return FTFactory.shared.createAddingSpendIcomeView(
+            dataManager: dataManager,
+            threadToUse: .main,
+            transactionType: transactionsTypeSelected,
+            balanceAccount: balanceAccountToFilter,
+            forAction: forAction,
+            namespace: namespace,
+            delegate: self
+        )
+    }
+    
+    func didSelectAction(action: ActionWithTransaction) {
+        delegate?.didSelectAction(action)
+    }
+    
+    //MARK: Private props
+    private func addButtonPressedFromTabBar() {
+        guard tapEnabled else { return }
+        tapEnabled = false
+        withAnimation(.snappy(duration: 0.5)) {
+            actionSelected = .add(dateSelected)
+        }
+    }
+    
+    private func enableTapsWithDeadline() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.tapEnabled = true
+        }
+    }
+    
+    /// Groups, filters and sorts fetshed transactions array and sets new array to published array of transactions (filteredGroupedTranactions) with default animation
+    /// - Parameters:
+    ///   - date: provide value to filter by date, if nil the method filters by selected from UI date
+    ///   - balanceAccount: provide value to filter by balance account, if nil the method filters by selected from UI balance acount
+    private func filterGroupSortTransactions(type: TransactionsType? = nil, balanceAccount: BalanceAccount? = nil, animated: Bool = false) {
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+            
+            let changedTransactions = self.transactions
+                .filter {
+                    $0.type == (type ?? self.transactionsTypeSelected)
+                }
+                .filter {
+                    $0.balanceAccount == balanceAccount ?? self.balanceAccountToFilter
+                }
+                .grouped { $0.category }
+                .map { $0.value }
+                .sorted {
+                    ($0.first!.category?.name ?? "Err") < ($1.first!.category?.name ?? "Err")
+                }
+            
+            let sumValue = changedTransactions.flatMap{$0}.map{$0.value}.reduce(0, +)
+            
+            DispatchQueue.main.async {
+                if animated {
+                    withAnimation{
+                        self.filteredGroupedTranactions = changedTransactions
+                        self.transactionsValueSum = sumValue
+                    }
+                } else {
+                    self.filteredGroupedTranactions = changedTransactions
+                    self.transactionsValueSum = sumValue
+                }
+            }
+        }
+    }
+    
+    private func fetchAllData(completionHandler: (@Sendable ()->Void)? = nil) {
+        Task {
+            await fetchTransactions()
+            await fetchBalanceAccounts()
+            completionHandler?()
+        }
+    }
+    
+    @MainActor
+    private func fetchTransactions(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
+        let startOfSelectedDate = calendar.startOfDay(for: dateSelected)
+        let endOfSelectedDate = dateSelected.endOfDay() ?? dateSelected
+        
+        let predicate = #Predicate<Transaction> {
+            (startOfSelectedDate...endOfSelectedDate).contains($0.date)
+        }
+        
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor<Transaction>(\.date, order: .reverse)]
+        )
+        descriptor.relationshipKeyPathsForPrefetching = [\.category, \.balanceAccount]
+        
+        do {
+            let fetchedTranses = try dataManager.fetch(descriptor)
+            transactions = fetchedTranses
+        } catch {
+            errorHandler?(error)
+        }
+    }
+    
+    @MainActor
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) {
+        let descriptor = FetchDescriptor<BalanceAccount>()
+        
+        do {
+            let fetchedBAs = try dataManager.fetch(descriptor)
+            availableBalanceAccounts = fetchedBAs
+        } catch {
+            errorHandler?(error)
+        }
+    }
+}
+
+//MARK: Extension for AddingSpendIcomeViewModelDelegate
+extension SpendIncomeViewModel: AddingSpendIcomeViewModelDelegate {
+    func addedNewTransaction(_ transaction: Transaction) {
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didAddTransaction(transaction, from: .spendIncomeView)
+        }
+    }
+    
+    func updateTransaction(_ transaction: Transaction) {
+        filterGroupSortTransactions()
+        enableTapsWithDeadline()
+        delegate?.didUpdateTransaction(transaction, from: .spendIncomeView)
+    }
+    
+    func deletedTransaction(_ transaction: Transaction) {
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            enableTapsWithDeadline()
+            delegate?.didDeleteTransaction(transaction, from: .spendIncomeView)
+        }
+    }
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        transactionsTypeSelected = newType
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didAddCategory(category, from: .spendIncomeView)
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        delegate?.didUpdateCategory(category, from: .spendIncomeView)
+        filterGroupSortTransactions()
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchTransactions()
+            filterGroupSortTransactions()
+            delegate?.didDeleteCategory(category, from: .spendIncomeView)
+        }
+    }
+    
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didAddBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didUpdateBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        delegate?.didDeleteBalanceAccount(balanceAccount, from: .spendIncomeView)
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+}
+
+//MARK: Extension for CustomTabViewModelDelegate
+extension SpendIncomeViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        "SpendIncomeViewModel"
+    }
+    
+    func addButtonPressed() {
+        addButtonPressedFromTabBar()
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .spendIncomeView else { return }
+        
+        getUpdateFromTabView(for: dataType, from: tabView)
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        switch dataType {
+        case .balanceAccounts:
+            Task { @MainActor in
+                fetchBalanceAccounts()
+                if tabView == .welcomeView {
+                    balanceAccountToFilter = dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+                }
+            }
+        case .categories:
+            Task {
+                await fetchTransactions()
+                filterGroupSortTransactions()
+            }
+        case .data:
+            fetchAllData {
+                self.filterGroupSortTransactions()
+                Task { @MainActor in
+                    self.balanceAccountToFilter = self.dataManager.getDefaultBalanceAccount() ?? .emptyBalanceAccount
+                }
+            }
+        case .transactions(let transaction):
+            if transaction == nil || transaction?.date.startOfDay() == dateSelected.startOfDay() {
+                Task {
+                    await fetchTransactions()
+                    filterGroupSortTransactions()
+                }
+            }
+        case .tags:
+            break
+        case .budgets:
+            break
+        case .appearance:
+            break
+        case .notifications:
+            break
+        case .transfers:
+            break
+        case .advancedAnalytics:
+            break
+        }
+    }
+}

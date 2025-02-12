@@ -1,0 +1,3700 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    " + %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " + %lld"
+          }
+        }
+      }
+    },
+    " and currency" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " и валюта"
+          }
+        }
+      }
+    },
+    "__Finance Tracker__\nVersion: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "__Финансовый Трекер__\nВерсия: %@"
+          }
+        }
+      }
+    },
+    "/" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/"
+          }
+        }
+      }
+    },
+    "#" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#"
+          }
+        }
+      }
+    },
+    "# %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "# %@"
+          }
+        }
+      }
+    },
+    "%@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
+    },
+    "+" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+"
+          }
+        }
+      }
+    },
+    "+%lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld"
+          }
+        }
+      }
+    },
+    "0" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        }
+      }
+    },
+    "0 tags" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 тегов"
+          }
+        }
+      }
+    },
+    "404" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "404"
+          }
+        }
+      }
+    },
+    "Adavanced analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая аналитика"
+          }
+        }
+      }
+    },
+    "Add" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить"
+          }
+        }
+      }
+    },
+    "Add any number of filters to search for transactions of interest and get analytics on them. Analytics will reflect unique transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте любое количество фильтров для поиска интересующих транзакций, чтобы получить по ним аналитику. В аналитике будут отображены только уникальные транзакции"
+          }
+        }
+      }
+    },
+    "Add budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить бюджет"
+          }
+        }
+      }
+    },
+    "Add filter" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить фильтр"
+          }
+        }
+      }
+    },
+    "Add new" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый"
+          }
+        }
+      }
+    },
+    "Add tag" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить тег"
+          }
+        }
+      }
+    },
+    "Add transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить транзакцию"
+          }
+        }
+      }
+    },
+    "Additional tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительные вкладки"
+          }
+        }
+      }
+    },
+    "Advanced Analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продвинутая Аналитика"
+          }
+        }
+      }
+    },
+    "Again, this action is irretable. Do you want to delete all transactions?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Еще раз, данное действие безвозвратное. Хотите удалить все транзакции?"
+          }
+        }
+      }
+    },
+    "Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Еще раз, данное действие безвозвратное. Если вы беспокоитесь безопасности своих данных, то уверяем, что ваши данные хранятся исключительно на вашем устройстве. Хотите удалить все сохраненные данные?"
+          }
+        }
+      }
+    },
+    "All" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все"
+          }
+        }
+      }
+    },
+    "All accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все счета"
+          }
+        }
+      }
+    },
+    "All categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все категории"
+          }
+        }
+      }
+    },
+    "All Categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все категории"
+          }
+        }
+      }
+    },
+    "All currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все валюты"
+          }
+        }
+      }
+    },
+    "All Icons" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все иконки"
+          }
+        }
+      }
+    },
+    "All is up to date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все актуально"
+          }
+        }
+      }
+    },
+    "All stored data will be deleted and replaced with imported data, even it is empty" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все сохраненные данные будут удалены и заменены на импортированные, даже если импортированный файл не содержит значений"
+          }
+        }
+      }
+    },
+    "All time" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все время"
+          }
+        }
+      }
+    },
+    "Always show add button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать кнопку Добавить постоянно"
+          }
+        }
+      }
+    },
+    "An error occurred during creating a Excel (csv) file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создании файла Excel (csv). Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "An error occurred during decoding selected file. Error text: %@. Probably, you selected wrong file " : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка в процессе декодирования файла. Текст ошибки: %@. Возможно, вы выбрали не тот файл"
+          }
+        }
+      }
+    },
+    "An error occurred while creating a JSON file. Error text: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при создания JSON файла. Текст ошибки: %@"
+          }
+        }
+      }
+    },
+    "Analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
+    },
+    "Any text or number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Любой текст или число"
+          }
+        }
+      }
+    },
+    "App and Data" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приложение и данные"
+          }
+        }
+      }
+    },
+    "Appearance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внешний вид"
+          }
+        }
+      }
+    },
+    "Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены? Все данные (транзакции, счета, категории и т.д.) будут безвозвратно удалены \n\nВы можете удалить только транзакции, если желаете "
+          }
+        }
+      }
+    },
+    "Are you sure? All transactions will be deleted, this action is irretable" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены? Все транзакции будут удалены, данное действие безвозвратно"
+          }
+        }
+      }
+    },
+    "As you have changed the position of the Settings tab, click Save to apply the changes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поскольку вы поменяли позицию вкладки Настройки, нажмите кнопку Сохранить, чтобы применить изменения"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назад"
+          }
+        }
+      }
+    },
+    "Balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет"
+          }
+        }
+      }
+    },
+    "Balance Account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет"
+          }
+        }
+      }
+    },
+    "Balance account name" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя счета"
+          }
+        }
+      }
+    },
+    "Balance account to transfer from is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет для перевода из не выбран"
+          }
+        }
+      }
+    },
+    "Balance account to transfer to is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счет для перевода в не выбран"
+          }
+        }
+      }
+    },
+    "Balance Accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета"
+          }
+        }
+      }
+    },
+    "Balance accounts to transfer from and to cannot be equal" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Счета для перевода из и в не могут быть одинаковыми"
+          }
+        }
+      }
+    },
+    "Bar chart" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гистограмма"
+          }
+        }
+      }
+    },
+    "Bar chart date sride type picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер шага данных гистограммы"
+          }
+        }
+      }
+    },
+    "Bar chart picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер гистограммы"
+          }
+        }
+      }
+    },
+    "Both types" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оба типа"
+          }
+        }
+      }
+    },
+    "Budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджет"
+          }
+        }
+      }
+    },
+    "Budget name" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета"
+          }
+        }
+      }
+    },
+    "Budget name (Optional)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя бюджета (Опционально)"
+          }
+        }
+      }
+    },
+    "Budget period" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер бюджета"
+          }
+        }
+      }
+    },
+    "Budget total" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма бюджета"
+          }
+        }
+      }
+    },
+    "Budgets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бюджеты"
+          }
+        }
+      }
+    },
+    "Can't save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получается сохранить фильтры"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить"
+          }
+        }
+      }
+    },
+    "Cancel the import?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить импорт?"
+          }
+        }
+      }
+    },
+    "Card type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип карточки"
+          }
+        }
+      }
+    },
+    "Categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Категории"
+          }
+        }
+      }
+    },
+    "Category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Категория"
+          }
+        }
+      }
+    },
+    "Category is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Категория не выбрана"
+          }
+        }
+      }
+    },
+    "Category name" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя категории"
+          }
+        }
+      }
+    },
+    "Changes are saved automatically" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменения сохраняются автоматически"
+          }
+        }
+      }
+    },
+    "Charts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Графики"
+          }
+        }
+      }
+    },
+    "Check other items using the picker at the top" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посмотрите другие объекты с помощью пикера вверху"
+          }
+        }
+      }
+    },
+    "Check the spelling and enter the query in English" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте написание и вводите запрос на английском"
+          }
+        }
+      }
+    },
+    "Clear selection" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить выбор"
+          }
+        }
+      }
+    },
+    "Click here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите здесь"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
+          }
+        }
+      }
+    },
+    "Code source" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репозиторий"
+          }
+        }
+      }
+    },
+    "Color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет"
+          }
+        }
+      }
+    },
+    "Color for tag" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет тега"
+          }
+        }
+      }
+    },
+    "Comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий"
+          }
+        }
+      }
+    },
+    "Comment: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий: %@"
+          }
+        }
+      }
+    },
+    "Completely open source, all information is stored on your device. No need to worry about privacy!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полностью открытый код, все данные хранятся исключительно на вашем устройстве. Нет причин для беспокойства о приватности!"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продолжить"
+          }
+        }
+      }
+    },
+    "Copy email" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать email"
+          }
+        }
+      }
+    },
+    "Create" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать"
+          }
+        }
+      }
+    },
+    "Create tag" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать тег"
+          }
+        }
+      }
+    },
+    "Create your balance account to start" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создайте ваш счет чтобы начать пользоваться приложением"
+          }
+        }
+      }
+    },
+    "Currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Валюты"
+          }
+        }
+      }
+    },
+    "Currency name or code" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя или код валюты"
+          }
+        }
+      }
+    },
+    "Currency rate cannot be zero, negative or empy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курс валют не может быть нулевым, отрицательным или пустым"
+          }
+        }
+      }
+    },
+    "Current balance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текущий баланс"
+          }
+        }
+      }
+    },
+    "Current date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текущая дата"
+          }
+        }
+      }
+    },
+    "Daily reminder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ежедневное напоминание"
+          }
+        }
+      }
+    },
+    "Dark mode" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Темная тема"
+          }
+        }
+      }
+    },
+    "Data is deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данные удалены"
+          }
+        }
+      }
+    },
+    "Data settings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки данных"
+          }
+        }
+      }
+    },
+    "Date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата"
+          }
+        }
+      }
+    },
+    "Date range" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Промежуток дат"
+          }
+        }
+      }
+    },
+    "Date type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип даты"
+          }
+        }
+      }
+    },
+    "Date;Time;Type;Value;Currency;Category;Balance Account;Comment;Tags\n" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата;Время;Тип;Значение;Валюта;Категория;Счет;Комментарий;Теги\n"
+          }
+        }
+      }
+    },
+    "default" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "базовый"
+          }
+        }
+      }
+    },
+    "Default color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет по умолчанию"
+          }
+        }
+      }
+    },
+    "Default filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дефолтные фильтры"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Delete all data?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все данные?"
+          }
+        }
+      }
+    },
+    "Delete all filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все фильтры"
+          }
+        }
+      }
+    },
+    "Delete all stored data" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все сохраненные данные"
+          }
+        }
+      }
+    },
+    "Delete all transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все транзакции"
+          }
+        }
+      }
+    },
+    "Delete all transactions?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все транзакции?"
+          }
+        }
+      }
+    },
+    "Delete balance account?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить счет?"
+          }
+        }
+      }
+    },
+    "Delete budget?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить бюджет?"
+          }
+        }
+      }
+    },
+    "Delete category only" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить только категорию"
+          }
+        }
+      }
+    },
+    "Delete category?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить категорию?"
+          }
+        }
+      }
+    },
+    "Delete only balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить только счет"
+          }
+        }
+      }
+    },
+    "Delete tag only" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить только тег"
+          }
+        }
+      }
+    },
+    "Delete tag?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить тег?"
+          }
+        }
+      }
+    },
+    "Delete transaction?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакцию?"
+          }
+        }
+      }
+    },
+    "Delete transactions in the group" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции в группе"
+          }
+        }
+      }
+    },
+    "Delete transactions?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить транзакции?"
+          }
+        }
+      }
+    },
+    "Delete transfer?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить перевод?"
+          }
+        }
+      }
+    },
+    "Delete with transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить вместе с транзакциями"
+          }
+        }
+      }
+    },
+    "Deletion failed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось удалить"
+          }
+        }
+      }
+    },
+    "Developer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разработчик"
+          }
+        }
+      }
+    },
+    "Developer tool" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструмент разработчика"
+          }
+        }
+      }
+    },
+    "Different currency" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разные валюты"
+          }
+        }
+      }
+    },
+    "Do not hide the window after adding a transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не прятать окно после добавления транзакции"
+          }
+        }
+      }
+    },
+    "Don't forget to add your spendings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не забудьте добавить свои расходы"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
+    "DR" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ПД"
+          }
+        }
+      }
+    },
+    "Drag and drop to reorder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетащите чтобы переставить"
+          }
+        }
+      }
+    },
+    "Drag to reorder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удерживайте чтобы упорядочить"
+          }
+        }
+      }
+    },
+    "Duplicate" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дублировать"
+          }
+        }
+      }
+    },
+    "Easily add your expenses and income" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С легкостью добавляйте ваши расходы и доходы"
+          }
+        }
+      }
+    },
+    "Education" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Образование"
+          }
+        }
+      }
+    },
+    "Email" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
+    "Email is copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email скопирован"
+          }
+        }
+      }
+    },
+    "Empty" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пустой"
+          }
+        }
+      }
+    },
+    "End date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Конечная дата"
+          }
+        }
+      }
+    },
+    "Enter comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите комментарий"
+          }
+        }
+      }
+    },
+    "Enter name here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите имя"
+          }
+        }
+      }
+    },
+    "Enter number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите количество"
+          }
+        }
+      }
+    },
+    "Entertainments" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Развлечения"
+          }
+        }
+      }
+    },
+    "Epty" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пустой"
+          }
+        }
+      }
+    },
+    "Err" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошбк"
+          }
+        }
+      }
+    },
+    "Error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка"
+          }
+        }
+      }
+    },
+    "Excel (csv) file creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания Excel (csv) файла"
+          }
+        }
+      }
+    },
+    "Export all data as JSON file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать данные в виде JSON файла"
+          }
+        }
+      }
+    },
+    "Export transactions as Excel file (csv) for date range" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать транзакции в виде Excel файла (csv) за промежуток дат"
+          }
+        }
+      }
+    },
+    "Family" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Семья"
+          }
+        }
+      }
+    },
+    "File decoding error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка декодирования файла"
+          }
+        }
+      }
+    },
+    "Filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры"
+          }
+        }
+      }
+    },
+    "Final alert!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последнее предупреждение!"
+          }
+        }
+      }
+    },
+    "Finance Tracker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Финансовый Трекер"
+          }
+        }
+      }
+    },
+    "Finances are important" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Финансы это важно"
+          }
+        }
+      }
+    },
+    "First step" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Первый шаг"
+          }
+        }
+      }
+    },
+    "For a day" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День"
+          }
+        }
+      }
+    },
+    "For a month" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Месяц"
+          }
+        }
+      }
+    },
+    "For a week" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя"
+          }
+        }
+      }
+    },
+    "For a year" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Год"
+          }
+        }
+      }
+    },
+    "For all categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для всех категорий"
+          }
+        }
+      }
+    },
+    "Forward" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вперед"
+          }
+        }
+      }
+    },
+    "From" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из"
+          }
+        }
+      }
+    },
+    "From Balance Accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из счетов"
+          }
+        }
+      }
+    },
+    "Get analytics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аналитика"
+          }
+        }
+      }
+    },
+    "Gifts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подарки"
+          }
+        }
+      }
+    },
+    "Graphs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Графики"
+          }
+        }
+      }
+    },
+    "Groceries" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продукты"
+          }
+        }
+      }
+    },
+    "Health" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здоровье"
+          }
+        }
+      }
+    },
+    "Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дом"
+          }
+        }
+      }
+    },
+    "Icon" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Иконка"
+          }
+        }
+      }
+    },
+    "Icons made by Freepik from" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons made by Freepik from"
+          }
+        }
+      }
+    },
+    "If the statistics take a long time to load, you can choose to display a light version. The light version of the statistics is faster, but it does not show the current account balance and also shows a smaller interval on the bar chart" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если статистика долго загружается, вы можете выбрать отображение легкой версии. Легкая версия статистики быстрее, однако она не отображает текущий баланс счета, а также показывает меньший промежуток на столбчатом графике"
+          }
+        }
+      }
+    },
+    "If you are adding multiple transactions at a time, enable this option so that the Add window is not hidden after pressing the Add button" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы добавляете несколько транзакций за раз, включите данную опцию, чтобы окно добавления не пряталось после нажатия кнопки Добавить"
+          }
+        }
+      }
+    },
+    "If you want to open it, please reorder the tabs in Settings. To do so, press \"%@ Reorder tabs\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы хотите открыть ее, пожалуйста, переставьте вкладки в настройках. Чтобы это сделать, нажмите кнопку \"%@ Упорядочить вкладки\""
+          }
+        }
+      }
+    },
+    "Import" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать"
+          }
+        }
+      }
+    },
+    "Import data from JSON file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные из JSON файла"
+          }
+        }
+      }
+    },
+    "Import data?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортировать данные?"
+          }
+        }
+      }
+    },
+    "Imported data will be cleaned" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные данные будут очищены"
+          }
+        }
+      }
+    },
+    "Imported objects" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импортированные объекты"
+          }
+        }
+      }
+    },
+    "In development" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В разработке"
+          }
+        }
+      }
+    },
+    "Income" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доход"
+          }
+        }
+      }
+    },
+    "Initial balance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стартовый баланс"
+          }
+        }
+      }
+    },
+    "Insert" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вставить"
+          }
+        }
+      }
+    },
+    "Interest" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проценты"
+          }
+        }
+      }
+    },
+    "It is good opportunity to try!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хорошая возможность чтобы попробовать!"
+          }
+        }
+      }
+    },
+    "JSON creation error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания JSON файла"
+          }
+        }
+      }
+    },
+    "Large blue circle button with plus" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Большая синяя круглая кнопка с плюсом"
+          }
+        }
+      }
+    },
+    "Light mode" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Светлая мема"
+          }
+        }
+      }
+    },
+    "Light version" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Легкая весия"
+          }
+        }
+      }
+    },
+    "List" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Список"
+          }
+        }
+      }
+    },
+    "Loading..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка…"
+          }
+        }
+      }
+    },
+    "Make transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать перевод"
+          }
+        }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Больше"
+          }
+        }
+      }
+    },
+    "Move and delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить и удалить"
+          }
+        }
+      }
+    },
+    "Move transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить транзакции"
+          }
+        }
+      }
+    },
+    "New balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый счет"
+          }
+        }
+      }
+    },
+    "New budget" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый бюджет"
+          }
+        }
+      }
+    },
+    "New category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая категория"
+          }
+        }
+      }
+    },
+    "New transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый перевод"
+          }
+        }
+      }
+    },
+    "Next" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дальше"
+          }
+        }
+      }
+    },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
+    "No %@ for this date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет транзакций типа %@ на указанную дату"
+          }
+        }
+      }
+    },
+    "No balance accounts imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных счетов"
+          }
+        }
+      }
+    },
+    "No budgets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет бюджетов"
+          }
+        }
+      }
+    },
+    "No budgets imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных бюджетов"
+          }
+        }
+      }
+    },
+    "No categories imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных категорий"
+          }
+        }
+      }
+    },
+    "No currencies with \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет валют, содержащих \"%@\""
+          }
+        }
+      }
+    },
+    "No filters added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры не добавлены"
+          }
+        }
+      }
+    },
+    "No results for \"%@\"" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет результатов для \"%@\""
+          }
+        }
+      }
+    },
+    "No tags imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных тегов"
+          }
+        }
+      }
+    },
+    "No transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет транзакций"
+          }
+        }
+      }
+    },
+    "No transactions found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции не найдены"
+          }
+        }
+      }
+    },
+    "No transactions imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных транзакций"
+          }
+        }
+      }
+    },
+    "No transfers" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет переводов"
+          }
+        }
+      }
+    },
+    "No transfers imported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет импортированных переводов"
+          }
+        }
+      }
+    },
+    "No, cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, отменить"
+          }
+        }
+      }
+    },
+    "No, stay here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, остаться здесь"
+          }
+        }
+      }
+    },
+    "Nothing here yet" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь пока пусто"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления"
+          }
+        }
+      }
+    },
+    "Of type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Типа"
+          }
+        }
+      }
+    },
+    "Ok" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ok"
+          }
+        }
+      }
+    },
+    "One day date picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер конкретного дня"
+          }
+        }
+      }
+    },
+    "One day picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер конкретного дня"
+          }
+        }
+      }
+    },
+    "Open" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть"
+          }
+        }
+      }
+    },
+    "Open source" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открытый код"
+          }
+        }
+      }
+    },
+    "Other" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другое"
+          }
+        }
+      }
+    },
+    "Per day" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По дням"
+          }
+        }
+      }
+    },
+    "Per month" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По месяцам"
+          }
+        }
+      }
+    },
+    "Per week" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По неделям"
+          }
+        }
+      }
+    },
+    "Per year" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По годам"
+          }
+        }
+      }
+    },
+    "Pie chart" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диаграмма"
+          }
+        }
+      }
+    },
+    "Pie chart picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер круговой диаграммы"
+          }
+        }
+      }
+    },
+    "Please select any setting in the left-hand menu" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, выберите любую секцию настроек в меню слева"
+          }
+        }
+      }
+    },
+    "Please try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
+    },
+    "Please wait" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, ожидайте"
+          }
+        }
+      }
+    },
+    "Please, try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
+    },
+    "Popular currencies" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Популярные валюты"
+          }
+        }
+      }
+    },
+    "Preview" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Превью"
+          }
+        }
+      }
+    },
+    "Profit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прибыль"
+          }
+        }
+      }
+    },
+    "Random color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случайный цвет"
+          }
+        }
+      }
+    },
+    "Random color by default" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случайный цвет по умолчанию"
+          }
+        }
+      }
+    },
+    "Refresh?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить?"
+          }
+        }
+      }
+    },
+    "Refreshed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено"
+          }
+        }
+      }
+    },
+    "Reminder body" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текст напоминания"
+          }
+        }
+      }
+    },
+    "Reminder time" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время напоминания"
+          }
+        }
+      }
+    },
+    "Reminder title" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок напоминания"
+          }
+        }
+      }
+    },
+    "Remove all filters?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать все фильтры?"
+          }
+        }
+      }
+    },
+    "Reorder" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переставить"
+          }
+        }
+      }
+    },
+    "Reorder tabs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упорядочить вкладки"
+          }
+        }
+      }
+    },
+    "Reset filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить фильтры"
+          }
+        }
+      }
+    },
+    "Salary" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарплата"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Save filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры"
+          }
+        }
+      }
+    },
+    "Save filters?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить фильтры?"
+          }
+        }
+      }
+    },
+    "Saving empty filters deletes previously saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение пустых фильтров удаляет сохраненные в прошлом фильтры "
+          }
+        }
+      }
+    },
+    "Scroll to get more info" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пролистайте для большей информации"
+          }
+        }
+      }
+    },
+    "Search" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск"
+          }
+        }
+      }
+    },
+    "Search or add tag" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Искать или добавить тег"
+          }
+        }
+      }
+    },
+    "Select" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать"
+          }
+        }
+      }
+    },
+    "Select balance account" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите счет"
+          }
+        }
+      }
+    },
+    "Select category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите категорию"
+          }
+        }
+      }
+    },
+    "Select color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите цвет"
+          }
+        }
+      }
+    },
+    "Select currency" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать валюту"
+          }
+        }
+      }
+    },
+    "Select date for bars" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать промежуток для столбцов"
+          }
+        }
+      }
+    },
+    "Select date type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип даты"
+          }
+        }
+      }
+    },
+    "Select displayed transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать отображаемые транзакции"
+          }
+        }
+      }
+    },
+    "Select transaction type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать тип транзакций"
+          }
+        }
+      }
+    },
+    "Selected (%@) and Default (%@) balance accounts have different currency. Moved transactions will change currency to %@. Continue?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Selected (%1$@) and Default (%2$@) balance accounts have different currency. Moved transactions will change currency to %3$@. Continue?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранный (%1$@) и Дефолтный (%2$@) счета имеют разные валюты. Валюта будет изменена для перемещенных транзакций на %3$@. Продолжить?"
+          }
+        }
+      }
+    },
+    "Selected action is not data update" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранное действие не является обновлением данных"
+          }
+        }
+      }
+    },
+    "Send mail" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить письмо"
+          }
+        }
+      }
+    },
+    "Set as default" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Установить как базовый"
+          }
+        }
+      }
+    },
+    "Set the default balance account first" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала установите базовый счет"
+          }
+        }
+      }
+    },
+    "Setting is not selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Секция настроек не выбрана"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "Show less" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меньше"
+          }
+        }
+      }
+    },
+    "Show more filter" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Больше фильтров"
+          }
+        }
+      }
+    },
+    "Show transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать транзакции"
+          }
+        }
+      }
+    },
+    "Show?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать?"
+          }
+        }
+      }
+    },
+    "Simple" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Просто"
+          }
+        }
+      }
+    },
+    "Since you have removed the List tab from the bottom menu, the Add Transaction button is always displayed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поскольку вы убрали вкладку Список из нижнего меню, кнопка Добавить показывается всегда"
+          }
+        }
+      }
+    },
+    "Some error occurred" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка"
+          }
+        }
+      }
+    },
+    "Some existing categories" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые существующие категории"
+          }
+        }
+      }
+    },
+    "Some information cannot be previewed until the imported data is saved to the device. After saving, all information will be available for viewing and editing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторую информацию невозможно отобразить в превью до того, как ипортированные данные будут сохранены на устройство. После сохранения вся информация будет доступна для просмотра и редактирования"
+          }
+        }
+      }
+    },
+    "Some save error happened" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла некая ошибка сохранения"
+          }
+        }
+      }
+    },
+    "Some save error occured" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась ошибка при сохранении"
+          }
+        }
+      }
+    },
+    "Something went wrong during saving the filters. Please try again later" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так в процессе сохранения фильтров. Попробуйте еще раз позже"
+          }
+        }
+      }
+    },
+    "Sorry, some error occured. This page doesn't exist" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, произошла неизвестная ошибка. Данная страница не существует"
+          }
+        }
+      }
+    },
+    "Sorry, this tab is only available from the bottom menu" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, но данная вкладка доступна только из нижнего меню"
+          }
+        }
+      }
+    },
+    "Spending" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расход"
+          }
+        }
+      }
+    },
+    "Spendings" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расходы"
+          }
+        }
+      }
+    },
+    "Spent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потрачено"
+          }
+        }
+      }
+    },
+    "Start date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начальная дата"
+          }
+        }
+      }
+    },
+    "Statistics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистика"
+          }
+        }
+      }
+    },
+    "Stored data" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраненные данные"
+          }
+        }
+      }
+    },
+    "Sum of transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма транзакций"
+          }
+        }
+      }
+    },
+    "System mode" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системная тема"
+          }
+        }
+      }
+    },
+    "Tabs placements" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разположение вкладок"
+          }
+        }
+      }
+    },
+    "Tag name" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя тега"
+          }
+        }
+      }
+    },
+    "Tag total" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сумма по тегу"
+          }
+        }
+      }
+    },
+    "Tags" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теги"
+          }
+        }
+      }
+    },
+    "Tags and comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Теги и комментарий"
+          }
+        }
+      }
+    },
+    "The Add Transaction button is currently displayed on every tab, so you can add a transaction at any time" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сейчас кнопка добавления транзакции показывается на всех вкладках, так что вы можете добавить транзакцию в любое время"
+          }
+        }
+      }
+    },
+    "The Add Transaction button is only displayed when you tap the \"List\" tab." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка добавления транзакции показывается только когда вы находитесь на вкладке \"Список\""
+          }
+        }
+      }
+    },
+    "The next time you start the application, the filters will be loaded from memory" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При следующем запуске приложения фильтры будут загружены из памяти"
+          }
+        }
+      }
+    },
+    "There are no saved transactions for this date" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет сохраненных транзакций на выбранную дату"
+          }
+        }
+      }
+    },
+    "There is not a matching transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подходящих транзакций"
+          }
+        }
+      }
+    },
+    "This action is irretable" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное действий безвозвратно"
+          }
+        }
+      }
+    },
+    "This action is irretable. There are two ways to delete:\n\n - Delete category only: all transactions binded to deleted category will be moved to another one of your choice. Before deletion app will ask you where transactions should be moved to\n\n - Delete with transactions: category and binded to it transactions will be deleted all together" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное действий безвозвратно. Есть несколько вариантов удаления:\n\n - Удалить только категорию: все транзакции, привязанные к данной категории, будут перенесены в другую на ваш выбор. Перед удалением приложение спросит в какую категорию переместить транзакции\n\n - Удалить вместе с транзакциями: категория и все привязанные к ней транзакции будут удалены"
+          }
+        }
+      }
+    },
+    "This action is irretable. There are two ways to delete:\n\n - Delete only balance account: all transactions binded to deleted balance account will be moved to default one\n\n - Delete with transactions: balance account and binded to this account transactions will be deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное действий безвозвратно. Есть несколько вариантов удаления:\n\n - Удалить только счет: все привязанные к счету транзакции будут перемещены в дефолтный счет\n\n - Удалить вместе с транзакциями: счет и все привязанные к нему транзакции будут удалены"
+          }
+        }
+      }
+    },
+    "This action is irretable. There are two ways to delete:\n\n - Delete tag only: only selected tag will be deleted and removed from transactions \n\n - Delete with transactions: tag and transactions marked with this tag will be deleted all together" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное действий безвозвратно. Есть несколько вариантов удаления:\n\n - Удалить только тег: тег будет удален и убран из транзакций\n\n - Удалить вместе с транзакциями: тег и все привязанные к нему транзакции будут удалены"
+          }
+        }
+      }
+    },
+    "This screen refreshes by itself automatically, so you don't need to do it manually. But if you don't see needed changes, press button to refresh" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данный экран обновляется автоматически, так что нет необходимости делать это вручную. Но, если вы не видите нужных изменений, нажмите кнопку ниже чтобы обновить"
+          }
+        }
+      }
+    },
+    "This will not affect saved filters" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это не повлияет на сохраненные фильтры"
+          }
+        }
+      }
+    },
+    "This window is used to test the App performance during high loading. It creates bench of transactions (default it is 5000) for a selected Balance Account and Category. All transactions are created for the current date, so __do not push the button \"Insert\"__ if you don't want to dramatically slow down the App" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное окно используется для теста производительности приложения в процессе высокой нагрузки. Оно создает огромное количество транзакций (базово 5000) для выбранных Счета и Категории. Все транзакции создаются на текущую дату, так что __не нажимайте кнопку \"Вставить\"__ если вы не хотите сильно замедлить приложение"
+          }
+        }
+      }
+    },
+    "Time, Title and Body" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время, Заголовок и Текст"
+          }
+        }
+      }
+    },
+    "To" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В"
+          }
+        }
+      }
+    },
+    "To Balance Accounts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На счета"
+          }
+        }
+      }
+    },
+    "Total" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Итого"
+          }
+        }
+      }
+    },
+    "Total balance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Баланс"
+          }
+        }
+      }
+    },
+    "Track your finances with customizable graphs" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отслеживайте ваши финансы с настраиваемыми графиками"
+          }
+        }
+      }
+    },
+    "Transaction" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакция"
+          }
+        }
+      }
+    },
+    "Transaction added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакция добавлена"
+          }
+        }
+      }
+    },
+    "Transaction type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип транзакции"
+          }
+        }
+      }
+    },
+    "Transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции"
+          }
+        }
+      }
+    },
+    "Transactions are deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транзакции удалены"
+          }
+        }
+      }
+    },
+    "Transfer" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевод"
+          }
+        }
+      }
+    },
+    "Transfers" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переводы"
+          }
+        }
+      }
+    },
+    "Transport" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Транспорт"
+          }
+        }
+      }
+    },
+    "Try to change filters to get more transactions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте поменять фильтры, чтобы получить больше транзакций"
+          }
+        }
+      }
+    },
+    "Type" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип"
+          }
+        }
+      }
+    },
+    "Type picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер типов"
+          }
+        }
+      }
+    },
+    "Unable to delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Невозможно удалить"
+          }
+        }
+      }
+    },
+    "Unable to delete default balance account. Set an another balance account as default if you need to delete the selected one" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Невозможно удалить базовый счет. Установите другой счет в качестве базового, если вам необходимо удалить выбранный счет"
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестно"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
+          }
+        }
+      }
+    },
+    "Unknown error occured, please try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Случилась неизвестная ошибка, пожалуйста, попробуйте еще раз"
+          }
+        }
+      }
+    },
+    "Update" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить"
+          }
+        }
+      }
+    },
+    "Update category" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить категорию"
+          }
+        }
+      }
+    },
+    "Updating text field" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновления текста"
+          }
+        }
+      }
+    },
+    "USD" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RUB"
+          }
+        }
+      }
+    },
+    "Value cannot be infinite or not a number" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть бесконечным или не числом"
+          }
+        }
+      }
+    },
+    "Value cannot be negative" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть отрицательным"
+          }
+        }
+      }
+    },
+    "Value cannot be zero or empy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть нулем или пустым"
+          }
+        }
+      }
+    },
+    "Value cannot be zero, negative or empy" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение не может быть нулевым, отрицательным или пустым"
+          }
+        }
+      }
+    },
+    "Value of each transaction will be equal to the number entered" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение каждой транзакции будет равно введенному количеству"
+          }
+        }
+      }
+    },
+    "Week" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неделя"
+          }
+        }
+      }
+    },
+    "Week day picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер дня недели"
+          }
+        }
+      }
+    },
+    "Week picker" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пикер недели"
+          }
+        }
+      }
+    },
+    "Welcome" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать"
+          }
+        }
+      }
+    },
+    "Why I don't see some information" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почему я не вижу некоторую информацию"
+          }
+        }
+      }
+    },
+    "www.flaticon.com" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "www.flaticon.com"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
+          }
+        }
+      }
+    },
+    "Yes, cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, отменить"
+          }
+        }
+      }
+    },
+    "Yes, delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, удалить"
+          }
+        }
+      }
+    },
+    "Yes, delete anyway" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, удалить в любом случае"
+          }
+        }
+      }
+    },
+    "Yes, refresh" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, обновить"
+          }
+        }
+      }
+    },
+    "You do not have %@ with tags" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас нет транзакций типа %@ с тегами"
+          }
+        }
+      }
+    },
+    "You do not have any saved tag." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас нет сохраненных тегов."
+          }
+        }
+      }
+    },
+    "You don't have any saved budgets yet. Good opportunity to give it a try!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас пока нет сохраненных бюджетов. Хорошая возможность попробовать!"
+          }
+        }
+      }
+    },
+    "You have prevented the application from sending notifications. %@ to go to Settings and allow notifications to be sent." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы запретили приложению отправлять уведомления. %@ чтобы перейти в Настройки и разрешить отправку уведомлений"
+          }
+        }
+      }
+    },
+    "Сafes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кафе"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

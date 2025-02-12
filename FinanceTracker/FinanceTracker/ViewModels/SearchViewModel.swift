@@ -1,0 +1,814 @@
+//
+//  SearchViewModel.swift
+//  FinanceTracker
+//
+//  Created by Лев Куликов on 27.06.2024.
+//
+
+import Foundation
+@preconcurrency import SwiftData
+import SwiftUI
+
+protocol SearchViewModelDelegate: AnyObject, TransactionManipulationDelegate {
+    func hideTabBar(_ hide: Bool)
+}
+
+enum DateFilterType: LocalizedStringResource, CaseIterable, Identifiable, Codable {
+    case day = "For a day"
+    case week = "For a week"
+    case month = "For a month"
+    case year = "For a year"
+    case customDateRange = "Date range"
+    
+    var id: Self {
+        return self
+    }
+}
+
+struct TransactionGroupedData: Identifiable {
+    let id: String = UUID().uuidString
+    let date: Date
+    let transactions: [Transaction]
+}
+
+struct SearchConfiguration: Identifiable, Codable {
+    struct StorageConvertedConfiguration: Codable {
+        let id: UUID
+        let filterTransactionType: TransactionFilterTypes
+        let filterBalanceAccountId: String?
+        let filterCategoryId: String?
+        let filterTagsIds: [String]
+        let dateFilterType: DateFilterType
+        let filterDate: Date
+        let filterDateStart: Date
+        let filterDateEnd: Date
+        
+        init(configuration: SearchConfiguration) {
+            self.id = configuration.id
+            self.filterTransactionType = configuration.filterTransactionType
+            self.filterBalanceAccountId = configuration.filterBalanceAccount?.id
+            self.filterCategoryId = configuration.filterCategory?.id
+            self.filterTagsIds = configuration.filterTags.map(\.id)
+            self.dateFilterType = configuration.dateFilterType
+            self.filterDate = configuration.filterDate
+            self.filterDateStart = configuration.filterDateStart
+            self.filterDateEnd = configuration.filterDateEnd
+        }
+        
+        func getConfiguration(balanceAccounts: [BalanceAccount], categories: [Category], tags: [Tag]) -> SearchConfiguration? {
+            var filterBalanceAccount: BalanceAccount? = nil
+            if let balanceAccountId = filterBalanceAccountId {
+                guard let balanceAccount = balanceAccounts.first(where: { $0.id == balanceAccountId }) else { return nil }
+                filterBalanceAccount = balanceAccount
+            }
+            
+            var filterCategory: Category? = nil
+            if let categoryId = filterCategoryId {
+                guard let category = categories.first(where: { $0.id == categoryId }) else { return nil }
+                filterCategory = category
+            }
+            
+            var filterTags: [Tag] = []
+            if !filterTagsIds.isEmpty {
+                for tagId in filterTagsIds {
+                    guard let tag = tags.first(where: { $0.id == tagId }) else { continue }
+                    filterTags.append(tag)
+                }
+            }
+            
+            let configuration = SearchConfiguration(
+                id: id,
+                filterTransactionType: filterTransactionType,
+                filterBalanceAccount: filterBalanceAccount,
+                filterCategory: filterCategory,
+                filterTags: filterTags,
+                dateFilterType: dateFilterType,
+                filterDate: filterDate,
+                filterDateStart: filterDateStart,
+                filterDateEnd: filterDateEnd
+            )
+            
+            return configuration
+        }
+    }
+    
+    let id: UUID
+    var filterTransactionType: TransactionFilterTypes = .both
+    var filterBalanceAccount: BalanceAccount?
+    var filterCategory: Category?
+    var filterTags: [Tag] = []
+    var dateFilterType: DateFilterType = .month
+    var filterDate: Date = .now
+    var filterDateStart: Date = .now
+    var filterDateEnd: Date = .now
+    
+    init(id: UUID = UUID(), filterTransactionType: TransactionFilterTypes = .both, filterBalanceAccount: BalanceAccount? = nil, filterCategory: Category? = nil, filterTags: [Tag] = [], dateFilterType: DateFilterType = .month, filterDate: Date = .now, filterDateStart: Date = .now, filterDateEnd: Date = .now) {
+        self.id = id
+        self.filterTransactionType = filterTransactionType
+        self.filterBalanceAccount = filterBalanceAccount
+        self.filterCategory = filterCategory
+        self.filterTags = filterTags
+        self.dateFilterType = dateFilterType
+        self.filterDate = filterDate
+        self.filterDateStart = filterDateStart
+        self.filterDateEnd = filterDateEnd
+    }
+}
+
+final class SearchViewModel: ObservableObject, @unchecked Sendable {
+    //MARK: - Properties
+    weak var delegate: (any SearchViewModelDelegate)?
+    
+    //MARK: Private props
+    private let dataManager: any DataAndSettingsManagerProtocol
+    private let calendar = Calendar.current
+    private var searchDispatchWorkItem: DispatchWorkItem?
+    private var allTransactions: [Transaction] = []
+    /// Not grouped, only filtered, used for search filter
+    private var filteredTransactions: [Transaction] = []
+    /// Not grouped, only filtered by search string
+    private var searchedTransactions: [Transaction] = []
+    private var allCategories: [Category] = []
+    /// Flag that determines if data filetering is allowed at this moment or not
+    private var isCalculationAllowed: Bool = true
+    /// For transactions predicate
+    private var dateFilterRange: ClosedRange<Date> {
+        switch dateFilterType {
+        case .day:
+            let startDate = filterDate.startOfDay()
+            let endDate = filterDate.endOfDay() ?? filterDate
+            return startDate...endDate
+        case .week:
+            let startDate = filterDate.startOfWeek() ?? filterDate
+            let endDate = filterDate.endOfWeek() ?? filterDate
+            return startDate...endDate
+        case .month:
+            let startDate = filterDate.startOfMonth() ?? filterDate
+            let endDate = filterDate.endOfMonth() ?? filterDate
+            return startDate...endDate
+        case .year:
+            let startDate = filterDate.startOfYear() ?? filterDate
+            let endDate = filterDate.endOfYear() ?? filterDate
+            return startDate...endDate
+        case .customDateRange:
+            let startDate = filterDateStart.startOfDay()
+            let endDate = filterDateEnd.endOfDay() ?? filterDateEnd
+            return startDate...endDate
+        }
+    }
+    
+    //MARK: UI props
+    // To filter
+    @MainActor @Published var searchText: String = "" {
+        didSet {
+            searchDispatchWorkItem?.cancel()
+            searchDispatchWorkItem = DispatchWorkItem { [weak self] in
+                self?.filterTransactionsWithSearch()
+            }
+            if let searchDispatchWorkItem {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: searchDispatchWorkItem)
+            }
+        }
+    }
+    @Published var filterTransactionType: TransactionFilterTypes = .both {
+        didSet {
+            guard filterTransactionType != oldValue else { return }
+            if let filterCategoryType = filterCategory?.type, let selectedType = filterTransactionType.binaryTransactionType {
+                if filterCategoryType != selectedType {
+                    filterCategory = nil
+                    return
+                }
+            }
+            filterAndSetTransactions()
+        }
+    }
+    @Published var filterBalanceAccount: BalanceAccount? = nil {
+        didSet {
+            guard filterBalanceAccount != oldValue else { return }
+            filterAndSetTransactions()
+        }
+    }
+    @Published var filterCategory: Category? = nil {
+        didSet {
+            guard filterCategory != oldValue else { return }
+            filterAndSetTransactions()
+        }
+    }
+    @Published var filterTags: [Tag] = [] {
+        didSet {
+            guard filterTags != oldValue else { return }
+            filterAndSetTransactions()
+        }
+    }
+    @Published var dateFilterType: DateFilterType = .month {
+        didSet {
+            guard dateFilterType != oldValue else { return }
+            Task {
+                await fetchTransactions(showFetching: true)
+                filterAndSetTransactions()
+            }
+        }
+    }
+    @Published var filterDate: Date = .now {
+        didSet {
+            guard filterDate != oldValue else { return }
+            Task {
+                await fetchTransactions(showFetching: true)
+                filterAndSetTransactions()
+            }
+        }
+    }
+    @Published var filterDateStart: Date = .now {
+        didSet {
+            guard filterDateStart != oldValue else { return }
+            Task {
+                await fetchTransactions(showFetching: true)
+                filterAndSetTransactions()
+            }
+        }
+    }
+    @Published var filterDateEnd: Date = .now {
+        didSet {
+            guard filterDateEnd != oldValue else { return }
+            Task {
+                await fetchTransactions(showFetching: true)
+                filterAndSetTransactions()
+            }
+        }
+    }
+    
+    //Filter data arrays
+    @Published private(set) var allBalanceAccounts: [BalanceAccount] = []
+    @Published private(set) var allTags: [Tag] = []
+    var filterCategories: [Category] {
+        guard filterTransactionType != .both else { return allCategories }
+        
+        return allCategories.filter { category in
+            switch filterTransactionType {
+            case .both:
+                return true
+            case .spending:
+                return category.type == .spending
+            case .income:
+                return category.type == .income
+            }
+        }
+    }
+    
+    //For UI
+    @Published private(set) var isFiltering: Bool = false
+    @Published private(set) var isFetching: Bool = false
+    @Published private(set) var filteredTransactionGroups: [TransactionGroupedData] = []
+    @MainActor @Published private(set) var filteredTransactionsCurrencies: [String] = []
+    
+    //MARK: - Initializer
+    init(dataManager: some DataAndSettingsManagerProtocol) {
+        self.dataManager = dataManager
+        fetchAllData(competionHandler:  { [weak self] in
+            self?.filterAndSetTransactions()
+        })
+    }
+    
+    init(dataManager: some DataAndSettingsManagerProtocol, configuration: SearchConfiguration) {
+        self.dataManager = dataManager
+        self._filterTransactionType = Published(wrappedValue: configuration.filterTransactionType)
+        self._filterBalanceAccount = Published(wrappedValue: configuration.filterBalanceAccount)
+        self._filterCategory = Published(wrappedValue: configuration.filterCategory)
+        self._filterTags = Published(wrappedValue: configuration.filterTags)
+        self._dateFilterType = Published(wrappedValue: configuration.dateFilterType)
+        self._filterDate = Published(wrappedValue: configuration.filterDate)
+        self._filterDateStart = Published(wrappedValue: configuration.filterDateStart)
+        self._filterDateEnd = Published(wrappedValue: configuration.filterDateEnd)
+        fetchAllData(competionHandler:  { [weak self] in
+            self?.filterAndSetTransactions()
+        })
+    }
+    
+    //MARK: - Methods
+    func addRemoveTag(_ tag: Tag) {
+        if filterTags.contains(tag) {
+            withAnimation {
+                filterTags.removeAll {
+                    $0 == tag
+                }
+            }
+        } else {
+            withAnimation {
+                filterTags.append(tag)
+            }
+        }
+    }
+    
+    func hideTabBar(_ hide: Bool) {
+        delegate?.hideTabBar(hide)
+    }
+    
+    /// Resets only additional filters, except date type and date range
+    @MainActor
+    func resetFilters() {
+        isCalculationAllowed = false
+        
+        filterTransactionType = .both
+        filterBalanceAccount = nil
+        filterCategory = nil
+        filterTags = []
+        
+        isCalculationAllowed = true
+        filterAndSetTransactions()
+    }
+    
+    @MainActor
+    func getTransactionView(for transaction: Transaction, namespace: Namespace.ID) -> some View {
+        return FTFactory.shared.createAddingSpendIcomeView(dataManager: dataManager, threadToUse: .global, transactionType: transaction.type ?? TransactionsType(rawValue: transaction.typeRawValue)!, balanceAccount: transaction.balanceAccount ?? .emptyBalanceAccount, forAction: .constant(.update(transaction)), namespace: namespace, delegate: self)
+    }
+    
+    @MainActor
+    func getProvidedStatisticsView(for currency: String, fromSearch: Bool) -> some View {
+        let transactions: [Transaction]
+        if fromSearch {
+            transactions = filteredTransactionsCurrencies.count == 1 ? searchedTransactions : searchedTransactions.filter { $0.balanceAccount?.currency == currency }
+        } else {
+            transactions = filteredTransactionsCurrencies.count == 1 ? filteredTransactions : filteredTransactions.filter { $0.balanceAccount?.currency == currency }
+        }
+        
+        return FTFactory.shared.createProvidedStatisticsView(transactions: transactions, currency: currency)
+    }
+    
+    func refetchData(errorHandler: (@MainActor @Sendable () -> Void)? = nil, completionHandler: (@MainActor @Sendable () -> Void)? = nil) {
+        fetchAllData { _ in
+            Task { @MainActor in
+                errorHandler?()
+            }
+        } competionHandler: { [weak self] in
+            self?.filterAndSetTransactions()
+            Task { @MainActor in
+                completionHandler?()
+            }
+        }
+
+    }
+    
+    func deleteTransaction(_ transaction: Transaction) {
+        Task {
+            do {
+                allTransactions.removeAll(where: { $0.id == transaction.id })
+                try await dataManager.deleteTransactionFromBackground(transaction)
+                delegate?.didDeleteTransaction(transaction, from: .searchView)
+            } catch {
+                print("SearchViewModel: Error deleting transaction: \(error)")
+                allTransactions.append(transaction)
+            }
+            filterAndSetTransactions()
+        }
+    }
+    
+    //MARK: Private props
+    private func filterAndSetTransactions() {
+        guard isCalculationAllowed else { return }
+        
+        Task { @MainActor in
+            isFiltering = true
+        }
+        
+        Task.detached(priority: .high) { [weak self, allTransactions] in
+            guard let self else { return }
+            
+            let filteredData = allTransactions
+                //Filter by transaction type
+                .filter { trans in
+                    switch self.filterTransactionType {
+                    case .both:
+                        return true
+                    case .spending:
+                        return trans.type == .spending
+                    case .income:
+                        return trans.type == .income
+                    }
+                }
+                //Filter by balance account, category and tags
+                //Uses id to compare because of different context used for fetching
+                .filter { trans in
+                    var sameBA = true
+                    if let filterBA = self.filterBalanceAccount {
+                        sameBA = trans.balanceAccount?.id == filterBA.id
+                    }
+                    
+                    var sameCategory = true
+                    if let filterCat = self.filterCategory {
+                        sameCategory = trans.category?.id == filterCat.id
+                    }
+                    
+                    var containsNeededTag = true
+                    if !self.filterTags.isEmpty {
+                        let sortedFilterTags = Set(self.filterTags.map(\.id))
+                        let sortedTransTags = Set(trans.tags.map(\.id))
+                        containsNeededTag = sortedFilterTags.isSubset(of: sortedTransTags)
+                    }
+                    
+                    return (sameBA && sameCategory && containsNeededTag)
+                }
+            
+            self.filteredTransactions = filteredData
+            
+            var searchData = filteredData
+            let searchTextIsEmpty = await MainActor.run { return self.searchText.isEmpty }
+            if !searchTextIsEmpty {
+                searchData = await self.getFilteredTransactionWithSearchText(arrayToFilter: searchData)
+            }
+            Task { [searchData] in
+                await self.setFilteredTransactionsCurrencies(for: searchData)
+            }
+            
+            let sortedGroupedData = self.groupAndSortTransactionArray(searchData)
+            
+            await MainActor.run {
+                self.isFiltering = false
+                withAnimation {
+                    self.filteredTransactionGroups = sortedGroupedData
+                }
+            }
+        }
+    }
+    
+    private func filterTransactionsWithSearch() {
+        Task { @MainActor in
+            isFiltering = true
+        }
+        
+        Task.detached(priority: .high) { [weak self] in
+            guard let self else { return }
+            
+            let searchTextIsEmpty = await MainActor.run { return self.searchText.isEmpty }
+            if !searchTextIsEmpty {
+                let searchFiltered = await self.getFilteredTransactionWithSearchText(arrayToFilter: filteredTransactions)
+                self.searchedTransactions = searchFiltered
+                Task { await self.setFilteredTransactionsCurrencies(for: searchFiltered) }
+                
+                let groups = self.groupAndSortTransactionArray(searchFiltered)
+                
+                await MainActor.run {
+                    self.isFiltering = false
+                    withAnimation {
+                        self.filteredTransactionGroups = groups
+                    }
+                }
+            } else {
+                let groups = self.groupAndSortTransactionArray(filteredTransactions)
+                self.searchedTransactions = filteredTransactions
+                Task { [filteredTransactions] in
+                    await self.setFilteredTransactionsCurrencies(for: filteredTransactions)
+                }
+                
+                await MainActor.run {
+                    self.isFiltering = false
+                    withAnimation {
+                        self.filteredTransactionGroups = groups
+                    }
+                }
+            }
+        }
+    }
+    
+    private func setFilteredTransactionsCurrencies(for transactins: [Transaction]) async {
+        await MainActor.run {
+            filteredTransactionsCurrencies = []
+        }
+        var currencies: Set<String> = []
+        for transactin in transactins {
+            if let currency = transactin.balanceAccount?.currency {
+                currencies.insert(currency)
+            }
+        }
+        
+        let currenciesArray = Array(currencies)
+        await MainActor.run {
+            filteredTransactionsCurrencies = currenciesArray
+        }
+    }
+    
+    private func getFilteredTransactionWithSearchText(arrayToFilter: [Transaction]) async -> [Transaction] {
+        let immutableCopyString = await MainActor.run { return searchText }
+        // Check if it is number
+        var copyString = immutableCopyString
+        if copyString.contains(",") {
+            copyString.replace(",", with: ".")
+        }
+        
+        if copyString.contains(" ") {
+            copyString.replace(" ", with: "")
+        }
+        let floatSearchNumber = Float(copyString)
+        let isNumber = floatSearchNumber != nil
+        
+        return arrayToFilter
+            .filter { trans in
+                // If searchText is number
+                var valueIsEqual = false
+                if isNumber {
+                    valueIsEqual = trans.value == floatSearchNumber
+                }
+                
+                // if searchText is text
+                guard let balanceAccount = trans.balanceAccount, let category = trans.category else { return false }
+                
+                let baNameHasSuchString = balanceAccount.name.localizedCaseInsensitiveContains(immutableCopyString)
+                let currencyHasSuchString = balanceAccount.currency.localizedCaseInsensitiveContains(immutableCopyString)
+                let catNameHasSuchString = category.name.localizedCaseInsensitiveContains(immutableCopyString)
+                let tagsHaveSuchString = trans.tags.map { $0.name }.joined().localizedCaseInsensitiveContains(immutableCopyString)
+                let commentHasSuchString = trans.comment.localizedCaseInsensitiveContains(immutableCopyString)
+                
+                return (valueIsEqual || baNameHasSuchString || currencyHasSuchString || catNameHasSuchString || tagsHaveSuchString || commentHasSuchString)
+            }
+    }
+    
+    private func groupAndSortTransactionArray(_ array: [Transaction]) -> [TransactionGroupedData] {
+        return array
+            .grouped { trans in
+                let year = self.calendar.component(.year, from: trans.date)
+                let month = self.calendar.component(.month, from: trans.date)
+                let day = self.calendar.component(.day, from: trans.date)
+                return DateComponents(year: year, month: month, day: day)
+            }
+            .map { dictTuple in
+                let date = self.calendar.date(from: dictTuple.key) ?? .now
+                return TransactionGroupedData(date: date, transactions: dictTuple.value)
+            }
+            .sorted { $0.date > $1.date }
+    }
+    
+    private func fetchAllData(errorHandler: (@Sendable (Error) -> Void)? = nil, competionHandler: (@Sendable () -> Void)? = nil) {
+        Task.detached(priority: .medium) { 
+            await MainActor.run {
+                self.isFetching = true
+            }
+            print("SearchViewModel, fetchAllData: starts fetching categories")
+            await self.fetchCategories(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching tags")
+            await self.fetchTags(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching balance accounts")
+            await self.fetchBalanceAccounts(errorHandler: errorHandler)
+            print("SearchViewModel, fetchAllData: starts fetching transactions")
+            await self.fetchTransactions(errorHandler: errorHandler)
+            await MainActor.run {
+                self.isFetching = false
+            }
+            print("SearchViewModel, fetchAllData: ended all fetch")
+            competionHandler?()
+        }
+    }
+    
+    private func fetchTransactions(showFetching: Bool = false, errorHandler: ((Error) -> Void)? = nil) async {
+        if showFetching {
+            await MainActor.run {
+                isFetching = true
+            }
+        }
+        
+        let lowerBound = dateFilterRange.lowerBound
+        let upperBound = dateFilterRange.upperBound
+        let predicate = #Predicate<Transaction> {
+            (lowerBound...upperBound).contains($0.date)
+        }
+        let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
+        
+        do {
+            let fetchedTransactions: [Transaction] = try await dataManager.fetchFromBackground(descriptor)
+            allTransactions = fetchedTransactions
+        } catch {
+            errorHandler?(error)
+        }
+        
+        if showFetching {
+            await MainActor.run {
+                isFetching = false
+            }
+        }
+    }
+    
+    private func fetchCategories(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
+        guard let fetchedCategories: [Category] = await fetch(sortBy: [SortDescriptor<Category>(\.placement)]) else {
+            errorHandler?(FetchErrors.unableToFetchCategories)
+            return
+        }
+        
+        await MainActor.run {
+            self.allCategories = fetchedCategories
+        }
+    }
+    
+    private func fetchTags(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
+        guard let fetchedTags: [Tag] = await fetch() else {
+            errorHandler?(FetchErrors.unableToFetchTags)
+            return
+        }
+        
+        await MainActor.run {
+            self.allTags = fetchedTags
+        }
+    }
+    
+    private func fetchBalanceAccounts(errorHandler: (@Sendable (Error) -> Void)? = nil) async {
+        guard let fetchedBalanceAccounts: [BalanceAccount] = await fetch() else {
+            errorHandler?(FetchErrors.unableToFetchBalanceAccounts)
+            return
+        }
+        
+        await MainActor.run {
+            self.allBalanceAccounts = fetchedBalanceAccounts
+        }
+    }
+    
+    private func fetch<T>(withPredicate: Predicate<T>? = nil, sortBy: [SortDescriptor<T>] = []) async -> [T]? where T: PersistentModel, T: Sendable {
+        let descriptor = FetchDescriptor<T>(
+            predicate: withPredicate,
+            sortBy: sortBy
+        )
+        
+        do {
+            let fetchedItems = try await dataManager.fetchFromBackground(descriptor)
+            return fetchedItems
+        } catch {
+            print(error.localizedDescription)
+            return nil
+        }
+    }
+}
+
+//MARK: - Extensions
+extension SearchViewModel: CustomTabViewModelDelegate {
+    var id: String {
+        "SearchViewModel"
+    }
+    
+    func addButtonPressed() {
+        return
+    }
+    
+    func didUpdateData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .update)
+        }
+    }
+    
+    func didAddData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .add)
+        }
+    }
+    
+    func didDeleteData(for dataType: SettingsSectionAndDataType, from tabView: TabViewType) {
+        guard tabView != .searchView else { return }
+        
+        Task {
+            await getUpdateFromTabView(for: dataType, from: tabView, action: .delete)
+        }
+    }
+    
+    private func getUpdateFromTabView(for dataType: SettingsSectionAndDataType, from tabView: TabViewType, action: DataAction) async {
+        switch dataType {
+        case .transactions(let transaction):
+            if let transaction {
+                guard dateFilterRange.contains(transaction.date) else {
+                    print("SearchViewModel: Ignoring transaction which is not in date filter range, transaction id: \(transaction.id)")
+                    return
+                }
+                
+                switch action {
+                case .add:
+                    do {
+                        let transactionID = transaction.id
+                        guard let addedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) else {
+                            print("ERROR SearchViewModel: Error fetching single transaction: No transaction found with id: \(transactionID)")
+                            await fetchTransactions()
+                            break
+                        }
+                        print("SearchViewModel: Adding transaction with id: \(addedTransaction.id)")
+                        allTransactions.append(addedTransaction)
+                    } catch {
+                        print("ERROR SearchViewModel: Error fetching single transaction: \(error)")
+                        await fetchTransactions()
+                    }
+                case .delete:
+                    let transactionID = transaction.id
+                    if let index = allTransactions.firstIndex(where: { $0.id == transactionID }) {
+                        print("SearchViewModel: Deleting transaction from array")
+                        allTransactions.remove(at: index)
+                    } else {
+                        print("ERROR SearchViewModel: No transaction found with such id in array for deletion")
+                        await fetchTransactions()
+                    }
+                case .update:
+                    do {
+                        let transactionID = transaction.id
+                        if let index = allTransactions.firstIndex(where: { $0.id == transactionID }),
+                           let updatedTransaction = try await dataManager.fetchSingleFromBackground(withPredicate: #Predicate<Transaction> { $0.id == transactionID }) {
+                            print("SearchViewModel: Updating transaction with id: \(updatedTransaction.id)")
+                            allTransactions[index] = updatedTransaction
+                        } else {
+                            print("ERROR SearchViewModel: Error fetching single transaction: No transaction found with id, or there is no transaction with id in transactions array: \(transactionID)")
+                            await fetchTransactions()
+                        }
+                    } catch {
+                        print("ERROR SearchViewModel: Error fetching single transaction: \(error)")
+                        await fetchTransactions()
+                    }
+                case .doNothing:
+                    return
+                }
+                
+                filterAndSetTransactions()
+            } else {
+                print("ERROR SearchViewModel: Provided transaction for action \(action) is nil")
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
+            
+        case .balanceAccounts:
+            await fetchBalanceAccounts()
+            
+        case .categories:
+            await fetchCategories()
+            
+        case .tags:
+            await fetchTags()
+            
+        case .data:
+            fetchAllData(competionHandler:  { [weak self] in
+                self?.filterAndSetTransactions()
+            })
+        case .transfers, .budgets, .appearance, .notifications, .advancedAnalytics:
+            break
+        }
+    }
+}
+
+extension SearchViewModel: AddingSpendIcomeViewModelDelegate {
+    func didAddBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didUpdateBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didDeleteBalanceAccount(_ balanceAccount: BalanceAccount, from tabView: TabViewType) {
+        Task {
+            await fetchBalanceAccounts()
+        }
+    }
+    
+    func didAddCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func didUpdateCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func didDeleteCategory(_ category: Category, from tabView: TabViewType) {
+        Task {
+            await fetchCategories()
+        }
+    }
+    
+    func addedNewTransaction(_ transaction: Transaction) {
+        allTransactions.append(transaction)
+        filterAndSetTransactions()
+        delegate?.didAddTransaction(transaction, from: .searchView)
+    }
+    
+    func updateTransaction(_ transaction: Transaction) {
+        filterAndSetTransactions()
+        delegate?.didUpdateTransaction(transaction, from: .searchView)
+    }
+    
+    func deletedTransaction(_ transaction: Transaction) {
+        Task {
+            let transactionID = transaction.id
+            if let index = allTransactions.firstIndex(where: { $0.id == transactionID }) {
+                allTransactions.remove(at: index)
+                filterAndSetTransactions()
+            } else {
+                await fetchTransactions()
+                filterAndSetTransactions()
+            }
+            delegate?.didDeleteTransaction(transaction, from: .searchView)
+        }
+    }
+    
+    func transactionsTypeReselected(to newType: TransactionsType) {
+        return
+    }
+}

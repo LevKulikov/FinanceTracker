@@ -1,0 +1,207 @@
+//
+//  ManageDataView.swift
+//  FinanceTracker
+//
+//  Created by Лев Куликов on 25.06.2024.
+//
+
+import SwiftUI
+import UniformTypeIdentifiers
+
+struct ManageDataView: View {
+    //MARK: - Properties
+    @StateObject private var viewModel: ManageDataViewModel
+    
+    @State private var deleteTransactionsFirstAlert = false
+    @State private var deleteTransactionsSecondAlert = false
+    
+    @State private var deleteAllDataFirstAlert = false
+    @State private var deleteAllDataSecondAlert = false
+    
+    @State private var showFileImporter = false
+    
+    //MARK: - Initializer
+    init(viewModel: ManageDataViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
+    //MARK: - Body
+    var body: some View {
+        NavigationStack {
+            List {
+                csvSection
+                
+                jsonSection
+                
+                Section {
+                    deleteAllTransactionsRow
+                }
+                
+                Section {
+                    deleteAllStoredDataRow
+                }
+            }
+            .navigationTitle("Data settings")
+            .sheet(item: $viewModel.fileToExport, content: { item in
+                ActivityView(activityItems: [item])
+                    .ignoresSafeArea(edges: .bottom)
+            })
+            .alert("JSON creation error", isPresented: .init(get: { viewModel.dataExportError != nil }, set: {_ in viewModel.dataExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred while creating a JSON file. Error text: \(viewModel.dataExportError?.localizedDescription ?? "no text")")
+            }
+            .alert("Excel (csv) file creation error", isPresented: .init(get: { viewModel.csvExportError != nil }, set: {_ in viewModel.csvExportError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during creating a Excel (csv) file. Error text: \(viewModel.csvExportError?.localizedDescription ?? "no text")")
+            }
+            .fullScreenCover(item: $viewModel.decodedContainer) { container in
+                ImportDataPreview(container: container) {
+                    viewModel.deleteAndImportData()
+                }
+            }
+        }
+    }
+    
+    //MARK: - Computed view props
+    private var deleteAllTransactionsRow: some View {
+        Button {
+            deleteTransactionsFirstAlert.toggle()
+        } label: {
+            Label("Delete all transactions", systemImage: "trash")
+                .foregroundStyle(.red)
+        }
+        .listRowBackground(Color.red.opacity(0.1))
+        .confirmationDialog("Delete all transactions?", isPresented: $deleteTransactionsFirstAlert, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                deleteTransactionsSecondAlert.toggle()
+            }
+        } message: {
+            Text("Are you sure? All transactions will be deleted, this action is irretable")
+        }
+        .alert("Final alert!", isPresented: $deleteTransactionsSecondAlert) {
+            Button("Yes, delete", role: .destructive) {
+                viewModel.deleteAllTransactions {
+                    Toast.shared.present(
+                        title: String(localized: "Transactions are deleted"),
+                        symbol: "trash"
+                    )
+                }
+            }
+            
+            Button("No, cancel", role: .cancel, action: {})
+        } message: {
+            Text("Again, this action is irretable. Do you want to delete all transactions?")
+        }
+    }
+    
+    private var deleteAllStoredDataRow: some View {
+        Button {
+            deleteAllDataFirstAlert.toggle()
+        } label: {
+            Label("Delete all stored data", systemImage: "trash")
+                .foregroundStyle(.red)
+        }
+        .listRowBackground(Color.red.opacity(0.1))
+        .confirmationDialog("Delete all data?", isPresented: $deleteAllDataFirstAlert, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                deleteAllDataSecondAlert.toggle()
+            }
+        } message: {
+            Text("Are you sure? All stored data (transactions, balance accounts, categories etc.) will be deleted, this action is irretable \n\nYour can delete only transactions if you would like")
+        }
+        .alert("Final alert!", isPresented: $deleteAllDataSecondAlert) {
+            Button("Yes, delete anyway", role: .destructive) {
+                viewModel.deleteAllStoredData {
+                    Toast.shared.present(
+                        title: String(localized: "Data is deleted"),
+                        symbol: "trash"
+                    )
+                }
+            }
+            
+            Button("No, cancel", role: .cancel, action: {})
+        } message: {
+            Text("Again, this action is irretable. If you are concerned about privacy, your data is stored only on your device. Do you want to delete all stored data?")
+        }
+    }
+    
+    private var jsonSection: some View {
+        Section {
+            HStack {
+                Button("Export all data as JSON file", systemImage: "square.and.arrow.up") {
+                    viewModel.getDataToExport()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataFetchingForExport {
+                    ProgressView()
+                }
+            }
+            
+            HStack {
+                Button("Import data from JSON file", systemImage: "square.and.arrow.down") {
+                    showFileImporter.toggle()
+                }
+                
+                Spacer()
+                
+                if viewModel.isDataDecoding {
+                    ProgressView()
+                }
+            }
+            .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.json]) { result in
+                importFile(result: result)
+            }
+            .alert("File decoding error", isPresented: .init(get: { viewModel.dataDecodingError != nil }, set: {_ in viewModel.dataDecodingError = nil })) {
+                Button("Ok") { }
+            } message: {
+                Text("An error occurred during decoding selected file. Error text: \(viewModel.dataDecodingError?.localizedDescription ?? "no text"). Probably, you selected wrong file ")
+            }
+        }
+    }
+    
+    private var csvSection: some View {
+        Section {
+            HStack {
+                Button("Export transactions as Excel file (csv) for date range", systemImage: "tablecells.badge.ellipsis") {
+                    viewModel.getCSVToExport()
+                }
+                .foregroundStyle(Color.green)
+                
+                if viewModel.isDataFetchingForCSVExport {
+                    ProgressView()
+                }
+            }
+            
+            DateRangePicker(startDate: $viewModel.csvStartDate, endDate: $viewModel.csvEndDate, dateRange: FTAppAssets.availableDateRange)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+    
+    //MARK: - Methods
+    private func importFile(result: Result<URL, any Error>) {
+        Task {
+            do {
+                let fileURL = try result.get()
+                if fileURL.startAccessingSecurityScopedResource() {
+                    await viewModel.getDataFromImportedJSON(fileURL: fileURL)
+                }
+                fileURL.stopAccessingSecurityScopedResource()
+            } catch {
+                await MainActor.run {
+                    viewModel.dataDecodingError = error
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    let dataManger = DataManager(container: FinanceTrackerApp.createModelContainer())
+    let viewModel = ManageDataViewModel(dataManager: dataManger)
+    
+    return ManageDataView(viewModel: viewModel)
+}
