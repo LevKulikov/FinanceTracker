@@ -230,6 +230,7 @@ struct CustomTabView: View  {
                 }
             }
         }
+        .shadow(radius: 7)
         .contentShape([.hoverEffect, .contextMenuPreview], Circle())
         .hoverEffect(.highlight)
     }
