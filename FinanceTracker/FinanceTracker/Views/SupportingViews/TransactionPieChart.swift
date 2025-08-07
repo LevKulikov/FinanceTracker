@@ -8,13 +8,6 @@
 import SwiftUI
 import Charts
 
-struct TransactionPieChartData: Identifiable {
-    let id = UUID().uuidString
-    let category: Category
-    let sumValue: Float
-    let transactions: [Transaction]
-}
-
 @MainActor
 struct TransactionPieChart: View {
     //MARK: - Properties

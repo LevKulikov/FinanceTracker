@@ -8,33 +8,6 @@
 import SwiftUI
 import Charts
 
-enum TransactionCalculationValueType: LocalizedStringResource {
-    case spending = "Spending"
-    case income = "Income"
-    case profit = "Profit"
-    case unknown = "Unknown"
-    
-    var color: Color {
-        switch self {
-        case .spending:
-            return .red
-        case .income:
-            return .green
-        case .profit:
-            return .blue
-        case .unknown:
-            return .yellow
-        }
-    }
-}
-
-struct TransactionBarChartData: Identifiable, Hashable {
-    let id: String = UUID().uuidString
-    let type: TransactionCalculationValueType
-    let value: Float
-    let date: Date
-}
-
 @MainActor
 struct TransactionBarChart: View {
     //MARK: Properties
@@ -150,7 +123,12 @@ struct TransactionBarChart: View {
     @State private var windowSize: CGSize = FTAppAssets.getWindowSize()
     
     //MARK: - Init
-    init(transactionsData: [[TransactionBarChartData]], perDate: Binding<BarChartPerDateFilter>, transactionType: Binding<TransactionFilterTypes>, xScaleEndDate: Date = .now) {
+    init(
+        transactionsData: [[TransactionBarChartData]],
+        perDate: Binding<BarChartPerDateFilter>,
+        transactionType: Binding<TransactionFilterTypes>,
+        xScaleEndDate: Date = .now
+    ) {
         self.transactionsData = transactionsData
         self._perDate = perDate
         self._transactionType = transactionType
