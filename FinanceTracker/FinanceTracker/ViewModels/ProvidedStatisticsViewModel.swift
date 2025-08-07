@@ -17,7 +17,13 @@ struct TotalValueData: Identifiable {
 /// ViewModel for View, thats represents statistics for provided transactions and other data. This view model does not fetch any data by itself
 final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: - Properties
-    
+    ///Currency code String
+    let currency: String
+    /// Currency struct with code, name, symbol and etc.
+    let currencyPrecised: Currency?
+    @MainActor var showStatValuesSection: Bool {
+        middleValue != nil || minValue != nil || maxValue != nil
+    }
     
     //MARK: Published properties
     @MainActor @Published private(set) var providedTransactionType: TransactionFilterTypes = .both
@@ -25,6 +31,18 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     
     /// Array of total values. Its is array because of there can be different transaction types so it is needed to get total values for spendings, income and profit
     @MainActor @Published private(set) var totalValues: [TotalValueData] = []
+    
+    @MainActor @Published private(set) var middleValue: TransactionTypedValue?
+    @MainActor @Published private(set) var minValue: TransactionTypedValue?
+    @MainActor @Published private(set) var maxValue: TransactionTypedValue?
+    @MainActor @Published var statsValuesTransactionType: TransactionsType = .spending {
+        didSet {
+            guard statsValuesTransactionType != oldValue else { return }
+            Task {
+                await calculateStatsValues()
+            }
+        }
+    }
     
     @MainActor @Published private(set) var pieChartTransactionData: [TransactionPieChartData] = []
     @MainActor @Published private(set) var pieDataIsCalculating = false
@@ -59,10 +77,6 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
     //MARK: Private properties
     /// Transactions to calculate statistics for
     private let transactions: [Transaction]
-    ///Currency code String
-    let currency: String
-    /// Currency struct with code, name, symbol and etc.
-    let currencyPrecised: Currency?
     private let calendar = Calendar.current
     
     //MARK: - Initializer
@@ -91,6 +105,10 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
             await withTaskGroup(of: Void.self) { taskGroup in
                 taskGroup.addTask {
                     await self.calculateTotalValues()
+                }
+                
+                taskGroup.addTask {
+                    await self.calculateStatsValues()
                 }
                 
                 taskGroup.addTask {
@@ -177,6 +195,61 @@ final class ProvidedStatisticsViewModel: ObservableObject, @unchecked Sendable {
             await MainActor.run { [incomeData, spendingData] in
                 totalValues = [incomeData, spendingData, profitData]
             }
+        }
+    }
+    
+    private func calculateStatsValues() async {
+        guard !transactions.isEmpty else { return }
+        var minValue: Float?
+        var maxValue: Float?
+        
+        let typeCopy = await MainActor.run { statsValuesTransactionType }
+        let filteredTransaction = transactions
+            .filter { $0.type == typeCopy }
+        
+        guard !filteredTransaction.isEmpty else {
+            await MainActor.run {
+                middleValue = TransactionTypedValue(
+                    type: .convert(from: typeCopy),
+                    value: 0,
+                    description: "No transactions"
+                )
+                minValue = nil
+                maxValue = nil
+            }
+            return
+        }
+        
+        let summ = filteredTransaction.reduce(0 as Float) { partialResult, transaction in
+            let transValue = transaction.value
+            minValue = (minValue ?? transValue) < transValue ? minValue : transValue
+            maxValue = (maxValue ?? transValue) > transValue ? maxValue : transValue
+            
+            return partialResult + transValue
+        }
+        
+        let midValue = summ / Float(filteredTransaction.count)
+        
+        await MainActor.run {
+            let convertedType = TransactionCalculationValueType.convert(from: typeCopy)
+            
+            middleValue = TransactionTypedValue(
+                type: convertedType,
+                value: midValue,
+                description: "Both types middle value"
+            )
+            
+            self.minValue = minValue == nil ? nil : TransactionTypedValue(
+                type: convertedType,
+                value: minValue ?? 0,
+                description: "Both types minimal value"
+            )
+            
+            self.maxValue = maxValue == nil ? nil : TransactionTypedValue(
+                type: convertedType,
+                value: maxValue ?? 0,
+                description: "Both types maximum value"
+            )
         }
     }
     

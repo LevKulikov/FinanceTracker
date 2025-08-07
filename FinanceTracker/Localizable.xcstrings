@@ -629,6 +629,15 @@
         }
       }
     },
+    "Both types maximum value" : {
+
+    },
+    "Both types middle value" : {
+
+    },
+    "Both types minimal value" : {
+
+    },
     "Budget" : {
       "localizations" : {
         "ru" : {
@@ -2009,6 +2018,15 @@
         }
       }
     },
+    "Max" : {
+
+    },
+    "Middle" : {
+
+    },
+    "Min" : {
+
+    },
     "More" : {
       "localizations" : {
         "ru" : {
@@ -3024,6 +3042,9 @@
           }
         }
       }
+    },
+    "Stats values picker" : {
+
     },
     "Stored data" : {
       "localizations" : {

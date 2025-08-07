@@ -20,6 +20,18 @@ struct ProvidedStatisticsView: View {
     private var cellColor: Color {
         colorScheme == .light ? Color(.systemBackground) : Color(.secondarySystemBackground)
     }
+    private var outerCellModifier: some ViewModifier {
+        StatisticCellModifier(
+            cornerRadius: 15,
+            backgroundColor: cellColor
+        )
+    }
+    private var innerCellModifier: some ViewModifier {
+        StatisticCellModifier(
+            cornerRadius: 10,
+            backgroundColor: backgroundColor
+        )
+    }
     
     //MARK: - Initializer
     init(viewModel: ProvidedStatisticsViewModel) {
@@ -32,6 +44,10 @@ struct ProvidedStatisticsView: View {
             ScrollView {
                 VStack {
                     totalsSection
+                    
+                    if viewModel.showStatValuesSection {
+                        statValuesView
+                    }
                     
                     pieChartSection
                     
@@ -66,7 +82,7 @@ struct ProvidedStatisticsView: View {
             ForEach(viewModel.totalValues) { totalValue in
                 HStack {
                     HStack {
-                        Text(FTFormatters.numberFormatterWithDecimals.string(for: totalValue.value) ?? "Err")
+                        Text(formatNumber(totalValue.value))
                         if let currency = viewModel.currencyPrecised {
                             Text(currency.symbol)
                         }
@@ -75,21 +91,72 @@ struct ProvidedStatisticsView: View {
                             .foregroundStyle(totalValue.type.color)
                             .layoutPriority(1)
                     }
-                    .padding()
-                    .background {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(backgroundColor)
-                    }
+                    .modifier(innerCellModifier)
                     
                     Spacer()
                 }
             }
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(cellColor)
+        .modifier(outerCellModifier)
+    }
+    
+    private var statValuesView: some View {
+        VStack {
+            HStack {
+                if let middleValue = viewModel.middleValue {
+                    HStack {
+                        Text("Middle")
+                            .layoutPriority(1)
+                            .foregroundStyle(.secondary)
+                        Text(formatNumber(middleValue.value))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .modifier(innerCellModifier)
+                    .lineLimit(1)
+                }
+                
+                if viewModel.providedTransactionType == .both {
+                    Menu(String(localized: viewModel.statsValuesTransactionType.localizedString)) {
+                        Picker("Stats values picker", selection: $viewModel.statsValuesTransactionType) {
+                            ForEach(TransactionsType.allCases) { type in
+                                Text(type.localizedString)
+                                    .tag(type)
+                            }
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .hoverEffect(.highlight)
+                }
+            }
+            
+            HStack {
+                if let minValue = viewModel.minValue {
+                    HStack {
+                        Text("Min")
+                            .layoutPriority(1)
+                            .foregroundStyle(.secondary)
+                        Text(formatNumber(minValue.value))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .modifier(innerCellModifier)
+                    .lineLimit(1)
+                }
+                
+                if let maxValue = viewModel.maxValue {
+                    HStack {
+                        Text("Max")
+                            .foregroundStyle(.secondary)
+                            .layoutPriority(1)
+                        Text(formatNumber(maxValue.value))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .modifier(innerCellModifier)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                }
+            }
         }
+        .modifier(outerCellModifier)
     }
     
     private var pieChartSection: some View {
@@ -123,11 +190,7 @@ struct ProvidedStatisticsView: View {
             TransactionPieChart(transactionGroups: viewModel.pieChartTransactionData)
             .padding(.bottom)
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(cellColor)
-        }
+        .modifier(outerCellModifier)
         .frame(height: pieChartHeight)
     }
     
@@ -191,14 +254,27 @@ struct ProvidedStatisticsView: View {
                 Spacer()
             }
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(cellColor)
-        }
+        .modifier(outerCellModifier)
     }
     
     //MARK: - Methods
+    private func formatNumber<T: Numeric>(_ number: T) -> String {
+        FTFormatters.numberFormatterWithDecimals.string(for: number) ?? "Err"
+    }
+}
+
+struct StatisticCellModifier: ViewModifier {
+    let cornerRadius: CGFloat
+    let backgroundColor: Color
+    
+    func body(content: Content) -> some View {
+        content
+            .padding()
+            .background {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(backgroundColor)
+            }
+    }
 }
 
 #Preview {

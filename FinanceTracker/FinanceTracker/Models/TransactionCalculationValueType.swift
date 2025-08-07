@@ -26,4 +26,12 @@ enum TransactionCalculationValueType: LocalizedStringResource {
             return .yellow
         }
     }
+    
+    static func convert(from type: TransactionsType?) -> TransactionCalculationValueType {
+        switch type {
+        case .spending: .spending
+        case .income: .income
+        case nil: .unknown
+        }
+    }
 }
