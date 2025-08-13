@@ -106,10 +106,13 @@ struct ProvidedStatisticsView: View {
                 if let middleValue = viewModel.middleValue {
                     HStack {
                         Text("Middle")
-                            .layoutPriority(1)
+                            .layoutPriority(1.5)
                             .foregroundStyle(.secondary)
+                    
+                        statsValuseSeparator
+                        
                         Text(formatNumber(middleValue.value))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .frame(alignment: .trailing)
                     }
                     .modifier(innerCellModifier)
                     .lineLimit(1)
@@ -126,6 +129,7 @@ struct ProvidedStatisticsView: View {
                     }
                     .buttonStyle(.bordered)
                     .hoverEffect(.highlight)
+                    .layoutPriority(2)
                 }
             }
             
@@ -133,30 +137,46 @@ struct ProvidedStatisticsView: View {
                 if let minValue = viewModel.minValue {
                     HStack {
                         Text("Min")
-                            .layoutPriority(1)
+                            .layoutPriority(1.5)
                             .foregroundStyle(.secondary)
+                        
+                        statsValuseSeparator
+                        
                         Text(formatNumber(minValue.value))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .frame(alignment: .trailing)
+                            .layoutPriority(1)
                     }
                     .modifier(innerCellModifier)
                     .lineLimit(1)
+                    .layoutPriority(2)
                 }
                 
                 if let maxValue = viewModel.maxValue {
                     HStack {
                         Text("Max")
                             .foregroundStyle(.secondary)
-                            .layoutPriority(1)
+                            .layoutPriority(1.5)
+                        
+                        statsValuseSeparator
+                        
                         Text(formatNumber(maxValue.value))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .frame(alignment: .trailing)
                     }
                     .modifier(innerCellModifier)
                     .lineLimit(1)
                     .fixedSize(horizontal: true, vertical: false)
+                    .layoutPriority(2)
                 }
             }
         }
         .modifier(outerCellModifier)
+    }
+    
+    private var statsValuseSeparator: some View {
+        RoundedRectangle(cornerRadius: 1.5)
+            .frame(height: 3)
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.tertiary)
     }
     
     private var pieChartSection: some View {

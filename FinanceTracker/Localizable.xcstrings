@@ -2019,13 +2019,34 @@
       }
     },
     "Max" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Макс."
+          }
+        }
+      }
     },
     "Middle" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сред."
+          }
+        }
+      }
     },
     "Min" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мин."
+          }
+        }
+      }
     },
     "More" : {
       "localizations" : {
@@ -3044,7 +3065,14 @@
       }
     },
     "Stats values picker" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбор статистических значений"
+          }
+        }
+      }
     },
     "Stored data" : {
       "localizations" : {
